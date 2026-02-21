@@ -1,24 +1,51 @@
+"use client";
+
 import Link from "next/link";
-import { ArrowRight, ShieldAlert, HeartPulse, SmartphoneNfc, CheckCircle2 } from "lucide-react";
+import { ArrowRight, ShieldAlert, HeartPulse, SmartphoneNfc, CheckCircle2, Menu, X } from "lucide-react";
+import { useState } from "react";
 
 export default function Home() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   return (
     <div className="min-h-screen flex flex-col items-center">
       {/* Navigation */}
-      <nav className="w-full flex justify-between items-center py-6 px-8 max-w-7xl mx-auto border-b border-border/40">
+      <nav className="w-full flex justify-between items-center py-6 px-8 max-w-7xl mx-auto border-b border-border/40 relative z-50">
         <div className="flex items-center gap-3">
           <div className="bg-primary/10 p-2 rounded-xl text-primary">
             <HeartPulse size={28} />
           </div>
           <span className="text-xl font-bold tracking-tight">RescueChip</span>
         </div>
-        <div className="flex items-center gap-6">
+
+        {/* Desktop Menu */}
+        <div className="hidden md:flex items-center gap-6">
           <Link href="#caracteristicas" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Características</Link>
           <Link href="#como-funciona" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Cómo funciona</Link>
           <Link href="/activate" className="text-sm font-semibold bg-primary text-primary-foreground px-5 py-2.5 rounded-full hover:bg-primary/90 transition-all shadow-sm">
             Activar Chip
           </Link>
         </div>
+
+        {/* Mobile Menu Toggle */}
+        <button
+          className="md:hidden p-2 text-foreground"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          aria-label="Toggle menu"
+        >
+          {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+        </button>
+
+        {/* Mobile Menu Dropdown */}
+        {isMenuOpen && (
+          <div className="absolute top-full left-0 w-full bg-background border-b border-border shadow-lg py-4 px-8 flex flex-col gap-4 md:hidden animate-[fade-in-up_0.2s_ease-out_forwards]">
+            <Link href="#caracteristicas" onClick={() => setIsMenuOpen(false)} className="text-lg font-medium py-2 border-b border-border/50">Características</Link>
+            <Link href="#como-funciona" onClick={() => setIsMenuOpen(false)} className="text-lg font-medium py-2 border-b border-border/50">Cómo funciona</Link>
+            <Link href="/activate" onClick={() => setIsMenuOpen(false)} className="text-lg font-semibold bg-primary text-primary-foreground px-5 py-3 rounded-xl text-center mt-2 shadow-md">
+              Activar Chip
+            </Link>
+          </div>
+        )}
       </nav>
 
       <main className="flex-1 w-full flex flex-col items-center">

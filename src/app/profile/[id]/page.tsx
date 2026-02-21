@@ -239,7 +239,7 @@ export default async function ProfilePage({ params }: ProfileProps) {
 
                                 <div className="space-y-4 relative z-10">
                                     {emergencyContactsArray.map((contact, idx) => (
-                                        <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white/60 dark:bg-black/20 p-3 rounded-xl border border-destructive/10">
+                                        <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3 rounded-xl border border-destructive/10 shadow-sm">
                                             <div>
                                                 <p className="text-base font-bold text-foreground">{contact.name}</p>
                                                 <p className="text-xs font-semibold text-muted-foreground uppercase">Contacto {idx + 1}</p>
