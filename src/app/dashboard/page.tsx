@@ -18,6 +18,10 @@ export default function DashboardPage() {
     const [profileId, setProfileId] = useState("");
     const [folio, setFolio] = useState("");
 
+    // Photo
+    const [photoFile, setPhotoFile] = useState<File | null>(null);
+    const [currentPhotoUrl, setCurrentPhotoUrl] = useState<string | null>(null);
+
     // Form fields
     const [fullName, setFullName] = useState("");
     const [age, setAge] = useState("");
@@ -66,6 +70,7 @@ export default function DashboardPage() {
                 // Populate state
                 setProfileId(profile.id);
                 setFolio(profile.chips?.folio || "");
+                setCurrentPhotoUrl(profile.photo_url || null);
 
                 setFullName(profile.full_name || "");
                 setAge(profile.age ? profile.age.toString() : "");
@@ -125,10 +130,30 @@ export default function DashboardPage() {
                 throw new Error("Debes proporcionar al menos un contacto de emergencia.");
             }
 
+            let newPhotoUrl = currentPhotoUrl;
+            if (photoFile) {
+                const fileExt = photoFile.name.split('.').pop();
+                const fileName = `${folio}-${Math.random()}.${fileExt}`;
+                const { data: uploadData, error: uploadError } = await supabase.storage
+                    .from('profile-photos')
+                    .upload(fileName, photoFile);
+
+                if (uploadError) {
+                    throw new Error("No se pudo subir la nueva foto de perfil. Inténtalo de nuevo.");
+                }
+
+                const { data: publicUrlData } = supabase.storage
+                    .from('profile-photos')
+                    .getPublicUrl(fileName);
+
+                newPhotoUrl = publicUrlData.publicUrl;
+            }
+
             const { error: updateError } = await supabase
                 .from('profiles')
                 .update({
                     full_name: fullName,
+                    photo_url: newPhotoUrl,
                     age: age ? parseInt(age, 10) : null,
                     location: location,
                     emergency_contacts: emergencyContacts,
@@ -241,6 +266,42 @@ export default function DashboardPage() {
                                     Identificación
                                 </h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="space-y-4 md:col-span-2 mt-2 mb-4">
+                                        <label className="text-sm font-semibold">Foto de Perfil</label>
+                                        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                                            {photoFile ? (
+                                                <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-primary bg-muted shrink-0 shadow-md">
+                                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                    <img src={URL.createObjectURL(photoFile)} alt="Preview" className="w-full h-full object-cover" />
+                                                </div>
+                                            ) : currentPhotoUrl ? (
+                                                <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-border/50 bg-muted shrink-0 shadow-sm relative group">
+                                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                    <img src={currentPhotoUrl} alt="Foto actual" className="w-full h-full object-cover" />
+                                                    <div className="absolute inset-0 bg-background/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <span className="text-[10px] text-white font-bold">Actual</span>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="w-20 h-20 rounded-2xl border-2 border-dashed border-muted-foreground flex items-center justify-center bg-muted/50 text-muted-foreground shrink-0 text-2xl">
+                                                    📷
+                                                </div>
+                                            )}
+                                            <div className="flex-1">
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={(e) => {
+                                                        if (e.target.files && e.target.files[0]) {
+                                                            setPhotoFile(e.target.files[0]);
+                                                        }
+                                                    }}
+                                                    className="w-full flex h-14 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 cursor-pointer shadow-sm"
+                                                />
+                                                <p className="text-xs text-muted-foreground mt-2 leading-relaxed font-medium">Sube una nueva foto si deseas cambiar la actual.</p>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div className="space-y-2 md:col-span-2">
                                         <label htmlFor="fullName" className="text-sm font-semibold">Nombre Completo *</label>
                                         <input type="text" id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" required />
