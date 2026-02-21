@@ -32,7 +32,7 @@ export default function ShopPage() {
     };
 
     const getWhatsAppLink = (planName: string) => {
-        const phone = "525531909086";
+        const phone = "525551433904";
         const message = `Hola, me interesa el plan ${planName} de RescueChip para mi agencia/empresa.`;
         return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
     };
