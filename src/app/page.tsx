@@ -39,6 +39,7 @@ export default function Home() {
         <div className="hidden md:flex items-center gap-6">
           <Link href="#caracteristicas" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Características</Link>
           <Link href="#como-funciona" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Cómo funciona</Link>
+          <Link href="/shop" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Tienda</Link>
           <Link href="/activate" className="text-sm font-bold text-primary hover:text-primary/80 transition-colors">Activar Chip</Link>
           {session ? (
             <Link href="/dashboard" className="flex items-center gap-2 text-sm font-semibold bg-primary text-primary-foreground px-5 py-2.5 rounded-full hover:bg-primary/90 transition-all shadow-sm">
@@ -65,6 +66,7 @@ export default function Home() {
           <div className="absolute top-full left-0 w-full bg-background border-b border-border shadow-lg py-4 px-8 flex flex-col gap-4 md:hidden animate-[fade-in-up_0.2s_ease-out_forwards]">
             <Link href="#caracteristicas" onClick={() => setIsMenuOpen(false)} className="text-lg font-medium py-2 border-b border-border/50">Características</Link>
             <Link href="#como-funciona" onClick={() => setIsMenuOpen(false)} className="text-lg font-medium py-2 border-b border-border/50">Cómo funciona</Link>
+            <Link href="/shop" onClick={() => setIsMenuOpen(false)} className="text-lg font-medium py-2 border-b border-border/50">Tienda</Link>
             <Link href="/activate" onClick={() => setIsMenuOpen(false)} className="text-lg font-medium py-2 border-b border-border/50 text-primary">Activar Chip</Link>
             {session ? (
               <Link href="/dashboard" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-center gap-2 text-lg font-semibold bg-primary text-primary-foreground px-5 py-3 rounded-xl text-center mt-2 shadow-md">
