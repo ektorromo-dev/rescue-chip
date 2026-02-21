@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 import Stripe from "stripe";
+
+const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export async function POST(req: NextRequest) {
     try {
@@ -8,7 +14,7 @@ export async function POST(req: NextRequest) {
             apiVersion: "2023-10-16" as any,
         });
 
-        const { paquete } = await req.json();
+        const { paquete, factura_id } = await req.json();
 
         let priceData = {
             product_data: { name: "", description: "" },
@@ -56,9 +62,16 @@ export async function POST(req: NextRequest) {
                 allowed_countries: ["MX"],
             },
             // URLS
-            success_url: `${req.headers.get("origin")}/shop/success?session_id={CHECKOUT_SESSION_ID}`,
+            success_url: `${req.headers.get("origin")}/shop/success?session_id={CHECKOUT_SESSION_ID}${factura_id ? '&factura=true' : ''}`,
             cancel_url: `${req.headers.get("origin")}/shop`,
         });
+
+        if (factura_id) {
+            await supabase
+                .from("factura_requests")
+                .update({ session_id: session.id })
+                .eq("id", factura_id);
+        }
 
         return NextResponse.json({ url: session.url });
     } catch (error: any) {

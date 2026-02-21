@@ -88,3 +88,20 @@ create policy "Public Access to Profile Photos"
 create policy "Allow Inserts to Profile Photos"
   on storage.objects for insert
   with check ( bucket_id = 'profile-photos' );
+
+-- Create 'factura_requests' table (Store Invoice Requests from /shop checkout)
+create table public.factura_requests (
+  id uuid primary key default gen_random_uuid(),
+  session_id text,
+  nombre_fiscal text not null,
+  rfc text not null,
+  regimen_fiscal text not null,
+  uso_cfdi text not null default 'G03',
+  codigo_postal_fiscal text not null,
+  email_factura text not null,
+  whatsapp_factura text not null,
+  paquete text,
+  monto numeric,
+  status text default 'pendiente',
+  created_at timestamp default timezone('utc'::text, now()) not null
+);

@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { CheckCircle2, Home, ArrowRight } from "lucide-react";
 
-export default function SuccessPage() {
+export default function SuccessPage({ searchParams }: { searchParams: { factura?: string } }) {
+    const isFactura = searchParams.factura === 'true';
+
     return (
         <div className="min-h-screen bg-muted flex flex-col items-center justify-center p-4">
             <div className="w-full max-w-md bg-card rounded-[2.5rem] shadow-2xl border border-border/50 overflow-hidden text-center p-10 relative">
@@ -15,6 +17,13 @@ export default function SuccessPage() {
                 <p className="text-muted-foreground leading-relaxed mb-8">
                     Tu pedido está siendo preparado. Recibirás tu chip NFC en 3-7 días hábiles. Una vez que lo recibas, actívalo en nuestra plataforma para estar protegido en todo momento.
                 </p>
+
+                {isFactura && (
+                    <div className="bg-primary/10 border border-primary/20 text-primary-foreground text-sm font-semibold p-4 rounded-xl mb-8 flex flex-col gap-2">
+                        <p className="text-foreground">Solicitaste factura.</p>
+                        <p className="text-muted-foreground font-medium">Recibirás tu CFDI y XML en el correo y WhatsApp que proporcionaste en un máximo de 72 horas hábiles.</p>
+                    </div>
+                )}
 
                 <div className="flex flex-col gap-4">
                     <Link href="/activate" className="flex items-center justify-center gap-2 bg-primary text-primary-foreground h-14 rounded-xl text-lg font-bold hover:scale-[1.02] hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
