@@ -54,8 +54,8 @@ export default function Home() {
           {/* Background decorative elements */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-3xl -z-10" />
 
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent text-accent-foreground text-sm font-medium mb-8 animate-[fade-in-up_0.5s_ease-out_forwards]">
-            <ShieldAlert size={16} />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent text-[#6B7280] text-sm font-medium mb-8 animate-[fade-in-up_0.5s_ease-out_forwards]">
+            <ShieldAlert size={16} className="text-[#ef4444]" />
             <span>Datos médicos cruciales, justo cuando se necesitan.</span>
           </div>
 
@@ -71,7 +71,7 @@ export default function Home() {
             <Link href="/activate" className="flex items-center justify-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-full text-lg font-bold hover:scale-105 hover:bg-primary/90 transition-all shadow-lg shadow-primary/25">
               Activa tu Chip <ArrowRight size={20} />
             </Link>
-            <Link href="/profile/RSC-001" className="flex items-center justify-center gap-2 bg-secondary text-secondary-foreground px-8 py-4 rounded-full text-lg font-bold hover:bg-secondary/80 transition-all">
+            <Link href="/profile/RSC-001" className="flex items-center justify-center gap-2 bg-transparent border-2 border-[#374151] text-[#374151] px-8 py-4 rounded-full text-lg font-bold hover:bg-[#374151]/10 transition-all">
               Ver una Demo
             </Link>
           </div>
