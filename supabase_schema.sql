@@ -10,6 +10,7 @@ create table public.chips (
 create table public.profiles (
   id uuid default gen_random_uuid() primary key,
   chip_id uuid references public.chips(id) on delete cascade not null,
+  user_id uuid references auth.users(id),
   
   -- IDENTIFICACIÓN
   full_name text not null,
@@ -69,6 +70,11 @@ create policy "Allow public read access to profiles"
 create policy "Allow public insert to profiles"
   on public.profiles for insert
   with check (true);
+
+-- Allow authenticated users to update their own profiles (dashboard)
+create policy "Allow users to update own profile"
+  on public.profiles for update
+  using (auth.uid() = user_id);
 
 -- Create storage bucket for profile photos
 -- Run this manually in Supabase SQL editor or via dashboard if it doesn't execute

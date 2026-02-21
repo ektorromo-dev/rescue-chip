@@ -54,6 +54,29 @@ function ActivationFormContent() {
                 throw new Error("Este chip ya ha sido activado previamente.");
             }
 
+            // 1.5 Create Auth User
+            const email = formData.get("email") as string;
+            const password = formData.get("password") as string;
+
+            if (!email || !password) {
+                throw new Error("El correo electrónico y la contraseña son obligatorios para crear tu cuenta.");
+            }
+
+            const { data: authData, error: authError } = await supabase.auth.signUp({
+                email,
+                password,
+            });
+
+            if (authError) {
+                // If user already exists, Supabase throws an error if we try to sign up with the same email.
+                throw new Error("Error al crear cuenta: " + authError.message);
+            }
+
+            const userId = authData.user?.id;
+            if (!userId) {
+                throw new Error("No se pudo crear el usuario o confirmar la cuenta.");
+            }
+
             // Build emergency contacts array dynamically
             const emergencyContacts = [];
 
@@ -108,6 +131,7 @@ function ActivationFormContent() {
                 .from('profiles')
                 .insert({
                     chip_id: chip.id,
+                    user_id: userId,
                     photo_url: photoUrl,
                     full_name: formData.get("fullName") as string,
                     age: age,
@@ -183,6 +207,25 @@ function ActivationFormContent() {
                         <label htmlFor="folio" className="text-sm font-semibold">Número de Folio (incluido en tu paquete) *</label>
                         <input type="text" id="folio" name="folio" value={folio} onChange={(e) => setFolio(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase placeholder:normal-case font-mono" placeholder="Ej. RSC-0001" required />
                     </div>
+                </section>
+
+                {/* CREAR CUENTA */}
+                <section className="space-y-4">
+                    <h3 className="text-xl font-bold flex items-center gap-2 border-b border-border pb-2">
+                        <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">Cuenta</span>
+                        Crear Cuenta
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <label htmlFor="email" className="text-sm font-semibold">Correo Electrónico *</label>
+                            <input type="email" id="email" name="email" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="tu@correo.com" required />
+                        </div>
+                        <div className="space-y-2">
+                            <label htmlFor="password" className="text-sm font-semibold">Contraseña *</label>
+                            <input type="password" id="password" name="password" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Mínimo 6 caracteres" required minLength={6} />
+                        </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground font-medium">Esta cuenta te servirá para iniciar sesión en tu panel (dashboard) y actualizar tus datos en el futuro.</p>
                 </section>
 
                 {/* IDENTIFICACIÓN */}

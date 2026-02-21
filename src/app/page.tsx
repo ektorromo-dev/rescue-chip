@@ -1,11 +1,28 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, ShieldAlert, HeartPulse, SmartphoneNfc, CheckCircle2, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { ArrowRight, ShieldAlert, HeartPulse, SmartphoneNfc, CheckCircle2, Menu, X, LogIn, LayoutDashboard } from "lucide-react";
+import { useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [session, setSession] = useState<any>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col items-center">
@@ -22,9 +39,16 @@ export default function Home() {
         <div className="hidden md:flex items-center gap-6">
           <Link href="#caracteristicas" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Características</Link>
           <Link href="#como-funciona" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Cómo funciona</Link>
-          <Link href="/activate" className="text-sm font-semibold bg-primary text-primary-foreground px-5 py-2.5 rounded-full hover:bg-primary/90 transition-all shadow-sm">
-            Activar Chip
-          </Link>
+          <Link href="/activate" className="text-sm font-bold text-primary hover:text-primary/80 transition-colors">Activar Chip</Link>
+          {session ? (
+            <Link href="/dashboard" className="flex items-center gap-2 text-sm font-semibold bg-primary text-primary-foreground px-5 py-2.5 rounded-full hover:bg-primary/90 transition-all shadow-sm">
+              <LayoutDashboard size={16} /> Mi Panel
+            </Link>
+          ) : (
+            <Link href="/login" className="flex items-center gap-2 text-sm font-semibold bg-primary text-primary-foreground px-5 py-2.5 rounded-full hover:bg-primary/90 transition-all shadow-sm">
+              <LogIn size={16} /> Iniciar Sesión
+            </Link>
+          )}
         </div>
 
         {/* Mobile Menu Toggle */}
@@ -41,9 +65,16 @@ export default function Home() {
           <div className="absolute top-full left-0 w-full bg-background border-b border-border shadow-lg py-4 px-8 flex flex-col gap-4 md:hidden animate-[fade-in-up_0.2s_ease-out_forwards]">
             <Link href="#caracteristicas" onClick={() => setIsMenuOpen(false)} className="text-lg font-medium py-2 border-b border-border/50">Características</Link>
             <Link href="#como-funciona" onClick={() => setIsMenuOpen(false)} className="text-lg font-medium py-2 border-b border-border/50">Cómo funciona</Link>
-            <Link href="/activate" onClick={() => setIsMenuOpen(false)} className="text-lg font-semibold bg-primary text-primary-foreground px-5 py-3 rounded-xl text-center mt-2 shadow-md">
-              Activar Chip
-            </Link>
+            <Link href="/activate" onClick={() => setIsMenuOpen(false)} className="text-lg font-medium py-2 border-b border-border/50 text-primary">Activar Chip</Link>
+            {session ? (
+              <Link href="/dashboard" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-center gap-2 text-lg font-semibold bg-primary text-primary-foreground px-5 py-3 rounded-xl text-center mt-2 shadow-md">
+                <LayoutDashboard size={20} /> Mi Panel
+              </Link>
+            ) : (
+              <Link href="/login" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-center gap-2 text-lg font-semibold bg-primary text-primary-foreground px-5 py-3 rounded-xl text-center mt-2 shadow-md">
+                <LogIn size={20} /> Iniciar Sesión
+              </Link>
+            )}
           </div>
         )}
       </nav>
