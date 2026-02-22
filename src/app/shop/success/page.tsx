@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { CheckCircle2, Home, ArrowRight } from "lucide-react";
 
-export default function SuccessPage({ searchParams }: { searchParams: { factura?: string } }) {
-    const isFactura = searchParams.factura === 'true';
+export default async function SuccessPage({ searchParams }: { searchParams: Promise<{ factura?: string }> }) {
+    const params = await searchParams;
+    const isFactura = params.factura === 'true';
 
     return (
         <div className="min-h-screen bg-muted flex flex-col items-center justify-center p-4">

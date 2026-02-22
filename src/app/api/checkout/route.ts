@@ -14,32 +14,16 @@ export async function POST(req: NextRequest) {
             apiVersion: "2023-10-16" as any,
         });
 
-        const { paquete, shippingData, requiresInvoice, invoiceData, monto } = await req.json();
+        const { paquete, shippingData, factura_id, monto } = await req.json();
 
-        // 1. Crear Factura Request (opcional si lo pidió)
-        let factura_id = null;
-        if (requiresInvoice && invoiceData) {
-            const { data: fData, error: fError } = await supabase
-                .from("factura_requests")
-                .insert([{
-                    ...invoiceData,
-                    paquete,
-                    monto
-                }])
-                .select("id")
-                .single();
-            if (fError) throw new Error("Error creando solicitud de factura: " + fError.message);
-            factura_id = fData.id;
-        }
-
-        // 2. Crear Orden
+        // 1. Crear Orden
         const { data: oData, error: oError } = await supabase
             .from("orders")
             .insert([{
                 ...shippingData,
                 paquete,
                 monto,
-                requiere_factura: requiresInvoice,
+                requiere_factura: factura_id ? true : false,
                 factura_id
             }])
             .select("id")

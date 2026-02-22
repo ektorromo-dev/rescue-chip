@@ -103,6 +103,34 @@ export default function ShopPage() {
         if (!selectedPackage) return;
         setLoadingPackage(selectedPackage);
 
+        let currentFacturaId = null;
+
+        if (requiresInvoice) {
+            try {
+                const resFactura = await fetch("/api/factura-notify", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        ...invoiceData,
+                        paquete: selectedPackage,
+                        monto: packagePrices[selectedPackage]
+                    }),
+                });
+
+                const dataFactura = await resFactura.json();
+
+                if (!resFactura.ok || !dataFactura.factura_id) {
+                    throw new Error(dataFactura.error || "Error al procesar la solicitud de factura");
+                }
+                currentFacturaId = dataFactura.factura_id;
+            } catch (error: any) {
+                console.error(error);
+                alert("Error al guardar datos de facturación: " + error.message);
+                setLoadingPackage(null);
+                return; // Stop checkout if invoice save fails
+            }
+        }
+
         try {
             const res = await fetch("/api/checkout", {
                 method: "POST",
@@ -110,8 +138,7 @@ export default function ShopPage() {
                 body: JSON.stringify({
                     paquete: selectedPackage,
                     shippingData,
-                    requiresInvoice,
-                    invoiceData: requiresInvoice ? invoiceData : null,
+                    factura_id: currentFacturaId,
                     monto: packagePrices[selectedPackage]
                 }),
             });
