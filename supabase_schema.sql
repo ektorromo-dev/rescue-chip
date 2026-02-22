@@ -105,3 +105,25 @@ create table public.factura_requests (
   status text default 'pendiente',
   created_at timestamp default timezone('utc'::text, now()) not null
 );
+
+-- Create 'orders' table (Store Shopping Orders and Shipping info before Stripe Checkout)
+create table public.orders (
+  id uuid primary key default gen_random_uuid(),
+  session_id text,
+  paquete text not null,
+  monto numeric not null,
+  nombre_receptor text not null,
+  telefono_receptor text not null,
+  codigo_postal text not null,
+  estado text not null,
+  ciudad text not null,
+  colonia text not null,
+  calle_numero text not null,
+  numero_interior text,
+  referencia text not null,
+  email_cliente text,
+  requiere_factura boolean default false,
+  factura_id uuid references public.factura_requests(id),
+  status text default 'pendiente',
+  created_at timestamp default timezone('utc'::text, now()) not null
+);

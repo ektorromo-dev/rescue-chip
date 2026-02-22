@@ -14,7 +14,38 @@ export async function POST(req: NextRequest) {
             apiVersion: "2023-10-16" as any,
         });
 
-        const { paquete, factura_id } = await req.json();
+        const { paquete, shippingData, requiresInvoice, invoiceData, monto } = await req.json();
+
+        // 1. Crear Factura Request (opcional si lo pidió)
+        let factura_id = null;
+        if (requiresInvoice && invoiceData) {
+            const { data: fData, error: fError } = await supabase
+                .from("factura_requests")
+                .insert([{
+                    ...invoiceData,
+                    paquete,
+                    monto
+                }])
+                .select("id")
+                .single();
+            if (fError) throw new Error("Error creando solicitud de factura: " + fError.message);
+            factura_id = fData.id;
+        }
+
+        // 2. Crear Orden
+        const { data: oData, error: oError } = await supabase
+            .from("orders")
+            .insert([{
+                ...shippingData,
+                paquete,
+                monto,
+                requiere_factura: requiresInvoice,
+                factura_id
+            }])
+            .select("id")
+            .single();
+        if (oError) throw new Error("Error creando orden en DB: " + oError.message);
+        const order_id = oData.id;
 
         let priceData = {
             product_data: { name: "", description: "" },
@@ -57,17 +88,18 @@ export async function POST(req: NextRequest) {
             // Pedir nombre y telefono
             customer_creation: "always",
             phone_number_collection: { enabled: true },
-            // Envio a Mexico
-            shipping_address_collection: {
-                allowed_countries: ["MX"],
-            },
+            // Ya no pedimos envio porque lo hacemos por nuestra cuenta:
+            // shipping_address_collection: {
+            //     allowed_countries: ["MX"],
+            // },
             // URLS
             success_url: `${req.headers.get("origin")}/shop/success?session_id={CHECKOUT_SESSION_ID}${factura_id ? '&factura=true' : ''}`,
             cancel_url: `${req.headers.get("origin")}/shop`,
             metadata: {
                 paquete,
                 factura: factura_id ? "true" : "false",
-                factura_id: factura_id || "none"
+                factura_id: factura_id || "none",
+                order_id: order_id
             }
         });
 
@@ -77,6 +109,12 @@ export async function POST(req: NextRequest) {
                 .update({ session_id: session.id })
                 .eq("id", factura_id);
         }
+
+        // 4. Actualizar orden con Stripe Session ID
+        await supabase
+            .from("orders")
+            .update({ session_id: session.id })
+            .eq("id", order_id);
 
         return NextResponse.json({ url: session.url });
     } catch (error: any) {

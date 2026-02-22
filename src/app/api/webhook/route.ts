@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import nodemailer from "nodemailer";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export async function POST(req: NextRequest) {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
@@ -43,21 +49,36 @@ export async function POST(req: NextRequest) {
         // Extraer metadatos
         const paquete = session.metadata?.paquete || "Desconocido";
         const pidioFactura = session.metadata?.factura === "true";
+        const order_id = session.metadata?.order_id;
+
+        let orderDetails = null;
+        if (order_id) {
+            // Actualizar orden
+            const { data, error } = await supabase
+                .from("orders")
+                .update({ status: 'pagado', session_id: session.id })
+                .eq("id", order_id)
+                .select()
+                .single();
+
+            if (!error && data) {
+                orderDetails = data;
+            } else {
+                console.error("Error updating order in webhook:", error);
+            }
+        }
 
         // Extraer detalles del cliente
-        const customerDetails = session.customer_details;
-        const nombre = customerDetails?.name || "No especificado";
-        const email = customerDetails?.email || "No especificado";
-        const telefono = customerDetails?.phone || "No especificado";
+        const nombre = orderDetails?.nombre_receptor || session.customer_details?.name || "No especificado";
+        const email = orderDetails?.email_cliente || session.customer_details?.email || "No especificado";
+        const telefono = orderDetails?.telefono_receptor || session.customer_details?.phone || "No especificado";
 
         // Dirección de envío
-        const address = customerDetails?.address;
-        const direccion = address
-            ? `${address.line1 || ""} ${address.line2 || ""}
-${address.city || ""}, ${address.state || ""}
-C.P. ${address.postal_code || ""}
-${address.country || ""}`.trim()
-            : "No especificada";
+        const direccion = orderDetails
+            ? `${orderDetails.calle_numero} ${orderDetails.numero_interior ? `Int. ${orderDetails.numero_interior}` : ""}, Col. ${orderDetails.colonia}
+${orderDetails.ciudad}, ${orderDetails.estado}, C.P. ${orderDetails.codigo_postal}
+Referencia: ${orderDetails.referencia}`.trim()
+            : "No especificada (Orden no encontrada en DB)";
 
         const monto = (session.amount_total || 0) / 100;
 
