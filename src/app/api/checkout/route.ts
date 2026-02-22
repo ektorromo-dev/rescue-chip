@@ -64,6 +64,10 @@ export async function POST(req: NextRequest) {
             // URLS
             success_url: `${req.headers.get("origin")}/shop/success?session_id={CHECKOUT_SESSION_ID}${factura_id ? '&factura=true' : ''}`,
             cancel_url: `${req.headers.get("origin")}/shop`,
+            metadata: {
+                paquete,
+                factura_id: factura_id || "none"
+            }
         });
 
         if (factura_id) {
