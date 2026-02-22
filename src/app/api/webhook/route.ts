@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
 
         // Extraer metadatos
         const paquete = session.metadata?.paquete || "Desconocido";
-        const pidioFactura = session.metadata?.factura_id && session.metadata?.factura_id !== "none";
+        const pidioFactura = session.metadata?.factura === "true";
 
         // Extraer detalles del cliente
         const customerDetails = session.customer_details;

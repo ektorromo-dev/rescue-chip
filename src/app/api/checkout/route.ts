@@ -66,6 +66,7 @@ export async function POST(req: NextRequest) {
             cancel_url: `${req.headers.get("origin")}/shop`,
             metadata: {
                 paquete,
+                factura: factura_id ? "true" : "false",
                 factura_id: factura_id || "none"
             }
         });
