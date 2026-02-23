@@ -1,7 +1,6 @@
 import { HeartPulse, Droplets, AlertTriangle, PhoneCall, CheckCircle2, FileText, UserSquare2, ArrowLeft, ShieldAlert, Navigation, Info } from "lucide-react";
 import Link from "next/link";
 import FirstAidBanner from "@/components/FirstAidBanner";
-import { MedicalBadge } from "@/components/MedicalBadge";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 
@@ -203,9 +202,8 @@ export default async function ProfilePage({ params }: ProfileProps) {
 
                                 {profile.medical_system !== "Sin seguro médico" ? (
                                     <>
-                                        <h3 className="flex items-center justify-between gap-2 text-sm font-bold text-primary uppercase tracking-wider mb-4 border-b border-primary/20 pb-3">
-                                            <div className="flex items-center gap-2"><Info size={20} className="text-primary" /> Información de Seguro</div>
-                                            <MedicalBadge medicalSystem={profile.medical_system} aseguradora={profile.aseguradora || profile.insurance_provider} className="ml-2 shrink-0" />
+                                        <h3 className="flex items-center gap-2 text-sm font-bold text-primary uppercase tracking-wider mb-4 border-b border-primary/20 pb-3">
+                                            <Info size={20} className="text-primary" /> Información de Seguro
                                         </h3>
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mb-5 relative z-10">
@@ -248,6 +246,10 @@ export default async function ProfilePage({ params }: ProfileProps) {
                                             {/* INSTITUCIONES PÚBLICAS */}
                                             {profile.medical_system === "IMSS" && (
                                                 <>
+                                                    <div>
+                                                        <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1">🏥 Institución Médica</h4>
+                                                        <p className="font-black text-lg text-foreground">IMSS</p>
+                                                    </div>
                                                     {profile.nss && (
                                                         <div>
                                                             <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">NSS (Número de Seguridad Social)</h4>
@@ -271,6 +273,10 @@ export default async function ProfilePage({ params }: ProfileProps) {
 
                                             {profile.medical_system === "ISSSTE" && (
                                                 <>
+                                                    <div>
+                                                        <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1">🏥 Institución Médica</h4>
+                                                        <p className="font-black text-lg text-foreground">ISSSTE</p>
+                                                    </div>
                                                     {profile.numero_afiliacion && (
                                                         <div>
                                                             <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">Afiliación</h4>
@@ -294,6 +300,10 @@ export default async function ProfilePage({ params }: ProfileProps) {
 
                                             {profile.medical_system === "IMSS-BIENESTAR" && (
                                                 <>
+                                                    <div>
+                                                        <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1">🏥 Institución Médica</h4>
+                                                        <p className="font-black text-lg text-foreground">IMSS-BIENESTAR</p>
+                                                    </div>
                                                     {profile.curp_seguro && (
                                                         <div>
                                                             <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">CURP</h4>
@@ -311,6 +321,10 @@ export default async function ProfilePage({ params }: ProfileProps) {
 
                                             {(profile.medical_system === "PEMEX" || profile.medical_system === "SEDENA / SEMAR") && (
                                                 <>
+                                                    <div>
+                                                        <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1">🏥 Institución Médica</h4>
+                                                        <p className="font-black text-lg text-foreground">{profile.medical_system}</p>
+                                                    </div>
                                                     {profile.numero_afiliacion && (
                                                         <div>
                                                             <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">Afiliación</h4>
