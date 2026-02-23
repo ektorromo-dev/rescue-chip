@@ -17,14 +17,57 @@ export default async function ProfilePage({ params }: ProfileProps) {
     const cleanId = id.trim();
     console.log("Perfil - Buscando chip con folio:", cleanId);
 
-    // 1. Fetch the chip by folio
-    const { data: chip, error: chipError } = await supabase
-        .from('chips')
-        .select('*')
-        .ilike('folio', cleanId)
-        .single();
+    // 1. Fetch or Mock the chip by folio
+    let chip: any = null;
+    let profile: any = null;
+    let chipError: any = null;
+    let profileError: any = null;
 
-    console.log("Perfil - Respuesta de Supabase:", { chip, chipError });
+    if (cleanId.toUpperCase() === "RSC-001" || cleanId.toUpperCase() === "DEMO") {
+        chip = { id: 'demo-chip', folio: cleanId.toUpperCase(), activated: true };
+
+        let demoPolizaUrl = null;
+        const { data: chip4 } = await supabase.from('chips').select('id').eq('folio', 'RSC-004').single();
+        if (chip4) {
+            const { data: profile4 } = await supabase.from('profiles').select('poliza_url').eq('chip_id', chip4.id).single();
+            if (profile4) demoPolizaUrl = profile4.poliza_url;
+        }
+
+        profile = {
+            id: 'demo-profile',
+            chip_id: 'demo-chip',
+            full_name: 'Carlos Martínez López',
+            age: 32,
+            blood_type: 'O+',
+            location: '+52 55 1234 5678',
+            allergies: 'Penicilina, Sulfonamidas',
+            medical_conditions: 'Asma leve',
+            important_medications: 'Salbutamol (inhalador de rescate)',
+            additional_notes: 'Usa lentes de contacto',
+            medical_system: 'Seguro Privado (Gastos Médicos Mayores)',
+            aseguradora: 'AXA',
+            numero_poliza: 'GMM-2025-84723',
+            nombre_asegurado: 'Carlos Martínez López',
+            vigencia_poliza: '2026-12-31T00:00:00.000Z',
+            telefono_aseguradora: '800-900-1292',
+            poliza_url: demoPolizaUrl,
+            emergency_contacts: [
+                { name: 'María López (Madre)', phone: '+52 55 9876 5432' },
+                { name: 'Ana Martínez (Esposa)', phone: '+52 55 5555 1234' }
+            ],
+            organ_donor: false,
+            is_motorcyclist: true,
+            photo_url: null
+        };
+    } else {
+        const { data: dbChip, error: cError } = await supabase
+            .from('chips')
+            .select('*')
+            .ilike('folio', cleanId)
+            .single();
+        chip = dbChip;
+        chipError = cError;
+    }
 
     if (chipError || !chip) {
         if (!chip) return notFound(); // Chip not found in database
@@ -48,12 +91,16 @@ export default async function ProfilePage({ params }: ProfileProps) {
         );
     }
 
-    // 2. Fetch the profile for this chip
-    const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('chip_id', chip.id)
-        .single();
+    // 2. Fetch the profile for this chip if not mocked
+    if (!profile) {
+        const { data: dbProfile, error: pError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('chip_id', chip.id)
+            .single();
+        profile = dbProfile;
+        profileError = pError;
+    }
 
     if (profileError || !profile) {
         console.error(profileError);
