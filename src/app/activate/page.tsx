@@ -53,11 +53,15 @@ function ActivationFormContent() {
             console.log("Activación - Respuesta de Supabase:", { chip, chipError });
 
             if (chipError || !chip) {
-                throw new Error("Folio de chip RescueChip inválido o no reconocido.");
+                throw new Error("Este folio no es válido. Verifica que esté escrito correctamente o contacta a soporte.");
             }
 
-            if (chip.activated) {
-                throw new Error("Este chip ya ha sido activado previamente.");
+            if (chip.status === 'activado' || chip.activated) {
+                throw new Error("Este chip ya fue activado por otro usuario.");
+            }
+
+            if (chip.status !== 'disponible') {
+                throw new Error("Este chip no está disponible para activación (" + (chip.status || "desconocido") + ").");
             }
 
             // 1.5 Create Auth User
@@ -191,7 +195,12 @@ function ActivationFormContent() {
             // 3. Update chip as activated
             const { error: activateError } = await supabase
                 .from('chips')
-                .update({ activated: true })
+                .update({
+                    status: 'activado',
+                    activated: true,
+                    activated_by: userId,
+                    activated_at: new Date().toISOString()
+                })
                 .eq('id', chip.id);
 
             if (activateError) {

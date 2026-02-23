@@ -2,7 +2,10 @@
 create table public.chips (
   id uuid default gen_random_uuid() primary key,
   folio text unique not null,
+  status text default 'disponible',
   activated boolean default false,
+  activated_by uuid references auth.users(id),
+  activated_at timestamp with time zone,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 

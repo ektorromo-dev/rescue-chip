@@ -70,21 +70,30 @@ export default async function ProfilePage({ params }: ProfileProps) {
     }
 
     if (chipError || !chip) {
-        if (!chip) return notFound(); // Chip not found in database
         console.error(chipError);
-        return <div>Error al cargar información del dispositivo.</div>;
+        return (
+            <div className="min-h-screen bg-muted flex flex-col items-center justify-center p-4">
+                <div className="bg-card p-10 rounded-3xl shadow-xl max-w-md text-center border border-border">
+                    <AlertTriangle size={48} className="mx-auto text-destructive mb-6" />
+                    <h1 className="text-2xl font-bold mb-4">Chip no válido</h1>
+                    <p className="text-muted-foreground mb-8">El folio proporcionado no existe en nuestros registros o está mal escrito.</p>
+                </div>
+            </div>
+        );
     }
 
     // If the chip exists but isn't activated yet
-    if (!chip.activated) {
+    if (chip.status !== 'activado' && !chip.activated) {
+        // Redirigir a la pantalla de activación con el folio interceptado
         return (
             <div className="min-h-screen bg-muted flex flex-col items-center justify-center p-4">
                 <div className="bg-card p-10 rounded-3xl shadow-xl max-w-md text-center border border-border">
                     <HeartPulse size={48} className="mx-auto text-primary/50 mb-6" />
-                    <h1 className="text-2xl font-bold mb-4">RescueChip Inactivo</h1>
-                    <p className="text-muted-foreground mb-8">Este dispositivo ({chip.folio}) aún no ha sido registrado.</p>
-                    <Link href={`/activate?folio=${encodeURIComponent(chip.folio)}`} className="bg-primary text-primary-foreground px-6 py-3 rounded-full font-bold hover:bg-primary/90 transition-colors">
-                        Activar Ahora
+                    <h1 className="text-2xl font-bold mb-4">Redirigiendo...</h1>
+                    <p className="text-muted-foreground mb-8">Este dispositivo está pendiente de registro.</p>
+                    <meta httpEquiv="refresh" content={`0; url=/activate?folio=${encodeURIComponent(chip.folio)}`} />
+                    <Link href={`/activate?folio=${encodeURIComponent(chip.folio)}`} className="text-primary underline font-bold mt-4">
+                        Haz clic aquí si no te redirige automáticamente.
                     </Link>
                 </div>
             </div>
