@@ -1,5 +1,6 @@
 import { HeartPulse, Droplets, AlertTriangle, PhoneCall, CheckCircle2, FileText, UserSquare2, ArrowLeft, ShieldAlert, Navigation, Info } from "lucide-react";
 import Link from "next/link";
+import FirstAidBanner from "@/components/FirstAidBanner";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 
@@ -57,6 +58,20 @@ export default async function ProfilePage({ params }: ProfileProps) {
     if (profileError || !profile) {
         console.error(profileError);
         return <div>Error al cargar el perfil médico.</div>;
+    }
+
+    // Generate Signed URL for Policy Document
+    let signedPolizaUrl = null;
+    if (profile.poliza_url) {
+        const { data: urlData, error: urlError } = await supabase.storage
+            .from('polizas')
+            .createSignedUrl(profile.poliza_url, 60 * 60); // 1 hour valid
+
+        if (!urlError && urlData) {
+            signedPolizaUrl = urlData.signedUrl;
+        } else {
+            console.error("Error generating signed url:", urlError);
+        }
     }
 
     // Safe extraction of multiple contacts
@@ -120,6 +135,9 @@ export default async function ProfilePage({ params }: ProfileProps) {
                 {/* Content Body */}
                 <div className="w-full px-6 md:px-10 -mt-6 relative z-20 pb-10 space-y-6">
 
+                    {/* First Aid Banner */}
+                    <FirstAidBanner />
+
                     {/* Critical Info Banner */}
                     <div className="bg-card w-full rounded-2xl p-6 shadow-lg border border-border flex justify-around items-center divide-x divide-border">
                         <div className="flex flex-col items-center px-4 w-1/2">
@@ -178,29 +196,87 @@ export default async function ProfilePage({ params }: ProfileProps) {
                         )}
 
                         {/* INSURANCE DETAILS */}
-                        {(profile.insurance_provider || profile.policy_number || profile.medical_system) && (
-                            <div className="bg-muted/50 rounded-2xl p-5 border border-border/80">
-                                <h3 className="flex items-center gap-2 text-sm font-bold text-muted-foreground uppercase tracking-wider mb-3">
-                                    <Info size={18} className="text-primary" /> Seguro Médico
+                        {(profile.aseguradora || profile.numero_poliza || profile.insurance_provider || profile.policy_number) && (
+                            <div className="bg-primary/5 rounded-2xl p-6 border-2 border-primary/20 shadow-sm relative overflow-hidden group">
+                                <div className="absolute right-0 top-0 w-32 h-full bg-gradient-to-l from-primary/10 to-transparent pointer-events-none" />
+                                <h3 className="flex items-center justify-between gap-2 text-sm font-bold text-primary uppercase tracking-wider mb-4 border-b border-primary/20 pb-3">
+                                    <div className="flex items-center gap-2"><Info size={20} className="text-primary" /> Información de Seguro</div>
                                 </h3>
-                                <div className="grid grid-cols-2 gap-4">
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mb-5 relative z-10">
+                                    {/* Medical System (Legacy) */}
                                     {profile.medical_system && (
-                                        <div className="col-span-2">
-                                            <h4 className="text-xs font-bold text-muted-foreground uppercase">Sistema Institucional</h4>
-                                            <p className="font-medium text-sm">{profile.medical_system}</p>
+                                        <div className="md:col-span-2">
+                                            <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">Sistema Institucional</h4>
+                                            <p className="font-bold text-sm text-foreground">{profile.medical_system}</p>
                                         </div>
                                     )}
-                                    {profile.insurance_provider && (
+
+                                    {/* Aseguradora */}
+                                    {(profile.aseguradora || profile.insurance_provider) && (
                                         <div>
-                                            <h4 className="text-xs font-bold text-muted-foreground uppercase">Aseguradora</h4>
-                                            <p className="font-medium text-sm">{profile.insurance_provider}</p>
+                                            <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1">🏦 Aseguradora</h4>
+                                            <p className="font-black text-lg text-foreground">{profile.aseguradora || profile.insurance_provider}</p>
                                         </div>
                                     )}
-                                    {profile.policy_number && (
+
+                                    {/* Numero Poliza */}
+                                    {(profile.numero_poliza || profile.policy_number) && (
                                         <div>
-                                            <h4 className="text-xs font-bold text-muted-foreground uppercase">Póliza</h4>
-                                            <p className="font-medium text-sm font-mono">{profile.policy_number}</p>
+                                            <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1">🔢 Número de Póliza</h4>
+                                            <p className="font-bold text-lg text-foreground font-mono bg-background px-2 py-0.5 rounded border border-border inline-block mt-0.5">{profile.numero_poliza || profile.policy_number}</p>
                                         </div>
+                                    )}
+
+                                    {/* Tipo Seguro */}
+                                    {profile.tipo_seguro && (
+                                        <div>
+                                            <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">Tipo de Seguro</h4>
+                                            <p className="font-bold text-sm text-foreground bg-primary/10 text-primary px-2 py-0.5 rounded inline-block mt-0.5">{profile.tipo_seguro}</p>
+                                        </div>
+                                    )}
+
+                                    {/* Vigencia */}
+                                    {profile.vigencia_poliza && (
+                                        <div>
+                                            <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">Vigencia hasta</h4>
+                                            <p className="font-bold text-sm text-foreground">{new Date(profile.vigencia_poliza).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                                        </div>
+                                    )}
+
+                                    {/* Nombre Asegurado */}
+                                    {profile.nombre_asegurado && (
+                                        <div className="md:col-span-2 mt-2">
+                                            <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">Nombre del Titular</h4>
+                                            <p className="font-bold text-base text-foreground">{profile.nombre_asegurado}</p>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Call Insurance Button */}
+                                {profile.telefono_aseguradora && (
+                                    <div className="mb-4 relative z-10 w-full">
+                                        <a href={`tel:${profile.telefono_aseguradora.replace(/\D/g, '')}`} className="w-full bg-blue-600 text-white flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm hover:scale-[1.02] transition-transform shadow-md">
+                                            <PhoneCall size={18} /> Llamar a Aseguradora: {profile.telefono_aseguradora}
+                                        </a>
+                                    </div>
+                                )}
+
+                                {/* Warning & File Button */}
+                                <div className="border-t border-primary/20 pt-4 mt-2 relative z-10">
+                                    <p className="text-xs font-semibold text-primary/80 leading-relaxed mb-3 bg-white p-3 rounded-xl border border-primary/10 shadow-sm flex gap-3 text-justify">
+                                        <span className="text-lg">📢</span>
+                                        <span><strong>AVISO PARA PARAMÉDICOS:</strong> Si el paciente requiere hospitalización, presente este documento en admisión para coordinar el ingreso y cobertura inmediata.</span>
+                                    </p>
+                                    {signedPolizaUrl && (
+                                        <a
+                                            href={signedPolizaUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="w-full bg-background border-2 border-primary text-primary flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm hover:bg-primary/5 transition-colors shadow-sm"
+                                        >
+                                            <FileText size={18} /> Ver Documento / Póliza Completa
+                                        </a>
                                     )}
                                 </div>
                             </div>

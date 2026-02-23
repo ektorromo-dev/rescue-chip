@@ -33,6 +33,19 @@ export default function DashboardPage() {
     const [insuranceProvider, setInsuranceProvider] = useState("");
     const [policyNumber, setPolicyNumber] = useState("");
     const [medicalSystem, setMedicalSystem] = useState("");
+
+    // New Insurance fields
+    const [aseguradora, setAseguradora] = useState("");
+    const [aseguradoraOtra, setAseguradoraOtra] = useState("");
+    const [numeroPoliza, setNumeroPoliza] = useState("");
+    const [tipoSeguro, setTipoSeguro] = useState("");
+    const [nombreAsegurado, setNombreAsegurado] = useState("");
+    const [vigenciaPoliza, setVigenciaPoliza] = useState("");
+    const [telefonoAseguradora, setTelefonoAseguradora] = useState("");
+
+    const [polizaFile, setPolizaFile] = useState<File | null>(null);
+    const [currentPolizaUrl, setCurrentPolizaUrl] = useState<string | null>(null);
+
     const [organDonor, setOrganDonor] = useState(false);
     const [isMotorcyclist, setIsMotorcyclist] = useState(false);
     const [additionalNotes, setAdditionalNotes] = useState("");
@@ -82,6 +95,21 @@ export default function DashboardPage() {
                 setInsuranceProvider(profile.insurance_provider || "");
                 setPolicyNumber(profile.policy_number || "");
                 setMedicalSystem(profile.medical_system || "");
+
+                const knownAseguradoras = ['AXA', 'GNP', 'Monterrey New York Life (Seguros Monterrey)', 'Allianz', 'MetLife', 'Zurich', 'BUPA', 'Mapfre', 'Seguros Atlas'];
+                if (profile.aseguradora && !knownAseguradoras.includes(profile.aseguradora)) {
+                    setAseguradora("Otro");
+                    setAseguradoraOtra(profile.aseguradora);
+                } else {
+                    setAseguradora(profile.aseguradora || "");
+                }
+                setNumeroPoliza(profile.numero_poliza || "");
+                setTipoSeguro(profile.tipo_seguro || "");
+                setNombreAsegurado(profile.nombre_asegurado || "");
+                setVigenciaPoliza(profile.vigencia_poliza || "");
+                setTelefonoAseguradora(profile.telefono_aseguradora || "");
+                setCurrentPolizaUrl(profile.poliza_url || null);
+
                 setOrganDonor(profile.organ_donor || false);
                 setIsMotorcyclist(profile.is_motorcyclist || false);
                 setAdditionalNotes(profile.additional_notes || "");
@@ -149,6 +177,27 @@ export default function DashboardPage() {
                 newPhotoUrl = publicUrlData.publicUrl;
             }
 
+            let newPolizaUrl = currentPolizaUrl;
+            if (polizaFile) {
+                const sessionResponse = await supabase.auth.getSession();
+                const userId = sessionResponse.data.session?.user.id;
+                const fileExt = polizaFile.name.split('.').pop();
+                const fileName = `poliza.${fileExt}`;
+                const fullPath = `${userId}/${fileName}`;
+
+                const { data: uploadData, error: uploadError } = await supabase.storage
+                    .from('polizas')
+                    .upload(fullPath, polizaFile, { upsert: true });
+
+                if (uploadError) {
+                    throw new Error("No se pudo subir el archivo de la póliza. Inténtalo de nuevo.");
+                }
+
+                newPolizaUrl = fullPath;
+            }
+
+            const finalAseguradora = aseguradora === "Otro" ? aseguradoraOtra : (aseguradora || null);
+
             const { error: updateError } = await supabase
                 .from('profiles')
                 .update({
@@ -168,6 +217,13 @@ export default function DashboardPage() {
                     is_motorcyclist: isMotorcyclist,
                     additional_notes: additionalNotes,
                     google_maps_link: googleMapsLink,
+                    aseguradora: finalAseguradora,
+                    numero_poliza: numeroPoliza || null,
+                    tipo_seguro: tipoSeguro || null,
+                    nombre_asegurado: nombreAsegurado || null,
+                    vigencia_poliza: vigenciaPoliza || null,
+                    telefono_aseguradora: telefonoAseguradora || null,
+                    poliza_url: newPolizaUrl,
                     updated_at: new Date().toISOString()
                 })
                 .eq('id', profileId);
@@ -183,6 +239,47 @@ export default function DashboardPage() {
             setErrorMsg(err.message || "Ocurrió un error inesperado al guardar.");
         } finally {
             setSaving(false);
+        }
+    };
+
+    const handleDeleteInsuranceInfo = async () => {
+        if (!confirm("¿Estás seguro de que deseas eliminar toda la información y documento de tu seguro?")) return;
+        setSaving(true);
+        try {
+            if (currentPolizaUrl) {
+                await supabase.storage.from('polizas').remove([currentPolizaUrl]);
+            }
+            const { error: updateError } = await supabase
+                .from('profiles')
+                .update({
+                    aseguradora: null,
+                    numero_poliza: null,
+                    tipo_seguro: null,
+                    nombre_asegurado: null,
+                    vigencia_poliza: null,
+                    telefono_aseguradora: null,
+                    poliza_url: null,
+                })
+                .eq('id', profileId);
+
+            if (updateError) throw updateError;
+
+            setAseguradora("");
+            setAseguradoraOtra("");
+            setNumeroPoliza("");
+            setTipoSeguro("");
+            setNombreAsegurado("");
+            setVigenciaPoliza("");
+            setTelefonoAseguradora("");
+            setPolizaFile(null);
+            setCurrentPolizaUrl(null);
+
+            setSuccessMsg("Información de seguro eliminada.");
+        } catch (err: any) {
+            setErrorMsg(err.message || "Error al eliminar información.");
+        } finally {
+            setSaving(false);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     };
 
@@ -437,11 +534,117 @@ export default function DashboardPage() {
                                 </div>
                             </section>
 
+                            {/* MI PÓLIZA DE SEGURO */}
+                            <section className="space-y-4">
+                                <h3 className="text-xl font-bold flex items-center justify-between border-b border-border pb-2">
+                                    <div className="flex items-center gap-2">
+                                        <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">5</span>
+                                        Mi Póliza de Seguro
+                                    </div>
+                                    {(aseguradora || currentPolizaUrl) && (
+                                        <button type="button" onClick={handleDeleteInsuranceInfo} className="text-destructive text-sm font-bold flex items-center gap-1 hover:underline">
+                                            Eliminar información
+                                        </button>
+                                    )}
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-muted/30 p-5 rounded-2xl border border-border">
+                                    <div className="space-y-2 lg:col-span-2">
+                                        <label htmlFor="aseguradora" className="text-sm font-semibold">Aseguradora</label>
+                                        <select id="aseguradora" value={aseguradora} onChange={(e) => setAseguradora(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all">
+                                            <option value="">Selecciona una aseguradora</option>
+                                            <option value="AXA">AXA</option>
+                                            <option value="GNP">GNP</option>
+                                            <option value="Monterrey New York Life (Seguros Monterrey)">Monterrey New York Life (Seguros Monterrey)</option>
+                                            <option value="Allianz">Allianz</option>
+                                            <option value="MetLife">MetLife</option>
+                                            <option value="Zurich">Zurich</option>
+                                            <option value="BUPA">BUPA</option>
+                                            <option value="Mapfre">Mapfre</option>
+                                            <option value="Seguros Atlas">Seguros Atlas</option>
+                                            <option value="Otro">Otro</option>
+                                        </select>
+                                    </div>
+                                    {aseguradora === "Otro" && (
+                                        <div className="space-y-2 animate-in fade-in duration-300 md:col-span-2">
+                                            <label htmlFor="aseguradoraOtra" className="text-sm font-semibold text-primary">Especificar Aseguradora *</label>
+                                            <input type="text" id="aseguradoraOtra" value={aseguradoraOtra} onChange={(e) => setAseguradoraOtra(e.target.value)} required className="w-full flex h-12 rounded-xl border border-primary/50 bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                        </div>
+                                    )}
+                                    <div className="space-y-2">
+                                        <label htmlFor="numeroPoliza" className="text-sm font-semibold">Número de Póliza {aseguradora && "*"}</label>
+                                        <input type="text" id="numeroPoliza" value={numeroPoliza} onChange={(e) => setNumeroPoliza(e.target.value)} required={!!aseguradora} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label htmlFor="tipoSeguro" className="text-sm font-semibold">Tipo de Seguro</label>
+                                        <select id="tipoSeguro" value={tipoSeguro} onChange={(e) => setTipoSeguro(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all">
+                                            <option value="">Selecciona un tipo</option>
+                                            <option value="Gastos Médicos Mayores">Gastos Médicos Mayores</option>
+                                            <option value="Seguro de Auto">Seguro de Auto</option>
+                                            <option value="Seguro de Moto">Seguro de Moto</option>
+                                            <option value="Seguro de Vida">Seguro de Vida</option>
+                                            <option value="Otro">Otro</option>
+                                        </select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label htmlFor="nombreAsegurado" className="text-sm font-semibold">Nombre Asegurado Titular {aseguradora && "*"}</label>
+                                        <input type="text" id="nombreAsegurado" value={nombreAsegurado} onChange={(e) => setNombreAsegurado(e.target.value)} required={!!aseguradora} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label htmlFor="vigenciaPoliza" className="text-sm font-semibold">Vigencia (Opcional)</label>
+                                        <input type="date" id="vigenciaPoliza" value={vigenciaPoliza} onChange={(e) => setVigenciaPoliza(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all text-foreground" style={{ colorScheme: 'dark' }} />
+                                    </div>
+                                    <div className="space-y-2 md:col-span-2">
+                                        <label htmlFor="telefonoAseguradora" className="text-sm font-semibold">Teléfono de Emergencias (Opcional)</label>
+                                        <input type="tel" id="telefonoAseguradora" value={telefonoAseguradora} onChange={(e) => setTelefonoAseguradora(e.target.value)} placeholder="Ej: 800-123-4567" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                    </div>
+
+                                    {/* Subida de Póliza */}
+                                    <div className="space-y-4 md:col-span-2 mt-4 pt-4 border-t border-border/50">
+                                        <div>
+                                            <label className="text-sm font-semibold">Documento (PDF, JPG, PNG)</label>
+                                            <p className="text-xs text-muted-foreground mt-1">Sube el extracto de tu póliza (máx 5MB). Se mostrará a paramédicos.</p>
+                                        </div>
+
+                                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                                            {polizaFile ? (
+                                                <div className="px-4 py-3 bg-primary/10 border border-primary/20 rounded-xl text-primary font-bold text-sm flex items-center gap-2">
+                                                    📄 {polizaFile.name}
+                                                </div>
+                                            ) : currentPolizaUrl ? (
+                                                <div className="px-4 py-3 bg-background border border-border rounded-xl text-foreground font-bold text-sm flex items-center gap-2 relative group overflow-hidden">
+                                                    📄 Póliza Actual
+                                                </div>
+                                            ) : null}
+
+                                            <div className="flex-1 w-full relative">
+                                                <input
+                                                    type="file"
+                                                    accept=".pdf,image/png,image/jpeg,image/jpg"
+                                                    onChange={(e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) {
+                                                            if (file.size > 5 * 1024 * 1024) {
+                                                                alert("El archivo no debe pesar más de 5MB");
+                                                                e.target.value = '';
+                                                                return;
+                                                            }
+                                                            setPolizaFile(file);
+                                                        }
+                                                    }}
+                                                    className="w-full flex h-14 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 cursor-pointer shadow-sm relative z-10"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
                             {/* NOTAS Y UBICACIÓN */}
                             <section className="space-y-4">
                                 <h3 className="text-xl font-bold flex items-center gap-2 border-b border-border pb-2">
-                                    <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">5</span>
+                                    <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">6</span>
                                     Notas y Ubicación
+
                                 </h3>
 
                                 <div className="space-y-2 flex items-center gap-3 pt-2 rounded-xl border border-primary/30 p-5 bg-primary/5 mb-6">

@@ -32,6 +32,14 @@ create table public.profiles (
   policy_number text,
   medical_system text, -- ej. IMSS, ISSSTE, Privado
   organ_donor boolean default false,
+  aseguradora text,
+  numero_poliza text,
+  tipo_seguro text,
+  nombre_asegurado text,
+  vigencia_poliza date,
+  telefono_aseguradora text,
+  poliza_url text,
+
   
   -- NOTAS IMPORTANTES Y AVISOS
   is_motorcyclist boolean default false,
@@ -88,6 +96,32 @@ create policy "Public Access to Profile Photos"
 create policy "Allow Inserts to Profile Photos"
   on storage.objects for insert
   with check ( bucket_id = 'profile-photos' );
+
+-- Create storage bucket for medical insurance policies
+insert into storage.buckets (id, name, public) 
+values ('polizas', 'polizas', false)
+on conflict (id) do nothing;
+
+create policy "Permitir a usuarios subir su propia póliza"
+on storage.objects for insert
+with check ( bucket_id = 'polizas' and (storage.foldername(name))[1] = auth.uid()::text );
+
+create policy "Permitir a usuarios actualizar su póliza"
+on storage.objects for update
+using ( bucket_id = 'polizas' and (storage.foldername(name))[1] = auth.uid()::text );
+
+create policy "Permitir a usuarios ver su póliza"
+on storage.objects for select
+using ( bucket_id = 'polizas' and (storage.foldername(name))[1] = auth.uid()::text );
+
+create policy "Permitir a usuarios borrar su póliza"
+on storage.objects for delete
+using ( bucket_id = 'polizas' and (storage.foldername(name))[1] = auth.uid()::text );
+
+create policy "Permitir accesos de lectura a service_role para URLs firmadas"
+on storage.objects for select
+using ( bucket_id = 'polizas' );
+
 
 -- Create 'factura_requests' table (Store Invoice Requests from /shop checkout)
 create table public.factura_requests (
