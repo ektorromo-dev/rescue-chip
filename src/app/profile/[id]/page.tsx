@@ -4,6 +4,32 @@ import FirstAidBanner from "@/components/FirstAidBanner";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 
+// Helper to get badge style based on system or insurer
+function getMedicalBadge(medicalSystem: string | null, aseguradora: string | null) {
+    if (medicalSystem === "IMSS") return { bg: "bg-[#006847]", text: "text-white", label: "IMSS" };
+    if (medicalSystem === "ISSSTE") return { bg: "bg-[#003366]", text: "text-white", label: "ISSSTE" };
+    if (medicalSystem === "IMSS-BIENESTAR") return { bg: "bg-[#004D40]", text: "text-white", label: "IMSS-BIENESTAR" };
+    if (medicalSystem === "PEMEX") return { bg: "bg-[#C8102E]", text: "text-white", label: "PEMEX" };
+    if (medicalSystem === "SEDENA / SEMAR") return { bg: "bg-[#4A5E23]", text: "text-white", label: "SEDENA / SEMAR" };
+
+    // Si es privado, usar aseguradora
+    if (medicalSystem === "Seguro Privado (Gastos Médicos Mayores)" || aseguradora) {
+        const a = aseguradora || "";
+        if (a === "AXA") return { bg: "bg-[#003974]", text: "text-white", label: "AXA" };
+        if (a === "GNP") return { bg: "bg-[#FF6600]", text: "text-white", label: "GNP" };
+        if (a === "Seguros Monterrey (SMNYL)") return { bg: "bg-[#002855]", text: "text-white", label: "SMNYL" };
+        if (a === "Allianz") return { bg: "bg-[#003781]", text: "text-white", label: "Allianz" };
+        if (a === "MetLife") return { bg: "bg-[#00A94F]", text: "text-white", label: "MetLife" };
+        if (a === "Zurich") return { bg: "bg-[#003399]", text: "text-white", label: "Zurich" };
+        if (a === "BUPA") return { bg: "bg-[#00A88E]", text: "text-white", label: "BUPA" };
+        if (a === "Mapfre") return { bg: "bg-[#DA291C]", text: "text-white", label: "Mapfre" };
+        if (a === "Seguros Atlas") return { bg: "bg-[#1B3A6B]", text: "text-white", label: "Atlas" };
+        return { bg: "bg-gray-800", text: "text-white", label: a || "Seguro Privado" };
+    }
+
+    return { bg: "bg-gray-600", text: "text-white", label: medicalSystem || "Seguro Médico" };
+}
+
 interface ProfileProps {
     params: Promise<{ id: string }>;
 }
@@ -196,89 +222,191 @@ export default async function ProfilePage({ params }: ProfileProps) {
                         )}
 
                         {/* INSURANCE DETAILS */}
-                        {(profile.aseguradora || profile.numero_poliza || profile.insurance_provider || profile.policy_number) && (
+                        {(profile.medical_system || profile.aseguradora || profile.numero_poliza || profile.insurance_provider || profile.policy_number) && (
                             <div className="bg-primary/5 rounded-2xl p-6 border-2 border-primary/20 shadow-sm relative overflow-hidden group">
                                 <div className="absolute right-0 top-0 w-32 h-full bg-gradient-to-l from-primary/10 to-transparent pointer-events-none" />
-                                <h3 className="flex items-center justify-between gap-2 text-sm font-bold text-primary uppercase tracking-wider mb-4 border-b border-primary/20 pb-3">
-                                    <div className="flex items-center gap-2"><Info size={20} className="text-primary" /> Información de Seguro</div>
-                                </h3>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mb-5 relative z-10">
-                                    {/* Medical System (Legacy) */}
-                                    {profile.medical_system && (
-                                        <div className="md:col-span-2">
-                                            <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">Sistema Institucional</h4>
-                                            <p className="font-bold text-sm text-foreground">{profile.medical_system}</p>
+                                {profile.medical_system !== "Sin seguro médico" ? (
+                                    <>
+                                        <h3 className="flex items-center justify-between gap-2 text-sm font-bold text-primary uppercase tracking-wider mb-4 border-b border-primary/20 pb-3">
+                                            <div className="flex items-center gap-2"><Info size={20} className="text-primary" /> Información de Seguro</div>
+                                            {(() => {
+                                                const badge = getMedicalBadge(profile.medical_system, profile.aseguradora || profile.insurance_provider);
+                                                return (
+                                                    <span className={`${badge.bg} ${badge.text} px-3 py-1 rounded-full text-xs font-black shadow-sm`}>
+                                                        {badge.label}
+                                                    </span>
+                                                );
+                                            })()}
+                                        </h3>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mb-5 relative z-10">
+                                            {/* SEGURO PRIVADO */}
+                                            {(!profile.medical_system || profile.medical_system === "Seguro Privado (Gastos Médicos Mayores)" || profile.medical_system === "Otro" || profile.medical_system === "Seguro Médico Privado") && (
+                                                <>
+                                                    {(profile.aseguradora || profile.insurance_provider) && (
+                                                        <div>
+                                                            <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1">🏦 Aseguradora</h4>
+                                                            <p className="font-black text-lg text-foreground">{profile.aseguradora || profile.insurance_provider}</p>
+                                                        </div>
+                                                    )}
+                                                    {(profile.numero_poliza || profile.policy_number) && (
+                                                        <div>
+                                                            <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1">🔢 Número de Póliza</h4>
+                                                            <p className="font-bold text-lg text-foreground font-mono bg-background px-2 py-0.5 rounded border border-border inline-block mt-0.5">{profile.numero_poliza || profile.policy_number}</p>
+                                                        </div>
+                                                    )}
+                                                    {profile.tipo_seguro && (
+                                                        <div>
+                                                            <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">Tipo de Seguro</h4>
+                                                            <p className="font-bold text-sm text-foreground bg-primary/10 text-primary px-2 py-0.5 rounded inline-block mt-0.5">{profile.tipo_seguro}</p>
+                                                        </div>
+                                                    )}
+                                                    {profile.vigencia_poliza && (
+                                                        <div>
+                                                            <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">Vigencia</h4>
+                                                            <p className="font-bold text-sm text-foreground">{new Date(profile.vigencia_poliza).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                                                        </div>
+                                                    )}
+                                                    {(profile.nombre_asegurado || profile.full_name) && (
+                                                        <div className="md:col-span-2 mt-2">
+                                                            <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">Nombre del Titular</h4>
+                                                            <p className="font-bold text-base text-foreground">{profile.nombre_asegurado || profile.full_name}</p>
+                                                        </div>
+                                                    )}
+                                                </>
+                                            )}
+
+                                            {/* INSTITUCIONES PÚBLICAS */}
+                                            {profile.medical_system === "IMSS" && (
+                                                <>
+                                                    {profile.nss && (
+                                                        <div>
+                                                            <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">NSS (Número de Seguridad Social)</h4>
+                                                            <p className="font-bold text-lg text-foreground font-mono bg-background px-2 py-0.5 rounded border border-border inline-block mt-0.5">{profile.nss}</p>
+                                                        </div>
+                                                    )}
+                                                    {profile.clinica_asignada && (
+                                                        <div>
+                                                            <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">UMF / Clínica</h4>
+                                                            <p className="font-bold text-sm text-foreground">{profile.clinica_asignada}</p>
+                                                        </div>
+                                                    )}
+                                                    {profile.curp_seguro && (
+                                                        <div className="md:col-span-2 mt-2">
+                                                            <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">CURP</h4>
+                                                            <p className="font-bold text-sm text-foreground">{profile.curp_seguro}</p>
+                                                        </div>
+                                                    )}
+                                                </>
+                                            )}
+
+                                            {profile.medical_system === "ISSSTE" && (
+                                                <>
+                                                    {profile.numero_afiliacion && (
+                                                        <div>
+                                                            <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">Afiliación</h4>
+                                                            <p className="font-bold text-lg text-foreground font-mono bg-background px-2 py-0.5 rounded border border-border inline-block mt-0.5">{profile.numero_afiliacion}</p>
+                                                        </div>
+                                                    )}
+                                                    {profile.clinica_asignada && (
+                                                        <div>
+                                                            <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">Clínica</h4>
+                                                            <p className="font-bold text-sm text-foreground">{profile.clinica_asignada}</p>
+                                                        </div>
+                                                    )}
+                                                    {profile.curp_seguro && (
+                                                        <div className="md:col-span-2 mt-2">
+                                                            <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">CURP</h4>
+                                                            <p className="font-bold text-sm text-foreground">{profile.curp_seguro}</p>
+                                                        </div>
+                                                    )}
+                                                </>
+                                            )}
+
+                                            {profile.medical_system === "IMSS-BIENESTAR" && (
+                                                <>
+                                                    {profile.curp_seguro && (
+                                                        <div>
+                                                            <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">CURP</h4>
+                                                            <p className="font-bold text-lg text-foreground font-mono bg-background px-2 py-0.5 rounded border border-border inline-block mt-0.5">{profile.curp_seguro}</p>
+                                                        </div>
+                                                    )}
+                                                    {profile.clinica_asignada && (
+                                                        <div>
+                                                            <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">Centro de Salud</h4>
+                                                            <p className="font-bold text-sm text-foreground">{profile.clinica_asignada}</p>
+                                                        </div>
+                                                    )}
+                                                </>
+                                            )}
+
+                                            {(profile.medical_system === "PEMEX" || profile.medical_system === "SEDENA / SEMAR") && (
+                                                <>
+                                                    {profile.numero_afiliacion && (
+                                                        <div>
+                                                            <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">Afiliación</h4>
+                                                            <p className="font-bold text-lg text-foreground font-mono bg-background px-2 py-0.5 rounded border border-border inline-block mt-0.5">{profile.numero_afiliacion}</p>
+                                                        </div>
+                                                    )}
+                                                    {profile.clinica_asignada && (
+                                                        <div>
+                                                            <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">Unidad Médica</h4>
+                                                            <p className="font-bold text-sm text-foreground">{profile.clinica_asignada}</p>
+                                                        </div>
+                                                    )}
+                                                </>
+                                            )}
                                         </div>
-                                    )}
 
-                                    {/* Aseguradora */}
-                                    {(profile.aseguradora || profile.insurance_provider) && (
-                                        <div>
-                                            <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1">🏦 Aseguradora</h4>
-                                            <p className="font-black text-lg text-foreground">{profile.aseguradora || profile.insurance_provider}</p>
+                                        {/* Call Action & Document */}
+                                        <div className="space-y-4 relative z-10 w-full mt-4">
+                                            {(() => {
+                                                const sys = profile.medical_system;
+                                                let phone = profile.telefono_aseguradora;
+                                                let label = `Llamar a ${profile.aseguradora || "Aseguradora"}`;
+
+                                                if (sys === "IMSS") { phone = "8002222668"; label = "Llamar a IMSS"; }
+                                                else if (sys === "ISSSTE") { phone = "8000190900"; label = "Llamar a ISSSTE"; }
+                                                else if (sys === "PEMEX") { phone = "5519442500"; label = "Llamar a Urgencias PEMEX"; } // Generic Pemex Number
+
+                                                if (phone) {
+                                                    const cleanPhone = phone.replace(/\D/g, '');
+                                                    return (
+                                                        <a href={`tel:${cleanPhone}`} className="w-full bg-blue-600 text-white flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm hover:scale-[1.02] transition-transform shadow-md">
+                                                            <PhoneCall size={18} /> {label}: {phone}
+                                                        </a>
+                                                    );
+                                                }
+                                                return null;
+                                            })()}
+
+                                            {(!profile.medical_system || profile.medical_system === "Seguro Privado (Gastos Médicos Mayores)" || profile.medical_system === "Otro") && (
+                                                <div className="border-t border-primary/20 pt-4 mt-2">
+                                                    <p className="text-xs font-semibold text-primary/80 leading-relaxed mb-3 bg-white p-3 rounded-xl border border-primary/10 shadow-sm flex gap-3 text-justify">
+                                                        <span className="text-lg">📢</span>
+                                                        <span><strong>AVISO PARA PARAMÉDICOS:</strong> Si el paciente requiere hospitalización, presente este documento en admisión para coordinar el ingreso y cobertura inmediata.</span>
+                                                    </p>
+                                                    {signedPolizaUrl && (
+                                                        <a
+                                                            href={signedPolizaUrl}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="w-full bg-background border-2 border-primary text-primary flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm hover:bg-primary/5 transition-colors shadow-sm"
+                                                        >
+                                                            <FileText size={18} /> Ver Documento / Póliza Completa
+                                                        </a>
+                                                    )}
+                                                </div>
+                                            )}
                                         </div>
-                                    )}
-
-                                    {/* Numero Poliza */}
-                                    {(profile.numero_poliza || profile.policy_number) && (
-                                        <div>
-                                            <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1">🔢 Número de Póliza</h4>
-                                            <p className="font-bold text-lg text-foreground font-mono bg-background px-2 py-0.5 rounded border border-border inline-block mt-0.5">{profile.numero_poliza || profile.policy_number}</p>
-                                        </div>
-                                    )}
-
-                                    {/* Tipo Seguro */}
-                                    {profile.tipo_seguro && (
-                                        <div>
-                                            <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">Tipo de Seguro</h4>
-                                            <p className="font-bold text-sm text-foreground bg-primary/10 text-primary px-2 py-0.5 rounded inline-block mt-0.5">{profile.tipo_seguro}</p>
-                                        </div>
-                                    )}
-
-                                    {/* Vigencia */}
-                                    {profile.vigencia_poliza && (
-                                        <div>
-                                            <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">Vigencia hasta</h4>
-                                            <p className="font-bold text-sm text-foreground">{new Date(profile.vigencia_poliza).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                                        </div>
-                                    )}
-
-                                    {/* Nombre Asegurado */}
-                                    {profile.nombre_asegurado && (
-                                        <div className="md:col-span-2 mt-2">
-                                            <h4 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">Nombre del Titular</h4>
-                                            <p className="font-bold text-base text-foreground">{profile.nombre_asegurado}</p>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Call Insurance Button */}
-                                {profile.telefono_aseguradora && (
-                                    <div className="mb-4 relative z-10 w-full">
-                                        <a href={`tel:${profile.telefono_aseguradora.replace(/\D/g, '')}`} className="w-full bg-blue-600 text-white flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm hover:scale-[1.02] transition-transform shadow-md">
-                                            <PhoneCall size={18} /> Llamar a Aseguradora: {profile.telefono_aseguradora}
-                                        </a>
-                                    </div>
+                                    </>
+                                ) : (
+                                    <h3 className="flex items-center gap-2 text-sm font-bold text-primary uppercase tracking-wider">
+                                        <Info size={20} className="text-primary" /> Sin Seguro Médico Reportado
+                                    </h3>
                                 )}
 
-                                {/* Warning & File Button */}
-                                <div className="border-t border-primary/20 pt-4 mt-2 relative z-10">
-                                    <p className="text-xs font-semibold text-primary/80 leading-relaxed mb-3 bg-white p-3 rounded-xl border border-primary/10 shadow-sm flex gap-3 text-justify">
-                                        <span className="text-lg">📢</span>
-                                        <span><strong>AVISO PARA PARAMÉDICOS:</strong> Si el paciente requiere hospitalización, presente este documento en admisión para coordinar el ingreso y cobertura inmediata.</span>
-                                    </p>
-                                    {signedPolizaUrl && (
-                                        <a
-                                            href={signedPolizaUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="w-full bg-background border-2 border-primary text-primary flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm hover:bg-primary/5 transition-colors shadow-sm"
-                                        >
-                                            <FileText size={18} /> Ver Documento / Póliza Completa
-                                        </a>
-                                    )}
-                                </div>
                             </div>
                         )}
 

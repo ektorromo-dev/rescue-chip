@@ -34,7 +34,13 @@ export default function DashboardPage() {
     const [policyNumber, setPolicyNumber] = useState("");
     const [medicalSystem, setMedicalSystem] = useState("");
 
-    // New Insurance fields
+    // Public / Inst. Insurance fields
+    const [nss, setNss] = useState("");
+    const [numeroAfiliacion, setNumeroAfiliacion] = useState("");
+    const [clinicaAsignada, setClinicaAsignada] = useState("");
+    const [curpSeguro, setCurpSeguro] = useState("");
+
+    // Private Insurance fields
     const [aseguradora, setAseguradora] = useState("");
     const [aseguradoraOtra, setAseguradoraOtra] = useState("");
     const [numeroPoliza, setNumeroPoliza] = useState("");
@@ -96,7 +102,7 @@ export default function DashboardPage() {
                 setPolicyNumber(profile.policy_number || "");
                 setMedicalSystem(profile.medical_system || "");
 
-                const knownAseguradoras = ['AXA', 'GNP', 'Monterrey New York Life (Seguros Monterrey)', 'Allianz', 'MetLife', 'Zurich', 'BUPA', 'Mapfre', 'Seguros Atlas'];
+                const knownAseguradoras = ['AXA', 'GNP', 'Seguros Monterrey (SMNYL)', 'Allianz', 'MetLife', 'Zurich', 'BUPA', 'Mapfre', 'Seguros Atlas'];
                 if (profile.aseguradora && !knownAseguradoras.includes(profile.aseguradora)) {
                     setAseguradora("Otro");
                     setAseguradoraOtra(profile.aseguradora);
@@ -109,6 +115,11 @@ export default function DashboardPage() {
                 setVigenciaPoliza(profile.vigencia_poliza || "");
                 setTelefonoAseguradora(profile.telefono_aseguradora || "");
                 setCurrentPolizaUrl(profile.poliza_url || null);
+
+                setNss(profile.nss || "");
+                setNumeroAfiliacion(profile.numero_afiliacion || "");
+                setClinicaAsignada(profile.clinica_asignada || "");
+                setCurpSeguro(profile.curp_seguro || "");
 
                 setOrganDonor(profile.organ_donor || false);
                 setIsMotorcyclist(profile.is_motorcyclist || false);
@@ -224,6 +235,10 @@ export default function DashboardPage() {
                     vigencia_poliza: vigenciaPoliza || null,
                     telefono_aseguradora: telefonoAseguradora || null,
                     poliza_url: newPolizaUrl,
+                    nss: nss || null,
+                    numero_afiliacion: numeroAfiliacion || null,
+                    clinica_asignada: clinicaAsignada || null,
+                    curp_seguro: curpSeguro || null,
                     updated_at: new Date().toISOString()
                 })
                 .eq('id', profileId);
@@ -252,6 +267,7 @@ export default function DashboardPage() {
             const { error: updateError } = await supabase
                 .from('profiles')
                 .update({
+                    medical_system: null,
                     aseguradora: null,
                     numero_poliza: null,
                     tipo_seguro: null,
@@ -259,11 +275,16 @@ export default function DashboardPage() {
                     vigencia_poliza: null,
                     telefono_aseguradora: null,
                     poliza_url: null,
+                    nss: null,
+                    numero_afiliacion: null,
+                    clinica_asignada: null,
+                    curp_seguro: null,
                 })
                 .eq('id', profileId);
 
             if (updateError) throw updateError;
 
+            setMedicalSystem("");
             setAseguradora("");
             setAseguradoraOtra("");
             setNumeroPoliza("");
@@ -273,6 +294,10 @@ export default function DashboardPage() {
             setTelefonoAseguradora("");
             setPolizaFile(null);
             setCurrentPolizaUrl(null);
+            setNss("");
+            setNumeroAfiliacion("");
+            setClinicaAsignada("");
+            setCurpSeguro("");
 
             setSuccessMsg("Información de seguro eliminada.");
         } catch (err: any) {
@@ -501,47 +526,14 @@ export default function DashboardPage() {
                                 </div>
                             </section>
 
-                            {/* SEGURO MÉDICO */}
-                            <section className="space-y-4">
-                                <h3 className="text-xl font-bold flex items-center gap-2 border-b border-border pb-2">
-                                    <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">4</span>
-                                    Seguro Médico
-                                </h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="space-y-2 md:col-span-2">
-                                        <label htmlFor="medicalSystem" className="text-sm font-semibold">Sistema Médico u Organización</label>
-                                        <select id="medicalSystem" value={medicalSystem} onChange={(e) => setMedicalSystem(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all">
-                                            <option value="">Ninguno específico</option>
-                                            <option value="IMSS">IMSS</option>
-                                            <option value="ISSSTE">ISSSTE</option>
-                                            <option value="Seguro Popular / Insabi">Seguro Popular / INSABI</option>
-                                            <option value="Seguro Médico Privado">Seguro Médico Privado</option>
-                                            <option value="Otro">Otro</option>
-                                        </select>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="insuranceProvider" className="text-sm font-semibold">Aseguradora</label>
-                                        <input type="text" id="insuranceProvider" value={insuranceProvider} onChange={(e) => setInsuranceProvider(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="policyNumber" className="text-sm font-semibold">Número de Póliza</label>
-                                        <input type="text" id="policyNumber" value={policyNumber} onChange={(e) => setPolicyNumber(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
-                                    </div>
-                                    <div className="space-y-2 flex items-center gap-3 pt-6 rounded-xl border border-border p-4 bg-muted/20 md:col-span-2">
-                                        <input type="checkbox" id="organDonor" checked={organDonor} onChange={(e) => setOrganDonor(e.target.checked)} className="w-5 h-5 rounded border-input accent-primary text-primary" />
-                                        <label htmlFor="organDonor" className="text-sm font-semibold cursor-pointer">Soy donante oficial de órganos</label>
-                                    </div>
-                                </div>
-                            </section>
-
-                            {/* MI PÓLIZA DE SEGURO */}
+                            {/* MI SEGURO MÉDICO (UNIFIED) */}
                             <section className="space-y-4">
                                 <h3 className="text-xl font-bold flex items-center justify-between border-b border-border pb-2">
                                     <div className="flex items-center gap-2">
-                                        <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">5</span>
-                                        Mi Póliza de Seguro
+                                        <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">4</span>
+                                        Mi Seguro Médico
                                     </div>
-                                    {(aseguradora || currentPolizaUrl) && (
+                                    {(medicalSystem || currentPolizaUrl) && (
                                         <button type="button" onClick={handleDeleteInsuranceInfo} className="text-destructive text-sm font-bold flex items-center gap-1 hover:underline">
                                             Eliminar información
                                         </button>
@@ -549,102 +541,181 @@ export default function DashboardPage() {
                                 </h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-muted/30 p-5 rounded-2xl border border-border">
                                     <div className="space-y-2 lg:col-span-2">
-                                        <label htmlFor="aseguradora" className="text-sm font-semibold">Aseguradora</label>
-                                        <select id="aseguradora" value={aseguradora} onChange={(e) => setAseguradora(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all">
-                                            <option value="">Selecciona una aseguradora</option>
-                                            <option value="AXA">AXA</option>
-                                            <option value="GNP">GNP</option>
-                                            <option value="Monterrey New York Life (Seguros Monterrey)">Monterrey New York Life (Seguros Monterrey)</option>
-                                            <option value="Allianz">Allianz</option>
-                                            <option value="MetLife">MetLife</option>
-                                            <option value="Zurich">Zurich</option>
-                                            <option value="BUPA">BUPA</option>
-                                            <option value="Mapfre">Mapfre</option>
-                                            <option value="Seguros Atlas">Seguros Atlas</option>
-                                            <option value="Otro">Otro</option>
+                                        <label htmlFor="medicalSystem" className="text-sm font-semibold">Sistema médico *</label>
+                                        <select id="medicalSystem" value={medicalSystem} onChange={(e) => setMedicalSystem(e.target.value)} required className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all">
+                                            <option value="">Selecciona un sistema</option>
+                                            <option value="Seguro Privado (Gastos Médicos Mayores)">Seguro Privado (Gastos Médicos Mayores)</option>
+                                            <option value="IMSS">IMSS</option>
+                                            <option value="ISSSTE">ISSSTE</option>
+                                            <option value="IMSS-BIENESTAR">IMSS-BIENESTAR</option>
+                                            <option value="PEMEX">PEMEX</option>
+                                            <option value="SEDENA / SEMAR">SEDENA / SEMAR</option>
+                                            <option value="Sin seguro médico">Sin seguro médico</option>
                                         </select>
                                     </div>
-                                    {aseguradora === "Otro" && (
-                                        <div className="space-y-2 animate-in fade-in duration-300 md:col-span-2">
-                                            <label htmlFor="aseguradoraOtra" className="text-sm font-semibold text-primary">Especificar Aseguradora *</label>
-                                            <input type="text" id="aseguradoraOtra" value={aseguradoraOtra} onChange={(e) => setAseguradoraOtra(e.target.value)} required className="w-full flex h-12 rounded-xl border border-primary/50 bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+
+                                    {/* CONDITIONAL RENDERINGS */}
+                                    {medicalSystem === "Seguro Privado (Gastos Médicos Mayores)" && (
+                                        <>
+                                            <div className="space-y-2 lg:col-span-2">
+                                                <label htmlFor="aseguradora" className="text-sm font-semibold">Aseguradora</label>
+                                                <select id="aseguradora" value={aseguradora} onChange={(e) => setAseguradora(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all">
+                                                    <option value="">Selecciona una aseguradora</option>
+                                                    <option value="AXA">AXA</option>
+                                                    <option value="GNP">GNP</option>
+                                                    <option value="Seguros Monterrey (SMNYL)">Seguros Monterrey (SMNYL)</option>
+                                                    <option value="Allianz">Allianz</option>
+                                                    <option value="MetLife">MetLife</option>
+                                                    <option value="Zurich">Zurich</option>
+                                                    <option value="BUPA">BUPA</option>
+                                                    <option value="Mapfre">Mapfre</option>
+                                                    <option value="Seguros Atlas">Seguros Atlas</option>
+                                                    <option value="Otro">Otro</option>
+                                                </select>
+                                            </div>
+                                            {aseguradora === "Otro" && (
+                                                <div className="space-y-2 animate-in fade-in duration-300 md:col-span-2">
+                                                    <label htmlFor="aseguradoraOtra" className="text-sm font-semibold text-primary">Especificar Aseguradora *</label>
+                                                    <input type="text" id="aseguradoraOtra" value={aseguradoraOtra} onChange={(e) => setAseguradoraOtra(e.target.value)} required className="w-full flex h-12 rounded-xl border border-primary/50 bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                </div>
+                                            )}
+                                            <div className="space-y-2">
+                                                <label htmlFor="numeroPoliza" className="text-sm font-semibold">Número de Póliza *</label>
+                                                <input type="text" id="numeroPoliza" value={numeroPoliza} onChange={(e) => setNumeroPoliza(e.target.value)} required className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label htmlFor="nombreAsegurado" className="text-sm font-semibold">Nombre Asegurado Titular *</label>
+                                                <input type="text" id="nombreAsegurado" value={nombreAsegurado} onChange={(e) => setNombreAsegurado(e.target.value)} required className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label htmlFor="vigenciaPoliza" className="text-sm font-semibold">Vigencia (Opcional)</label>
+                                                <input type="date" id="vigenciaPoliza" value={vigenciaPoliza} onChange={(e) => setVigenciaPoliza(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all text-foreground" style={{ colorScheme: 'dark' }} />
+                                            </div>
+                                            <div className="space-y-2 md:col-span-2">
+                                                <label htmlFor="telefonoAseguradora" className="text-sm font-semibold">Teléfono de Emergencias (Opcional)</label>
+                                                <input type="tel" id="telefonoAseguradora" value={telefonoAseguradora} onChange={(e) => setTelefonoAseguradora(e.target.value)} placeholder="Ej: 800-123-4567" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                            </div>
+
+                                            {/* Subida de Póliza */}
+                                            <div className="space-y-4 md:col-span-2 mt-4 pt-4 border-t border-border/50">
+                                                <div>
+                                                    <label className="text-sm font-semibold">Documento Póliza (PDF, JPG, PNG)</label>
+                                                    <p className="text-xs text-muted-foreground mt-1">Sube el extracto de tu póliza (máx 5MB). Se mostrará a paramédicos.</p>
+                                                </div>
+                                                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                                                    {polizaFile ? (
+                                                        <div className="px-4 py-3 bg-primary/10 border border-primary/20 rounded-xl text-primary font-bold text-sm flex items-center gap-2">
+                                                            📄 {polizaFile.name}
+                                                        </div>
+                                                    ) : currentPolizaUrl ? (
+                                                        <div className="px-4 py-3 bg-background border border-border rounded-xl text-foreground font-bold text-sm flex items-center gap-2 relative group overflow-hidden">
+                                                            📄 Póliza Actual
+                                                        </div>
+                                                    ) : null}
+
+                                                    <div className="flex-1 w-full relative">
+                                                        <input
+                                                            type="file"
+                                                            accept=".pdf,image/png,image/jpeg,image/jpg"
+                                                            onChange={(e) => {
+                                                                const file = e.target.files?.[0];
+                                                                if (file) {
+                                                                    if (file.size > 5 * 1024 * 1024) {
+                                                                        alert("El archivo no debe pesar más de 5MB");
+                                                                        e.target.value = '';
+                                                                        return;
+                                                                    }
+                                                                    setPolizaFile(file);
+                                                                }
+                                                            }}
+                                                            className="w-full flex h-14 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 cursor-pointer shadow-sm relative z-10"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+
+                                    {medicalSystem === "IMSS" && (
+                                        <>
+                                            <div className="space-y-2">
+                                                <label htmlFor="nss" className="text-sm font-semibold">NSS - Número de Seguridad Social *</label>
+                                                <input type="text" id="nss" value={nss} onChange={(e) => setNss(e.target.value)} required maxLength={11} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label htmlFor="clinicaAsignada" className="text-sm font-semibold">UMF / Clínica asignada (Opcional)</label>
+                                                <input type="text" id="clinicaAsignada" value={clinicaAsignada} onChange={(e) => setClinicaAsignada(e.target.value)} placeholder="Ej: UMF 28, Monterrey" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                            </div>
+                                            <div className="space-y-2 md:col-span-2">
+                                                <label htmlFor="curpSeguro" className="text-sm font-semibold">CURP (Opcional)</label>
+                                                <input type="text" id="curpSeguro" value={curpSeguro} onChange={(e) => setCurpSeguro(e.target.value.toUpperCase())} maxLength={18} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase" />
+                                            </div>
+                                        </>
+                                    )}
+
+                                    {medicalSystem === "ISSSTE" && (
+                                        <>
+                                            <div className="space-y-2 md:col-span-2">
+                                                <label htmlFor="numeroAfiliacion" className="text-sm font-semibold">Número de afiliación ISSSTE *</label>
+                                                <input type="text" id="numeroAfiliacion" value={numeroAfiliacion} onChange={(e) => setNumeroAfiliacion(e.target.value)} required className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label htmlFor="clinicaAsignada" className="text-sm font-semibold">Clínica asignada (Opcional)</label>
+                                                <input type="text" id="clinicaAsignada" value={clinicaAsignada} onChange={(e) => setClinicaAsignada(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label htmlFor="curpSeguro" className="text-sm font-semibold">CURP (Opcional)</label>
+                                                <input type="text" id="curpSeguro" value={curpSeguro} onChange={(e) => setCurpSeguro(e.target.value.toUpperCase())} maxLength={18} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase" />
+                                            </div>
+                                        </>
+                                    )}
+
+                                    {medicalSystem === "IMSS-BIENESTAR" && (
+                                        <>
+                                            <div className="space-y-2">
+                                                <label htmlFor="curpSeguro" className="text-sm font-semibold">CURP *</label>
+                                                <input type="text" id="curpSeguro" value={curpSeguro} onChange={(e) => setCurpSeguro(e.target.value.toUpperCase())} required maxLength={18} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label htmlFor="clinicaAsignada" className="text-sm font-semibold">Centro de salud asignado (Opcional)</label>
+                                                <input type="text" id="clinicaAsignada" value={clinicaAsignada} onChange={(e) => setClinicaAsignada(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                            </div>
+                                        </>
+                                    )}
+
+                                    {(medicalSystem === "PEMEX" || medicalSystem === "SEDENA / SEMAR") && (
+                                        <>
+                                            <div className="space-y-2">
+                                                <label htmlFor="numeroAfiliacion" className="text-sm font-semibold">Número de afiliación *</label>
+                                                <input type="text" id="numeroAfiliacion" value={numeroAfiliacion} onChange={(e) => setNumeroAfiliacion(e.target.value)} required className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label htmlFor="clinicaAsignada" className="text-sm font-semibold">Unidad médica asignada (Opcional)</label>
+                                                <input type="text" id="clinicaAsignada" value={clinicaAsignada} onChange={(e) => setClinicaAsignada(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                            </div>
+                                        </>
+                                    )}
+
+                                    {medicalSystem === "Sin seguro médico" && (
+                                        <div className="col-span-1 md:col-span-2 p-4 bg-muted/50 rounded-xl border border-border text-sm text-muted-foreground">
+                                            <p className="font-semibold text-foreground mb-1">Aviso:</p>
+                                            En caso de emergencia serás atendido en el hospital público más cercano. Te recomendamos considerar un seguro de gastos médicos mayores para una mejor atención.
                                         </div>
                                     )}
-                                    <div className="space-y-2">
-                                        <label htmlFor="numeroPoliza" className="text-sm font-semibold">Número de Póliza {aseguradora && "*"}</label>
-                                        <input type="text" id="numeroPoliza" value={numeroPoliza} onChange={(e) => setNumeroPoliza(e.target.value)} required={!!aseguradora} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="tipoSeguro" className="text-sm font-semibold">Tipo de Seguro</label>
-                                        <select id="tipoSeguro" value={tipoSeguro} onChange={(e) => setTipoSeguro(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all">
-                                            <option value="">Selecciona un tipo</option>
-                                            <option value="Gastos Médicos Mayores">Gastos Médicos Mayores</option>
-                                            <option value="Seguro de Auto">Seguro de Auto</option>
-                                            <option value="Seguro de Moto">Seguro de Moto</option>
-                                            <option value="Seguro de Vida">Seguro de Vida</option>
-                                            <option value="Otro">Otro</option>
-                                        </select>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="nombreAsegurado" className="text-sm font-semibold">Nombre Asegurado Titular {aseguradora && "*"}</label>
-                                        <input type="text" id="nombreAsegurado" value={nombreAsegurado} onChange={(e) => setNombreAsegurado(e.target.value)} required={!!aseguradora} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="vigenciaPoliza" className="text-sm font-semibold">Vigencia (Opcional)</label>
-                                        <input type="date" id="vigenciaPoliza" value={vigenciaPoliza} onChange={(e) => setVigenciaPoliza(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all text-foreground" style={{ colorScheme: 'dark' }} />
-                                    </div>
-                                    <div className="space-y-2 md:col-span-2">
-                                        <label htmlFor="telefonoAseguradora" className="text-sm font-semibold">Teléfono de Emergencias (Opcional)</label>
-                                        <input type="tel" id="telefonoAseguradora" value={telefonoAseguradora} onChange={(e) => setTelefonoAseguradora(e.target.value)} placeholder="Ej: 800-123-4567" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+
+                                    <div className="space-y-2 flex items-center gap-3 pt-6 rounded-xl border border-border p-4 bg-muted/20 md:col-span-2">
+                                        <input type="checkbox" id="organDonor" checked={organDonor} onChange={(e) => setOrganDonor(e.target.checked)} className="w-5 h-5 rounded border-input accent-primary text-primary" />
+                                        <label htmlFor="organDonor" className="text-sm font-semibold cursor-pointer">Soy donante oficial de órganos</label>
                                     </div>
 
-                                    {/* Subida de Póliza */}
-                                    <div className="space-y-4 md:col-span-2 mt-4 pt-4 border-t border-border/50">
-                                        <div>
-                                            <label className="text-sm font-semibold">Documento (PDF, JPG, PNG)</label>
-                                            <p className="text-xs text-muted-foreground mt-1">Sube el extracto de tu póliza (máx 5MB). Se mostrará a paramédicos.</p>
-                                        </div>
-
-                                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                                            {polizaFile ? (
-                                                <div className="px-4 py-3 bg-primary/10 border border-primary/20 rounded-xl text-primary font-bold text-sm flex items-center gap-2">
-                                                    📄 {polizaFile.name}
-                                                </div>
-                                            ) : currentPolizaUrl ? (
-                                                <div className="px-4 py-3 bg-background border border-border rounded-xl text-foreground font-bold text-sm flex items-center gap-2 relative group overflow-hidden">
-                                                    📄 Póliza Actual
-                                                </div>
-                                            ) : null}
-
-                                            <div className="flex-1 w-full relative">
-                                                <input
-                                                    type="file"
-                                                    accept=".pdf,image/png,image/jpeg,image/jpg"
-                                                    onChange={(e) => {
-                                                        const file = e.target.files?.[0];
-                                                        if (file) {
-                                                            if (file.size > 5 * 1024 * 1024) {
-                                                                alert("El archivo no debe pesar más de 5MB");
-                                                                e.target.value = '';
-                                                                return;
-                                                            }
-                                                            setPolizaFile(file);
-                                                        }
-                                                    }}
-                                                    className="w-full flex h-14 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 cursor-pointer shadow-sm relative z-10"
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                             </section>
 
                             {/* NOTAS Y UBICACIÓN */}
                             <section className="space-y-4">
                                 <h3 className="text-xl font-bold flex items-center gap-2 border-b border-border pb-2">
-                                    <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">6</span>
+                                    <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">5</span>
                                     Notas y Ubicación
-
                                 </h3>
 
                                 <div className="space-y-2 flex items-center gap-3 pt-2 rounded-xl border border-primary/30 p-5 bg-primary/5 mb-6">

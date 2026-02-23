@@ -20,6 +20,11 @@ function ActivationFormContent() {
     const [photoFile, setPhotoFile] = useState<File | null>(null);
     const [showPassword, setShowPassword] = useState(false);
 
+    // Insurance state for conditional rendering
+    const [medicalSystem, setMedicalSystem] = useState("");
+    const [aseguradora, setAseguradora] = useState("");
+    const [polizaFile, setPolizaFile] = useState<File | null>(null);
+
     useEffect(() => {
         if (folioFromUrl) {
             setFolio(folioFromUrl);
@@ -127,6 +132,25 @@ function ActivationFormContent() {
                 photoUrl = publicUrlData.publicUrl;
             }
 
+            let polizaUrl = null;
+            if (polizaFile) {
+                const fileExt = polizaFile.name.split('.').pop();
+                const fileName = `poliza.${fileExt}`;
+                const fullPath = `${userId}/${fileName}`;
+
+                const { data: uploadData, error: uploadError } = await supabase.storage
+                    .from('polizas')
+                    .upload(fullPath, polizaFile, { upsert: true });
+
+                if (uploadError) {
+                    throw new Error("No se pudo subir el archivo de la póliza. Inténtalo de nuevo.");
+                }
+
+                polizaUrl = fullPath;
+            }
+
+            const finalAseguradora = aseguradora === "Otro" ? (formData.get("aseguradoraOtra") as string) : aseguradora;
+
             // 2. Insert profile
             const { error: profileError } = await supabase
                 .from('profiles')
@@ -142,13 +166,22 @@ function ActivationFormContent() {
                     allergies: formData.get("allergies") as string,
                     medical_conditions: formData.get("medicalConditions") as string,
                     important_medications: formData.get("importantMedications") as string,
-                    insurance_provider: formData.get("insuranceProvider") as string,
-                    policy_number: formData.get("policyNumber") as string,
-                    medical_system: formData.get("medicalSystem") as string,
+                    medical_system: medicalSystem,
                     organ_donor: organDonor,
                     is_motorcyclist: isMotorcyclist,
                     additional_notes: formData.get("additionalNotes") as string,
                     google_maps_link: formData.get("googleMapsLink") as string,
+                    aseguradora: finalAseguradora || null,
+                    numero_poliza: formData.get("numeroPoliza") as string || null,
+                    tipo_seguro: formData.get("tipoSeguro") as string || null,
+                    nombre_asegurado: formData.get("nombreAsegurado") as string || null,
+                    vigencia_poliza: formData.get("vigenciaPoliza") as string || null,
+                    telefono_aseguradora: formData.get("telefonoAseguradora") as string || null,
+                    poliza_url: polizaUrl,
+                    nss: formData.get("nss") as string || null,
+                    numero_afiliacion: formData.get("numeroAfiliacion") as string || null,
+                    clinica_asignada: formData.get("clinicaAsignada") as string || null,
+                    curp_seguro: formData.get("curpSeguro") as string || null,
                 });
 
             if (profileError) {
@@ -376,36 +409,187 @@ function ActivationFormContent() {
                     </div>
                 </section>
 
-                {/* SEGURO MÉDICO */}
+                {/* SEGURO MÉDICO (UNIFIED) */}
                 <section className="space-y-4">
                     <h3 className="text-xl font-bold flex items-center gap-2 border-b border-border pb-2">
                         <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">4</span>
-                        Seguro Médico <span className="text-muted-foreground font-normal text-sm ml-2">(Opcional)</span>
+                        Mi Seguro Médico <span className="text-muted-foreground font-normal text-sm ml-2">(Opcional)</span>
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2 md:col-span-2">
-                            <label htmlFor="medicalSystem" className="text-sm font-semibold">Sistema Médico u Organización</label>
-                            <select id="medicalSystem" name="medicalSystem" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all">
-                                <option value="">Selecciona tu sistema (Opcional)</option>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-muted/30 p-5 rounded-2xl border border-border">
+                        <div className="space-y-2 lg:col-span-2">
+                            <label htmlFor="medicalSystem" className="text-sm font-semibold">Sistema médico</label>
+                            <select id="medicalSystem" name="medicalSystem" value={medicalSystem} onChange={(e) => setMedicalSystem(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all">
+                                <option value="">Selecciona un sistema</option>
+                                <option value="Seguro Privado (Gastos Médicos Mayores)">Seguro Privado (Gastos Médicos Mayores)</option>
                                 <option value="IMSS">IMSS</option>
                                 <option value="ISSSTE">ISSSTE</option>
-                                <option value="Seguro Popular / Insabi">Seguro Popular / INSABI</option>
-                                <option value="Seguro Médico Privado">Seguro Médico Privado</option>
-                                <option value="Otro">Otro</option>
+                                <option value="IMSS-BIENESTAR">IMSS-BIENESTAR</option>
+                                <option value="PEMEX">PEMEX</option>
+                                <option value="SEDENA / SEMAR">SEDENA / SEMAR</option>
+                                <option value="Sin seguro médico">Sin seguro médico</option>
                             </select>
                         </div>
-                        <div className="space-y-2">
-                            <label htmlFor="insuranceProvider" className="text-sm font-semibold">Aseguradora (Si aplica)</label>
-                            <input type="text" id="insuranceProvider" name="insuranceProvider" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. GNP, AXA, MetLife..." />
-                        </div>
-                        <div className="space-y-2">
-                            <label htmlFor="policyNumber" className="text-sm font-semibold">Número de Póliza / Afiliación</label>
-                            <input type="text" id="policyNumber" name="policyNumber" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Número de seguro o póliza" />
-                        </div>
+
+                        {/* CONDITIONAL RENDERINGS */}
+                        {medicalSystem === "Seguro Privado (Gastos Médicos Mayores)" && (
+                            <>
+                                <div className="space-y-2 lg:col-span-2">
+                                    <label htmlFor="aseguradora" className="text-sm font-semibold">Aseguradora</label>
+                                    <select id="aseguradora" name="aseguradora" value={aseguradora} onChange={(e) => setAseguradora(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all">
+                                        <option value="">Selecciona una aseguradora</option>
+                                        <option value="AXA">AXA</option>
+                                        <option value="GNP">GNP</option>
+                                        <option value="Seguros Monterrey (SMNYL)">Seguros Monterrey (SMNYL)</option>
+                                        <option value="Allianz">Allianz</option>
+                                        <option value="MetLife">MetLife</option>
+                                        <option value="Zurich">Zurich</option>
+                                        <option value="BUPA">BUPA</option>
+                                        <option value="Mapfre">Mapfre</option>
+                                        <option value="Seguros Atlas">Seguros Atlas</option>
+                                        <option value="Otro">Otro</option>
+                                    </select>
+                                </div>
+                                {aseguradora === "Otro" && (
+                                    <div className="space-y-2 animate-in fade-in duration-300 md:col-span-2">
+                                        <label htmlFor="aseguradoraOtra" className="text-sm font-semibold text-primary">Especificar Aseguradora *</label>
+                                        <input type="text" id="aseguradoraOtra" name="aseguradoraOtra" required className="w-full flex h-12 rounded-xl border border-primary/50 bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                    </div>
+                                )}
+                                <div className="space-y-2">
+                                    <label htmlFor="numeroPoliza" className="text-sm font-semibold">Número de Póliza *</label>
+                                    <input type="text" id="numeroPoliza" name="numeroPoliza" required className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label htmlFor="tipoSeguro" className="text-sm font-semibold">Tipo de Seguro</label>
+                                    <select id="tipoSeguro" name="tipoSeguro" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all">
+                                        <option value="">Selecciona un tipo</option>
+                                        <option value="Gastos Médicos Mayores">Gastos Médicos Mayores</option>
+                                        <option value="Seguro de Auto">Seguro de Auto</option>
+                                        <option value="Seguro de Moto">Seguro de Moto</option>
+                                        <option value="Seguro de Vida">Seguro de Vida</option>
+                                        <option value="Otro">Otro</option>
+                                    </select>
+                                </div>
+                                <div className="space-y-2">
+                                    <label htmlFor="nombreAsegurado" className="text-sm font-semibold">Nombre Asegurado Titular *</label>
+                                    <input type="text" id="nombreAsegurado" name="nombreAsegurado" required className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label htmlFor="vigenciaPoliza" className="text-sm font-semibold">Vigencia (Opcional)</label>
+                                    <input type="date" id="vigenciaPoliza" name="vigenciaPoliza" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all text-foreground" style={{ colorScheme: 'dark' }} />
+                                </div>
+                                <div className="space-y-2 md:col-span-2">
+                                    <label htmlFor="telefonoAseguradora" className="text-sm font-semibold">Teléfono de Emergencias (Opcional)</label>
+                                    <input type="tel" id="telefonoAseguradora" name="telefonoAseguradora" placeholder="Ej: 800-123-4567" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                </div>
+
+                                {/* Subida de Póliza */}
+                                <div className="space-y-4 md:col-span-2 mt-4 pt-4 border-t border-border/50">
+                                    <div>
+                                        <label className="text-sm font-semibold">Documento Póliza (PDF, JPG, PNG)</label>
+                                        <p className="text-xs text-muted-foreground mt-1">Sube el extracto de tu póliza (máx 5MB). Se mostrará a paramédicos.</p>
+                                    </div>
+                                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                                        {polizaFile ? (
+                                            <div className="px-4 py-3 bg-primary/10 border border-primary/20 rounded-xl text-primary font-bold text-sm flex items-center gap-2">
+                                                📄 {polizaFile.name}
+                                            </div>
+                                        ) : null}
+                                        <div className="flex-1 w-full relative">
+                                            <input
+                                                type="file"
+                                                accept=".pdf,image/png,image/jpeg,image/jpg"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) {
+                                                        if (file.size > 5 * 1024 * 1024) {
+                                                            alert("El archivo no debe pesar más de 5MB");
+                                                            e.target.value = '';
+                                                            return;
+                                                        }
+                                                        setPolizaFile(file);
+                                                    }
+                                                }}
+                                                className="w-full flex h-14 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 cursor-pointer shadow-sm relative z-10"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {medicalSystem === "IMSS" && (
+                            <>
+                                <div className="space-y-2">
+                                    <label htmlFor="nss" className="text-sm font-semibold">NSS - Número de Seguridad Social *</label>
+                                    <input type="text" id="nss" name="nss" required maxLength={11} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label htmlFor="clinicaAsignada" className="text-sm font-semibold">UMF / Clínica asignada (Opcional)</label>
+                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" placeholder="Ej: UMF 28, Monterrey" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                </div>
+                                <div className="space-y-2 md:col-span-2">
+                                    <label htmlFor="curpSeguro" className="text-sm font-semibold">CURP (Opcional)</label>
+                                    <input type="text" id="curpSeguro" name="curpSeguro" maxLength={18} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase" />
+                                </div>
+                            </>
+                        )}
+
+                        {medicalSystem === "ISSSTE" && (
+                            <>
+                                <div className="space-y-2 md:col-span-2">
+                                    <label htmlFor="numeroAfiliacion" className="text-sm font-semibold">Número de afiliación ISSSTE *</label>
+                                    <input type="text" id="numeroAfiliacion" name="numeroAfiliacion" required className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label htmlFor="clinicaAsignada" className="text-sm font-semibold">Clínica asignada (Opcional)</label>
+                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label htmlFor="curpSeguro" className="text-sm font-semibold">CURP (Opcional)</label>
+                                    <input type="text" id="curpSeguro" name="curpSeguro" maxLength={18} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase" />
+                                </div>
+                            </>
+                        )}
+
+                        {medicalSystem === "IMSS-BIENESTAR" && (
+                            <>
+                                <div className="space-y-2">
+                                    <label htmlFor="curpSeguro" className="text-sm font-semibold">CURP *</label>
+                                    <input type="text" id="curpSeguro" name="curpSeguro" required maxLength={18} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label htmlFor="clinicaAsignada" className="text-sm font-semibold">Centro de salud asignado (Opcional)</label>
+                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                </div>
+                            </>
+                        )}
+
+                        {(medicalSystem === "PEMEX" || medicalSystem === "SEDENA / SEMAR") && (
+                            <>
+                                <div className="space-y-2">
+                                    <label htmlFor="numeroAfiliacion" className="text-sm font-semibold">Número de afiliación *</label>
+                                    <input type="text" id="numeroAfiliacion" name="numeroAfiliacion" required className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label htmlFor="clinicaAsignada" className="text-sm font-semibold">Unidad médica asignada (Opcional)</label>
+                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                </div>
+                            </>
+                        )}
+
+                        {medicalSystem === "Sin seguro médico" && (
+                            <div className="col-span-1 md:col-span-2 p-4 bg-muted/50 rounded-xl border border-border text-sm text-muted-foreground">
+                                <p className="font-semibold text-foreground mb-1">Aviso:</p>
+                                En caso de emergencia serás atendido en el hospital público más cercano. Te recomendamos considerar un seguro de gastos médicos mayores para una mejor atención.
+                            </div>
+                        )}
+
                         <div className="space-y-2 flex items-center gap-3 pt-6 rounded-xl border border-border p-4 bg-muted/20 md:col-span-2">
                             <input type="checkbox" id="organDonor" name="organDonor" className="w-5 h-5 rounded border-input accent-primary text-primary" />
                             <label htmlFor="organDonor" className="text-sm font-semibold cursor-pointer">Soy donante oficial de órganos</label>
                         </div>
+
                     </div>
                 </section>
 

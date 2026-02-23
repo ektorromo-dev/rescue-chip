@@ -39,6 +39,10 @@ create table public.profiles (
   vigencia_poliza date,
   telefono_aseguradora text,
   poliza_url text,
+  nss text,
+  numero_afiliacion text,
+  clinica_asignada text,
+  curp_seguro text,
 
   
   -- NOTAS IMPORTANTES Y AVISOS
