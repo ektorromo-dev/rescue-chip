@@ -70,21 +70,26 @@ export default async function ProfilePage({ params }: ProfileProps) {
     }
 
     if (chipError || !chip) {
-        console.error(chipError);
+        console.error("Error al buscar el chip o no se encontró:", chipError);
         return (
             <div className="min-h-screen bg-muted flex flex-col items-center justify-center p-4">
                 <div className="bg-card p-10 rounded-3xl shadow-xl max-w-md text-center border border-border">
                     <AlertTriangle size={48} className="mx-auto text-destructive mb-6" />
                     <h1 className="text-2xl font-bold mb-4">Chip no válido</h1>
-                    <p className="text-muted-foreground mb-8">El folio proporcionado no existe en nuestros registros o está mal escrito.</p>
+                    <p className="text-muted-foreground mb-8">Este folio no existe en nuestro sistema.</p>
+                    <Link href="/" className="bg-primary text-primary-foreground px-6 py-3 rounded-full font-bold hover:bg-primary/90 transition-colors inline-block mt-4">
+                        Volver al inicio
+                    </Link>
                 </div>
             </div>
         );
     }
 
-    // If the chip exists but isn't activated yet
-    if (chip.status !== 'activado' && !chip.activated) {
-        // Redirigir a la pantalla de activación con el folio interceptado
+    // Compatibilidad para evitar que chips "viejos" ya activados fallen (status = null pero activated = true)
+    const isChipFullyActivated = chip.status === 'activado' || chip.activated === true;
+
+    // Si el folio EXISTE pero NO está activado (ej. disponible o vendido)
+    if (!isChipFullyActivated) {
         return (
             <div className="min-h-screen bg-muted flex flex-col items-center justify-center p-4">
                 <div className="bg-card p-10 rounded-3xl shadow-xl max-w-md text-center border border-border">
