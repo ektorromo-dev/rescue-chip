@@ -5,6 +5,7 @@ import { ArrowLeft, CheckCircle2, AlertCircle, Loader2, LogOut, LayoutDashboard,
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { MedicalBadge } from "@/components/MedicalBadge";
 
 export default function DashboardPage() {
     const router = useRouter();
@@ -528,13 +529,16 @@ export default function DashboardPage() {
 
                             {/* MI SEGURO MÉDICO (UNIFIED) */}
                             <section className="space-y-4">
-                                <h3 className="text-xl font-bold flex items-center justify-between border-b border-border pb-2">
-                                    <div className="flex items-center gap-2">
-                                        <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">4</span>
-                                        Mi Seguro Médico
+                                <h3 className="text-xl font-bold flex flex-col sm:flex-row sm:items-center justify-between border-b border-border pb-2 gap-4">
+                                    <div className="flex flex-wrap items-center gap-3">
+                                        <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0">4</span>
+                                        <span>Mi Seguro Médico</span>
+                                        {(medicalSystem && medicalSystem !== "Sin seguro médico") && (
+                                            <MedicalBadge medicalSystem={medicalSystem} aseguradora={aseguradora} className="shrink-0" />
+                                        )}
                                     </div>
                                     {(medicalSystem || currentPolizaUrl) && (
-                                        <button type="button" onClick={handleDeleteInsuranceInfo} className="text-destructive text-sm font-bold flex items-center gap-1 hover:underline">
+                                        <button type="button" onClick={handleDeleteInsuranceInfo} className="text-destructive text-sm font-bold flex items-center gap-1 hover:underline shrink-0">
                                             Eliminar información
                                         </button>
                                     )}

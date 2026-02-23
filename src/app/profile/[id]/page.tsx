@@ -1,34 +1,9 @@
 import { HeartPulse, Droplets, AlertTriangle, PhoneCall, CheckCircle2, FileText, UserSquare2, ArrowLeft, ShieldAlert, Navigation, Info } from "lucide-react";
 import Link from "next/link";
 import FirstAidBanner from "@/components/FirstAidBanner";
+import { MedicalBadge } from "@/components/MedicalBadge";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
-
-// Helper to get badge style based on system or insurer
-function getMedicalBadge(medicalSystem: string | null, aseguradora: string | null) {
-    if (medicalSystem === "IMSS") return { bg: "bg-[#006847]", text: "text-white", label: "IMSS" };
-    if (medicalSystem === "ISSSTE") return { bg: "bg-[#003366]", text: "text-white", label: "ISSSTE" };
-    if (medicalSystem === "IMSS-BIENESTAR") return { bg: "bg-[#004D40]", text: "text-white", label: "IMSS-BIENESTAR" };
-    if (medicalSystem === "PEMEX") return { bg: "bg-[#C8102E]", text: "text-white", label: "PEMEX" };
-    if (medicalSystem === "SEDENA / SEMAR") return { bg: "bg-[#4A5E23]", text: "text-white", label: "SEDENA / SEMAR" };
-
-    // Si es privado, usar aseguradora
-    if (medicalSystem === "Seguro Privado (Gastos Médicos Mayores)" || aseguradora) {
-        const a = aseguradora || "";
-        if (a === "AXA") return { bg: "bg-[#003974]", text: "text-white", label: "AXA" };
-        if (a === "GNP") return { bg: "bg-[#FF6600]", text: "text-white", label: "GNP" };
-        if (a === "Seguros Monterrey (SMNYL)") return { bg: "bg-[#002855]", text: "text-white", label: "SMNYL" };
-        if (a === "Allianz") return { bg: "bg-[#003781]", text: "text-white", label: "Allianz" };
-        if (a === "MetLife") return { bg: "bg-[#00A94F]", text: "text-white", label: "MetLife" };
-        if (a === "Zurich") return { bg: "bg-[#003399]", text: "text-white", label: "Zurich" };
-        if (a === "BUPA") return { bg: "bg-[#00A88E]", text: "text-white", label: "BUPA" };
-        if (a === "Mapfre") return { bg: "bg-[#DA291C]", text: "text-white", label: "Mapfre" };
-        if (a === "Seguros Atlas") return { bg: "bg-[#1B3A6B]", text: "text-white", label: "Atlas" };
-        return { bg: "bg-gray-800", text: "text-white", label: a || "Seguro Privado" };
-    }
-
-    return { bg: "bg-gray-600", text: "text-white", label: medicalSystem || "Seguro Médico" };
-}
 
 interface ProfileProps {
     params: Promise<{ id: string }>;
@@ -230,14 +205,7 @@ export default async function ProfilePage({ params }: ProfileProps) {
                                     <>
                                         <h3 className="flex items-center justify-between gap-2 text-sm font-bold text-primary uppercase tracking-wider mb-4 border-b border-primary/20 pb-3">
                                             <div className="flex items-center gap-2"><Info size={20} className="text-primary" /> Información de Seguro</div>
-                                            {(() => {
-                                                const badge = getMedicalBadge(profile.medical_system, profile.aseguradora || profile.insurance_provider);
-                                                return (
-                                                    <span className={`${badge.bg} ${badge.text} px-3 py-1 rounded-full text-xs font-black shadow-sm`}>
-                                                        {badge.label}
-                                                    </span>
-                                                );
-                                            })()}
+                                            <MedicalBadge medicalSystem={profile.medical_system} aseguradora={profile.aseguradora || profile.insurance_provider} className="ml-2 shrink-0" />
                                         </h3>
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mb-5 relative z-10">
