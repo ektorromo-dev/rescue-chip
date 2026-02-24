@@ -104,10 +104,57 @@ Referencia: ${orderDetails.referencia}`.trim()
                 subject: `Nueva venta - RescueChip [${paquete}]`,
                 html: emailHtml,
             });
-            console.log("Notificación de venta enviada por email.");
+            console.log("Notificación de venta enviada al admin por email.");
         } catch (mailError) {
-            console.error("Error enviando email de notificación de venta:", mailError);
+            console.error("Error enviando email de notificación de venta al admin:", mailError);
             // No bloqueamos a Stripe si falla el envío de correo.
+        }
+
+        // --- ENVIAR CORREO DE CONFIRMACIÓN AL CLIENTE ---
+        if (email && email !== "No especificado") {
+            const customerEmailHtml = `
+                <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+                    <h1 style="color: #e11d48; margin-bottom: 5px;">RescueChip</h1>
+                    <h2 style="color: #333; margin-top: 0;">¡Gracias por tu compra!</h2>
+                    
+                    <p style="color: #555; font-size: 16px;">Hola ${nombre},</p>
+                    <p style="color: #555; font-size: 16px;">Tu pedido ha sido recibido y está siendo preparado.</p>
+                    
+                    <div style="background-color: #f9fafb; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                        <h3 style="margin-top: 0; color: #333;">Resumen de tu compra:</h3>
+                        <ul style="color: #555; margin-bottom: 0;">
+                            <li><strong>Paquete:</strong> ${paquete}</li>
+                            <li><strong>Monto Pagado:</strong> $${monto.toFixed(2)} MXN</li>
+                        </ul>
+                    </div>
+                    
+                    <p style="color: #555; font-size: 16px;">Recibirás tu chip en 3-7 días hábiles en la dirección que proporcionaste.</p>
+                    <p style="color: #555; font-size: 16px;">Una vez que lo recibas, escanéalo con tu celular para activarlo y registrar tus datos médicos.</p>
+                    
+                    ${pidioFactura ? `<p style="color: #555; font-size: 16px; background-color: #fdf2f8; padding: 10px; border-left: 4px solid #db2777; margin: 20px 0;">Solicitaste factura. Recibirás tu CFDI y XML en un máximo de 72 horas hábiles.</p>` : ''}
+                    
+                    <div style="margin-top: 30px; font-size: 15px; color: #666;">
+                        <p>Si tienes dudas, contáctanos:</p>
+                        <p style="margin: 5px 0;"><strong>WhatsApp:</strong> +52 55 5143 3904</p>
+                        <p style="margin: 5px 0;"><strong>Email:</strong> contacto@rescue-chip.com</p>
+                    </div>
+                    
+                    <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+                    <p style="font-size: 12px; color: #999; text-align: center;">&copy; 2025 RescueChip - Protección Inteligente</p>
+                </div>
+            `;
+
+            try {
+                await transporter.sendMail({
+                    from: `"RescueChip" <contacto@rescue-chip.com>`,
+                    to: email,
+                    subject: '¡Gracias por tu compra! - RescueChip',
+                    html: customerEmailHtml,
+                });
+                console.log("Correo de confirmación enviado al cliente.");
+            } catch (mailError) {
+                console.error("Error enviando email al cliente:", mailError);
+            }
         }
     }
 
