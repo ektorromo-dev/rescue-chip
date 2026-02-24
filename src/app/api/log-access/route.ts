@@ -90,7 +90,8 @@ export async function POST(req: NextRequest) {
                                         <li><strong>Tipo de Escaneo:</strong> Emergencia Real</li>
                                         <li><strong>Fecha y Hora:</strong> ${fechaStr}</li>
                                         <li><strong>Ubicación Aproximada:</strong> ${mapsLink}</li>
-                                        <li><strong>Dispositivo que escaneó:</strong> ${user_agent}</li>
+                                        <li><strong>Dirección IP:</strong> ${ip_address}</li>
+                                        <li><strong>Dispositivo:</strong> ${user_agent}</li>
                                     </ul>
                                 </div>
                                 

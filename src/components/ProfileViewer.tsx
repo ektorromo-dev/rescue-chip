@@ -50,13 +50,9 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
             } catch (err) {
                 console.warn("Geolocation denied or timed out", err);
                 setGeoError(true);
-                setIsLoadingConsent(false);
-                return;
             }
         } else {
             setGeoError(true);
-            setIsLoadingConsent(false);
-            return;
         }
 
         const token = generateUUID();
@@ -161,12 +157,6 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
                         <strong>AVISO DE PRIVACIDAD:</strong> La información contenida en este perfil es confidencial y está protegida por la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP). Este acceso queda registrado con fecha, hora, ubicación aproximada y dispositivo. El uso indebido de esta información será perseguido y sancionado conforme a la legislación mexicana vigente, incluyendo los artículos 67 y 68 de la LFPDPPP que establecen penas de 3 a 5 años de prisión y multas de 100 a 320,000 días de UMA.
                     </div>
 
-                    {geoError && (
-                        <div className="bg-destructive/10 text-destructive border border-destructive/20 p-4 rounded-xl mb-6 text-sm text-center font-bold">
-                            Para tu seguridad y la del paciente, necesitamos registrar la ubicación de este acceso. Por favor activa la ubicación en tu navegador e intenta de nuevo.
-                        </div>
-                    )}
-
                     <div className="space-y-4">
                         <button
                             onClick={() => handleConsent('emergencia')}
@@ -184,7 +174,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
                             disabled={isLoadingConsent}
                             className={`w-full bg-muted-foreground/10 text-foreground flex items-center justify-center py-4 rounded-2xl transition-all font-bold text-sm gap-2 ${isLoadingConsent ? 'opacity-50 cursor-not-allowed' : 'hover:bg-muted-foreground/20'}`}
                         >
-                            <Info size={18} /> {geoError ? "Intentar de nuevo (Consulta)" : "Solo es una consulta o prueba"}
+                            <Info size={18} /> Solo es una consulta o prueba
                         </button>
                     </div>
                 </div>
@@ -243,6 +233,13 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
                 {!isDemo && !isEmergency && (
                     <div className="w-full bg-slate-700 text-white px-4 py-2 text-center text-xs font-black uppercase tracking-widest relative z-[60]">
                         MODO CONSULTA - No se notificará a contactos
+                    </div>
+                )}
+
+                {/* Geo Error Notice */}
+                {geoError && !isDemo && (
+                    <div className="w-full bg-red-600/90 text-white px-6 py-3 text-center text-[11px] font-bold leading-tight relative z-[60] border-b border-red-800 tracking-wide shadow-md">
+                        ⚠️ AVISO: No se pudo obtener tu ubicación. Este acceso queda registrado con tu dirección IP y dispositivo. El uso indebido de esta información será perseguido legalmente.
                     </div>
                 )}
 
