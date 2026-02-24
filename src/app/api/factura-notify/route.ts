@@ -76,7 +76,8 @@ export async function POST(req: NextRequest) {
         `;
 
         await transporter.sendMail({
-            from: `"RescueChip Facturación" <${process.env.SMTP_USER}>`,
+            from: 'RescueChip <contacto@rescue-chip.com>',
+            replyTo: 'contacto@rescue-chip.com',
             to: notifyEmail,
             subject: "Nueva solicitud de factura - RescueChip",
             html: emailHtml,

@@ -99,7 +99,8 @@ Referencia: ${orderDetails.referencia}`.trim()
 
         try {
             await transporter.sendMail({
-                from: `"RescueChip Ventas" <${process.env.SMTP_USER}>`,
+                from: 'RescueChip <contacto@rescue-chip.com>',
+                replyTo: 'contacto@rescue-chip.com',
                 to: process.env.NOTIFY_EMAIL || "chiprescue2025@gmail.com",
                 subject: `Nueva venta - RescueChip [${paquete}]`,
                 html: emailHtml,
@@ -146,7 +147,8 @@ Referencia: ${orderDetails.referencia}`.trim()
 
             try {
                 await transporter.sendMail({
-                    from: `"RescueChip" <contacto@rescue-chip.com>`,
+                    from: 'RescueChip <contacto@rescue-chip.com>',
+                    replyTo: 'contacto@rescue-chip.com',
                     to: email,
                     subject: '¡Gracias por tu compra! - RescueChip',
                     html: customerEmailHtml,
