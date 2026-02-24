@@ -9,6 +9,22 @@ create table public.chips (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
+-- Create 'chip_accesos' table
+create table public.chip_accesos (
+  id uuid default gen_random_uuid() primary key,
+  chip_folio text not null,
+  tipo text not null check (tipo in ('emergencia', 'prueba')),
+  latitud numeric,
+  longitud numeric,
+  ip_address text,
+  user_agent text,
+  session_token text,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Opcional index para búsquedas rápidas en dashboard
+create index idx_chip_accesos_folio on public.chip_accesos(chip_folio);
+
 -- Create 'profiles' table
 create table public.profiles (
   id uuid default gen_random_uuid() primary key,
@@ -85,6 +101,35 @@ create policy "Allow public read access to profiles"
 create policy "Allow public insert to profiles"
   on public.profiles for insert
   with check (true);
+
+-- 5. Policies para INVOICE_REQUESTS
+alter table public.factura_requests enable row level security;
+create policy "Cualquiera puede insertar solicitudes de factura"
+  on public.factura_requests
+  for insert
+  to public
+  with check (true);
+
+-- 6. Policies para CHIP_ACCESOS
+alter table public.chip_accesos enable row level security;
+-- Todos (incluso anónimos o Service Role) pueden insertar accesos
+create policy "Cualquiera puede registrar un acceso"
+  on public.chip_accesos
+  for insert
+  to public
+  with check (true);
+
+-- Sólo el dueño del chip puede ver los accesos de SU chip
+create policy "Dueño puede ver accesos de su chip"
+  on public.chip_accesos
+  for select
+  using (
+    exists (
+      select 1 from public.profiles
+      where profiles.chip_id = (select id from public.chips where folio = chip_accesos.chip_folio limit 1)
+      and profiles.user_id = auth.uid()
+    )
+  );
 
 -- Allow authenticated users to update their own profiles (dashboard)
 create policy "Allow users to update own profile"
