@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
                         const ownerEmail = userData.user.email;
 
                         const mapsLink = latitud && longitud
-                            ? `<a href="https://maps.google.com/?q=${latitud},${longitud}">Ver Ubicación en Google Maps</a>`
+                            ? `<a href="https://www.google.com/maps?q=${latitud},${longitud}">Ver Ubicación en Google Maps</a>`
                             : "Ubicación GPS no proporcionada/detectada.";
 
                         const fechaStr = new Date().toLocaleString("es-MX", { timeZone: "America/Mexico_City" });

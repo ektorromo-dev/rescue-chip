@@ -795,8 +795,8 @@ export default function DashboardPage() {
                                                             </div>
                                                             <p className="text-sm text-muted-foreground">
                                                                 {log.latitud && log.longitud ? (
-                                                                    <a href={`https://www.google.com/maps/search/?api=1&query=${log.latitud},${log.longitud}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline">
-                                                                        Ver ubicación en mapa <ExternalLink size={12} />
+                                                                    <a href={`https://www.google.com/maps?q=${log.latitud},${log.longitud}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline">
+                                                                        Ver ubicación <ExternalLink size={12} />
                                                                     </a>
                                                                 ) : (
                                                                     "Ubicación no disponible"

@@ -18,9 +18,11 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
     const [hasConsented, setHasConsented] = useState<boolean>(isDemo);
     const [isEmergency, setIsEmergency] = useState<boolean>(isDemo);
     const [sessionExpired, setSessionExpired] = useState<boolean>(false);
-    const [timeLeft, setTimeLeft] = useState<number>(600); // 10 minutes
+    const [timeLeft, setTimeLeft] = useState<number>(420); // 7 minutes
     const [sessionToken, setSessionToken] = useState<string>("");
     const [screenshotWarning, setScreenshotWarning] = useState<boolean>(false);
+    const [geoError, setGeoError] = useState<boolean>(false);
+    const [isLoadingConsent, setIsLoadingConsent] = useState<boolean>(false);
 
     // Generate UUID function
     const generateUUID = () => {
@@ -31,28 +33,38 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
     };
 
     const handleConsent = async (type: 'emergencia' | 'prueba') => {
-        const token = generateUUID();
-        setSessionToken(token);
-        sessionStorage.setItem(`rescuechip_session_${chip.folio}`, token);
+        setGeoError(false);
+        setIsLoadingConsent(true);
 
-        const isEmerg = type === 'emergencia';
-        setIsEmergency(isEmerg);
-
-        // Fetch Location
+        // Fetch Location Mandaory
         let lat = null;
         let lng = null;
 
         if (navigator.geolocation) {
             try {
                 const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 });
+                    navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 15000 });
                 });
                 lat = position.coords.latitude;
                 lng = position.coords.longitude;
             } catch (err) {
                 console.warn("Geolocation denied or timed out", err);
+                setGeoError(true);
+                setIsLoadingConsent(false);
+                return;
             }
+        } else {
+            setGeoError(true);
+            setIsLoadingConsent(false);
+            return;
         }
+
+        const token = generateUUID();
+        setSessionToken(token);
+        sessionStorage.setItem(`rescuechip_session_${chip.folio}`, token);
+
+        const isEmerg = type === 'emergencia';
+        setIsEmergency(isEmerg);
 
         // Send Log
         try {
@@ -72,6 +84,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
         }
 
         setHasConsented(true);
+        setIsLoadingConsent(false);
     };
 
     // Timer Logic
@@ -148,22 +161,30 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
                         <strong>AVISO DE PRIVACIDAD:</strong> La información contenida en este perfil es confidencial y está protegida por la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP). Este acceso queda registrado con fecha, hora, ubicación aproximada y dispositivo. El uso indebido de esta información será perseguido y sancionado conforme a la legislación mexicana vigente, incluyendo los artículos 67 y 68 de la LFPDPPP que establecen penas de 3 a 5 años de prisión y multas de 100 a 320,000 días de UMA.
                     </div>
 
+                    {geoError && (
+                        <div className="bg-destructive/10 text-destructive border border-destructive/20 p-4 rounded-xl mb-6 text-sm text-center font-bold">
+                            Para tu seguridad y la del paciente, necesitamos registrar la ubicación de este acceso. Por favor activa la ubicación en tu navegador e intenta de nuevo.
+                        </div>
+                    )}
+
                     <div className="space-y-4">
                         <button
                             onClick={() => handleConsent('emergencia')}
-                            className="w-full bg-destructive text-destructive-foreground flex flex-col items-center justify-center py-4 rounded-2xl shadow-lg border-2 border-transparent hover:border-red-900 transition-all font-black text-lg gap-1"
+                            disabled={isLoadingConsent}
+                            className={`w-full bg-destructive text-destructive-foreground flex flex-col items-center justify-center py-4 rounded-2xl shadow-lg border-2 border-transparent transition-all font-black text-lg gap-1 ${isLoadingConsent ? 'opacity-50 cursor-not-allowed' : 'hover:border-red-900'}`}
                         >
                             <span className="flex items-center gap-2 uppercase tracking-wide">
-                                <AlertTriangle size={24} /> ES UNA EMERGENCIA REAL
+                                {isLoadingConsent ? "Procesando..." : <><AlertTriangle size={24} /> ES UNA EMERGENCIA REAL</>}
                             </span>
-                            <span className="text-[10px] font-normal opacity-80 uppercase tracking-widest">(Notificará contactes de emergencia)</span>
+                            {!isLoadingConsent && <span className="text-[10px] font-normal opacity-80 uppercase tracking-widest">(Notificará contactos de emergencia)</span>}
                         </button>
 
                         <button
                             onClick={() => handleConsent('prueba')}
-                            className="w-full bg-muted-foreground/10 text-foreground flex items-center justify-center py-4 rounded-2xl hover:bg-muted-foreground/20 transition-all font-bold text-sm gap-2"
+                            disabled={isLoadingConsent}
+                            className={`w-full bg-muted-foreground/10 text-foreground flex items-center justify-center py-4 rounded-2xl transition-all font-bold text-sm gap-2 ${isLoadingConsent ? 'opacity-50 cursor-not-allowed' : 'hover:bg-muted-foreground/20'}`}
                         >
-                            <Info size={18} /> Solo es una consulta o prueba
+                            <Info size={18} /> {geoError ? "Intentar de nuevo (Consulta)" : "Solo es una consulta o prueba"}
                         </button>
                     </div>
                 </div>
@@ -265,7 +286,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
                 </div>
 
                 {/* Content Body */}
-                <div className="w-full px-6 md:px-10 -mt-6 relative z-20 pb-10 space-y-6">
+                <div className="w-full px-6 md:px-10 mt-6 relative z-20 pb-10 space-y-6">
 
                     {/* First Aid Banner */}
                     <FirstAidBanner />
@@ -426,11 +447,13 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
                                     {emergencyContactsArray.map((contact, idx) => {
                                         const cleanPhone = contact.phone ? contact.phone.replace(/\D/g, '') : "";
                                         const maskedPhone = maskNumber(contact.phone);
+                                        const nameParts = contact.name ? contact.name.trim().split(' ') : [];
+                                        const maskedName = nameParts.length > 0 ? nameParts[0] : "Contacto";
 
                                         return (
                                             <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3 rounded-xl border border-destructive/10 shadow-sm">
                                                 <div>
-                                                    <p className="text-base font-bold text-foreground pointer-events-none">{contact.name}</p>
+                                                    <p className="text-base font-bold text-foreground pointer-events-none">{maskedName}</p>
                                                     <p className="text-xs font-semibold text-muted-foreground uppercase pointer-events-none">Familiar / Contacto {idx + 1}</p>
                                                 </div>
                                                 {contact.phone && (
