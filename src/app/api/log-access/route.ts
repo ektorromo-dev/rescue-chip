@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import nodemailer from "nodemailer";
+import twilio from "twilio";
+
+// Twilio Setup
+const twilioClient = twilio(
+    process.env.TWILIO_ACCOUNT_SID,
+    process.env.TWILIO_AUTH_TOKEN
+);
 
 const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -131,6 +138,82 @@ export async function POST(req: NextRequest) {
                         }
                     } else {
                         console.log("No hay emails para notificar (ni de dueño ni de contactos).");
+                    }
+
+                    // --- TWILIO SMS & WHATSAPP INTEGRATION ---
+                    // Helper function to format Mexican phone numbers robustly
+                    const formatMexicanPhone = (phoneRaw: string): string => {
+                        let phone = phoneRaw.replace(/\D/g, ""); // strip non-numeric
+                        if (phone.length === 12 && phone.startsWith("52")) {
+                            return `+${phone}`;
+                        } else if (phone.length === 10) {
+                            // Automatically add +52 for Mexican 10-digit formats mapping common prefixes roughly
+                            return `+52${phone}`; // Force country string
+                        } else if (!phone.startsWith("+52")) {
+                            return `+52${phone}`; // best effort fallback
+                        }
+                        return `+${phone}`;
+                    };
+
+                    const plainLocation = latitud && longitud
+                        ? `https://maps.google.com/?q=${latitud},${longitud}`
+                        : "No disponible";
+
+                    const textMessageBody = `⚠️ ALERTA RESCUECHIP: Se activó una emergencia para ${userName}. Ubicación: ${plainLocation}. Llama al 911 si aún no lo han hecho. Más info: www.rescue-chip.com`;
+
+                    const ownerPhones = [];
+                    // Extract owner phone if available
+                    if (profileData.user_id) {
+                        // Normally user phone is in profiles table, let's see if we have phone in auth.users
+                        // Instead, profile data might contain a phone or general user profile.
+                        // We will just process contacts array in the profile and user. phone if present.
+                    }
+
+                    // Extract contact phones
+                    const contactPhones = contacts
+                        .filter((c: any) => c.phone && c.phone.trim() !== '')
+                        .map((c: any) => c.phone.trim());
+
+                    // Find if profile has an owner phone directly natively? 
+                    // No direct phone_number field retrieved earlier, 
+                    // Let's rely on retrieving the Auth User's phone if configured:
+                    if (profileData.user_id) {
+                        const { data: userData } = await supabase.auth.admin.getUserById(profileData.user_id);
+                        if (userData && userData.user && userData.user.phone) {
+                            ownerPhones.push(userData.user.phone);
+                        }
+                    }
+
+                    const allPhonesToNotify = Array.from(new Set([...ownerPhones, ...contactPhones]));
+
+                    for (const rawPhone of allPhonesToNotify) {
+                        const formattedPhone = formatMexicanPhone(rawPhone);
+
+                        // 1) SEND SMS
+                        try {
+                            await twilioClient.messages.create({
+                                body: textMessageBody,
+                                from: process.env.TWILIO_PHONE_NUMBER,
+                                to: formattedPhone
+                            });
+                            console.log(`[Twilio SMS] Enviado exitosamente a ${formattedPhone}`);
+                        } catch (smsError: any) {
+                            console.error(`[Twilio SMS Error] Falló el envío a ${formattedPhone}:`, smsError.message);
+                        }
+
+                        // 2) SEND WHATSAPP
+                        const waTo = `whatsapp:${formattedPhone}`;
+                        try {
+                            const waFrom = process.env.TWILIO_WHATSAPP_NUMBER || "whatsapp:+14155238886";
+                            await twilioClient.messages.create({
+                                body: textMessageBody,
+                                from: waFrom,
+                                to: waTo
+                            });
+                            console.log(`[Twilio WA] Enviado exitosamente a ${waTo}`);
+                        } catch (waError: any) {
+                            console.error(`[Twilio WA Error] Falló el envío a ${waTo}:`, waError.message);
+                        }
                     }
                 }
             }
