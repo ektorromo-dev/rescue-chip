@@ -147,7 +147,6 @@ export async function POST(req: NextRequest) {
                         if (phone.length === 12 && phone.startsWith("52")) {
                             return `+${phone}`;
                         } else if (phone.length === 10) {
-                            // Automatically add +52 for Mexican 10-digit formats mapping common prefixes roughly
                             return `+52${phone}`; // Force country string
                         } else if (!phone.startsWith("+52")) {
                             return `+52${phone}`; // best effort fallback
@@ -159,7 +158,8 @@ export async function POST(req: NextRequest) {
                         ? `https://maps.google.com/?q=${latitud},${longitud}`
                         : "No disponible";
 
-                    const textMessageBody = `⚠️ ALERTA RESCUECHIP: Se activó una emergencia para ${userName}. Ubicación: ${plainLocation}. Llama al 911 si aún no lo han hecho. Más info: www.rescue-chip.com`;
+                    // Shortened to < 160 characters for WhatsApp/SMS compatibility
+                    const textMessageBody = `⚠️ RESCUECHIP EMERGENCIA: ${userName} necesita ayuda. GPS: ${plainLocation}. Llama al 911.`;
 
                     const ownerPhones = [];
                     // Extract owner phone if available
@@ -188,6 +188,8 @@ export async function POST(req: NextRequest) {
 
                     for (const rawPhone of allPhonesToNotify) {
                         const formattedPhone = formatMexicanPhone(rawPhone);
+
+                        console.log(`[Twilio Pre-Send Check] Enviando mensaje a número formateado: ${formattedPhone}`);
 
                         // 1) SEND SMS
                         try {
