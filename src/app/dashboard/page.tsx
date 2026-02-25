@@ -60,10 +60,13 @@ export default function DashboardPage() {
     // Contacts
     const [contact1Name, setContact1Name] = useState("");
     const [contact1Phone, setContact1Phone] = useState("");
+    const [contact1Email, setContact1Email] = useState("");
     const [contact2Name, setContact2Name] = useState("");
     const [contact2Phone, setContact2Phone] = useState("");
+    const [contact2Email, setContact2Email] = useState("");
     const [contact3Name, setContact3Name] = useState("");
     const [contact3Phone, setContact3Phone] = useState("");
+    const [contact3Email, setContact3Email] = useState("");
 
     // Access Logs
     const [accessLogs, setAccessLogs] = useState<any[]>([]);
@@ -133,13 +136,13 @@ export default function DashboardPage() {
 
                 if (profile.emergency_contacts && Array.isArray(profile.emergency_contacts)) {
                     const c1 = profile.emergency_contacts[0];
-                    if (c1) { setContact1Name(c1.name || ""); setContact1Phone(c1.phone || ""); }
+                    if (c1) { setContact1Name(c1.name || ""); setContact1Phone(c1.phone || ""); setContact1Email(c1.email || ""); }
 
                     const c2 = profile.emergency_contacts[1];
-                    if (c2) { setContact2Name(c2.name || ""); setContact2Phone(c2.phone || ""); }
+                    if (c2) { setContact2Name(c2.name || ""); setContact2Phone(c2.phone || ""); setContact2Email(c2.email || ""); }
 
                     const c3 = profile.emergency_contacts[2];
-                    if (c3) { setContact3Name(c3.name || ""); setContact3Phone(c3.phone || ""); }
+                    if (c3) { setContact3Name(c3.name || ""); setContact3Phone(c3.phone || ""); setContact3Email(c3.email || ""); }
                 }
 
                 // Fetch access logs
@@ -181,9 +184,9 @@ export default function DashboardPage() {
 
         try {
             const emergencyContacts = [];
-            if (contact1Name && contact1Phone) emergencyContacts.push({ name: contact1Name, phone: contact1Phone });
-            if (contact2Name && contact2Phone) emergencyContacts.push({ name: contact2Name, phone: contact2Phone });
-            if (contact3Name && contact3Phone) emergencyContacts.push({ name: contact3Name, phone: contact3Phone });
+            if (contact1Name && contact1Phone) emergencyContacts.push({ name: contact1Name, phone: contact1Phone, email: contact1Email });
+            if (contact2Name && contact2Phone) emergencyContacts.push({ name: contact2Name, phone: contact2Phone, email: contact2Email });
+            if (contact3Name && contact3Phone) emergencyContacts.push({ name: contact3Name, phone: contact3Phone, email: contact3Email });
 
             if (emergencyContacts.length === 0) {
                 throw new Error("Debes proporcionar al menos un contacto de emergencia.");
@@ -478,6 +481,10 @@ export default function DashboardPage() {
                                                 <label className="text-sm font-semibold text-muted-foreground">Teléfono</label>
                                                 <input type="tel" value={contact1Phone} onChange={(e) => setContact1Phone(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" required />
                                             </div>
+                                            <div className="space-y-2 md:col-span-2">
+                                                <label className="text-sm font-semibold text-muted-foreground">Email (Opcional, para recibir alertas)</label>
+                                                <input type="email" value={contact1Email} onChange={(e) => setContact1Email(e.target.value)} placeholder="Email del contacto" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                            </div>
                                         </div>
                                     </div>
 
@@ -492,6 +499,10 @@ export default function DashboardPage() {
                                                 <label className="text-sm font-semibold text-muted-foreground">Teléfono</label>
                                                 <input type="tel" value={contact2Phone} onChange={(e) => setContact2Phone(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                             </div>
+                                            <div className="space-y-2 md:col-span-2">
+                                                <label className="text-sm font-semibold text-muted-foreground">Email (Opcional, para recibir alertas)</label>
+                                                <input type="email" value={contact2Email} onChange={(e) => setContact2Email(e.target.value)} placeholder="Email del contacto" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                            </div>
                                         </div>
                                     </div>
 
@@ -505,6 +516,10 @@ export default function DashboardPage() {
                                             <div className="space-y-2">
                                                 <label className="text-sm font-semibold text-muted-foreground">Teléfono</label>
                                                 <input type="tel" value={contact3Phone} onChange={(e) => setContact3Phone(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                            </div>
+                                            <div className="space-y-2 md:col-span-2">
+                                                <label className="text-sm font-semibold text-muted-foreground">Email (Opcional, para recibir alertas)</label>
+                                                <input type="email" value={contact3Email} onChange={(e) => setContact3Email(e.target.value)} placeholder="Email del contacto" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                             </div>
                                         </div>
                                     </div>
@@ -790,7 +805,7 @@ export default function DashboardPage() {
                                                                     {log.tipo}
                                                                 </span>
                                                                 <span className="text-sm font-semibold text-foreground">
-                                                                    {new Date(log.created_at).toLocaleString('es-MX', { dateStyle: 'medium', timeStyle: 'short' })}
+                                                                    {new Date(log.created_at).toLocaleString('es-MX', { timeZone: 'America/Mexico_City', dateStyle: 'medium', timeStyle: 'short' })}
                                                                 </span>
                                                             </div>
                                                             <p className="text-sm text-muted-foreground">
@@ -829,6 +844,6 @@ export default function DashboardPage() {
                     )}
                 </div>
             </div>
-        </div>
+        </div >
     );
 }

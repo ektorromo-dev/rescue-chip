@@ -93,21 +93,22 @@ function ActivationFormContent() {
             // Contact 1 (Required)
             emergencyContacts.push({
                 name: formData.get("contact1Name") as string,
-                phone: formData.get("contact1Phone") as string
+                phone: formData.get("contact1Phone") as string,
+                email: formData.get("contact1Email") as string || ""
             });
 
             // Contact 2 (Optional)
             const contact2Name = formData.get("contact2Name") as string;
             const contact2Phone = formData.get("contact2Phone") as string;
             if (contact2Name && contact2Phone) {
-                emergencyContacts.push({ name: contact2Name, phone: contact2Phone });
+                emergencyContacts.push({ name: contact2Name, phone: contact2Phone, email: formData.get("contact2Email") as string || "" });
             }
 
             // Contact 3 (Optional)
             const contact3Name = formData.get("contact3Name") as string;
             const contact3Phone = formData.get("contact3Phone") as string;
             if (contact3Name && contact3Phone) {
-                emergencyContacts.push({ name: contact3Name, phone: contact3Phone });
+                emergencyContacts.push({ name: contact3Name, phone: contact3Phone, email: formData.get("contact3Email") as string || "" });
             }
 
             // Optional integer parsing
@@ -348,6 +349,10 @@ function ActivationFormContent() {
                                 <label htmlFor="contact1Phone" className="text-sm font-semibold text-muted-foreground">Teléfono</label>
                                 <input type="tel" id="contact1Phone" name="contact1Phone" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="+52 55 1234 5678" required />
                             </div>
+                            <div className="space-y-2 md:col-span-2">
+                                <label htmlFor="contact1Email" className="text-sm font-semibold text-muted-foreground">Email (Opcional, para recibir alertas)</label>
+                                <input type="email" id="contact1Email" name="contact1Email" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Email del contacto" />
+                            </div>
                         </div>
                     </div>
 
@@ -362,6 +367,10 @@ function ActivationFormContent() {
                                 <label htmlFor="contact2Phone" className="text-sm font-semibold text-muted-foreground">Teléfono</label>
                                 <input type="tel" id="contact2Phone" name="contact2Phone" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="+52 55 0000 0000" />
                             </div>
+                            <div className="space-y-2 md:col-span-2">
+                                <label htmlFor="contact2Email" className="text-sm font-semibold text-muted-foreground">Email (Opcional, para recibir alertas)</label>
+                                <input type="email" id="contact2Email" name="contact2Email" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Email del contacto" />
+                            </div>
                         </div>
                     </div>
 
@@ -375,6 +384,10 @@ function ActivationFormContent() {
                             <div className="space-y-2">
                                 <label htmlFor="contact3Phone" className="text-sm font-semibold text-muted-foreground">Teléfono</label>
                                 <input type="tel" id="contact3Phone" name="contact3Phone" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="+52 55 0000 0000" />
+                            </div>
+                            <div className="space-y-2 md:col-span-2">
+                                <label htmlFor="contact3Email" className="text-sm font-semibold text-muted-foreground">Email (Opcional, para recibir alertas)</label>
+                                <input type="email" id="contact3Email" name="contact3Email" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Email del contacto" />
                             </div>
                         </div>
                     </div>

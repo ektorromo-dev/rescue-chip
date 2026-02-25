@@ -140,7 +140,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
     };
 
     const maskNumber = (num: string | null | undefined, visibleDigits = 4) => {
-        if (!num || isDemo) return num;
+        if (!num) return num;
         if (num.length <= visibleDigits) return num;
         return `****${num.slice(-visibleDigits)}`;
     };
@@ -203,15 +203,13 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
         <div className="min-h-screen bg-muted flex justify-center pb-12 sm:pt-12 p-0 sm:p-4 select-none relative" style={{ WebkitTouchCallout: 'none' }}>
 
             {/* Watermark */}
-            {!isDemo && (
-                <div className="fixed inset-0 pointer-events-none z-[100] flex flex-col items-center justify-center overflow-hidden opacity-[0.03]">
-                    {Array.from({ length: 20 }).map((_, i) => (
-                        <div key={i} className="whitespace-nowrap -rotate-45 text-4xl font-black mb-24">
-                            CONFIDENCIAL - ACCESO REGISTRADO - {new Date().toLocaleDateString()}
-                        </div>
-                    ))}
-                </div>
-            )}
+            <div className="fixed inset-0 pointer-events-none z-[100] flex flex-col items-center justify-center overflow-hidden opacity-[0.03]">
+                {Array.from({ length: 20 }).map((_, i) => (
+                    <div key={i} className="whitespace-nowrap -rotate-45 text-4xl font-black mb-24">
+                        CONFIDENCIAL - ACCESO REGISTRADO - {new Date().toLocaleDateString('es-MX', { timeZone: 'America/Mexico_City' })}
+                    </div>
+                ))}
+            </div>
 
             <div className="w-full max-w-lg bg-card sm:rounded-[2.5rem] shadow-2xl border-x sm:border border-border/50 overflow-hidden flex flex-col items-center relative z-10">
 

@@ -59,61 +59,78 @@ export async function POST(req: NextRequest) {
             if (chipData) {
                 const { data: profileData } = await supabase
                     .from("profiles")
-                    .select("user_id")
+                    .select("user_id, full_name, emergency_contacts")
                     .eq("chip_id", chipData.id)
                     .single();
 
-                if (profileData && profileData.user_id) {
-                    // Buscar el email en auth.users (requiere Service Role)
-                    // Como no hay una función directa exportada, usaremos rpc o admin api si está disponible.
-                    // Afortunadamente, Supabase js proporciona admin.getUserById
-                    const { data: userData, error: userError } = await supabase.auth.admin.getUserById(profileData.user_id);
+                if (profileData) {
+                    const userName = profileData.full_name || 'Usuario';
+                    const contacts = profileData.emergency_contacts || [];
+                    const contactEmails = contacts
+                        .filter((c: any) => c.email && c.email.trim() !== '')
+                        .map((c: any) => c.email.trim());
 
-                    if (userData && userData.user && userData.user.email) {
-                        const ownerEmail = userData.user.email;
+                    // Buscar el email del DUEÑO en auth.users (requiere Service Role)
+                    let ownerEmail = null;
+                    if (profileData.user_id) {
+                        const { data: userData, error: userError } = await supabase.auth.admin.getUserById(profileData.user_id);
+                        if (userData && userData.user && userData.user.email) {
+                            ownerEmail = userData.user.email;
+                        } else {
+                            console.error("No se pudo obtener el email del dueño del chip via Auth Admin.", userError);
+                        }
+                    }
 
-                        const mapsLink = latitud && longitud
-                            ? `<a href="https://www.google.com/maps?q=${latitud},${longitud}">Ver Ubicación en Google Maps</a>`
-                            : "Ubicación GPS no proporcionada/detectada.";
+                    const mapsLink = latitud && longitud
+                        ? `<a href="https://www.google.com/maps?q=${latitud},${longitud}">Ver Ubicación en Google Maps</a>`
+                        : "Ubicación GPS no proporcionada/detectada.";
 
-                        const fechaStr = new Date().toLocaleString("es-MX", { timeZone: "America/Mexico_City" });
+                    const fechaStr = new Date().toLocaleString("es-MX", { timeZone: "America/Mexico_City", dateStyle: 'short', timeStyle: 'short' });
 
-                        const emailHtml = `
-                            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 2px solid #e11d48; border-radius: 10px;">
-                                <h2 style="color: #e11d48; margin-top: 0; text-align: center;">⚠️ ALERTA DE EMERGENCIA ⚠️</h2>
-                                <h3 style="color: #333; text-align: center;">Tu RescueChip fue escaneado</h3>
-                                
-                                <p style="font-size: 16px;">Tu dispositivo con folio <strong>${chip_folio}</strong> fue escaneado.</p>
-                                
-                                <div style="background-color: #fef2f2; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                                    <ul style="color: #991b1b; margin-bottom: 0;">
-                                        <li><strong>Tipo de Escaneo:</strong> Emergencia Real</li>
-                                        <li><strong>Fecha y Hora:</strong> ${fechaStr}</li>
-                                        <li><strong>Ubicación Aproximada:</strong> ${mapsLink}</li>
-                                        <li><strong>Dirección IP:</strong> ${ip_address}</li>
-                                        <li><strong>Dispositivo:</strong> ${user_agent}</li>
-                                    </ul>
-                                </div>
-                                
-                                <p style="color: #555; font-size: 14px; text-align: center;">Si NO te encuentras en una emergencia, por favor contacta inmediatamente a soporte:</p>
-                                <p style="text-align: center;"><a href="mailto:contacto@rescue-chip.com" style="color: #e11d48; font-weight: bold;">contacto@rescue-chip.com</a></p>
+                    const emailHtml = `
+                        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 2px solid #e11d48; border-radius: 10px;">
+                            <h2 style="color: #e11d48; margin-top: 0; text-align: center;">⚠️ ALERTA DE EMERGENCIA ⚠️</h2>
+                            <h3 style="color: #333; text-align: center;">El RescueChip de ${userName} fue escaneado</h3>
+                            
+                            <p style="font-size: 16px;">El dispositivo con folio <strong>${chip_folio}</strong> perteneciente a <strong>${userName}</strong> fue escaneado.</p>
+                            
+                            <div style="background-color: #fef2f2; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                                <ul style="color: #991b1b; margin-bottom: 0;">
+                                    <li><strong>Tipo de Escaneo:</strong> Emergencia Real</li>
+                                    <li><strong>Fecha y Hora:</strong> ${fechaStr}</li>
+                                    <li><strong>Ubicación Aproximada:</strong> ${mapsLink}</li>
+                                    <li><strong>Dirección IP:</strong> ${ip_address}</li>
+                                    <li><strong>Dispositivo:</strong> ${user_agent}</li>
+                                </ul>
                             </div>
-                        `;
+                            
+                            <p style="color: #555; font-size: 14px; text-align: center;">Si NO te encuentras en una emergencia, por favor contacta inmediatamente a soporte:</p>
+                            <p style="text-align: center;"><a href="mailto:contacto@rescue-chip.com" style="color: #e11d48; font-weight: bold;">contacto@rescue-chip.com</a></p>
+                        </div>
+                    `;
 
+                    const allEmailsToNotify = [];
+                    if (ownerEmail) allEmailsToNotify.push(ownerEmail);
+                    if (contactEmails.length > 0) allEmailsToNotify.push(...contactEmails);
+
+                    // De-duplicate emails
+                    const uniqueEmails = Array.from(new Set(allEmailsToNotify));
+
+                    if (uniqueEmails.length > 0) {
                         try {
                             await transporter.sendMail({
                                 from: 'RescueChip <contacto@rescue-chip.com>',
                                 replyTo: 'contacto@rescue-chip.com',
-                                to: ownerEmail,
-                                subject: "⚠️ ALERTA: Tu chip RescueChip fue escaneado en una emergencia",
+                                to: uniqueEmails.join(', '),
+                                subject: "⚠️ ALERTA: Un chip RescueChip fue escaneado en una emergencia",
                                 html: emailHtml,
                             });
-                            console.log("Notificación de emergencia enviada al dueño.");
+                            console.log(`Notificación de emergencia enviada a: ${uniqueEmails.join(', ')}`);
                         } catch (mailError) {
                             console.error("Error enviando email de emergencia:", mailError);
                         }
                     } else {
-                        console.error("No se pudo obtener el email del dueño del chip via Auth Admin.", userError);
+                        console.log("No hay emails para notificar (ni de dueño ni de contactos).");
                     }
                 }
             }
