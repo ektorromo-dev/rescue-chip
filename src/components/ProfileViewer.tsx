@@ -423,6 +423,14 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
                                         }
                                         return null;
                                     })()}
+
+                                    {signedPolizaUrl && (
+                                        <div className="w-full mt-4 pt-4 border-t border-primary/20">
+                                            <a href={signedPolizaUrl} target="_blank" rel="noopener noreferrer" className="w-full block bg-background border-2 border-primary text-primary flex items-center justify-center gap-2 py-4 rounded-xl font-bold text-sm hover:bg-primary/5 transition-colors shadow-sm">
+                                                <FileText size={20} /> Ver Póliza Completa
+                                            </a>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         )}
@@ -490,15 +498,6 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
                     </p>
                 </div>
             </div>
-
-            {/* POLICY BUTTON RENDERED COMPLETELY OUTSIDE */}
-            {signedPolizaUrl && (
-                <div className="w-full max-w-lg px-6 mt-6 pb-6 relative z-20" style={{ display: 'block' }}>
-                    <a href={signedPolizaUrl} target="_blank" rel="noopener noreferrer" className="w-full bg-background border-2 border-primary text-primary flex items-center justify-center gap-2 py-4 rounded-xl font-bold text-lg hover:bg-primary/5 transition-colors shadow-xl" style={{ display: 'flex', width: '100%' }}>
-                        <FileText size={24} /> Ver Póliza Completa
-                    </a>
-                </div>
-            )}
         </div>
     );
 }
