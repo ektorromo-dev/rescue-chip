@@ -267,15 +267,19 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
 
                     <div className="relative z-10 text-center mt-6">
                         <div className="w-28 h-28 bg-card text-foreground mx-auto rounded-full flex items-center justify-center shadow-xl mb-4 border-4 border-card/80 overflow-hidden shrink-0">
-                            {profile.photo_url ? (
+                            {isDemo ? (
+                                <div className="w-full h-full bg-[#DC2626] flex items-center justify-center text-white font-black text-4xl rounded-full">
+                                    CM
+                                </div>
+                            ) : profile.photo_url ? (
                                 <img src={profile.photo_url} alt={profile.full_name} className="w-full h-full object-cover pointer-events-none" />
                             ) : (
                                 <UserSquare2 size={48} className="text-muted-foreground/50" />
                             )}
                         </div>
-                        <h1 className="text-3xl font-black tracking-tight mb-2">{profile.full_name}</h1>
+                        <h1 className="text-3xl font-black tracking-tight mb-2">{isDemo ? 'Carlos Martínez' : profile.full_name}</h1>
                         <p className="text-white/80 font-medium">
-                            {profile.age ? `${profile.age} años • ` : ''} {profile.location}
+                            {isDemo ? '32 años • Ciudad de México' : `${profile.age ? `${profile.age} años • ` : ''} ${profile.location}`}
                         </p>
                     </div>
                 </div>
@@ -419,15 +423,15 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
                                         }
                                         return null;
                                     })()}
-
-                                    {signedPolizaUrl && (
-                                        <div className="border-t border-primary/20 pt-4 mt-2">
-                                            <a href={signedPolizaUrl} target="_blank" rel="noopener noreferrer" className="w-full bg-background border-2 border-primary text-primary flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm hover:bg-primary/5 transition-colors shadow-sm">
-                                                <FileText size={18} /> Ver Documento / Póliza
-                                            </a>
-                                        </div>
-                                    )}
                                 </div>
+                            </div>
+                        )}
+
+                        {signedPolizaUrl && (
+                            <div className="w-full bg-background rounded-2xl p-4 border border-primary/30 shadow-sm relative overflow-hidden group">
+                                <a href={signedPolizaUrl} target="_blank" rel="noopener noreferrer" className="w-full bg-background border-2 border-primary text-primary flex items-center justify-center gap-2 py-4 rounded-xl font-bold text-sm hover:bg-primary/5 transition-colors shadow-sm">
+                                    <FileText size={20} /> Ver Documento de Póliza
+                                </a>
                             </div>
                         )}
 

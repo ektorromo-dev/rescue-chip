@@ -805,7 +805,15 @@ export default function DashboardPage() {
                                                                     {log.tipo}
                                                                 </span>
                                                                 <span className="text-sm font-semibold text-foreground">
-                                                                    {new Date(log.created_at).toLocaleString('es-MX', { timeZone: 'America/Mexico_City', dateStyle: 'medium', timeStyle: 'short' })}
+                                                                    {new Date(log.created_at + (log.created_at.endsWith('Z') ? '' : 'Z')).toLocaleString('es-MX', {
+                                                                        timeZone: 'America/Mexico_City',
+                                                                        year: 'numeric',
+                                                                        month: 'short',
+                                                                        day: '2-digit',
+                                                                        hour: '2-digit',
+                                                                        minute: '2-digit',
+                                                                        second: '2-digit'
+                                                                    })}
                                                                 </span>
                                                             </div>
                                                             <p className="text-sm text-muted-foreground">
