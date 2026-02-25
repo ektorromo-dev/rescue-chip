@@ -200,7 +200,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
 
     // --- RENDER PROFILE ---
     return (
-        <div className="min-h-screen bg-muted flex justify-center pb-12 sm:pt-12 p-0 sm:p-4 select-none relative" style={{ WebkitTouchCallout: 'none' }}>
+        <div className="min-h-screen bg-muted flex flex-col items-center justify-start pb-12 sm:pt-12 p-0 sm:p-4 select-none relative" style={{ WebkitTouchCallout: 'none' }}>
 
             {/* Watermark */}
             <div className="fixed inset-0 pointer-events-none z-[100] flex flex-col items-center justify-center overflow-hidden opacity-[0.03]">
@@ -427,14 +427,6 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
                             </div>
                         )}
 
-                        {signedPolizaUrl && (
-                            <div className="w-full bg-background rounded-2xl p-4 border border-primary/30 shadow-sm relative overflow-hidden group">
-                                <a href={signedPolizaUrl} target="_blank" rel="noopener noreferrer" className="w-full bg-background border-2 border-primary text-primary flex items-center justify-center gap-2 py-4 rounded-xl font-bold text-sm hover:bg-primary/5 transition-colors shadow-sm">
-                                    <FileText size={20} /> Ver Documento de Póliza
-                                </a>
-                            </div>
-                        )}
-
                         {/* EMERGENCY CONTACTS */}
                         {emergencyContactsArray.length > 0 && (
                             <div className="bg-destructive/10 rounded-2xl p-5 border border-destructive/20 relative overflow-hidden group">
@@ -498,6 +490,15 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
                     </p>
                 </div>
             </div>
+
+            {/* POLICY BUTTON RENDERED COMPLETELY OUTSIDE */}
+            {signedPolizaUrl && (
+                <div className="w-full max-w-lg px-6 mt-6 pb-6 relative z-20" style={{ display: 'block' }}>
+                    <a href={signedPolizaUrl} target="_blank" rel="noopener noreferrer" className="w-full bg-background border-2 border-primary text-primary flex items-center justify-center gap-2 py-4 rounded-xl font-bold text-lg hover:bg-primary/5 transition-colors shadow-xl" style={{ display: 'flex', width: '100%' }}>
+                        <FileText size={24} /> Ver Póliza Completa
+                    </a>
+                </div>
+            )}
         </div>
     );
 }
