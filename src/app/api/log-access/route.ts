@@ -186,10 +186,11 @@ export async function POST(req: NextRequest) {
 
                     const allPhonesToNotify = Array.from(new Set([...ownerPhones, ...contactPhones]));
 
-                    for (const rawPhone of allPhonesToNotify) {
+                    // Trigger notifications concurrently
+                    const notificationPromises = allPhonesToNotify.map(async (rawPhone) => {
                         const formattedPhone = formatMexicanPhone(rawPhone);
 
-                        console.log(`[Twilio Pre-Send Check] Enviando mensaje a número formateado: ${formattedPhone}`);
+                        console.log(`[Twilio Pre-Send Check] Procesando SMS para destino: ${formattedPhone}`);
 
                         // 1) SEND SMS
                         try {
@@ -205,6 +206,7 @@ export async function POST(req: NextRequest) {
 
                         // 2) SEND WHATSAPP
                         const waTo = `whatsapp:${formattedPhone}`;
+                        console.log(`[Twilio Pre-Send Check] Procesando WhatsApp para destino: ${waTo}`);
                         try {
                             const waFrom = process.env.TWILIO_WHATSAPP_NUMBER || "whatsapp:+14155238886";
                             await twilioClient.messages.create({
@@ -216,7 +218,10 @@ export async function POST(req: NextRequest) {
                         } catch (waError: any) {
                             console.error(`[Twilio WA Error] Falló el envío a ${waTo}:`, waError.message);
                         }
-                    }
+                    });
+
+                    // Wait for all messages across all phones to finish attempting
+                    await Promise.all(notificationPromises);
                 }
             }
         }
