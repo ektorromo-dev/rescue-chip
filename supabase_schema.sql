@@ -213,3 +213,9 @@ create table public.orders (
   status text default 'pendiente',
   created_at timestamp default timezone('utc'::text, now()) not null
 );
+
+-- Migración Final: Multi-chip y Planes ("Familiar", "Pareja", "Individual")
+alter table public.profiles add column plan text default 'individual';
+alter table public.chips add column owner_profile_id uuid references public.profiles(id);
+alter table public.chips add column perfil_compartido boolean;
+alter table public.chips add column assigned_plan text default 'individual';
