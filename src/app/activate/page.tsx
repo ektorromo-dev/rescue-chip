@@ -256,33 +256,31 @@ function ActivationFormContent() {
                 throw new Error(`Error BD (${profileError.code || 'Desconocido'}): ${profileError.message || 'Fallo al guardar el perfil'}`);
             }
 
-            // 3. Update chip as activated
-            const { error: activateError } = await supabase
-                .from('chips')
-                .update({
-                    status: 'activado',
-                    activated: true,
-                    activated_by: userId,
-                    owner_profile_id: userId, // Temporarily use user_id here but usually it references profiles(id) -> we need profileId actually. We just inserted it.
-                    activated_at: new Date().toISOString()
-                })
-                .eq('id', chip.id);
+            // 3. Update chip as activated (using inserted profile ID and with rollback capability)
+            try {
+                const { error: activateError } = await supabase
+                    .from('chips')
+                    .update({
+                        status: 'activado',
+                        activated: true,
+                        activated_by: userId,
+                        owner_profile_id: insertedProfileData.id, // ID real del `profiles` insertado
+                        activated_at: new Date().toISOString()
+                    })
+                    .eq('id', chip.id);
 
-            const { data: createdProfile, error: fetchError } = await supabase.from('profiles').select('id').eq('chip_id', chip.id).single();
-            if (fetchError) {
-                console.error("Error al buscar el perfil recién creado:", JSON.stringify(fetchError, null, 2));
-            }
-            if (createdProfile) {
-                console.log("Activación - Actualizando owner_profile_id del chip al ID del perfil:", createdProfile.id);
-                const { error: chipOwnerError } = await supabase.from('chips').update({ owner_profile_id: createdProfile.id }).eq('id', chip.id);
-                if (chipOwnerError) {
-                    console.error("Error al actualizar owner_profile_id del chip:", JSON.stringify(chipOwnerError, null, 2));
+                if (activateError) {
+                    console.error("Error devuelto por Supabase al actualizar chip:", JSON.stringify(activateError, null, 2), activateError);
+                    throw activateError;
                 }
-            }
-
-            if (activateError) {
-                console.error("Error devuelto por Supabase al actualizar chip:", JSON.stringify(activateError, null, 2), activateError);
-                throw new Error(`Error BD (${activateError.code || 'Desconocido'}): Fallo al activar el chip - ${activateError.message}`);
+            } catch (chipUpdateError: any) {
+                console.error("Fallo crítico al actualizar el chip. Iniciando ROLLBACK del perfil...", chipUpdateError);
+                // Rollback: eliminar el perfil recién creado para no dejarlo huérfano
+                const { error: rollbackError } = await supabase.from('profiles').delete().eq('id', insertedProfileData.id);
+                if (rollbackError) {
+                    console.error("Error crítico durante el rollback (perfil huérfano):", JSON.stringify(rollbackError, null, 2));
+                }
+                throw new Error(`Fallo al vincular el chip (${chipUpdateError.code || 'Desconocido'}). Se deshizo la creación del perfil.`);
             }
 
             // 4. Redirect to the profile page
