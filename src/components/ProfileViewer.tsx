@@ -479,6 +479,13 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
                                             <p className="text-sm italic text-foreground opacity-90 leading-relaxed font-medium pointer-events-none">"{profile.additional_notes}"</p>
                                         </div>
                                     )}
+                                    {profile.google_maps_link && (
+                                        <div className="mt-4 pt-3 border-t border-primary/10">
+                                            <h4 className="text-[11px] font-black text-primary uppercase tracking-widest mb-1 pointer-events-none">Hospital / Clínica Preferida</h4>
+                                            <p className="text-sm font-bold bg-background p-3 rounded-xl border border-border inline-block pointer-events-none w-full">{profile.google_maps_link}</p>
+                                            <p className="text-[10px] text-muted-foreground mt-2 leading-tight pointer-events-none opacity-80">En caso de emergencia, el personal médico determinará el hospital más adecuado según tu estado de salud y criterio profesional. Este dato es solo una referencia.</p>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         )}

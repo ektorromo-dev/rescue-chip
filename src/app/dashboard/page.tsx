@@ -792,9 +792,12 @@ export default function DashboardPage() {
                                             <label htmlFor="additionalNotes" className="text-sm font-semibold">Notas Adicionales</label>
                                             <textarea id="additionalNotes" value={additionalNotes} onChange={(e) => setAdditionalNotes(e.target.value)} className="w-full flex min-h-[100px] rounded-xl border border-input bg-background px-4 py-3 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                         </div>
-                                        <div className="space-y-2 md:col-span-2">
-                                            <label htmlFor="googleMapsLink" className="text-sm font-semibold">Enlace de Ubicación (Google Maps)</label>
-                                            <input type="url" id="googleMapsLink" value={googleMapsLink} onChange={(e) => setGoogleMapsLink(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                        <div className="space-y-4 md:col-span-2 mt-2">
+                                            <div className="space-y-2">
+                                                <label htmlFor="googleMapsLink" className="text-sm font-semibold">Hospital o clínica de preferencia</label>
+                                                <input type="text" id="googleMapsLink" value={googleMapsLink} onChange={(e) => setGoogleMapsLink(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ejemplo: Hospital Ángeles Lindavista" />
+                                                <p className="text-xs text-muted-foreground mt-1">En caso de emergencia, el personal médico determinará el hospital más adecuado según tu estado de salud y criterio profesional. Este dato es solo una referencia.</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </section>
