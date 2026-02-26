@@ -1,4 +1,6 @@
 "use client";
+export const dynamic = 'force-dynamic';
+
 
 import Link from "next/link";
 import { ArrowLeft, CheckCircle2, AlertCircle, Loader2, Eye, EyeOff } from "lucide-react";
