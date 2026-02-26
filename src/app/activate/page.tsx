@@ -20,6 +20,12 @@ function ActivationFormContent() {
     const [photoFile, setPhotoFile] = useState<File | null>(null);
     const [showPassword, setShowPassword] = useState(false);
 
+    // Estado del flujo "Chip extra"
+    const [existingProfileToLink, setExistingProfileToLink] = useState<any>(null);
+    const [showLinkPrompt, setShowLinkPrompt] = useState(false);
+    const [pendingAuthData, setPendingAuthData] = useState<{ userId: string, email: string } | null>(null);
+    const [pendingChip, setPendingChip] = useState<any>(null);
+
     // Insurance state for conditional rendering
     const [medicalSystem, setMedicalSystem] = useState("");
     const [aseguradora, setAseguradora] = useState("");
@@ -64,29 +70,72 @@ function ActivationFormContent() {
                 throw new Error("Este chip no está disponible para activación (" + (chip.status || "desconocido") + ").");
             }
 
-            // 1.5 Create Auth User
+            // 1.5 Try Sign Up or Sign In
             const email = formData.get("email") as string;
             const password = formData.get("password") as string;
 
             if (!email || !password) {
-                throw new Error("El correo electrónico y la contraseña son obligatorios para crear tu cuenta.");
+                throw new Error("El correo electrónico y la contraseña son obligatorios para crear tu cuenta o iniciar sesión.");
             }
 
-            const { data: authData, error: authError } = await supabase.auth.signUp({
+            let userId = "";
+
+            // Intento de registro
+            const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
                 email,
                 password,
             });
 
-            if (authError) {
-                // If user already exists, Supabase throws an error if we try to sign up with the same email.
-                throw new Error("Error al crear cuenta: " + authError.message);
+            if (signUpError) {
+                if (signUpError.message.includes("User already registered") || signUpError.message.toLowerCase().includes("already registered")) {
+                    // Si ya existe y es este flujo, intentemos hacer login para vincular
+                    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+                        email,
+                        password,
+                    });
+                    if (signInError) {
+                        throw new Error("El usuario ya existe, pero la contraseña es incorrecta. Si ya tienes cuenta, ingresa tu contraseña correctamente.");
+                    }
+                    userId = signInData.user?.id || "";
+                } else {
+                    throw new Error("Error al crear cuenta: " + signUpError.message);
+                }
+            } else {
+                userId = signUpData.user?.id || "";
             }
 
-            const userId = authData.user?.id;
             if (!userId) {
-                throw new Error("No se pudo crear el usuario o confirmar la cuenta.");
+                throw new Error("No se pudo confirmar la cuenta.");
             }
 
+            // CHECK IF USER HAS EXISTING PROFILE (Para múltiples chips)
+            const { data: existingProfile } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('user_id', userId)
+                .single();
+
+            if (existingProfile) {
+                // El usuario ya tiene un perfil! Pausamos y preguntamos.
+                setPendingAuthData({ userId, email });
+                setPendingChip(chip);
+                setExistingProfileToLink(existingProfile);
+                setShowLinkPrompt(true);
+                setLoading(false);
+                return; // Salimos de la función principal
+            }
+
+            await proceedWithRegistration(userId, chip, formData);
+
+        } catch (err: any) {
+            setErrorMsg(err.message || "Ocurrió un error inesperado.");
+            setLoading(false);
+        }
+    };
+
+    const proceedWithRegistration = async (userId: string, chip: any, formData: FormData) => {
+        try {
+            // ================= CONTINUAR FLUJO NORMAL DE REGISTRO =================
             // Build emergency contacts array dynamically
             const emergencyContacts = [];
 
@@ -156,12 +205,16 @@ function ActivationFormContent() {
 
             const finalAseguradora = aseguradora === "Otro" ? (formData.get("aseguradoraOtra") as string) : aseguradora;
 
+            // Assigned plan defaults to individual or whatever was set in webhook
+            const chipAssignedPlan = chip.assigned_plan || 'individual';
+
             // 2. Insert profile
             const { error: profileError } = await supabase
                 .from('profiles')
                 .insert({
                     chip_id: chip.id,
                     user_id: userId,
+                    plan: chipAssignedPlan,
                     photo_url: photoUrl,
                     full_name: formData.get("fullName") as string,
                     age: age,
@@ -200,9 +253,16 @@ function ActivationFormContent() {
                     status: 'activado',
                     activated: true,
                     activated_by: userId,
+                    owner_profile_id: userId, // Temporarily use user_id here but usually it references profiles(id) -> we need profileId actually. We just inserted it.
                     activated_at: new Date().toISOString()
                 })
                 .eq('id', chip.id);
+
+            // Fetch created profile to get ID
+            const { data: createdProfile } = await supabase.from('profiles').select('id').eq('chip_id', chip.id).single();
+            if (createdProfile) {
+                await supabase.from('chips').update({ owner_profile_id: createdProfile.id }).eq('id', chip.id);
+            }
 
             if (activateError) {
                 throw new Error("Error al activar el chip. Por favor contacta a soporte.");
@@ -212,11 +272,91 @@ function ActivationFormContent() {
             router.push(`/profile/${encodeURIComponent(chip.folio)}`);
 
         } catch (err: any) {
-            setErrorMsg(err.message || "Ocurrió un error inesperado.");
+            setErrorMsg(err.message || "Ocurrió un error inesperado al registrar el perfil.");
         } finally {
             setLoading(false);
         }
     };
+
+    const handleLinkToMine = async () => {
+        if (!pendingAuthData || !pendingChip || !existingProfileToLink) return;
+        setLoading(true);
+        setErrorMsg("");
+
+        try {
+            // Actualizamos solo el chip para vincularlo al perfil existente
+            const { error: activateError } = await supabase
+                .from('chips')
+                .update({
+                    status: 'activado',
+                    activated: true,
+                    activated_by: pendingAuthData.userId,
+                    owner_profile_id: existingProfileToLink.id,
+                    perfil_compartido: true,
+                    activated_at: new Date().toISOString()
+                })
+                .eq('id', pendingChip.id);
+
+            if (activateError) {
+                throw new Error("Error al vincular el chip con tu perfil.");
+            }
+
+            router.push(`/dashboard`);
+        } catch (err: any) {
+            setErrorMsg(err.message || "Ocurrió un error al vincular el chip.");
+            setLoading(false);
+        }
+    };
+
+    const handleLinkToOther = async () => {
+        // Para otra persona -> forzamos logout y ocultamos todo
+        await supabase.auth.signOut();
+        setShowLinkPrompt(false);
+        setPendingAuthData(null);
+        setPendingChip(null);
+        setExistingProfileToLink(null);
+        setErrorMsg("Por favor, ingresa un correo electrónico distinto (nuevo) para crear la cuenta de esta persona.");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    if (showLinkPrompt) {
+        return (
+            <div className="p-8 md:p-12 text-center space-y-6">
+                <div className="mx-auto w-16 h-16 bg-primary/10 text-primary flex items-center justify-center rounded-full mb-4">
+                    <AlertCircle size={32} />
+                </div>
+                <h2 className="text-2xl md:text-3xl font-black text-foreground">Cuenta Existente Encontrada</h2>
+                <p className="text-muted-foreground text-lg max-w-md mx-auto">
+                    Detectamos que el correo <strong>{pendingAuthData?.email}</strong> ya tiene un perfil médico activo.
+                </p>
+
+                <div className="bg-muted p-6 rounded-2xl border border-border mt-8 max-w-lg mx-auto">
+                    <h3 className="font-bold text-lg mb-2">¿Este chip es para ti o para otra persona?</h3>
+                    <p className="text-sm text-muted-foreground mb-6">
+                        Si es para ti, compartirá la misma información médica. Si es para otra persona, deberás usar un correo distinto.
+                    </p>
+
+                    <div className="space-y-3">
+                        <button
+                            onClick={handleLinkToMine}
+                            disabled={loading}
+                            className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground h-14 rounded-xl font-bold hover:bg-primary/90 transition-all disabled:opacity-50"
+                        >
+                            {loading && <Loader2 size={18} className="animate-spin" />}
+                            Es para mí (Vincular a mi perfil)
+                        </button>
+                        <button
+                            onClick={handleLinkToOther}
+                            disabled={loading}
+                            className="w-full h-14 rounded-xl border-2 border-primary/20 bg-background font-bold hover:bg-muted text-foreground transition-all disabled:opacity-50"
+                        >
+                            Es para otra persona
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="p-8 md:p-12">

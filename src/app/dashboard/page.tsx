@@ -86,7 +86,7 @@ export default function DashboardPage() {
                 // Fetch profile associated with this user_id
                 const { data: profile, error: profileError } = await supabase
                     .from('profiles')
-                    .select('*, chips(folio)')
+                    .select('*, chips(folio, perfil_compartido)')
                     .eq('user_id', session.user.id)
                     .single();
 
@@ -96,7 +96,23 @@ export default function DashboardPage() {
 
                 // Populate state
                 setProfileId(profile.id);
-                setFolio(profile.chips?.folio || "");
+
+                // profile.chips can be an array if 1-to-many, or an object if 1-to-1 in current db schema
+                let associatedFolios: string[] = [];
+                let sharedProfileFlag = false;
+
+                if (Array.isArray(profile.chips)) {
+                    associatedFolios = profile.chips.map((c: any) => c.folio);
+                    sharedProfileFlag = profile.chips.some((c: any) => c.perfil_compartido);
+                } else if (profile.chips) {
+                    associatedFolios = [(profile.chips as any).folio];
+                    sharedProfileFlag = (profile.chips as any).perfil_compartido;
+                }
+
+                setFolio(associatedFolios.join(', ')); // Para mostrar o gestionar en estado simple actual
+                // Alternativamente, guardar folios y la flag compartida en un estado nuevo si la refactorización profunda es necesaria
+                // Pero por ahora extenderemos "folio" como lista delimitada por comas
+
                 setCurrentPhotoUrl(profile.photo_url || null);
 
                 setFullName(profile.full_name || "");
@@ -146,12 +162,12 @@ export default function DashboardPage() {
                 }
 
                 // Fetch access logs
-                if (profile.chips?.folio) {
+                if (associatedFolios.length > 0) {
                     setLoadingLogs(true);
                     const { data: logsData, error: logsError } = await supabase
                         .from('chip_accesos')
                         .select('*')
-                        .eq('chip_folio', profile.chips.folio)
+                        .in('chip_folio', associatedFolios)
                         .order('created_at', { ascending: false });
 
                     if (!logsError && logsData) {
@@ -159,6 +175,9 @@ export default function DashboardPage() {
                     }
                     setLoadingLogs(false);
                 }
+
+                // Temporary states to pass to render
+                (window as any)._sharedProfileFlag = sharedProfileFlag;
 
             } catch (err: any) {
                 setErrorMsg(err.message);
@@ -392,12 +411,21 @@ export default function DashboardPage() {
                                 <section className="bg-primary/5 border border-primary/20 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
                                     <div>
                                         <h3 className="font-bold text-primary mb-1 flex items-center gap-2">
-                                            <CheckCircle2 size={18} /> Chip Vinculado: {folio.toUpperCase()}
+                                            <CheckCircle2 size={18} /> Chips Vinculados: {folio.toUpperCase()}
                                         </h3>
-                                        <p className="text-sm text-muted-foreground">Este es el enlace al que accederán los paramédicos al escanear tu chip.</p>
+                                        <p className="text-sm text-muted-foreground">Este es el enlace al que accederán los paramédicos al escanear uno de tus chips.</p>
+
+                                        {/* Restricción de Perfil Compartido */}
+                                        {(window as any)._sharedProfileFlag && (
+                                            <div className="mt-4 p-3 bg-amber-500/10 text-amber-900 border border-amber-500/20 rounded-lg text-xs font-semibold flex gap-2 w-full max-w-md">
+                                                <AlertCircle size={16} className="shrink-0 mt-0.5" />
+                                                <p>La configuración de este chip ya no puede modificarse. Si necesitas ayuda contáctanos en contacto@rescue-chip.com</p>
+                                            </div>
+                                        )}
                                     </div>
                                     <Link
-                                        href={`/profile/${folio}`}
+                                        // Si es una lista, abrimos el primero (usualmente todos te llevan al profileId)
+                                        href={`/profile/${folio.split(', ')[0]}`}
                                         target="_blank"
                                         className="shrink-0 flex items-center gap-2 bg-background border border-border shadow-sm px-4 py-2 rounded-xl text-sm font-bold text-foreground hover:bg-muted transition-colors"
                                     >
