@@ -128,6 +128,7 @@ function ActivationFormContent() {
             await proceedWithRegistration(userId, chip, formData);
 
         } catch (err: any) {
+            console.error("Error detallado en handleSubmit:", err);
             setErrorMsg(err.message || "Ocurrió un error inesperado.");
             setLoading(false);
         }
@@ -272,6 +273,7 @@ function ActivationFormContent() {
             router.push(`/profile/${encodeURIComponent(chip.folio)}`);
 
         } catch (err: any) {
+            console.error("Error detallado en proceedWithRegistration:", err);
             setErrorMsg(err.message || "Ocurrió un error inesperado al registrar el perfil.");
         } finally {
             setLoading(false);
