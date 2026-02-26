@@ -219,3 +219,16 @@ alter table public.profiles add column plan text default 'individual';
 alter table public.chips add column owner_profile_id uuid references public.profiles(id);
 alter table public.chips add column perfil_compartido boolean;
 alter table public.chips add column assigned_plan text default 'individual';
+
+-- Solución de Errores RLS (406) para Activación de Chips
+drop policy if exists "Allow public insert to profiles" on public.profiles;
+create policy "Allow insert to profiles"
+  on public.profiles for insert
+  to public
+  with check (auth.uid() = user_id);
+
+drop policy if exists "Allow public update to chips" on public.chips;
+create policy "Allow update to chips"
+  on public.chips for update
+  to public
+  using (true);

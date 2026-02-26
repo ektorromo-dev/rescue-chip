@@ -212,41 +212,48 @@ function ActivationFormContent() {
             const chipAssignedPlan = chip.assigned_plan || 'individual';
 
             // 2. Insert profile
-            const { error: profileError } = await supabase
+            const profileToInsert = {
+                chip_id: chip.id,
+                user_id: userId,
+                plan: chipAssignedPlan,
+                photo_url: photoUrl,
+                full_name: formData.get("fullName") as string,
+                age: age,
+                location: formData.get("location") as string,
+                emergency_contacts: emergencyContacts,
+                blood_type: formData.get("bloodType") as string,
+                allergies: formData.get("allergies") as string,
+                medical_conditions: formData.get("medicalConditions") as string,
+                important_medications: formData.get("importantMedications") as string,
+                medical_system: medicalSystem,
+                organ_donor: organDonor,
+                is_motorcyclist: isMotorcyclist,
+                additional_notes: formData.get("additionalNotes") as string,
+                google_maps_link: formData.get("googleMapsLink") as string,
+                aseguradora: finalAseguradora || null,
+                numero_poliza: formData.get("numeroPoliza") as string || null,
+                tipo_seguro: formData.get("tipoSeguro") as string || null,
+                nombre_asegurado: formData.get("nombreAsegurado") as string || null,
+                vigencia_poliza: formData.get("vigenciaPoliza") as string || null,
+                telefono_aseguradora: formData.get("telefonoAseguradora") as string || null,
+                poliza_url: polizaUrl,
+                nss: formData.get("nss") as string || null,
+                numero_afiliacion: formData.get("numeroAfiliacion") as string || null,
+                clinica_asignada: formData.get("clinicaAsignada") as string || null,
+                curp_seguro: formData.get("curpSeguro") as string || null,
+            };
+
+            console.log("Activación - Intentando insertar en perfiles:", profileToInsert);
+
+            const { data: insertedProfileData, error: profileError } = await supabase
                 .from('profiles')
-                .insert({
-                    chip_id: chip.id,
-                    user_id: userId,
-                    plan: chipAssignedPlan,
-                    photo_url: photoUrl,
-                    full_name: formData.get("fullName") as string,
-                    age: age,
-                    location: formData.get("location") as string,
-                    emergency_contacts: emergencyContacts,
-                    blood_type: formData.get("bloodType") as string,
-                    allergies: formData.get("allergies") as string,
-                    medical_conditions: formData.get("medicalConditions") as string,
-                    important_medications: formData.get("importantMedications") as string,
-                    medical_system: medicalSystem,
-                    organ_donor: organDonor,
-                    is_motorcyclist: isMotorcyclist,
-                    additional_notes: formData.get("additionalNotes") as string,
-                    google_maps_link: formData.get("googleMapsLink") as string,
-                    aseguradora: finalAseguradora || null,
-                    numero_poliza: formData.get("numeroPoliza") as string || null,
-                    tipo_seguro: formData.get("tipoSeguro") as string || null,
-                    nombre_asegurado: formData.get("nombreAsegurado") as string || null,
-                    vigencia_poliza: formData.get("vigenciaPoliza") as string || null,
-                    telefono_aseguradora: formData.get("telefonoAseguradora") as string || null,
-                    poliza_url: polizaUrl,
-                    nss: formData.get("nss") as string || null,
-                    numero_afiliacion: formData.get("numeroAfiliacion") as string || null,
-                    clinica_asignada: formData.get("clinicaAsignada") as string || null,
-                    curp_seguro: formData.get("curpSeguro") as string || null,
-                });
+                .insert(profileToInsert)
+                .select()
+                .single();
 
             if (profileError) {
-                throw new Error(profileError.message);
+                console.error("Error devuelto por Supabase al insertar perfil:", JSON.stringify(profileError, null, 2), profileError);
+                throw new Error(`Error BD (${profileError.code || 'Desconocido'}): ${profileError.message || 'Fallo al guardar el perfil'}`);
             }
 
             // 3. Update chip as activated
@@ -261,22 +268,29 @@ function ActivationFormContent() {
                 })
                 .eq('id', chip.id);
 
-            // Fetch created profile to get ID
-            const { data: createdProfile } = await supabase.from('profiles').select('id').eq('chip_id', chip.id).single();
+            const { data: createdProfile, error: fetchError } = await supabase.from('profiles').select('id').eq('chip_id', chip.id).single();
+            if (fetchError) {
+                console.error("Error al buscar el perfil recién creado:", JSON.stringify(fetchError, null, 2));
+            }
             if (createdProfile) {
-                await supabase.from('chips').update({ owner_profile_id: createdProfile.id }).eq('id', chip.id);
+                console.log("Activación - Actualizando owner_profile_id del chip al ID del perfil:", createdProfile.id);
+                const { error: chipOwnerError } = await supabase.from('chips').update({ owner_profile_id: createdProfile.id }).eq('id', chip.id);
+                if (chipOwnerError) {
+                    console.error("Error al actualizar owner_profile_id del chip:", JSON.stringify(chipOwnerError, null, 2));
+                }
             }
 
             if (activateError) {
-                throw new Error("Error al activar el chip. Por favor contacta a soporte.");
+                console.error("Error devuelto por Supabase al actualizar chip:", JSON.stringify(activateError, null, 2), activateError);
+                throw new Error(`Error BD (${activateError.code || 'Desconocido'}): Fallo al activar el chip - ${activateError.message}`);
             }
 
             // 4. Redirect to the profile page
             router.push(`/profile/${encodeURIComponent(chip.folio)}`);
 
         } catch (err: any) {
-            console.error("Error detallado en proceedWithRegistration:", err);
-            setErrorMsg(err.message || "Ocurrió un error inesperado al registrar el perfil.");
+            console.error("Error completo en proceedWithRegistration:", JSON.stringify(err, null, 2), err);
+            setErrorMsg(err.message || "Ocurrió un error inesperado al registrar el perfil. Revisa la consola para más detalles.");
         } finally {
             setLoading(false);
         }
