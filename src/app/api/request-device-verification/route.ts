@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import nodemailer from "nodemailer";
 
-const supabase = createClient(
+const supabaseAdmin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
 const transporter = nodemailer.createTransport({
@@ -28,17 +28,18 @@ export async function POST(req: NextRequest) {
 
         // Validate user authentication using authorization header
         const authHeader = req.headers.get("authorization") || req.headers.get("Authorization");
-        if (!authHeader) {
-            console.error("No authorization header present");
-            return NextResponse.json({ error: "No authorization header" }, { status: 401 });
+        const token = authHeader?.replace("Bearer ", "")?.trim();
+
+        if (!token) {
+            console.error("No authorization header or token present");
+            return NextResponse.json({ error: "No token" }, { status: 401 });
         }
 
-        const token = authHeader.replace("Bearer ", "");
-        const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+        const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
 
-        if (authError || !user || !user.email) {
+        if (authError || !user) {
             console.error("Supabase auth error or missing user email:", authError);
-            return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+            return NextResponse.json({ error: "Invalid token" }, { status: 401 });
         }
 
         // Generate one-time 15 min random verification token 
@@ -50,7 +51,7 @@ export async function POST(req: NextRequest) {
         const deviceInfo = body.deviceInfo || req.headers.get("user-agent") || 'Unknown Device';
 
         // 1. Guardar en Supabase - Forma simple como en factura-notify para evitar errores del composite key default
-        const { data: existingSession } = await supabase
+        const { data: existingSession } = await supabaseAdmin
             .from('user_sessions')
             .select('id')
             .eq('user_id', user.id)
@@ -58,14 +59,14 @@ export async function POST(req: NextRequest) {
             .maybeSingle();
 
         if (existingSession) {
-            await supabase.from('user_sessions').update({
+            await supabaseAdmin.from('user_sessions').update({
                 status: 'pending',
                 device_info: deviceInfo,
                 verification_token: verificationToken,
                 token_expires_at: expiresAt.toISOString()
             }).eq('id', existingSession.id);
         } else {
-            await supabase.from('user_sessions').insert({
+            await supabaseAdmin.from('user_sessions').insert({
                 user_id: user.id,
                 device_id: deviceId,
                 device_info: deviceInfo,
