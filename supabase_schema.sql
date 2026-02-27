@@ -131,6 +131,34 @@ create policy "Dueño puede ver accesos de su chip"
     )
   );
 
+-- Create function to increment profile viewers count
+create or replace function increment_profile_views(profile_id uuid)
+returns void as $$
+begin
+  update public.profiles
+  set views = views + 1
+  where id = profile_id;
+end;
+$$ language plpgsql security definer;
+
+-- ==========================================
+-- SESSIONS PARA DETECCIÓN DE NUEVO DISPOSITIVO
+-- ==========================================
+
+CREATE TABLE IF NOT EXISTS public.user_sessions (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  device_id TEXT NOT NULL,
+  device_info TEXT,
+  last_seen TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+ALTER TABLE public.user_sessions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users manage own sessions" ON public.user_sessions
+FOR ALL TO authenticated USING (auth.uid() = user_id);
+
 -- Allow authenticated users to update their own profiles (dashboard)
 create policy "Allow users to update own profile"
   on public.profiles for update

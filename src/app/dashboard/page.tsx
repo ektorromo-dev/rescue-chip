@@ -15,6 +15,10 @@ export default function DashboardPage() {
     const [errorMsg, setErrorMsg] = useState("");
     const [successMsg, setSuccessMsg] = useState("");
 
+    // Device detection state
+    const [showNewDeviceModal, setShowNewDeviceModal] = useState(false);
+    const [deviceId, setDeviceId] = useState("");
+
     const [profileId, setProfileId] = useState("");
     const [folio, setFolio] = useState("");
 
@@ -81,6 +85,37 @@ export default function DashboardPage() {
                 router.replace("/login");
                 return;
             }
+
+            // --- MANEJO DE NUEVO DISPOSITIVO ---
+            try {
+                let currentDeviceId = localStorage.getItem("rescuechip_device_id");
+                if (!currentDeviceId) {
+                    currentDeviceId = crypto.randomUUID();
+                    localStorage.setItem("rescuechip_device_id", currentDeviceId);
+                }
+                setDeviceId(currentDeviceId);
+
+                const { data: sessionData } = await supabase
+                    .from('user_sessions')
+                    .select('id')
+                    .eq('user_id', session.user.id)
+                    .eq('device_id', currentDeviceId)
+                    .maybeSingle();
+
+                if (!sessionData) {
+                    // Es un dispositivo nuevo (y esperamos a que el usuario confirme para ocultarlo)
+                    setShowNewDeviceModal(true);
+                } else {
+                    // Actualizar silenciosamente el last_seen
+                    supabase.from('user_sessions')
+                        .update({ last_seen: new Date().toISOString() })
+                        .eq('id', sessionData.id)
+                        .then(); // bg task
+                }
+            } catch (err) {
+                console.error("Error checking device session:", err);
+            }
+            // --- FIN MANEJO DE NUEVO DISPOSITIVO ---
 
             try {
                 // Fetch profile associated with this user_id resiliently
@@ -195,6 +230,28 @@ export default function DashboardPage() {
 
     const handleSignOut = async () => {
         await supabase.auth.signOut();
+        router.push("/login");
+    };
+
+    const handleConfirmDevice = async () => {
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                await supabase.from('user_sessions').insert({
+                    user_id: session.user.id,
+                    device_id: deviceId,
+                    device_info: navigator.userAgent || 'Unknown Device'
+                });
+            }
+            setShowNewDeviceModal(false);
+        } catch (error) {
+            console.error("Error confirmando dispositivo:", error);
+            setShowNewDeviceModal(false); // fall back open if error so they aren't blocked forever, or handle it better
+        }
+    };
+
+    const handleRejectDevice = async () => {
+        await supabase.auth.signOut({ scope: 'global' });
         router.push("/login");
     };
 
@@ -364,6 +421,36 @@ export default function DashboardPage() {
 
     return (
         <div className="min-h-screen bg-muted flex flex-col items-center justify-center p-0 md:p-4">
+
+            {/* Modal de Nuevo Dispositivo */}
+            {showNewDeviceModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                    <div className="bg-card w-full max-w-md p-8 rounded-[2rem] shadow-2xl border border-destructive/20 text-center animate-in fade-in zoom-in duration-300">
+                        <div className="w-20 h-20 bg-destructive/10 text-destructive mx-auto rounded-full flex items-center justify-center mb-6 shadow-inner">
+                            <AlertCircle size={40} />
+                        </div>
+                        <h2 className="text-2xl font-black tracking-tight mb-3">Nuevo Dispositivo</h2>
+                        <p className="text-muted-foreground font-medium mb-8 leading-relaxed">
+                            Hemos detectado un acceso desde un dispositivo o navegador nuevo. <br />¿Eres tú intentando acceder a tu cuenta?
+                        </p>
+                        <div className="space-y-3">
+                            <button
+                                onClick={handleConfirmDevice}
+                                className="w-full bg-primary text-primary-foreground py-4 rounded-xl font-bold text-lg hover:scale-[1.02] shadow-xl shadow-primary/20 transition-all"
+                            >
+                                Sí, soy yo
+                            </button>
+                            <button
+                                onClick={handleRejectDevice}
+                                className="w-full bg-destructive/10 text-destructive hover:bg-destructive text-sm py-4 rounded-xl font-bold transition-colors"
+                            >
+                                No, cerrar sesión en todos lados
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="w-full max-w-3xl bg-card md:rounded-[2.5rem] shadow-2xl border-x md:border border-border/50 overflow-hidden">
                 {/* Header */}
                 <div className="bg-destructive px-8 pt-10 pb-12 text-destructive-foreground relative overflow-hidden">
