@@ -83,35 +83,37 @@ export default function DashboardPage() {
             }
 
             try {
-                // Fetch profile associated with this user_id
+                // Fetch profile associated with this user_id resiliently
                 const { data: profile, error: profileError } = await supabase
                     .from('profiles')
-                    .select('*, chips(folio, perfil_compartido)')
+                    .select('*')
                     .eq('user_id', session.user.id)
-                    .single();
+                    .limit(1)
+                    .maybeSingle();
 
                 if (profileError || !profile) {
-                    throw new Error("No se encontró un perfil médico asociado a esta cuenta.");
+                    throw new Error("No se encontró un perfil médico asociado a esta cuenta. Si acabas de adquirir tu Chip NFC o Pulsera, actívalo ahora.");
                 }
 
                 // Populate state
                 setProfileId(profile.id);
 
-                // profile.chips can be an array if 1-to-many, or an object if 1-to-1 in current db schema
+                // Fetch associated chips robustly
+                const { data: chipsData } = await supabase
+                    .from('chips')
+                    .select('folio, perfil_compartido')
+                    .eq('owner_profile_id', profile.id);
+
                 let associatedFolios: string[] = [];
                 let sharedProfileFlag = false;
 
-                if (Array.isArray(profile.chips)) {
-                    associatedFolios = profile.chips.map((c: any) => c.folio);
-                    sharedProfileFlag = profile.chips.some((c: any) => c.perfil_compartido);
-                } else if (profile.chips) {
-                    associatedFolios = [(profile.chips as any).folio];
-                    sharedProfileFlag = (profile.chips as any).perfil_compartido;
+                if (chipsData && chipsData.length > 0) {
+                    associatedFolios = chipsData.map((c: any) => c.folio);
+                    sharedProfileFlag = chipsData.some((c: any) => c.perfil_compartido);
                 }
 
                 setFolio(associatedFolios.join(', ')); // Para mostrar o gestionar en estado simple actual
-                // Alternativamente, guardar folios y la flag compartida en un estado nuevo si la refactorización profunda es necesaria
-                // Pero por ahora extenderemos "folio" como lista delimitada por comas
+                (window as any)._hasChips = associatedFolios.length > 0; // Marcar bandera temporal para la UI
 
                 setCurrentPhotoUrl(profile.photo_url || null);
 
@@ -148,6 +150,7 @@ export default function DashboardPage() {
                 setOrganDonor(profile.organ_donor || false);
                 setIsMotorcyclist(profile.is_motorcyclist || false);
                 setAdditionalNotes(profile.additional_notes || "");
+
                 setGoogleMapsLink(profile.google_maps_link || "");
 
                 if (profile.emergency_contacts && Array.isArray(profile.emergency_contacts)) {
@@ -399,39 +402,40 @@ export default function DashboardPage() {
                     )}
 
                     {!profileId ? (
-                        <div className="text-center py-10">
-                            <p className="text-muted-foreground text-lg">No tienes un perfil médico vinculado todavía.</p>
-                            <Link href="/activate" className="inline-block mt-4 bg-primary text-primary-foreground px-6 py-3 rounded-xl font-bold">Activar un Chip</Link>
+                        <div className="text-center py-6 mb-8 bg-primary/5 rounded-2xl border border-primary/20">
+                            <p className="text-muted-foreground text-lg mb-3">No tienes un perfil médico vinculado todavía.</p>
+                            <Link href="/activate" className="inline-block bg-primary text-primary-foreground px-6 py-2 rounded-xl font-bold hover:bg-primary/90 transition-colors">Activar Nuevo Chip</Link>
                         </div>
                     ) : (
                         <>
                             <form onSubmit={handleUpdate} className="space-y-10">
 
                                 {/* ENLACE PUBLICO */}
-                                <section className="bg-primary/5 border border-primary/20 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-                                    <div>
-                                        <h3 className="font-bold text-primary mb-1 flex items-center gap-2">
-                                            <CheckCircle2 size={18} /> Chips Vinculados: {folio.toUpperCase()}
-                                        </h3>
-                                        <p className="text-sm text-muted-foreground">Este es el enlace al que accederán los paramédicos al escanear uno de tus chips.</p>
+                                {folio && (
+                                    <section className="bg-primary/5 border border-primary/20 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                                        <div>
+                                            <h3 className="font-bold text-primary mb-1 flex items-center gap-2">
+                                                <CheckCircle2 size={18} /> Chips Vinculados: {folio.toUpperCase()}
+                                            </h3>
+                                            <p className="text-sm text-muted-foreground">Este es el enlace al que accederán los paramédicos al escanear uno de tus chips.</p>
 
-                                        {/* Restricción de Perfil Compartido */}
-                                        {(window as any)._sharedProfileFlag && (
-                                            <div className="mt-4 p-3 bg-amber-500/10 text-amber-900 border border-amber-500/20 rounded-lg text-xs font-semibold flex gap-2 w-full max-w-md">
-                                                <AlertCircle size={16} className="shrink-0 mt-0.5" />
-                                                <p>La configuración de este chip ya no puede modificarse. Si necesitas ayuda contáctanos en contacto@rescue-chip.com</p>
-                                            </div>
-                                        )}
-                                    </div>
-                                    <Link
-                                        // Si es una lista, abrimos el primero (usualmente todos te llevan al profileId)
-                                        href={`/profile/${folio.split(', ')[0]}`}
-                                        target="_blank"
-                                        className="shrink-0 flex items-center gap-2 bg-background border border-border shadow-sm px-4 py-2 rounded-xl text-sm font-bold text-foreground hover:bg-muted transition-colors"
-                                    >
-                                        Ver Perfil Público <ExternalLink size={16} />
-                                    </Link>
-                                </section>
+                                            {/* Restricción de Perfil Compartido */}
+                                            {(window as any)._sharedProfileFlag && (
+                                                <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded max-w-xl">
+                                                    <p className="text-xs text-blue-800 font-semibold mb-1 flex items-center gap-1"><AlertCircle size={14} /> Perfil Compartido</p>
+                                                    <p className="text-xs text-muted-foreground">La configuración maestra y control de desvinculación de este chip es manejada por otra persona. Si precisas desligar este chip contáctanos.</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="flex flex-col sm:flex-row gap-2 shrink-0 w-full sm:w-auto">
+                                            <a href={`/profile/${folio.split(',')[0].trim()}`} target="_blank" rel="noopener noreferrer"
+                                                className="bg-primary text-primary-foreground px-4 py-2 rounded-lg font-bold text-center flex items-center justify-center gap-2 whitespace-nowrap">
+                                                Ver mi Perfil Público
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                            </a>
+                                        </div>
+                                    </section>
+                                )}
 
                                 {/* IDENTIFICACIÓN */}
                                 <section className="space-y-4">
@@ -449,7 +453,7 @@ export default function DashboardPage() {
                                                         <img src={URL.createObjectURL(photoFile)} alt="Preview" className="w-full h-full object-cover" />
                                                     </div>
                                                 ) : currentPhotoUrl ? (
-                                                    <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-border/50 bg-muted shrink-0 shadow-sm relative group">
+                                                    <div className="w-20 h-20 rounded-2xl border-2 border-border/50 bg-muted shrink-0 shadow-sm relative group">
                                                         {/* eslint-disable-next-line @next/next/no-img-element */}
                                                         <img src={currentPhotoUrl} alt="Foto actual" className="w-full h-full object-cover" />
                                                         <div className="absolute inset-0 bg-background/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -883,6 +887,6 @@ export default function DashboardPage() {
                     )}
                 </div>
             </div>
-        </div >
+        </div>
     );
 }
