@@ -33,9 +33,38 @@ function ActivationFormContent() {
     const [aseguradora, setAseguradora] = useState("");
     const [polizaFile, setPolizaFile] = useState<File | null>(null);
 
+    // Pre-validación en carga
+    const [isLoadingPreCheck, setIsLoadingPreCheck] = useState(false);
+    const [preValidationError, setPreValidationError] = useState("");
+
     useEffect(() => {
         if (folioFromUrl) {
             setFolio(folioFromUrl);
+            const validateChipStatus = async () => {
+                setIsLoadingPreCheck(true);
+                try {
+                    const cleanFolio = folioFromUrl.trim();
+                    const { data: chip, error: chipError } = await supabase
+                        .from('chips')
+                        .select('status, activated')
+                        .ilike('folio', cleanFolio)
+                        .single();
+
+                    if (!chipError && chip) {
+                        const isActivatedStr = chip.status === 'activado';
+                        const isActivatedBool = chip.activated === true || String(chip.activated).toLowerCase() === 'true';
+
+                        if (isActivatedStr && isActivatedBool) {
+                            setPreValidationError('Este chip ya fue activado por otro usuario.');
+                        }
+                    }
+                } catch (e) {
+                    console.error("Error validando el chip al cargar", e);
+                } finally {
+                    setIsLoadingPreCheck(false);
+                }
+            };
+            validateChipStatus();
         }
     }, [folioFromUrl]);
 
@@ -421,6 +450,34 @@ function ActivationFormContent() {
                             Es para otra persona
                         </button>
                     </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (isLoadingPreCheck) {
+        return (
+            <div className="p-24 flex flex-col items-center justify-center text-muted-foreground">
+                <Loader2 size={48} className="animate-spin text-primary/30 mb-4" />
+                <p className="font-medium animate-pulse">Verificando estado del chip...</p>
+            </div>
+        );
+    }
+
+    if (preValidationError) {
+        return (
+            <div className="p-8 md:p-12 flex flex-col items-center justify-center text-center space-y-6">
+                <div className="w-20 h-20 bg-destructive/10 text-destructive rounded-full flex items-center justify-center mb-2">
+                    <AlertCircle size={40} />
+                </div>
+                <h2 className="text-2xl font-black text-foreground">Acceso Denegado</h2>
+                <p className="text-muted-foreground text-lg max-w-md mx-auto leading-relaxed">
+                    {preValidationError}
+                </p>
+                <div className="pt-6 w-full max-w-sm mx-auto">
+                    <Link href="/shop" className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground h-14 rounded-xl font-bold hover:bg-primary/90 transition-all">
+                        Comprar mi RescueChip
+                    </Link>
                 </div>
             </div>
         );
