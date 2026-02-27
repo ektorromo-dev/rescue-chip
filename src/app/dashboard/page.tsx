@@ -80,73 +80,73 @@ export default function DashboardPage() {
     useEffect(() => {
         let pollingInterval: NodeJS.Timeout;
 
-        const checkDeviceSession = async (userSessionData: any, token: string, localDeviceId: string) => {
-            const { data: userSessions } = await supabase
-                .from('user_sessions')
-                .select('id, device_id, status')
-                .eq('user_id', userSessionData.user.id);
-
-            const currentSession = userSessions?.find(s => s.device_id === localDeviceId);
-            const verifiedSessions = userSessions?.filter(s => s.status === 'verified' && s.device_id !== localDeviceId);
-
-            // 1. Si el dispositivo actual ya está verificado, permitir y actualizar last_seen
-            if (currentSession?.status === 'verified') {
-                setDeviceVerificationStatus('verified');
-                supabase.from('user_sessions')
-                    .update({ last_seen: new Date().toISOString() })
-                    .eq('id', currentSession.id)
-                    .then(); // bg task
-                return true;
-            }
-
-            // 2. Si no hay NINGÚN otro dispositivo verificado, este es técnicamente el "primer"
-            // dispositivo real validado. Autorizamos silenciosamente.
-            if (!verifiedSessions || verifiedSessions.length === 0) {
-                if (currentSession) {
-                    await supabase.from('user_sessions').update({
-                        status: 'verified',
-                        last_seen: new Date().toISOString()
-                    }).eq('id', currentSession.id);
-                } else {
-                    await supabase.from('user_sessions').insert({
-                        user_id: userSessionData.user.id,
-                        device_id: localDeviceId,
-                        device_info: navigator.userAgent || 'Unknown Device',
-                        status: 'verified'
-                    });
-                }
-                setDeviceVerificationStatus("verified");
-                return true;
-            }
-
-            // 3. A este punto, SÍ hay otros dispositivos verificados, y este NO lo está.
-            // Por lo tanto, enviamos correo y esperamos confirmación.
-            setDeviceVerificationStatus("pending");
-            try {
-                await fetch('/api/request-device-verification', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({
-                        deviceId: localDeviceId,
-                        deviceInfo: navigator.userAgent || 'Unknown Device'
-                    })
-                });
-            } catch (e) {
-                console.error("Error pidiendo verif por correo", e);
-            }
-            return false;
-        };
-
         const fetchUserData = async () => {
             const { data: { session } } = await supabase.auth.getSession();
 
-            if (!session) {
-                router.replace("/login");
+            if (!session || !session.user) {
+                router.push('/login');
                 return;
             }
+
+            const checkDeviceSession = async (userSessionData: any, token: string, localDeviceId: string) => {
+                const { data: userSessions } = await supabase
+                    .from('user_sessions')
+                    .select('id, device_id, status')
+                    .eq('user_id', userSessionData.user.id);
+
+                const currentSession = userSessions?.find(s => s.device_id === localDeviceId);
+                const verifiedSessions = userSessions?.filter(s => s.status === 'verified' && s.device_id !== localDeviceId);
+
+                // 1. Si el dispositivo actual ya está verificado, permitir y actualizar last_seen
+                if (currentSession?.status === 'verified') {
+                    setDeviceVerificationStatus('verified');
+                    supabase.from('user_sessions')
+                        .update({ last_seen: new Date().toISOString() })
+                        .eq('id', currentSession.id)
+                        .then(); // bg task
+                    return true;
+                }
+
+                // 2. Si no hay NINGÚN otro dispositivo verificado, este es técnicamente el "primer"
+                // dispositivo real validado. Autorizamos silenciosamente.
+                if (!verifiedSessions || verifiedSessions.length === 0) {
+                    if (currentSession) {
+                        await supabase.from('user_sessions').update({
+                            status: 'verified',
+                            last_seen: new Date().toISOString()
+                        }).eq('id', currentSession.id);
+                    } else {
+                        await supabase.from('user_sessions').insert({
+                            user_id: userSessionData.user.id,
+                            device_id: localDeviceId,
+                            device_info: navigator.userAgent || 'Unknown Device',
+                            status: 'verified'
+                        });
+                    }
+                    setDeviceVerificationStatus("verified");
+                    return true;
+                }
+
+                // 3. A este punto, SÍ hay otros dispositivos verificados, y este NO lo está.
+                // Por lo tanto, enviamos correo y esperamos confirmación.
+                setDeviceVerificationStatus("pending");
+                try {
+                    await fetch('/api/request-device-verification', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            deviceId: localDeviceId,
+                            deviceInfo: navigator.userAgent || 'Unknown Device'
+                        })
+                    });
+                } catch (e) {
+                    console.error("Error pidiendo verif por correo", e);
+                }
+                return false;
+            };
 
             // --- MANEJO DE NUEVO DISPOSITIVO POR EMAIL ---
             let currentDeviceId = localStorage.getItem("rescuechip_device_id");

@@ -104,32 +104,23 @@ export async function POST(req: NextRequest) {
             </div>
         `;
 
-        const mailOptions = {
-            from: 'RescueChip Security <contacto@rescue-chip.com>',
-            replyTo: 'contacto@rescue-chip.com',
-            to: user.email,
-            subject: "⚠️ ¿Eres tú? Nuevo acceso detectado en RescueChip",
-            html: emailHtml,
-        };
+        try {
+            await transporter.sendMail({
+                from: 'RescueChip Security <contacto@rescue-chip.com>',
+                replyTo: 'contacto@rescue-chip.com',
+                to: user.email,
+                subject: "⚠️ ¿Eres tú? Nuevo acceso detectado en RescueChip",
+                html: emailHtml,
+            });
+            console.log("Correo de verificación enviado al cliente.");
+        } catch (mailError) {
+            console.error("Error enviando email al cliente:", mailError);
+        }
 
-        console.log("Attempting to send security email to:", user.email);
-
-        const info = await transporter.sendMail(mailOptions);
-        console.log("Email sent successfully. Info:", info.messageId, info.response);
-
-        return NextResponse.json({ success: true, message: "Verification email sent", info: info.response });
+        return NextResponse.json({ success: true, message: "Verification endpoint reached" });
 
     } catch (error: any) {
-        console.error("\n================ SMTP/NODEMAILER ERROR ===============");
-        console.error("Error Message:", error.message);
-        console.error("Error Code:", error.code);
-        console.error("Error Command:", error.command);
-        console.error("Full Error Stack:", error.stack);
-        console.error("======================================================\n");
-        return NextResponse.json({
-            error: "Failed to send email",
-            details: error.message,
-            code: error.code
-        }, { status: 500 });
+        console.error("Error in request-device-verification general process:", error.message);
+        return NextResponse.json({ error: "Failed to process request" }, { status: 500 });
     }
 }
