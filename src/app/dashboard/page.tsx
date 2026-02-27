@@ -77,27 +77,20 @@ export default function DashboardPage() {
     const [loadingLogs, setLoadingLogs] = useState(false);
     const [expandedLogId, setExpandedLogId] = useState<string | null>(null);
 
+    // Este useEffect corre SIEMPRE que el usuario esté autenticado en el dashboard
     useEffect(() => {
-        let sessionCheckInterval: NodeJS.Timeout;
-
-        if (deviceVerificationStatus === "pending") {
-            sessionCheckInterval = setInterval(async () => {
-                console.log('Checking session...');
-                const { data: { user }, error } = await supabase.auth.getUser();
-                if (!user || error) {
-                    clearInterval(sessionCheckInterval);
-                    await supabase.auth.signOut();
-                    window.location.href = '/login';
-                }
-            }, 5000);
-        }
-
-        return () => {
-            if (sessionCheckInterval) {
-                clearInterval(sessionCheckInterval);
+        const sessionCheck = setInterval(async () => {
+            console.log('Checking session...');
+            const { data: { user }, error } = await supabase.auth.getUser();
+            if (!user || error) {
+                clearInterval(sessionCheck);
+                await supabase.auth.signOut();
+                window.location.href = '/login';
             }
-        };
-    }, [deviceVerificationStatus]);
+        }, 5000);
+
+        return () => clearInterval(sessionCheck);
+    }, []);
 
     useEffect(() => {
         let pollingInterval: NodeJS.Timeout;
