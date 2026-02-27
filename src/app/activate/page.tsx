@@ -64,12 +64,18 @@ function ActivationFormContent() {
                 throw new Error("Este folio no es válido. Verifica que esté escrito correctamente o contacta a soporte.");
             }
 
-            if (chip.status === 'activado' || chip.activated) {
+            console.log("Activación - Validando estado del chip recién traído de BD:");
+            console.log("chip.status:", `'${chip.status}'`, "(tipo: " + typeof chip.status + ")");
+            console.log("chip.activated:", chip.activated, "(tipo: " + typeof chip.activated + ")");
+
+            const isActivated = chip.status === 'activado' || chip.activated === true || String(chip.activated).toLowerCase() === 'true';
+
+            if (isActivated) {
                 throw new Error("Este chip ya fue activado por otro usuario.");
             }
 
-            if (chip.status !== 'disponible') {
-                throw new Error("Este chip no está disponible para activación (" + (chip.status || "desconocido") + ").");
+            if (chip.status !== 'disponible' && chip.status !== 'vendido') {
+                throw new Error(`Este chip no está disponible para activación (${chip.status || "desconocido"}).`);
             }
 
             // 1.5 Try Sign Up or Sign In
