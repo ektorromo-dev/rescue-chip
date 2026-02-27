@@ -309,8 +309,8 @@ function ActivationFormContent() {
                 throw new Error(`Fallo al vincular el chip (${chipUpdateError.code || 'Desconocido'}). Se deshizo la creación del perfil.`);
             }
 
-            // 4. Redirect to the profile page
-            router.push(`/profile/${encodeURIComponent(chip.folio)}`);
+            // 4. Redirect to the dashboard to let them edit their new profile instead of returning directly to public profile
+            router.push(`/dashboard`);
 
         } catch (err: any) {
             console.error("Error completo en proceedWithRegistration:", JSON.stringify(err, null, 2), err);
