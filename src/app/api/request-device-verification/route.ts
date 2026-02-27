@@ -10,7 +10,7 @@ const supabase = createClient(
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: Number(process.env.SMTP_PORT) || 587,
-    secure: Number(process.env.SMTP_PORT) === 465,
+    secure: Number(process.env.SMTP_PORT) === 465, // true for 465, false for other ports
     auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
@@ -19,9 +19,10 @@ const transporter = nodemailer.createTransport({
 
 export async function POST(req: NextRequest) {
     try {
-        const { deviceId, deviceToken } = await req.json();
+        const body = await req.json();
+        const { deviceId } = body;
 
-        if (!deviceId || !deviceToken) {
+        if (!deviceId) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
 
@@ -34,7 +35,7 @@ export async function POST(req: NextRequest) {
         const token = authHeader.replace("Bearer ", "");
         const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
-        if (authError || !user) {
+        if (authError || !user || !user.email) {
             return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
         }
 
@@ -46,51 +47,33 @@ export async function POST(req: NextRequest) {
         // Extract user agent for device info
         const deviceInfo = req.headers.get("user-agent") || 'Unknown Device';
 
-        // Upsert into user_sessions with Service Role to bypass potential RLS hiccups
-        const { data: sessionData, error: sessionError } = await supabase
+        // 1. Guardar en Supabase - Forma simple como en factura-notify para evitar errores del composite key default
+        const { data: existingSession } = await supabase
             .from('user_sessions')
-            .upsert({
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('device_id', deviceId)
+            .maybeSingle();
+
+        if (existingSession) {
+            await supabase.from('user_sessions').update({
+                status: 'pending',
+                device_info: deviceInfo,
+                verification_token: verificationToken,
+                token_expires_at: expiresAt.toISOString()
+            }).eq('id', existingSession.id);
+        } else {
+            await supabase.from('user_sessions').insert({
                 user_id: user.id,
                 device_id: deviceId,
                 device_info: deviceInfo,
                 status: 'pending',
                 verification_token: verificationToken,
                 token_expires_at: expiresAt.toISOString()
-            }, {
-                onConflict: 'user_id, device_id'
-            })
-            .select()
-            .single();
-
-        // If composite key conflict upsert fails (due to schema config), we try standard logic
-        if (sessionError) {
-            const { data: existingSession } = await supabase
-                .from('user_sessions')
-                .select('id')
-                .eq('user_id', user.id)
-                .eq('device_id', deviceId)
-                .single();
-
-            if (existingSession) {
-                await supabase.from('user_sessions').update({
-                    status: 'pending',
-                    device_info: deviceInfo,
-                    verification_token: verificationToken,
-                    token_expires_at: expiresAt.toISOString()
-                }).eq('id', existingSession.id);
-            } else {
-                await supabase.from('user_sessions').insert({
-                    user_id: user.id,
-                    device_id: deviceId,
-                    device_info: deviceInfo,
-                    status: 'pending',
-                    verification_token: verificationToken,
-                    token_expires_at: expiresAt.toISOString()
-                });
-            }
+            });
         }
 
-        // Send Email
+        // 2. Enviar Email de Notificación
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://rescue-chip.com";
         const emailHtml = `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eaeaea; border-radius: 10px; overflow: hidden;">
@@ -121,6 +104,7 @@ export async function POST(req: NextRequest) {
 
         await transporter.sendMail({
             from: 'RescueChip Security <contacto@rescue-chip.com>',
+            replyTo: 'contacto@rescue-chip.com',
             to: user.email,
             subject: "⚠️ ¿Eres tú? Nuevo acceso detectado en RescueChip",
             html: emailHtml,
