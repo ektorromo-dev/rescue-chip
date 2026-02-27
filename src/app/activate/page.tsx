@@ -135,24 +135,9 @@ function ActivationFormContent() {
                 throw new Error("No se pudo confirmar la cuenta.");
             }
 
-            // CHECK IF USER HAS EXISTING PROFILE (Para múltiples chips)
-            const { data: existingProfile } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('user_id', userId)
-                .single();
-
-            if (existingProfile) {
-                // El usuario ya tiene un perfil! Pausamos y preguntamos.
-                setPendingAuthData({ userId, email });
-                setPendingChip(chip);
-                setExistingProfileToLink(existingProfile);
-                setShowLinkPrompt(true);
-                setLoading(false);
-                return; // Salimos de la función principal
-            }
-
-            await proceedWithRegistration(userId, chip, formData);
+            // Procedemos inmediatamente al registro sin verificar por perfil para evitar RLS 406.
+            // Si el perfil ya existe, la base de datos nos devolverá un error de constraint 23505 de usuario único.
+            await proceedWithRegistration(userId, chip, formData, email);
 
         } catch (err: any) {
             console.error("Error detallado en handleSubmit:", err);
@@ -161,7 +146,7 @@ function ActivationFormContent() {
         }
     };
 
-    const proceedWithRegistration = async (userId: string, chip: any, formData: FormData) => {
+    const proceedWithRegistration = async (userId: string, chip: any, formData: FormData, email: string) => {
         try {
             // ================= CONTINUAR FLUJO NORMAL DE REGISTRO =================
             // Build emergency contacts array dynamically
@@ -277,6 +262,22 @@ function ActivationFormContent() {
                 .single();
 
             if (profileError) {
+                // Verificar si es un error de clave única violada (el usuario ya tiene un perfil)
+                if (profileError.code === '23505') {
+                    console.log("Activación - Perfil ya existente detectado vía constraint única. Preparando modal multi-chip.");
+                    // Obtenemos el ID de ese perfil existente para poder vincularlo
+                    const { data: existingProfile } = await supabase.from('profiles').select('id, user_id').eq('user_id', userId).single();
+
+                    if (existingProfile) {
+                        setPendingAuthData({ userId, email });
+                        setPendingChip(chip);
+                        setExistingProfileToLink(existingProfile);
+                        setShowLinkPrompt(true);
+                        setLoading(false);
+                        return; // Detener flujo, esperar interacción del usuario
+                    }
+                }
+
                 console.error("Error devuelto por Supabase al insertar perfil:", JSON.stringify(profileError, null, 2), profileError);
                 throw new Error(`Error BD (${profileError.code || 'Desconocido'}): ${profileError.message || 'Fallo al guardar el perfil'}`);
             }
