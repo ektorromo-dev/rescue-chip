@@ -16,7 +16,7 @@ export default function DashboardPage() {
     const [successMsg, setSuccessMsg] = useState("");
 
     // Device detection state
-    const [deviceVerificationStatus, setDeviceVerificationStatus] = useState<"checking" | "pending" | "verified" | "revoked">("checking");
+    const [deviceVerificationStatus, setDeviceVerificationStatus] = useState<"idle" | "checking" | "pending" | "verified" | "revoked">("idle");
     const [deviceId, setDeviceId] = useState("");
 
     const [profileId, setProfileId] = useState("");
@@ -465,15 +465,11 @@ export default function DashboardPage() {
         }
     };
 
-    if (loadingAuth) {
+    if (loadingAuth || deviceVerificationStatus === "idle") {
         return (
             <div className="min-h-screen bg-muted flex flex-col items-center justify-center p-4">
                 <Loader2 size={48} className="animate-spin text-primary/30 mb-4" />
-                <p className="font-medium animate-pulse text-muted-foreground">
-                    {deviceVerificationStatus === "pending" || deviceVerificationStatus === "checking"
-                        ? "Verificando seguridad del dispositivo..."
-                        : "Cargando tu panel de control..."}
-                </p>
+                <p className="font-medium animate-pulse text-muted-foreground">Cargando tu panel de control...</p>
             </div>
         );
     }

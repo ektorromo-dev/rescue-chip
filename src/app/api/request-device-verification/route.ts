@@ -104,18 +104,32 @@ export async function POST(req: NextRequest) {
             </div>
         `;
 
-        await transporter.sendMail({
+        const mailOptions = {
             from: 'RescueChip Security <contacto@rescue-chip.com>',
             replyTo: 'contacto@rescue-chip.com',
             to: user.email,
             subject: "⚠️ ¿Eres tú? Nuevo acceso detectado en RescueChip",
             html: emailHtml,
-        });
+        };
 
-        return NextResponse.json({ success: true, message: "Verification email sent" });
+        console.log("Attempting to send security email to:", user.email);
+
+        const info = await transporter.sendMail(mailOptions);
+        console.log("Email sent successfully. Info:", info.messageId, info.response);
+
+        return NextResponse.json({ success: true, message: "Verification email sent", info: info.response });
 
     } catch (error: any) {
-        console.error("Error in request-device-verification:", error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        console.error("\n================ SMTP/NODEMAILER ERROR ===============");
+        console.error("Error Message:", error.message);
+        console.error("Error Code:", error.code);
+        console.error("Error Command:", error.command);
+        console.error("Full Error Stack:", error.stack);
+        console.error("======================================================\n");
+        return NextResponse.json({
+            error: "Failed to send email",
+            details: error.message,
+            code: error.code
+        }, { status: 500 });
     }
 }
