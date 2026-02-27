@@ -106,11 +106,17 @@ export default async function ProfilePage({ params }: ProfileProps) {
 
     // 2. Fetch the profile for this chip if not mocked
     if (!profile) {
-        const { data: dbProfile, error: pError } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('chip_id', chip.id)
-            .single();
+        let pQuery = supabase.from('profiles').select('*');
+
+        if (chip.owner_profile_id) {
+            // Flujo nuevo multi-chip: buscar el perfil base usando el owner_profile_id
+            pQuery = pQuery.eq('id', chip.owner_profile_id);
+        } else {
+            // Flujo heredado (fallback): buscar el perfil donde su campo original chip_id sea este chip
+            pQuery = pQuery.eq('chip_id', chip.id);
+        }
+
+        const { data: dbProfile, error: pError } = await pQuery.single();
         profile = dbProfile;
         profileError = pError;
     }
