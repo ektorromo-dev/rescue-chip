@@ -135,8 +135,34 @@ function ActivationFormContent() {
                 throw new Error("No se pudo confirmar la cuenta.");
             }
 
-            // Procedemos inmediatamente al registro sin verificar por perfil para evitar RLS 406.
-            // Si el perfil ya existe, la base de datos nos devolverá un error de constraint 23505 de usuario único.
+            // NUEVA LÓGICA: Verificar activamente folios vinculados antes de intentar registrar un perfil nuevo
+            const { data: userProfile } = await supabase
+                .from('profiles')
+                .select('id')
+                .eq('user_id', userId)
+                .limit(1)
+                .maybeSingle();
+
+            if (userProfile) {
+                const { count: chipsCount, error: countError } = await supabase
+                    .from('chips')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('owner_profile_id', userProfile.id);
+
+                console.log(`Verificación multi-chip (Pre-registro): El usuario tiene ${chipsCount || 0} chips vinculados a su perfil.`);
+
+                if (chipsCount && chipsCount > 0) {
+                    // El usuario YA tiene chips. Interceptamos el flujo pidiendo confirmación.
+                    setPendingAuthData({ userId, email });
+                    setPendingChip(chip);
+                    setExistingProfileToLink(userProfile);
+                    setShowLinkPrompt(true);
+                    setLoading(false);
+                    return; // Detenemos la ejecución aquí, el modal tomará el control.
+                }
+            }
+
+            // Si no tiene perfil o no tiene chips, procedemos a crear un perfil nuevo/único.
             await proceedWithRegistration(userId, chip, formData, email);
 
         } catch (err: any) {
