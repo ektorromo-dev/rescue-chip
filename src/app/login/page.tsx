@@ -38,29 +38,6 @@ export default function LoginPage() {
         }
     };
 
-    const handleResetPassword = async () => {
-        if (!email) {
-            setErrorMsg("Por favor, ingresa tu correo electrónico para restablecer tu contraseña.");
-            return;
-        }
-
-        setLoading(true);
-        setErrorMsg("");
-        setMessage("");
-
-        try {
-            const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: `${window.location.origin}/dashboard`,
-            });
-
-            if (error) throw error;
-            setMessage("Se ha enviado un enlace para restablecer tu contraseña a tu correo.");
-        } catch (error: any) {
-            setErrorMsg(error.message || "Error al solicitar restablecimiento de contraseña.");
-        } finally {
-            setLoading(false);
-        }
-    };
 
     return (
         <div className="min-h-screen bg-muted flex flex-col items-center justify-center p-4">
@@ -135,13 +112,12 @@ export default function LoginPage() {
                         </div>
 
                         <div className="flex justify-end pt-2">
-                            <button
-                                type="button"
-                                onClick={handleResetPassword}
+                            <Link
+                                href="/reset-password"
                                 className="text-sm font-semibold text-primary hover:underline"
                             >
                                 ¿Olvidaste tu contraseña?
-                            </button>
+                            </Link>
                         </div>
 
                         <button
