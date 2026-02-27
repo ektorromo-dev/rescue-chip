@@ -81,8 +81,16 @@ export default function DashboardPage() {
     useEffect(() => {
         const sessionCheck = setInterval(async () => {
             console.log('Checking session...');
-            const { data: { user }, error } = await supabase.auth.getUser();
-            if (!user || error) {
+            const localDeviceId = localStorage.getItem('rescuechip_device_id');
+            if (!localDeviceId) return;
+
+            const { data } = await supabase
+                .from('user_sessions')
+                .select('status')
+                .eq('device_id', localDeviceId)
+                .single();
+
+            if (!data || data.status === 'revoked') {
                 clearInterval(sessionCheck);
                 await supabase.auth.signOut();
                 window.location.href = '/login';

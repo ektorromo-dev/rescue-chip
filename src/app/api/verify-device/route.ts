@@ -59,19 +59,6 @@ export async function GET(req: NextRequest) {
                 .eq('user_id', session.user_id)
                 .neq('id', session.id);
 
-            // Cierra la sesión del otro dispositivo usando Supabase Admin Auth 
-            // Esto bota (invalida JWTs) en cualquier parte
-            try {
-                const { error: signOutError } = await supabaseAdmin.auth.admin.signOut(session.user_id, 'global');
-                if (signOutError) {
-                    console.error("Global signout via admin API failed on 'allow' action:", signOutError);
-                } else {
-                    console.log("Successfully signed out previous devices for user:", session.user_id);
-                }
-            } catch (signOutErr) {
-                console.error("Exception during global signout on 'allow':", signOutErr);
-            }
-
             // Marca esta sesión como verificada y limpia el token para que no se re-use
             await supabaseAdmin
                 .from('user_sessions')
