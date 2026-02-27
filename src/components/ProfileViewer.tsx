@@ -481,9 +481,22 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
                                     )}
                                     {profile.google_maps_link && (
                                         <div className="mt-4 pt-3 border-t border-primary/10">
-                                            <h4 className="text-[11px] font-black text-primary uppercase tracking-widest mb-1 pointer-events-none">Hospital / Clínica Preferida</h4>
-                                            <p className="text-sm font-bold bg-background p-3 rounded-xl border border-border inline-block pointer-events-none w-full">{profile.google_maps_link}</p>
-                                            <p className="text-[10px] text-muted-foreground mt-2 leading-tight pointer-events-none opacity-80">En caso de emergencia, el personal médico determinará el hospital más adecuado según tu estado de salud y criterio profesional. Este dato es solo una referencia.</p>
+                                            <h4 className="text-[11px] font-black text-primary uppercase tracking-widest mb-2">Hospital / Clínica Preferida</h4>
+
+                                            {profile.google_maps_link.startsWith('http') ? (
+                                                <a
+                                                    href={profile.google_maps_link}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="w-full bg-blue-600 text-white flex items-center justify-center gap-2 py-4 rounded-xl font-bold text-base hover:scale-[1.02] transition-transform shadow-md"
+                                                >
+                                                    📍 Abrir en Maps
+                                                </a>
+                                            ) : (
+                                                <p className="text-sm font-bold bg-background p-3 rounded-xl border border-border inline-block pointer-events-none w-full">{profile.google_maps_link}</p>
+                                            )}
+
+                                            <p className="text-[10px] text-muted-foreground mt-3 leading-tight pointer-events-none opacity-80">En caso de emergencia, el personal médico determinará el hospital más adecuado según tu estado de salud y criterio profesional. Este dato es solo una referencia.</p>
                                         </div>
                                     )}
                                 </div>
