@@ -78,6 +78,28 @@ export default function DashboardPage() {
     const [expandedLogId, setExpandedLogId] = useState<string | null>(null);
 
     useEffect(() => {
+        let sessionCheckInterval: NodeJS.Timeout;
+
+        if (deviceVerificationStatus === "pending") {
+            sessionCheckInterval = setInterval(async () => {
+                console.log('Checking session...');
+                const { data: { user }, error } = await supabase.auth.getUser();
+                if (!user || error) {
+                    clearInterval(sessionCheckInterval);
+                    await supabase.auth.signOut();
+                    window.location.href = '/login';
+                }
+            }, 5000);
+        }
+
+        return () => {
+            if (sessionCheckInterval) {
+                clearInterval(sessionCheckInterval);
+            }
+        };
+    }, [deviceVerificationStatus]);
+
+    useEffect(() => {
         let pollingInterval: NodeJS.Timeout;
 
         const fetchUserData = async () => {
@@ -88,15 +110,6 @@ export default function DashboardPage() {
                 return;
             }
 
-            // Global session polling every 5 seconds to detect remote revocation
-            const sessionCheckInterval = setInterval(async () => {
-                const { data: { user }, error } = await supabase.auth.getUser();
-                if (!user || error) {
-                    clearInterval(sessionCheckInterval);
-                    await supabase.auth.signOut();
-                    window.location.href = '/login';
-                }
-            }, 5000);
 
             const checkDeviceSession = async (userSessionData: any, token: string, localDeviceId: string) => {
                 const { data: userSessions } = await supabase
