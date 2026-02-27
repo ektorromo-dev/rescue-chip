@@ -95,21 +95,29 @@ export default function DashboardPage() {
                 }
                 setDeviceId(currentDeviceId);
 
-                const { data: sessionData } = await supabase
+                const { data: userSessions } = await supabase
                     .from('user_sessions')
-                    .select('id')
-                    .eq('user_id', session.user.id)
-                    .eq('device_id', currentDeviceId)
-                    .maybeSingle();
+                    .select('id, device_id')
+                    .eq('user_id', session.user.id);
 
-                if (!sessionData) {
-                    // Es un dispositivo nuevo (y esperamos a que el usuario confirme para ocultarlo)
+                const hasAnySession = userSessions && userSessions.length > 0;
+                const currentSession = userSessions?.find(s => s.device_id === currentDeviceId);
+
+                if (!hasAnySession) {
+                    // Primer dispositivo de este usuario. Registrar silenciosamente.
+                    await supabase.from('user_sessions').insert({
+                        user_id: session.user.id,
+                        device_id: currentDeviceId,
+                        device_info: navigator.userAgent || 'Unknown Device'
+                    });
+                } else if (!currentSession) {
+                    // Ya tiene otros dispositivos, pero ESTE es nuevo. Esperar confirmación.
                     setShowNewDeviceModal(true);
                 } else {
-                    // Actualizar silenciosamente el last_seen
+                    // El dispositivo actual ya existe, actualizar last_seen
                     supabase.from('user_sessions')
                         .update({ last_seen: new Date().toISOString() })
-                        .eq('id', sessionData.id)
+                        .eq('id', currentSession.id)
                         .then(); // bg task
                 }
             } catch (err) {
@@ -251,8 +259,14 @@ export default function DashboardPage() {
     };
 
     const handleRejectDevice = async () => {
-        await supabase.auth.signOut({ scope: 'global' });
-        router.push("/login");
+        try {
+            await supabase.auth.signOut({ scope: 'global' });
+        } catch (e) {
+            console.error("Error signing out:", e);
+        } finally {
+            // Forzar redirección y limpieza local
+            window.location.href = "/login";
+        }
     };
 
     const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
