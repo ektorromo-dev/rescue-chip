@@ -232,3 +232,9 @@ create policy "Allow update to chips"
   on public.chips for update
   to public
   using (true);
+
+drop policy if exists "Allow select own profile" on public.profiles;
+create policy "Allow select own profile"
+  on public.profiles for select
+  to authenticated
+  using (auth.uid() = user_id);
