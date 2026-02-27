@@ -90,10 +90,11 @@ export default function DashboardPage() {
 
             // Global session polling every 5 seconds to detect remote revocation
             const sessionCheckInterval = setInterval(async () => {
-                const { data: { session: currentSession } } = await supabase.auth.getSession();
-                if (!currentSession) {
+                const { data: { user }, error } = await supabase.auth.getUser();
+                if (!user || error) {
                     clearInterval(sessionCheckInterval);
-                    router.replace('/login');
+                    await supabase.auth.signOut();
+                    window.location.href = '/login';
                 }
             }, 5000);
 
