@@ -112,6 +112,23 @@ function ActivationFormContent() {
                 }
             } else {
                 userId = signUpData.user?.id || "";
+
+                // Asegurar que exista una sesión activa explícita antes de interactuar con tablas RLS (profiles)
+                if (!signUpData.session) {
+                    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+                        email,
+                        password,
+                    });
+                    if (signInError) {
+                        throw new Error("Cuenta creada, pero hubo un error de sesión: " + signInError.message + ". Intenta iniciar sesión manualmente.");
+                    }
+                    if (!signInData.session) {
+                        throw new Error("Falló la sesión automática posterior a la creación de cuenta.");
+                    }
+                }
+
+                // Delay corto para asegurar que Supabase propague las credenciales Auth internamente
+                await new Promise(resolve => setTimeout(resolve, 800));
             }
 
             if (!userId) {
