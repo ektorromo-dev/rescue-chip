@@ -151,13 +151,24 @@ CREATE TABLE IF NOT EXISTS public.user_sessions (
   device_id TEXT NOT NULL,
   device_info TEXT,
   last_seen TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'verified', 'revoked')),
+  verification_token TEXT,
+  token_expires_at TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Asegurar que los perfiles existentes sean compatibles si se vuelve a correr el script
+ALTER TABLE public.user_sessions ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'verified', 'revoked'));
+ALTER TABLE public.user_sessions ADD COLUMN IF NOT EXISTS verification_token TEXT;
+ALTER TABLE public.user_sessions ADD COLUMN IF NOT EXISTS token_expires_at TIMESTAMP WITH TIME ZONE;
+
 ALTER TABLE public.user_sessions ENABLE ROW LEVEL SECURITY;
 
+-- Permitir a usuarios autenticados leer, insertar o actualizar sus propias sesiones
 CREATE POLICY "Users manage own sessions" ON public.user_sessions
 FOR ALL TO authenticated USING (auth.uid() = user_id);
+
+-- En el API de verificación actuaremos as sudo (Service Role) por lo que rebasaremos RLS.
 
 -- Allow authenticated users to update their own profiles (dashboard)
 create policy "Allow users to update own profile"

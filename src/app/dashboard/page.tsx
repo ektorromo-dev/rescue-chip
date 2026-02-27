@@ -16,7 +16,7 @@ export default function DashboardPage() {
     const [successMsg, setSuccessMsg] = useState("");
 
     // Device detection state
-    const [showNewDeviceModal, setShowNewDeviceModal] = useState(false);
+    const [deviceVerificationStatus, setDeviceVerificationStatus] = useState<"checking" | "pending" | "verified" | "revoked">("checking");
     const [deviceId, setDeviceId] = useState("");
 
     const [profileId, setProfileId] = useState("");
@@ -78,6 +78,59 @@ export default function DashboardPage() {
     const [expandedLogId, setExpandedLogId] = useState<string | null>(null);
 
     useEffect(() => {
+        let pollingInterval: NodeJS.Timeout;
+
+        const checkDeviceSession = async (userSessionData: any, token: string, localDeviceId: string) => {
+            const { data: userSessions } = await supabase
+                .from('user_sessions')
+                .select('id, device_id, status')
+                .eq('user_id', userSessionData.user.id);
+
+            const hasAnySession = userSessions && userSessions.length > 0;
+            const currentSession = userSessions?.find(s => s.device_id === localDeviceId);
+
+            if (!hasAnySession) {
+                // Primer dispositivo de este usuario. Registrar como 'verified' directamente.
+                await supabase.from('user_sessions').insert({
+                    user_id: userSessionData.user.id,
+                    device_id: localDeviceId,
+                    device_info: navigator.userAgent || 'Unknown Device',
+                    status: 'verified'
+                });
+                setDeviceVerificationStatus("verified");
+                return true;
+            } else if (!currentSession) {
+                // Ya tiene otros dispositivos, necesitamos confirmación para ESTE nuevo.
+                setDeviceVerificationStatus("pending");
+                // Disparar correo!
+                try {
+                    await fetch('/api/request-device-verification', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ deviceId: localDeviceId })
+                    });
+                } catch (e) {
+                    console.error("Error pidiendo verif por correo", e);
+                }
+                return false;
+            } else {
+                // El dispositivo ya existe
+                setDeviceVerificationStatus(currentSession.status as "pending" | "verified" | "revoked");
+
+                if (currentSession.status === 'verified') {
+                    supabase.from('user_sessions')
+                        .update({ last_seen: new Date().toISOString() })
+                        .eq('id', currentSession.id)
+                        .then(); // bg task
+                    return true;
+                }
+                return false;
+            }
+        };
+
         const fetchUserData = async () => {
             const { data: { session } } = await supabase.auth.getSession();
 
@@ -86,42 +139,47 @@ export default function DashboardPage() {
                 return;
             }
 
-            // --- MANEJO DE NUEVO DISPOSITIVO ---
+            // --- MANEJO DE NUEVO DISPOSITIVO POR EMAIL ---
+            let currentDeviceId = localStorage.getItem("rescuechip_device_id");
+            if (!currentDeviceId) {
+                currentDeviceId = crypto.randomUUID();
+                localStorage.setItem("rescuechip_device_id", currentDeviceId);
+            }
+            setDeviceId(currentDeviceId);
+
             try {
-                let currentDeviceId = localStorage.getItem("rescuechip_device_id");
-                if (!currentDeviceId) {
-                    currentDeviceId = crypto.randomUUID();
-                    localStorage.setItem("rescuechip_device_id", currentDeviceId);
+                const isVerified = await checkDeviceSession(session, session.access_token, currentDeviceId);
+
+                if (!isVerified) {
+                    // Start polling
+                    pollingInterval = setInterval(async () => {
+                        const { data: dbCurrent } = await supabase
+                            .from('user_sessions')
+                            .select('status')
+                            .eq('user_id', session.user.id)
+                            .eq('device_id', currentDeviceId)
+                            .maybeSingle();
+
+                        if (dbCurrent?.status) {
+                            setDeviceVerificationStatus(dbCurrent.status as any);
+                            if (dbCurrent.status === 'verified') {
+                                clearInterval(pollingInterval);
+                                // Refresh entire component state to load data now that it's verified
+                                window.location.reload();
+                            } else if (dbCurrent.status === 'revoked') {
+                                clearInterval(pollingInterval);
+                                await supabase.auth.signOut({ scope: 'global' });
+                                window.location.href = "/login";
+                            }
+                        }
+                    }, 3000);
+                    setLoadingAuth(false);
+                    return; // Detener flujo para no cargar datos reales de perfil, se esconde tras pantalla de pending
                 }
-                setDeviceId(currentDeviceId);
 
-                const { data: userSessions } = await supabase
-                    .from('user_sessions')
-                    .select('id, device_id')
-                    .eq('user_id', session.user.id);
-
-                const hasAnySession = userSessions && userSessions.length > 0;
-                const currentSession = userSessions?.find(s => s.device_id === currentDeviceId);
-
-                if (!hasAnySession) {
-                    // Primer dispositivo de este usuario. Registrar silenciosamente.
-                    await supabase.from('user_sessions').insert({
-                        user_id: session.user.id,
-                        device_id: currentDeviceId,
-                        device_info: navigator.userAgent || 'Unknown Device'
-                    });
-                } else if (!currentSession) {
-                    // Ya tiene otros dispositivos, pero ESTE es nuevo. Esperar confirmación.
-                    setShowNewDeviceModal(true);
-                } else {
-                    // El dispositivo actual ya existe, actualizar last_seen
-                    supabase.from('user_sessions')
-                        .update({ last_seen: new Date().toISOString() })
-                        .eq('id', currentSession.id)
-                        .then(); // bg task
-                }
             } catch (err) {
                 console.error("Error checking device session:", err);
+                setDeviceVerificationStatus("verified"); // Failsafe para no bloquear si hay error de DB
             }
             // --- FIN MANEJO DE NUEVO DISPOSITIVO ---
 
@@ -241,33 +299,7 @@ export default function DashboardPage() {
         router.push("/login");
     };
 
-    const handleConfirmDevice = async () => {
-        try {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
-                await supabase.from('user_sessions').insert({
-                    user_id: session.user.id,
-                    device_id: deviceId,
-                    device_info: navigator.userAgent || 'Unknown Device'
-                });
-            }
-            setShowNewDeviceModal(false);
-        } catch (error) {
-            console.error("Error confirmando dispositivo:", error);
-            setShowNewDeviceModal(false); // fall back open if error so they aren't blocked forever, or handle it better
-        }
-    };
-
-    const handleRejectDevice = async () => {
-        try {
-            await supabase.auth.signOut({ scope: 'global' });
-        } catch (e) {
-            console.error("Error signing out:", e);
-        } finally {
-            // Forzar redirección y limpieza local
-            window.location.href = "/login";
-        }
-    };
+    // handlers removed since validation happens in email now
 
     const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -428,43 +460,38 @@ export default function DashboardPage() {
         return (
             <div className="min-h-screen bg-muted flex flex-col items-center justify-center p-4">
                 <Loader2 size={48} className="animate-spin text-primary/30 mb-4" />
-                <p className="font-medium animate-pulse text-muted-foreground">Cargando tu panel de control...</p>
+                <p className="font-medium animate-pulse text-muted-foreground">
+                    {deviceVerificationStatus === "pending" || deviceVerificationStatus === "checking"
+                        ? "Verificando seguridad del dispositivo..."
+                        : "Cargando tu panel de control..."}
+                </p>
+            </div>
+        );
+    }
+
+    if (deviceVerificationStatus === "pending") {
+        return (
+            <div className="min-h-screen bg-muted flex flex-col items-center justify-center p-4">
+                <div className="bg-card w-full max-w-md p-10 rounded-[2rem] shadow-2xl border border-primary/20 text-center animate-in fade-in zoom-in duration-500">
+                    <div className="w-24 h-24 bg-primary/10 text-primary mx-auto rounded-full flex items-center justify-center mb-8 shadow-inner relative">
+                        <Loader2 size={48} className="animate-spin absolute opacity-20" />
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.2 8.4c.5.38.8.97.8 1.6v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V10a2 2 0 0 1 .8-1.6l8-6a2 2 0 0 1 2.4 0l8 6Z"></path><path d="m22 10-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 10"></path></svg>
+                    </div>
+                    <h2 className="text-2xl font-black tracking-tight mb-4">Verifica tu correo</h2>
+                    <p className="text-muted-foreground font-medium mb-6 leading-relaxed">
+                        Por seguridad, hemos enviado un enlace de autorización temporal a tu correo electrónico.
+                    </p>
+                    <div className="p-4 bg-yellow-500/10 rounded-xl text-yellow-700 text-sm font-semibold flex flex-col gap-2 items-center mb-2">
+                        <span>Abre tu correo y haz clic en "Permitir acceso".</span>
+                        <span className="text-xs opacity-70">Revisaremos automáticamente...</span>
+                    </div>
+                </div>
             </div>
         );
     }
 
     return (
         <div className="min-h-screen bg-muted flex flex-col items-center justify-center p-0 md:p-4">
-
-            {/* Modal de Nuevo Dispositivo */}
-            {showNewDeviceModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-                    <div className="bg-card w-full max-w-md p-8 rounded-[2rem] shadow-2xl border border-destructive/20 text-center animate-in fade-in zoom-in duration-300">
-                        <div className="w-20 h-20 bg-destructive/10 text-destructive mx-auto rounded-full flex items-center justify-center mb-6 shadow-inner">
-                            <AlertCircle size={40} />
-                        </div>
-                        <h2 className="text-2xl font-black tracking-tight mb-3">Nuevo Dispositivo</h2>
-                        <p className="text-muted-foreground font-medium mb-8 leading-relaxed">
-                            Hemos detectado un acceso desde un dispositivo o navegador nuevo. <br />¿Eres tú intentando acceder a tu cuenta?
-                        </p>
-                        <div className="space-y-3">
-                            <button
-                                onClick={handleConfirmDevice}
-                                className="w-full bg-primary text-primary-foreground py-4 rounded-xl font-bold text-lg hover:scale-[1.02] shadow-xl shadow-primary/20 transition-all"
-                            >
-                                Sí, soy yo
-                            </button>
-                            <button
-                                onClick={handleRejectDevice}
-                                className="w-full bg-destructive/10 text-destructive hover:bg-destructive text-sm py-4 rounded-xl font-bold transition-colors"
-                            >
-                                No, cerrar sesión en todos lados
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
             <div className="w-full max-w-3xl bg-card md:rounded-[2.5rem] shadow-2xl border-x md:border border-border/50 overflow-hidden">
                 {/* Header */}
                 <div className="bg-destructive px-8 pt-10 pb-12 text-destructive-foreground relative overflow-hidden">
@@ -988,6 +1015,6 @@ export default function DashboardPage() {
                     )}
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
