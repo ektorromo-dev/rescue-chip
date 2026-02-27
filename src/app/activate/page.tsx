@@ -68,9 +68,11 @@ function ActivationFormContent() {
             console.log("chip.status:", `'${chip.status}'`, "(tipo: " + typeof chip.status + ")");
             console.log("chip.activated:", chip.activated, "(tipo: " + typeof chip.activated + ")");
 
-            const isActivated = chip.status === 'activado' || chip.activated === true || String(chip.activated).toLowerCase() === 'true';
+            const isActivatedStr = chip.status === 'activado';
+            const isActivatedBool = chip.activated === true || String(chip.activated).toLowerCase() === 'true';
 
-            if (isActivated) {
+            // Solo bloquear si AMBAS condiciones dicen que está activado, o mínimamente el texto explícito de status
+            if (isActivatedStr && isActivatedBool) {
                 throw new Error("Este chip ya fue activado por otro usuario.");
             }
 
