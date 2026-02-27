@@ -129,7 +129,10 @@ export default function DashboardPage() {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
-                    body: JSON.stringify({ deviceId: localDeviceId })
+                    body: JSON.stringify({
+                        deviceId: localDeviceId,
+                        deviceInfo: navigator.userAgent || 'Unknown Device'
+                    })
                 });
             } catch (e) {
                 console.error("Error pidiendo verif por correo", e);

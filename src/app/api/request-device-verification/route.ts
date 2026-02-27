@@ -27,8 +27,9 @@ export async function POST(req: NextRequest) {
         }
 
         // Validate user authentication using authorization header
-        const authHeader = req.headers.get("Authorization");
+        const authHeader = req.headers.get("authorization") || req.headers.get("Authorization");
         if (!authHeader) {
+            console.error("No authorization header present");
             return NextResponse.json({ error: "No authorization header" }, { status: 401 });
         }
 
@@ -36,6 +37,7 @@ export async function POST(req: NextRequest) {
         const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
         if (authError || !user || !user.email) {
+            console.error("Supabase auth error or missing user email:", authError);
             return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
         }
 
@@ -45,7 +47,7 @@ export async function POST(req: NextRequest) {
         expiresAt.setMinutes(expiresAt.getMinutes() + 15);
 
         // Extract user agent for device info
-        const deviceInfo = req.headers.get("user-agent") || 'Unknown Device';
+        const deviceInfo = body.deviceInfo || req.headers.get("user-agent") || 'Unknown Device';
 
         // 1. Guardar en Supabase - Forma simple como en factura-notify para evitar errores del composite key default
         const { data: existingSession } = await supabase
