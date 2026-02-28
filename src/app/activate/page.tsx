@@ -45,23 +45,11 @@ function ActivationFormContent() {
                 setIsLoadingPreCheck(true);
                 try {
                     const cleanFolio = folioFromUrl.trim();
-                    const { data: chip, error: chipError } = await supabase
-                        .from('chips')
-                        .select('status, activated')
-                        .ilike('folio', cleanFolio)
-                        .maybeSingle();
+                    const res = await fetch(`/api/activate/validate?folio=${encodeURIComponent(cleanFolio)}`);
+                    const data = await res.json();
 
-                    const genericError = 'Este folio no es válido o ya fue activado.';
-
-                    if (chipError || !chip) {
-                        setPreValidationError(genericError);
-                    } else {
-                        const isActivatedStr = chip.status === 'activado';
-                        const isActivatedBool = chip.activated === true || String(chip.activated).toLowerCase() === 'true';
-
-                        if ((isActivatedStr && isActivatedBool) || (chip.status !== 'disponible' && chip.status !== 'vendido')) {
-                            setPreValidationError(genericError);
-                        }
+                    if (!res.ok) {
+                        setPreValidationError(data.error || 'Este folio no es válido o ya fue activado.');
                     }
                 } catch (e) {
                     console.error("Error validando el chip al cargar", e);
@@ -85,31 +73,16 @@ function ActivationFormContent() {
             const cleanFolio = folio.trim();
             console.log("Activación - Buscando chip con folio:", cleanFolio);
 
-            // 1. Verify chip exists and is not activated
-            const { data: chip, error: chipError } = await supabase
-                .from('chips')
-                .select('*')
-                .ilike('folio', cleanFolio)
-                .single();
+            // 1. Verify chip exists and is not activated using the server endpoint
+            const activationRes = await fetch(`/api/activate/validate?folio=${encodeURIComponent(cleanFolio)}`);
+            const activationData = await activationRes.json();
 
-            console.log("Activación - Respuesta de Supabase:", { chip, chipError });
-
-            const genericError = "Este folio no es válido o ya fue activado.";
-
-            if (chipError || !chip) {
-                throw new Error(genericError);
+            if (!activationRes.ok) {
+                throw new Error(activationData.error || "Este folio no es válido o ya fue activado.");
             }
 
-            console.log("Activación - Validando estado del chip recién traído de BD:");
-            console.log("chip.status:", `'${chip.status}'`, "(tipo: " + typeof chip.status + ")");
-            console.log("chip.activated:", chip.activated, "(tipo: " + typeof chip.activated + ")");
-
-            const isActivatedStr = chip.status === 'activado';
-            const isActivatedBool = chip.activated === true || String(chip.activated).toLowerCase() === 'true';
-
-            if ((isActivatedStr && isActivatedBool) || (chip.status !== 'disponible' && chip.status !== 'vendido')) {
-                throw new Error(genericError);
-            }
+            // Retrive chip for possible subsequent references if needed
+            const chip = activationData.chip;
 
             // 1.5 Try Sign Up or Sign In
             const email = formData.get("email") as string;
