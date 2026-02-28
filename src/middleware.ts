@@ -15,11 +15,12 @@ export async function middleware(request: NextRequest) {
 
     // Rate Limit solo para peticiones POST (intentos de login reales) sobre nuestra propia API route
     if (pathname.startsWith('/api/auth/login') && request.method === 'POST') {
-        const { success } = await rateLimitLogin.limit(ip);
-        console.log(`[Middleware] Rate Limit Login check for IP ${ip}. Success:`, success);
-        if (!success) {
+        const result = await rateLimitLogin.limit(ip);
+        console.log(`[Middleware] Rate Limit Login check for IP ${ip}. Success: ${result.success}, Remaining: ${result.remaining}, Limit: ${result.limit}`);
+
+        if (!result.success) {
             return NextResponse.json(
-                { error: "Demasiados intentos de inicio de sesión. Por favor, intenta nuevamente en 15 minutos." },
+                { error: "Demasiados intentos de inicio de sesión. Por favor, intenta repetirlo en 15 minutos." },
                 { status: 429 }
             );
         }

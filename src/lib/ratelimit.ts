@@ -27,7 +27,7 @@ class RateLimiter {
     async limit(identifier: string) {
         if (!this.ratelimit) {
             console.warn(`Rate limit bypassed for ${identifier}. Redis is not configured.`);
-            return { success: true };
+            return { success: true, remaining: 999, limit: 999 };
         }
         return await this.ratelimit.limit(identifier);
     }
@@ -42,7 +42,7 @@ export const rateLimitRequestDevice = new RateLimiter(5, "1 h", "@upstash/rateli
 export const rateLimitVerifyDevice = new RateLimiter(10, "1 h", "@upstash/ratelimit/verify-device");
 
 // /login: máximo 10 intentos por IP por 15 minutos
-export const rateLimitLogin = new RateLimiter(10, "15 m", "@upstash/ratelimit/login");
+export const rateLimitLogin = new RateLimiter(10, "15 m", "@upstash/ratelimit/login-v2");
 
 // /activate: máximo 10 requests por IP por hora
 export const rateLimitActivate = new RateLimiter(10, "1 h", "@upstash/ratelimit/activate");
