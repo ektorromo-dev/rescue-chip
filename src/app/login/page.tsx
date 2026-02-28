@@ -35,7 +35,31 @@ export default function LoginPage() {
             const data = await res.json();
 
             if (!res.ok) {
+                if (data.isRateLimited || res.status === 429) {
+                    setIsLockedOut(true);
+                    setLockCountdown(15 * 60); // 15 minutos en segundos
+
+                    // Iniciar contador
+                    const interval = setInterval(() => {
+                        setLockCountdown((prev) => {
+                            if (prev <= 1) {
+                                clearInterval(interval);
+                                setIsLockedOut(false);
+                                return 0;
+                            }
+                            return prev - 1;
+                        });
+                    }, 1000);
+                    return; // Retornar temprano
+                }
                 throw new Error(data.error || "Error al iniciar sesión. Verifica tus credenciales.");
+            }
+
+            if (data.session) {
+                await supabase.auth.setSession({
+                    access_token: data.session.access_token,
+                    refresh_token: data.session.refresh_token,
+                });
             }
 
             router.push("/dashboard");

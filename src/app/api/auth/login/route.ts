@@ -1,45 +1,36 @@
-import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import { rateLimitLogin } from "@/lib/ratelimit";
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
+import { createClient } from '@/lib/supabase/server';
 
-export async function POST(req: NextRequest) {
-    try {
-        const body = await req.json();
-        const { email, password } = body;
+const ratelimit = new Ratelimit({
+    redis: Redis.fromEnv(),
+    limiter: Ratelimit.slidingWindow(10, '15 m'),
+});
 
-        console.log("[Login API] Procesando intento de login para:", email);
+export async function POST(request: Request) {
+    const body = await request.json();
+    const { email, password } = body;
 
-        if (!email || !password) {
-            return NextResponse.json({ error: "Faltan credenciales." }, { status: 400 });
-        }
+    // Rate limit por email únicamente
+    const identifier = `login:${email}`;
+    const { success, remaining } = await ratelimit.limit(identifier);
 
-        const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-            || req.headers.get('x-real-ip')
-            || '127.0.0.1';
+    console.log(`[RATELIMIT] email: ${email}, success: ${success}, remaining: ${remaining}`);
 
-        const identifier = `login-v3:ip:${ip}:email:${email}`;
-        const { success } = await rateLimitLogin.limit(identifier);
-
-        if (!success) {
-            console.warn(`[Login API] Rate limit EXCEDIDO para ${identifier}`);
-            return NextResponse.json({ error: "Demasiados intentos de inicio de sesión. Por favor, intenta repetirlo en 15 minutos.", isRateLimited: true }, { status: 429 });
-        }
-
-        const supabase = await createClient();
-
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-        });
-
-        if (error) {
-            return NextResponse.json({ error: error.message }, { status: 401 });
-        }
-
-        // El login fue exitoso y las cookies de sesión ya fueron parseadas por @supabase/ssr en server.ts
-        return NextResponse.json({ success: true });
-    } catch (error: any) {
-        console.error("[Login API] Error inesperado:", error);
-        return NextResponse.json({ error: "Error interno del servidor." }, { status: 500 });
+    if (!success) {
+        return Response.json(
+            { error: 'Demasiados intentos. Espera 15 minutos.', isRateLimited: true },
+            { status: 429 }
+        );
     }
+
+    // Autenticar con Supabase
+    const supabase = await createClient();
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (error) {
+        return Response.json({ error: 'Credenciales incorrectas' }, { status: 401 });
+    }
+
+    return Response.json({ success: true, user: data.user, session: data.session });
 }
