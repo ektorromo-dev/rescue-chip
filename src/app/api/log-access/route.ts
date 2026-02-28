@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import nodemailer from "nodemailer";
 import twilio from "twilio";
+import { rateLimitSendEmergency } from "@/lib/ratelimit";
 
 // Twilio Setup
 const twilioClient = twilio(
@@ -56,6 +57,14 @@ export async function POST(req: NextRequest) {
 
         // 2. Si es emergencia, enviar notificación
         if (tipo === "emergencia") {
+            // Evaluamos rate limit usando el chip_folio como identificador
+            const { success: rateLimitSuccess } = await rateLimitSendEmergency.limit(chip_folio.toLowerCase());
+
+            if (!rateLimitSuccess) {
+                console.warn(`Rate limit excedido para emergencias del chip: ${chip_folio}`);
+                return NextResponse.json({ error: "Límite de notificaciones de emergencia alcanzado para hoy." }, { status: 429 });
+            }
+
             // Obtener el ID de usuario del dueño de este chip
             const { data: chipData } = await supabase
                 .from("chips")

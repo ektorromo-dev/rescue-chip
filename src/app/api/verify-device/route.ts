@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { rateLimitVerifyDevice } from "@/lib/ratelimit";
 
 // Use service role to bypass RLS and perform admin auth tasks 
 const supabaseAdmin = createClient(
@@ -14,6 +15,19 @@ export async function GET(req: NextRequest) {
 
     if (!token || !action) {
         return NextResponse.json({ error: "Parámetros inválidos o incompletos." }, { status: 400 });
+    }
+
+    const ip = req.headers.get("x-forwarded-for") ?? "127.0.0.1";
+    const { success } = await rateLimitVerifyDevice.limit(ip);
+    if (!success) {
+        return new NextResponse(`
+            <html><body>
+            <div style="font-family:sans-serif; text-align:center; padding: 50px;">
+                <h2 style="color: #ef4444;">Demasiadas peticiones</h2>
+                <p>Por favor espera un momento antes de volver a intentar verificar tu dispositivo.</p>
+            </div>
+            </body></html>
+        `, { status: 429, headers: { 'Content-Type': 'text/html' } });
     }
 
     try {

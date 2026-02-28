@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import nodemailer from "nodemailer";
+import { rateLimitRequestDevice } from "@/lib/ratelimit";
 
 const supabaseAdmin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -24,6 +25,13 @@ export async function POST(req: NextRequest) {
 
         if (!deviceId) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+        }
+
+        const ip = req.headers.get("x-forwarded-for") ?? "127.0.0.1";
+        const { success } = await rateLimitRequestDevice.limit(ip);
+        if (!success) {
+            console.warn(`Rate limit excedido para IP ${ip} en request-device-verification`);
+            return NextResponse.json({ error: "Demasiadas peticiones. Intenta más tarde." }, { status: 429 });
         }
 
         // Validate user authentication using authorization header

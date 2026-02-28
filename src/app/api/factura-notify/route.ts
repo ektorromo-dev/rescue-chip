@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import nodemailer from "nodemailer";
+import { rateLimitFactura } from "@/lib/ratelimit";
 
 const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -19,6 +20,13 @@ const transporter = nodemailer.createTransport({
 
 export async function POST(req: NextRequest) {
     try {
+        const ip = req.headers.get("x-forwarded-for") ?? "127.0.0.1";
+        const { success } = await rateLimitFactura.limit(ip);
+        if (!success) {
+            console.warn(`Spam detectado en solicitud de factura desde IP: ${ip}`);
+            return NextResponse.json({ error: "Demasiadas peticiones. Intenta más tarde." }, { status: 429 });
+        }
+
         const body = await req.json();
         const {
             nombre_fiscal,

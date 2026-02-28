@@ -5,6 +5,7 @@ import { ArrowLeft, CheckCircle2, AlertCircle, Loader2, LogOut, LayoutDashboard,
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { updateProfileSafe } from "@/app/actions/sanitize";
 
 export default function DashboardPage() {
     const router = useRouter();
@@ -390,43 +391,38 @@ export default function DashboardPage() {
 
             const finalAseguradora = aseguradora === "Otro" ? aseguradoraOtra : (aseguradora || null);
 
-            const { error: updateError } = await supabase
-                .from('profiles')
-                .update({
-                    full_name: fullName,
-                    photo_url: newPhotoUrl,
-                    age: age ? parseInt(age, 10) : null,
-                    location: location,
-                    emergency_contacts: emergencyContacts,
-                    blood_type: bloodType,
-                    allergies: allergies,
-                    medical_conditions: medicalConditions,
-                    important_medications: importantMedications,
-                    insurance_provider: insuranceProvider,
-                    policy_number: policyNumber,
-                    medical_system: medicalSystem,
-                    organ_donor: organDonor,
-                    is_motorcyclist: isMotorcyclist,
-                    additional_notes: additionalNotes,
-                    google_maps_link: googleMapsLink,
-                    aseguradora: finalAseguradora,
-                    numero_poliza: numeroPoliza || null,
-                    tipo_seguro: tipoSeguro || null,
-                    nombre_asegurado: nombreAsegurado || null,
-                    vigencia_poliza: vigenciaPoliza || null,
-                    telefono_aseguradora: telefonoAseguradora || null,
-                    poliza_url: newPolizaUrl,
-                    nss: nss || null,
-                    numero_afiliacion: numeroAfiliacion || null,
-                    clinica_asignada: clinicaAsignada || null,
-                    curp_seguro: curpSeguro || null,
-                    updated_at: new Date().toISOString()
-                })
-                .eq('id', profileId);
+            const profileToUpdate = {
+                full_name: fullName,
+                photo_url: newPhotoUrl,
+                age: age ? parseInt(age, 10) : null,
+                location: location,
+                emergency_contacts: emergencyContacts,
+                blood_type: bloodType,
+                allergies: allergies,
+                medical_conditions: medicalConditions,
+                important_medications: importantMedications,
+                insurance_provider: insuranceProvider,
+                policy_number: policyNumber,
+                medical_system: medicalSystem,
+                organ_donor: organDonor,
+                is_motorcyclist: isMotorcyclist,
+                additional_notes: additionalNotes,
+                google_maps_link: googleMapsLink,
+                aseguradora: finalAseguradora,
+                numero_poliza: numeroPoliza || null,
+                tipo_seguro: tipoSeguro || null,
+                nombre_asegurado: nombreAsegurado || null,
+                vigencia_poliza: vigenciaPoliza || null,
+                telefono_aseguradora: telefonoAseguradora || null,
+                poliza_url: newPolizaUrl,
+                nss: nss || null,
+                numero_afiliacion: numeroAfiliacion || null,
+                clinica_asignada: clinicaAsignada || null,
+                curp_seguro: curpSeguro || null,
+                updated_at: new Date().toISOString()
+            };
 
-            if (updateError) {
-                throw new Error("No se pudieron guardar los cambios: " + updateError.message);
-            }
+            await updateProfileSafe(profileId, profileToUpdate);
 
             setSuccessMsg("¡Perfil actualizado con éxito!");
             window.scrollTo({ top: 0, behavior: 'smooth' });

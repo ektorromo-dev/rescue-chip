@@ -7,6 +7,7 @@ import { ArrowLeft, CheckCircle2, AlertCircle, Loader2, Eye, EyeOff } from "luci
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, Suspense, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { sanitizeProfileInput } from "@/app/actions/sanitize";
 
 function ActivationFormContent() {
     const searchParams = useSearchParams();
@@ -48,14 +49,18 @@ function ActivationFormContent() {
                         .from('chips')
                         .select('status, activated')
                         .ilike('folio', cleanFolio)
-                        .single();
+                        .maybeSingle();
 
-                    if (!chipError && chip) {
+                    const genericError = 'Este folio no es válido o ya fue activado.';
+
+                    if (chipError || !chip) {
+                        setPreValidationError(genericError);
+                    } else {
                         const isActivatedStr = chip.status === 'activado';
                         const isActivatedBool = chip.activated === true || String(chip.activated).toLowerCase() === 'true';
 
-                        if (isActivatedStr && isActivatedBool) {
-                            setPreValidationError('Este chip ya fue activado por otro usuario.');
+                        if ((isActivatedStr && isActivatedBool) || (chip.status !== 'disponible' && chip.status !== 'vendido')) {
+                            setPreValidationError(genericError);
                         }
                     }
                 } catch (e) {
@@ -89,8 +94,10 @@ function ActivationFormContent() {
 
             console.log("Activación - Respuesta de Supabase:", { chip, chipError });
 
+            const genericError = "Este folio no es válido o ya fue activado.";
+
             if (chipError || !chip) {
-                throw new Error("Este folio no es válido. Verifica que esté escrito correctamente o contacta a soporte.");
+                throw new Error(genericError);
             }
 
             console.log("Activación - Validando estado del chip recién traído de BD:");
@@ -100,13 +107,8 @@ function ActivationFormContent() {
             const isActivatedStr = chip.status === 'activado';
             const isActivatedBool = chip.activated === true || String(chip.activated).toLowerCase() === 'true';
 
-            // Solo bloquear si AMBAS condiciones dicen que está activado, o mínimamente el texto explícito de status
-            if (isActivatedStr && isActivatedBool) {
-                throw new Error("Este chip ya fue activado por otro usuario.");
-            }
-
-            if (chip.status !== 'disponible' && chip.status !== 'vendido') {
-                throw new Error(`Este chip no está disponible para activación (${chip.status || "desconocido"}).`);
+            if ((isActivatedStr && isActivatedBool) || (chip.status !== 'disponible' && chip.status !== 'vendido')) {
+                throw new Error(genericError);
             }
 
             // 1.5 Try Sign Up or Sign In
@@ -308,11 +310,14 @@ function ActivationFormContent() {
                 curp_seguro: formData.get("curpSeguro") as string || null,
             };
 
-            console.log("Activación - Intentando insertar en perfiles:", profileToInsert);
+            // Filtrar y sanitizar en el servidor antes de guardar (XSS, Length Limits)
+            const sanitizedProfile = await sanitizeProfileInput(profileToInsert);
+
+            console.log("Activación - Intentando insertar en perfiles sanitize:", sanitizedProfile);
 
             const { data: insertedProfileData, error: profileError } = await supabase
                 .from('profiles')
-                .insert(profileToInsert)
+                .insert(sanitizedProfile)
                 .select()
                 .single();
 

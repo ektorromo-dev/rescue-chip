@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import Stripe from "stripe";
+import { rateLimitCheckout } from "@/lib/ratelimit";
 
 const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -9,6 +10,13 @@ const supabase = createClient(
 
 export async function POST(req: NextRequest) {
     try {
+        const ip = req.headers.get("x-forwarded-for") ?? "127.0.0.1";
+        const { success } = await rateLimitCheckout.limit(ip);
+        if (!success) {
+            console.warn(`Spam detectado en checkout desde IP: ${ip}`);
+            return NextResponse.json({ error: "Demasiadas peticiones. Intenta más tarde." }, { status: 429 });
+        }
+
         // Utiliza la variable de entorno, asegúrate de que esté configurada en Vercel/.env.local
         const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
             apiVersion: "2023-10-16" as any,
