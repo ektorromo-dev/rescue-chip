@@ -24,12 +24,18 @@ export default function LoginPage() {
         setMessage("");
 
         try {
-            const { error } = await supabase.auth.signInWithPassword({
-                email,
-                password,
+            const res = await fetch("/api/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password })
             });
 
-            if (error) throw error;
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error || "Error al iniciar sesión. Verifica tus credenciales.");
+            }
+
             router.push("/dashboard");
         } catch (error: any) {
             setErrorMsg(error.message || "Error al iniciar sesión. Verifica tus credenciales.");

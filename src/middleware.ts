@@ -8,20 +8,24 @@ export async function middleware(request: NextRequest) {
     // Extraer IP de forma agnóstica a Vercel/Localhost
     const ip = request.headers.get("x-forwarded-for") ?? "127.0.0.1";
 
-    if (pathname.startsWith('/login')) {
+    // 1. Logs de depuración para Upstash Redis
+    console.log("[Middleware] Route Intercepted:", pathname);
+    console.log("[Middleware] UPSTASH_REDIS_REST_URL exists:", !!process.env.UPSTASH_REDIS_REST_URL);
+    console.log("[Middleware] Request Method:", request.method);
+
+    // Rate Limit solo para peticiones POST (intentos de login reales) sobre nuestra propia API route
+    if (pathname.startsWith('/api/auth/login') && request.method === 'POST') {
         const { success } = await rateLimitLogin.limit(ip);
+        console.log(`[Middleware] Rate Limit Login check for IP ${ip}. Success:`, success);
         if (!success) {
-            return new NextResponse(`
-                <html><body>
-                <div style="font-family:sans-serif; text-align:center; padding: 50px;">
-                    <h2 style="color: #ef4444;">Demasiados intentos de inicio de sesión</h2>
-                    <p>Por seguridad, hemos bloqueado temporalmente tu IP. Por favor, intenta nuevamente en 15 minutos.</p>
-                </div>
-                </body></html>
-            `, { status: 429, headers: { 'Content-Type': 'text/html' } });
+            return NextResponse.json(
+                { error: "Demasiados intentos de inicio de sesión. Por favor, intenta nuevamente en 15 minutos." },
+                { status: 429 }
+            );
         }
     }
 
+    // Adaptamos activate para que atrape solo POSTs a la API o interceptaremos el page load pero mejor POST:
     if (pathname.startsWith('/activate')) {
         const { success } = await rateLimitActivate.limit(ip);
         if (!success) {
@@ -44,5 +48,5 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
     // Especificar rutas explícitas para no invocar Redis/Upstash en cada request de assets
-    matcher: ['/login', '/activate'],
+    matcher: ['/api/auth/login', '/activate'],
 };
