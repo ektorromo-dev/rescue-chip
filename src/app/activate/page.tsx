@@ -38,6 +38,10 @@ function ActivationFormContent() {
     const [isLoadingPreCheck, setIsLoadingPreCheck] = useState(false);
     const [preValidationError, setPreValidationError] = useState("");
 
+    // Rate Limit State
+    const [isLockedOut, setIsLockedOut] = useState(false);
+    const [lockCountdown, setLockCountdown] = useState(0);
+
     useEffect(() => {
         if (folioFromUrl) {
             setFolio(folioFromUrl);
@@ -49,6 +53,22 @@ function ActivationFormContent() {
                     const data = await res.json();
 
                     if (!res.ok) {
+                        if (res.status === 429) {
+                            setIsLockedOut(true);
+                            setLockCountdown(60 * 60); // 1 hora
+
+                            const interval = setInterval(() => {
+                                setLockCountdown((prev) => {
+                                    if (prev <= 1) {
+                                        clearInterval(interval);
+                                        setIsLockedOut(false);
+                                        return 0;
+                                    }
+                                    return prev - 1;
+                                });
+                            }, 1000);
+                            return;
+                        }
                         setPreValidationError(data.error || 'Este folio no es válido o ya fue activado.');
                     }
                 } catch (e) {
@@ -78,6 +98,23 @@ function ActivationFormContent() {
             const activationData = await activationRes.json();
 
             if (!activationRes.ok) {
+                if (activationRes.status === 429) {
+                    setIsLockedOut(true);
+                    setLockCountdown(60 * 60); // 1 hora
+
+                    const interval = setInterval(() => {
+                        setLockCountdown((prev) => {
+                            if (prev <= 1) {
+                                clearInterval(interval);
+                                setIsLockedOut(false);
+                                return 0;
+                            }
+                            return prev - 1;
+                        });
+                    }, 1000);
+                    setLoading(false);
+                    return;
+                }
                 throw new Error(activationData.error || "Este folio no es válido o ya fue activado.");
             }
 
@@ -457,6 +494,32 @@ function ActivationFormContent() {
                         Comprar mi RescueChip
                     </Link>
                 </div>
+            </div>
+        );
+    }
+
+    if (isLockedOut) {
+        const formatTime = (seconds: number) => {
+            const m = Math.floor(seconds / 60);
+            const s = seconds % 60;
+            return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+        };
+
+        return (
+            <div className="p-8 md:p-12 flex flex-col items-center justify-center text-center space-y-6">
+                <div className="w-20 h-20 bg-destructive/10 text-destructive rounded-full flex items-center justify-center mb-2">
+                    <AlertCircle size={40} />
+                </div>
+                <h2 className="text-2xl font-black text-foreground">Límite de intentos excedido</h2>
+                <p className="text-muted-foreground text-lg max-w-md mx-auto leading-relaxed">
+                    Por motivos de seguridad, los intentos de activación para este folio han sido temporalmente bloqueados.
+                </p>
+                <div className="bg-destructive/10 text-destructive font-mono text-2xl md:text-3xl font-bold py-4 px-8 rounded-xl tracking-wider">
+                    {formatTime(lockCountdown)}
+                </div>
+                <p className="text-sm font-semibold text-muted-foreground">
+                    Podrás intentar activar tu chip de nuevo cuando finalice el contador.
+                </p>
             </div>
         );
     }
