@@ -15,8 +15,6 @@ export async function POST(request: Request) {
     const identifier = `login:${email}`;
     const { success, remaining } = await ratelimit.limit(identifier);
 
-    console.log(`[RATELIMIT] email: ${email}, success: ${success}, remaining: ${remaining}`);
-
     if (!success) {
         return Response.json(
             { error: 'Demasiados intentos. Espera 15 minutos.', isRateLimited: true },

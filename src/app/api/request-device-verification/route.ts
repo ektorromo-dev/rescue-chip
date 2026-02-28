@@ -19,6 +19,11 @@ const transporter = nodemailer.createTransport({
 });
 
 export async function POST(req: NextRequest) {
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     try {
         const body = await req.json();
         const { deviceId } = body;
@@ -27,29 +32,24 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
 
-        const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-            || req.headers.get('x-real-ip')
-            || '127.0.0.1';
-        const { success } = await rateLimitRequestDevice.limit(ip);
-        if (!success) {
-            console.warn(`Rate limit excedido para IP ${ip} en request-device-verification`);
-            return NextResponse.json({ error: "Demasiadas peticiones. Intenta más tarde." }, { status: 429 });
-        }
-
-        // Validate user authentication using authorization header
-        const authHeader = req.headers.get("authorization") || req.headers.get("Authorization");
-        const token = authHeader?.replace("Bearer ", "")?.trim();
+        const token = authHeader.replace("Bearer ", "").trim();
 
         if (!token) {
-            console.error("No authorization header or token present");
             return NextResponse.json({ error: "No token" }, { status: 401 });
         }
 
         const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
 
-        if (authError || !user) {
+        if (authError || !user || !user.email) {
             console.error("Supabase auth error or missing user email:", authError);
             return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+        }
+
+        const identifier = `device-verify:${user.email}`;
+        const { success } = await rateLimitRequestDevice.limit(identifier);
+
+        if (!success) {
+            return NextResponse.json({ error: "Demasiadas peticiones. Intenta más tarde." }, { status: 429 });
         }
 
         // Generate one-time 15 min random verification token 

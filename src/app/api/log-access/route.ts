@@ -26,6 +26,11 @@ const transporter = nodemailer.createTransport({
 });
 
 export async function POST(req: NextRequest) {
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     try {
         const body = await req.json();
         const { chip_folio, tipo, latitud, longitud, session_token } = body;
@@ -61,7 +66,8 @@ export async function POST(req: NextRequest) {
         // 2. Si es emergencia, enviar notificación
         if (tipo === "emergencia") {
             // Evaluamos rate limit usando el chip_folio como identificador
-            const { success: rateLimitSuccess } = await rateLimitSendEmergency.limit(chip_folio.toLowerCase());
+            const identifier = `emergency:${chip_folio}`;
+            const { success: rateLimitSuccess } = await rateLimitSendEmergency.limit(identifier);
 
             if (!rateLimitSuccess) {
                 console.warn(`Rate limit excedido para emergencias del chip: ${chip_folio}`);
