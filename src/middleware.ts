@@ -6,8 +6,9 @@ export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
     // Extraer IP de forma agnóstica a Vercel/Localhost
-    const ip = request.headers.get("x-forwarded-for") ?? "127.0.0.1";
-
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+        || request.headers.get('x-real-ip')
+        || '127.0.0.1';
     // 1. Logs de depuración para Upstash Redis
     console.log("[Middleware] Route Intercepted:", pathname);
     console.log("[Middleware] UPSTASH_REDIS_REST_URL exists:", !!process.env.UPSTASH_REDIS_REST_URL);

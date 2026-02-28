@@ -34,7 +34,10 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Faltan datos requeridos." }, { status: 400 });
         }
 
-        const ip_address = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "Desconocida";
+        const ip_raw = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+            || req.headers.get('x-real-ip')
+            || '127.0.0.1';
+        const ip_address = ip_raw !== '127.0.0.1' ? ip_raw : "Desconocida";
         const user_agent = req.headers.get("user-agent") || "Desconocido";
 
         // 1. Insertar el log de acceso

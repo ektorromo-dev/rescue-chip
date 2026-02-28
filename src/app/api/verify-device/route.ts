@@ -17,7 +17,9 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: "Parámetros inválidos o incompletos." }, { status: 400 });
     }
 
-    const ip = req.headers.get("x-forwarded-for") ?? "127.0.0.1";
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+        || req.headers.get('x-real-ip')
+        || '127.0.0.1';
     const { success } = await rateLimitVerifyDevice.limit(ip);
     if (!success) {
         return new NextResponse(`
