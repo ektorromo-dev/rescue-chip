@@ -13,6 +13,8 @@ export default function LoginPage() {
     const [errorMsg, setErrorMsg] = useState("");
     const [message, setMessage] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const [isLockedOut, setIsLockedOut] = useState(false);
+    const [lockCountdown, setLockCountdown] = useState(0);
 
     const router = useRouter();
     const supabase = createClient();
@@ -44,6 +46,11 @@ export default function LoginPage() {
         }
     };
 
+    const formatTime = (seconds: number) => {
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return `${m}:${s.toString().padStart(2, '0')}`;
+    };
 
     return (
         <div className="min-h-screen bg-muted flex flex-col items-center justify-center p-4">
@@ -77,64 +84,90 @@ export default function LoginPage() {
                         </div>
                     )}
 
-                    <form onSubmit={handleLogin} className="space-y-5">
-                        <div className="space-y-2">
-                            <label className="text-sm font-bold text-muted-foreground flex items-center gap-2" htmlFor="email">
-                                <Mail size={16} /> Correo Electrónico
-                            </label>
-                            <input
-                                id="email"
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="w-full h-12 rounded-xl border border-input bg-background/50 px-4 py-2 focus-visible:ring-2 focus-visible:ring-ring transition-all"
-                                placeholder="tu@correo.com"
-                                required
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="text-sm font-bold text-muted-foreground flex items-center gap-2" htmlFor="password">
-                                <KeyRound size={16} /> Contraseña
-                            </label>
-                            <div className="relative">
-                                <input
-                                    id="password"
-                                    type={showPassword ? "text" : "password"}
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full h-12 rounded-xl border border-input bg-background/50 px-4 py-2 pr-12 focus-visible:ring-2 focus-visible:ring-ring transition-all"
-                                    placeholder="••••••••"
-                                    required
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-0 top-0 h-12 px-4 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-                                >
-                                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                                </button>
+                    {isLockedOut ? (
+                        <div className="text-center space-y-6 py-4 animate-[fade-in_0.3s_ease-out]">
+                            <div className="mx-auto w-16 h-16 bg-destructive/10 text-destructive flex items-center justify-center rounded-2xl mb-2">
+                                <AlertCircle size={32} />
                             </div>
-                        </div>
-
-                        <div className="flex justify-end pt-2">
-                            <Link
-                                href="/reset-password"
-                                className="text-sm font-semibold text-primary hover:underline"
-                            >
-                                ¿Olvidaste tu contraseña?
+                            <h3 className="text-xl font-black text-foreground">Demasiados Fallos</h3>
+                            <p className="text-muted-foreground text-sm leading-relaxed">
+                                Hemós detectado múltiples intentos fallidos de inicio de sesión. Por la seguridad de tus datos, tu sesión ha sido suspendida transitoriamente.
+                            </p>
+                            <div className="bg-muted rounded-xl p-4 mt-6">
+                                <span className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">
+                                    Podrás reintentarlo en
+                                </span>
+                                <span className="text-3xl font-black text-primary font-mono tracking-widest">
+                                    {formatTime(lockCountdown)}
+                                </span>
+                            </div>
+                            <Link href="/reset-password" className="text-primary font-bold hover:underline inline-block mt-4 text-sm">
+                                ¿Necesitas cambiar tu contraseña?
                             </Link>
                         </div>
+                    ) : (
+                        <form onSubmit={handleLogin} className="space-y-5">
+                            <div className="space-y-2">
+                                <label className="text-sm font-bold text-muted-foreground flex items-center gap-2" htmlFor="email">
+                                    <Mail size={16} /> Correo Electrónico
+                                </label>
+                                <input
+                                    id="email"
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="w-full h-12 rounded-xl border border-input bg-background/50 px-4 py-2 focus-visible:ring-2 focus-visible:ring-ring transition-all"
+                                    placeholder="tu@correo.com"
+                                    required
+                                    disabled={loading}
+                                />
+                            </div>
 
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground h-14 rounded-xl text-lg font-bold hover:scale-[1.02] hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 mt-4 disabled:opacity-70 disabled:pointer-events-none"
-                        >
-                            {loading ? <Loader2 size={20} className="animate-spin" /> : null}
-                            {loading ? "Iniciando..." : "Ingresar a mi Panel"}
-                        </button>
-                    </form>
+                            <div className="space-y-2">
+                                <label className="text-sm font-bold text-muted-foreground flex items-center gap-2" htmlFor="password">
+                                    <KeyRound size={16} /> Contraseña
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        id="password"
+                                        type={showPassword ? "text" : "password"}
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        className="w-full h-12 rounded-xl border border-input bg-background/50 px-4 py-2 pr-12 focus-visible:ring-2 focus-visible:ring-ring transition-all"
+                                        placeholder="••••••••"
+                                        required
+                                        disabled={loading}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-0 top-0 h-12 px-4 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+                                        disabled={loading}
+                                    >
+                                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="flex justify-end pt-2">
+                                <Link
+                                    href="/reset-password"
+                                    className="text-sm font-semibold text-primary hover:underline"
+                                >
+                                    ¿Olvidaste tu contraseña?
+                                </Link>
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground h-14 rounded-xl text-lg font-bold hover:scale-[1.02] hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 mt-4 disabled:opacity-70 disabled:pointer-events-none"
+                            >
+                                {loading ? <Loader2 size={20} className="animate-spin" /> : null}
+                                {loading ? "Iniciando..." : "Ingresar a mi Panel"}
+                            </button>
+                        </form>
+                    )}
 
                     <div className="mt-8 text-center border-t border-border/50 pt-6">
                         <p className="text-sm text-muted-foreground font-medium">

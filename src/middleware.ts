@@ -20,28 +20,8 @@ export async function middleware(request: NextRequest) {
     console.log("[Middleware] UPSTASH_REDIS_REST_URL exists:", !!process.env.UPSTASH_REDIS_REST_URL);
     console.log("[Middleware] Request Method:", request.method);
 
-    // Rate Limit solo para peticiones POST (intentos de login reales) sobre nuestra propia API route
-    if (pathname.startsWith('/api/auth/login') && request.method === 'POST') {
-        let email = 'unknown';
-        try {
-            // Utilizamos request.clone() para no consumir el stream que va a la API route real
-            const body = await request.clone().json();
-            email = body?.email || 'unknown';
-        } catch (e) {
-            console.error("Error parsing login body in middleware", e);
-        }
+    // EL RATE LIMIT DE LOGIN SE MOVIÓ A /api/auth/login/route.ts CON ACCESO NATIVO AL BODY DEL REQUEST
 
-        const identifier = `login-v3:ip:${ip}:email:${email}`;
-        const result = await rateLimitLogin.limit(identifier);
-        console.log(`[Middleware] Rate Limit Login check for ${identifier}. Success: ${result.success}, Remaining: ${result.remaining}, Limit: ${result.limit}`);
-
-        if (!result.success) {
-            return NextResponse.json(
-                { error: "Demasiados intentos de inicio de sesión. Por favor, intenta repetirlo en 15 minutos." },
-                { status: 429 }
-            );
-        }
-    }
 
     // Adaptamos activate para que atrape solo POSTs a la API o interceptaremos el page load pero mejor POST:
     if (pathname.startsWith('/activate')) {
