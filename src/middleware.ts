@@ -12,9 +12,15 @@ export async function middleware(request: NextRequest) {
 
     // Adaptamos activate para que atrape solo POSTs a la API o interceptaremos el page load pero mejor POST:
     if (pathname.startsWith('/activate')) {
-        const folio = request.nextUrl.searchParams.get('folio') || ip;
+        const folio = request.nextUrl.searchParams.get('folio');
+        if (!folio) {
+            // Sin folio = acceso directo a la página, no aplicar rate limit
+            return NextResponse.next();
+        }
+
         const identifier = `activate:${folio}`;
         const { success } = await rateLimitActivate.limit(identifier);
+
         if (!success) {
             return new NextResponse(`
                 <html><body>
