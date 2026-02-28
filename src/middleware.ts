@@ -12,17 +12,18 @@ export async function middleware(request: NextRequest) {
 
     // Adaptamos activate para que atrape solo POSTs a la API o interceptaremos el page load pero mejor POST:
     if (pathname.startsWith('/activate')) {
-        const identifier = `activate-v3:${ip}`;
+        const folio = request.nextUrl.searchParams.get('folio') || ip;
+        const identifier = `activate:${folio}`;
         const { success } = await rateLimitActivate.limit(identifier);
         if (!success) {
             return new NextResponse(`
                 <html><body>
                 <div style="font-family:sans-serif; text-align:center; padding: 50px;">
-                    <h2 style="color: #ef4444;">Límite de tráfico detectado</h2>
-                    <p>Has alcanzado el límite máximo de solicitudes de activación por hora. Intenta más tarde.</p>
+                    <h2 style="color: #ef4444;">Limite de trafico detectado</h2>
+                    <p>Has alcanzado el maximo de solicitudes por hora. Intenta mas tarde.</p>
                 </div>
                 </body></html>
-            `, { status: 429, headers: { 'Content-Type': 'text/html' } });
+            `, { status: 429, headers: { 'Content-Type': 'text/html; charset=utf-8' } });
         }
     }
 
