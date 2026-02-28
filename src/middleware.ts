@@ -5,10 +5,16 @@ import { rateLimitLogin, rateLimitActivate } from '@/lib/ratelimit';
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
+    console.log('[DEBUG IP]', {
+        forwarded: request.headers.get('x-forwarded-for'),
+        realIp: request.headers.get('x-real-ip')
+    });
+
     // Extraer IP de forma agnóstica a Vercel/Localhost
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
         || request.headers.get('x-real-ip')
         || '127.0.0.1';
+
     // 1. Logs de depuración para Upstash Redis
     console.log("[Middleware] Route Intercepted:", pathname);
     console.log("[Middleware] UPSTASH_REDIS_REST_URL exists:", !!process.env.UPSTASH_REDIS_REST_URL);
@@ -16,8 +22,18 @@ export async function middleware(request: NextRequest) {
 
     // Rate Limit solo para peticiones POST (intentos de login reales) sobre nuestra propia API route
     if (pathname.startsWith('/api/auth/login') && request.method === 'POST') {
-        const result = await rateLimitLogin.limit(ip);
-        console.log(`[Middleware] Rate Limit Login check for IP ${ip}. Success: ${result.success}, Remaining: ${result.remaining}, Limit: ${result.limit}`);
+        let email = 'unknown';
+        try {
+            // Utilizamos request.clone() para no consumir el stream que va a la API route real
+            const body = await request.clone().json();
+            email = body?.email || 'unknown';
+        } catch (e) {
+            console.error("Error parsing login body in middleware", e);
+        }
+
+        const identifier = `login-v3:ip:${ip}:email:${email}`;
+        const result = await rateLimitLogin.limit(identifier);
+        console.log(`[Middleware] Rate Limit Login check for ${identifier}. Success: ${result.success}, Remaining: ${result.remaining}, Limit: ${result.limit}`);
 
         if (!result.success) {
             return NextResponse.json(
@@ -29,7 +45,8 @@ export async function middleware(request: NextRequest) {
 
     // Adaptamos activate para que atrape solo POSTs a la API o interceptaremos el page load pero mejor POST:
     if (pathname.startsWith('/activate')) {
-        const { success } = await rateLimitActivate.limit(ip);
+        const identifier = `activate-v3:${ip}`;
+        const { success } = await rateLimitActivate.limit(identifier);
         if (!success) {
             return new NextResponse(`
                 <html><body>
