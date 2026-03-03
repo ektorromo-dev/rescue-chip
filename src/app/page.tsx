@@ -92,7 +92,7 @@ export default function Home() {
             <span>Datos médicos cruciales, justo cuando se necesitan.</span>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight max-w-4xl mb-6 bg-gradient-to-br from-foreground to-muted-foreground bg-clip-text text-transparent" style={{ animation: "fade-in-up 0.5s ease-out 0.1s both" }}>
+          <h1 className="pb-2 text-5xl md:text-7xl font-extrabold tracking-tight max-w-4xl mb-6 bg-gradient-to-br from-foreground to-muted-foreground bg-clip-text text-transparent" style={{ animation: "fade-in-up 0.5s ease-out 0.1s both" }}>
             En una emergencia, cada segundo cuenta.
           </h1>
 
