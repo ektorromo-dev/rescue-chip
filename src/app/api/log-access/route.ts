@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import nodemailer from "nodemailer";
 import twilio from "twilio";
 import { rateLimitSendEmergency } from "@/lib/ratelimit";
+import { logAuditEvent } from '@/lib/audit';
 
 // Twilio Setup
 const twilioClient = twilio(
@@ -45,7 +46,7 @@ export async function POST(req: NextRequest) {
         const ip_address = ip_raw !== '127.0.0.1' ? ip_raw : "Desconocida";
         const user_agent = req.headers.get("user-agent") || "Desconocido";
 
-        // 1. Insertar el log de acceso
+        // 1. Insertar el log de acceso público original
         const { error: insertError } = await supabase
             .from("chip_accesos")
             .insert({
@@ -62,6 +63,16 @@ export async function POST(req: NextRequest) {
             console.error("Error al registrar el acceso:", insertError);
             // No bloqueamos todo por fallar el log, pero advertimos
         }
+
+        // Determinar ID de perfil ligado si es posible antes (lo dejamos null por default)
+        await logAuditEvent({
+            action: typeof tipo === 'string' && tipo.toLowerCase() === 'emergencia' ? 'emergency_access' : 'profile_view',
+            entityType: 'chip',
+            entityId: chip_folio,
+            ipAddress: ip_address,
+            userAgent: user_agent,
+            metadata: { latitud, longitud, session_token }
+        });
 
         // 2. Si es emergencia, enviar notificación
         if (tipo === "emergencia") {

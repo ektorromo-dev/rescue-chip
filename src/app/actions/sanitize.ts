@@ -2,6 +2,8 @@
 
 import sanitizeHtml from 'sanitize-html';
 import { createClient } from "@/lib/supabase/server";
+import { headers } from "next/headers";
+import { logAuditEvent } from "@/lib/audit";
 
 export async function updateProfileSafe(profileId: string, data: Record<string, any>) {
     const supabase = await createClient();
@@ -38,6 +40,20 @@ export async function updateProfileSafe(profileId: string, data: Record<string, 
     if (updateError) {
         throw new Error("Error en BD al guardar: " + updateError.message);
     }
+
+    const headersList = await headers();
+    const ip = headersList.get('x-forwarded-for')?.split(',')[0]?.trim() || headersList.get('x-real-ip') || '127.0.0.1';
+    const userAgent = headersList.get('user-agent') || 'Unknown';
+
+    await logAuditEvent({
+        userId: user.id,
+        action: 'profile_update',
+        entityType: 'profile',
+        entityId: profileId,
+        ipAddress: ip,
+        userAgent: userAgent,
+        metadata: { updatedFields: Object.keys(sanitizedData) }
+    });
 
     return { success: true };
 }

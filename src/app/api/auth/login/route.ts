@@ -1,6 +1,7 @@
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
 import { createClient } from '@/lib/supabase/server';
+import { logAuditEvent } from '@/lib/audit';
 
 const ratelimit = new Ratelimit({
     redis: Redis.fromEnv(),
@@ -29,6 +30,20 @@ export async function POST(request: Request) {
     if (error) {
         return Response.json({ error: 'Credenciales incorrectas' }, { status: 401 });
     }
+
+    // Determinar IP y User Agent
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+        || request.headers.get('x-real-ip')
+        || '127.0.0.1';
+    const userAgent = request.headers.get('user-agent') || 'Unknown';
+
+    await logAuditEvent({
+        userId: data.user?.id,
+        action: 'login',
+        ipAddress: ip,
+        userAgent: userAgent,
+        metadata: { method: 'password' }
+    });
 
     return Response.json({ success: true, user: data.user, session: data.session });
 }
