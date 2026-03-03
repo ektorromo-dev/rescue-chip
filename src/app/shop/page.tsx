@@ -389,7 +389,7 @@ export default function ShopPage() {
                 {/* SECCIÓN 1 - PÚBLICO GENERAL */}
                 <section>
                     <div className="text-center mb-10">
-                        <h2 className="mt-6 md:mt-0 text-3xl md:text-4xl font-extrabold text-foreground flex items-center justify-center gap-3">
+                        <h2 className="-mt-6 md:mt-0 text-3xl md:text-4xl font-extrabold text-foreground flex items-center justify-center gap-3">
                             <Users size={32} className="text-primary hidden sm:block" /> Protege tu vida en cada rodada
                         </h2>
                         <p className="text-primary font-bold mt-2 bg-primary/10 inline-block px-4 py-1.5 rounded-full">🚚 Envío GRATIS a todo México</p>
