@@ -93,7 +93,7 @@ export default function Home() {
           </div>
 
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight max-w-4xl mb-6 bg-gradient-to-br from-foreground to-muted-foreground bg-clip-text text-transparent" style={{ animation: "fade-in-up 0.5s ease-out 0.1s both" }}>
-            La adición más inteligente para tu casco de motocicleta.
+            En una emergencia, cada segundo cuenta.
           </h1>
 
           <p className="text-xl text-muted-foreground max-w-2xl mb-12" style={{ animation: "fade-in-up 0.5s ease-out 0.2s both" }}>
