@@ -7,6 +7,7 @@ const cspHeader = `
     style-src 'self' 'unsafe-inline';
     img-src 'self' blob: data: https: wss:;
     font-src 'self' data:;
+    connect-src 'self' https://kainkhyqjmattriozick.supabase.co wss://kainkhyqjmattriozick.supabase.co https://o451098255.ingest.de.sentry.io;
     object-src 'none';
     base-uri 'self';
     form-action 'self';
