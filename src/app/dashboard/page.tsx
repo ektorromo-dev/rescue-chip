@@ -107,6 +107,9 @@ export default function DashboardPage() {
         const fetchUserData = async () => {
             const { data: { session } } = await supabase.auth.getSession();
 
+            console.log('SESSION USER ID:', session?.user?.id);
+            console.log('SESSION USER EMAIL:', session?.user?.email);
+
             if (!session || !session.user) {
                 router.push('/login');
                 return;
