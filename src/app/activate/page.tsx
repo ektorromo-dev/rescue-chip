@@ -22,6 +22,8 @@ function ActivationFormContent() {
     const [isMotorcyclist, setIsMotorcyclist] = useState(false);
     const [photoFile, setPhotoFile] = useState<File | null>(null);
     const [showPassword, setShowPassword] = useState(false);
+    const [phone, setPhone] = useState("");
+    const [whatsappOptedIn, setWhatsappOptedIn] = useState(true);
 
     // Estado del flujo "Chip extra"
     const [existingProfileToLink, setExistingProfileToLink] = useState<any>(null);
@@ -87,6 +89,12 @@ function ActivationFormContent() {
         setErrorMsg("");
 
         const formData = new FormData(e.currentTarget);
+
+        if (phone.length < 10) {
+            setErrorMsg("El número de celular debe tener 10 dígitos.");
+            setLoading(false);
+            return;
+        }
 
         try {
             // Limpiar el folio de espacios innecesarios
@@ -295,6 +303,8 @@ function ActivationFormContent() {
                 plan: chipAssignedPlan,
                 photo_url: photoUrl,
                 full_name: formData.get("fullName") as string,
+                phone: `+52${phone}`,
+                whatsapp_opted_in: whatsappOptedIn,
                 age: age,
                 location: formData.get("location") as string,
                 emergency_contacts: emergencyContacts,
@@ -625,6 +635,35 @@ function ActivationFormContent() {
                         <div className="space-y-2 md:col-span-2">
                             <label htmlFor="fullName" className="text-sm font-semibold">Nombre Completo *</label>
                             <input type="text" id="fullName" name="fullName" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Juan Pérez" required />
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                            <label className="text-sm font-semibold">Número de Celular *</label>
+                            <div className="flex">
+                                <span className="inline-flex items-center px-4 rounded-l-xl border border-r-0 border-input bg-muted text-muted-foreground text-sm font-medium">
+                                    🇲🇽 +52
+                                </span>
+                                <input
+                                    type="tel"
+                                    inputMode="numeric"
+                                    placeholder="55 1234 5678"
+                                    value={phone}
+                                    onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                                    className="flex-1 rounded-r-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all"
+                                    required
+                                />
+                            </div>
+                            <label className="flex items-start gap-3 cursor-pointer mt-3 p-3 bg-muted/40 rounded-xl border border-border">
+                                <input
+                                    type="checkbox"
+                                    checked={whatsappOptedIn}
+                                    onChange={(e) => setWhatsappOptedIn(e.target.checked)}
+                                    className="mt-0.5 h-4 w-4 rounded border-input text-primary focus:ring-primary"
+                                />
+                                <span className="text-xs text-muted-foreground leading-relaxed">
+                                    Acepto recibir notificaciones de RescueChip por WhatsApp en este número,
+                                    incluyendo confirmación de activación y alertas de emergencia.
+                                </span>
+                            </label>
                         </div>
                         <div className="space-y-2">
                             <label htmlFor="age" className="text-sm font-semibold">Edad (Opcional)</label>
