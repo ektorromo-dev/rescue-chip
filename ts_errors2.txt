@@ -1,0 +1,2 @@
+src/app/admin/page.tsx(9,10): error TS2305: Module '"@supabase/auth-helpers-nextjs"' has no exported member 'createClientComponentClient'.
+src/middleware.ts(4,10): error TS2305: Module '"@supabase/auth-helpers-nextjs"' has no exported member 'createMiddlewareClient'.

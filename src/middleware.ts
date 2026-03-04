@@ -38,7 +38,7 @@ export async function middleware(request: NextRequest) {
         const { data: { session } } = await supabase.auth.getSession();
 
         if (!session || session.user.email !== process.env.ADMIN_EMAIL) {
-            return NextResponse.redirect(new URL('/', request.url));
+            return NextResponse.redirect(new URL('/login?redirect=/admin', request.url));
         }
     }
 

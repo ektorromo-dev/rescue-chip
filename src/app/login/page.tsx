@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { ArrowLeft, KeyRound, Mail, AlertCircle, Loader2, Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
-export default function LoginPage() {
+function LoginForm() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
@@ -17,6 +17,7 @@ export default function LoginPage() {
     const [lockCountdown, setLockCountdown] = useState(0);
 
     const router = useRouter();
+    const searchParams = useSearchParams();
     const supabase = createClient();
 
     const handleLogin = async (e: React.FormEvent) => {
@@ -62,7 +63,8 @@ export default function LoginPage() {
                 });
             }
 
-            router.push("/dashboard");
+            const redirectUrl = searchParams.get("redirect") || "/dashboard";
+            router.push(redirectUrl);
         } catch (error: any) {
             setErrorMsg(error.message || "Error al iniciar sesión. Verifica tus credenciales.");
         } finally {
@@ -202,5 +204,13 @@ export default function LoginPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-muted flex items-center justify-center">Cargando...</div>}>
+            <LoginForm />
+        </Suspense>
     );
 }
