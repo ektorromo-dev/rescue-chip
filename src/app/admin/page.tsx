@@ -1,136 +1,97 @@
 'use client'
-// src/app/admin/page.tsx
-// ============================================================
-// RESCUECHIP — Dashboard Admin Completo
-// Ruta: rescue-chip.com/admin
-// ============================================================
-
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import {
-  AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
-} from 'recharts'
+import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { Plus, Siren, Store, Building2, CreditCard, Settings, Search, CheckCircle2, XCircle, AlertTriangle, TrendingUp, Users, Package, Clock, Zap, Activity, Target } from 'lucide-react'
 
-// ── PALETA ──────────────────────────────────────────────────
-const C = {
-  red: '#C0392B', redDim: 'rgba(192,57,43,0.12)',
-  bg: '#0D0D0D', surface: '#161616', card: '#1C1C1C', border: '#2A2A2A',
-  text: '#F0F0F0', muted: '#888', faint: '#333',
-  green: '#27AE60', greenDim: 'rgba(39,174,96,0.12)',
-  amber: '#F39C12', amberDim: 'rgba(243,156,18,0.12)',
-  blue: '#2980B9', blueDim: 'rgba(41,128,185,0.12)',
-  navy: '#1A3A5C', purple: '#8E44AD',
-}
-
-const PIE_COLORS = [C.red, C.amber, C.blue, C.green, C.purple, '#1ABC9C']
-
-// ── CONSTANTES ───────────────────────────────────────────────
+// ✨ PALETTE & CONFIG ✨
+const PIE_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#14b8a6']
 const ESTADOS = ['CDMX', 'Jalisco', 'Nuevo León', 'Estado de México', 'Puebla', 'Querétaro', 'Guanajuato', 'Otro']
 const TIPOS_ACC = ['Colisión vial', 'Caída propia', 'Atropellamiento', 'Colisión múltiple', 'Otro']
 const OUTCOMES = ['Chip escaneado por paramédico', 'Contacto de emergencia notificado', 'Información médica utilizada', 'Solo chip leído', 'No confirmado']
 const PLANES = ['Individual ($349)', 'Pareja ($549)', 'Familiar ($949)']
 const CANALES = ['Tienda web', 'Rodada', 'Taller consignación', 'Venta directa', 'Instagram DM', 'WhatsApp', 'Referido', 'Otro']
 const SEVERIDADES = ['leve', 'moderado', 'grave', 'critico']
-const STAGE_LABELS: Record<string, string> = {
-  prospecto: '🔵 Prospecto', contactado: '📞 Contactado',
-  reunion_agendada: '📅 Reunión agendada', demo_realizada: '🎯 Demo realizada',
-  propuesta_enviada: '📋 Propuesta enviada', negociacion: '🤝 Negociación',
-  cerrado_ganado: '✅ Ganado', cerrado_perdido: '❌ Perdido', pausado: '⏸ Pausado'
-}
-const WS_STATUS_LABELS: Record<string, string> = {
-  prospecto: '🔵 Prospecto', contactado: '📞 Contactado',
-  activo: '✅ Activo', inactivo: '⚫ Inactivo', pausado: '⏸ Pausado'
-}
+const STAGE_LABELS: Record<string, string> = { prospecto: 'Prospecto', contactado: 'Contactado', reunion_agendada: 'Reunión', demo_realizada: 'Demo', propuesta_enviada: 'Propuesta', negociacion: 'Negociación', cerrado_ganado: 'Ganado', cerrado_perdido: 'Perdido', pausado: 'Pausado' }
+const WS_STATUS_LABELS: Record<string, string> = { prospecto: 'Prospecto', contactado: 'Contactado', activo: 'Activo', inactivo: 'Inactivo', pausado: 'Pausado' }
 
-// ── HELPERS ──────────────────────────────────────────────────
+// 🧮 HELPERS
 const fmt = (n: number) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', minimumFractionDigits: 0 }).format(n)
 const fmtDate = (d: string) => d ? new Date(d).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'
 const planPrice = (plan: string) => plan.includes('349') ? 349 : plan.includes('549') ? 549 : 949
 
-// ── COMPONENTES BASE ─────────────────────────────────────────
-function Stat({ label, value, sub, color = C.text }: { label: string; value: string | number; sub?: string; color?: string }) {
+// 🧱 COMPONENTS
+function StatCard({ label, value, sub, color = 'text-white', icon: Icon, trend }: any) {
   return (
-    <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 10, padding: '18px 20px' }}>
-      <div style={{ color: C.muted, fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: 'monospace', marginBottom: 6 }}>{label}</div>
-      <div style={{ color, fontSize: 26, fontWeight: 800, lineHeight: 1.1, fontFamily: 'monospace' }}>{value}</div>
-      {sub && <div style={{ color: C.muted, fontSize: 11, marginTop: 4 }}>{sub}</div>}
-    </div>
-  )
-}
-
-function Tag({ color, children }: { color: string; children: React.ReactNode }) {
-  return (
-    <span style={{ background: color + '22', color, border: `1px solid ${color}44`, borderRadius: 4, padding: '2px 8px', fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap' }}>
-      {children}
-    </span>
-  )
-}
-
-function Modal({ title, onClose, children, wide }: { title: string; onClose: () => void; children: React.ReactNode; wide?: boolean }) {
-  return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, overflowY: 'auto' }}>
-      <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 12, width: '100%', maxWidth: wide ? 680 : 520, maxHeight: '92vh', overflowY: 'auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '18px 22px', borderBottom: `1px solid ${C.border}`, position: 'sticky', top: 0, background: C.card, zIndex: 1 }}>
-          <span style={{ color: C.text, fontWeight: 700, fontSize: 15 }}>{title}</span>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: C.muted, cursor: 'pointer', fontSize: 22, lineHeight: 1 }}>×</button>
+    <div className="bg-[#161b22] border border-[#2d3139] rounded-xl p-5 flex flex-col justify-between">
+      <div className="flex justify-between items-start mb-3">
+        <div className="text-[#8b949e] text-[11px] font-mono uppercase tracking-wider">{label}</div>
+        {Icon && <Icon size={16} className="text-[#8b949e]" />}
+      </div>
+      <div>
+        <div className={`text-2xl font-semibold font-mono tabular-nums tracking-tight ${color}`}>{value}</div>
+        <div className="flex items-center gap-2 mt-2">
+          {trend && (
+            <span className={`text-[11px] font-mono px-1.5 py-0.5 rounded-md ${trend > 0 ? 'bg-emerald-500/10 text-emerald-400' : trend < 0 ? 'bg-red-500/10 text-red-400' : 'bg-white/5 text-gray-400'}`}>
+              {trend > 0 ? '↑' : trend < 0 ? '↓' : ''}{Math.abs(trend)}%
+            </span>
+          )}
+          {sub && <span className="text-[#8b949e] text-xs">{sub}</span>}
         </div>
-        <div style={{ padding: 22 }}>{children}</div>
       </div>
     </div>
   )
 }
 
-function Field({ label, children, half }: { label: string; children: React.ReactNode; half?: boolean }) {
+function Tag({ children, colorClass }: any) {
+  return <span className={`px-2 py-0.5 rounded text-[11px] font-medium whitespace-nowrap border ${colorClass}`}>{children}</span>
+}
+
+function Modal({ title, onClose, children, wide }: any) {
   return (
-    <div style={{ marginBottom: 14, flex: half ? '1 1 45%' : '1 1 100%' }}>
-      <label style={{ color: C.muted, fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', display: 'block', marginBottom: 5, fontFamily: 'monospace' }}>{label}</label>
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className={`bg-[#161b22] border border-[#2d3139] rounded-2xl w-full max-h-[90vh] overflow-y-auto ${wide ? 'max-w-3xl' : 'max-w-lg'}`}>
+        <div className="flex justify-between items-center p-5 border-b border-[#2d3139] sticky top-0 bg-[#161b22] z-10">
+          <h3 className="text-[#f0f6fc] font-semibold">{title}</h3>
+          <button onClick={onClose} className="text-[#8b949e] hover:text-white transition-colors"><XCircle size={20} /></button>
+        </div>
+        <div className="p-5">{children}</div>
+      </div>
+    </div>
+  )
+}
+
+function Field({ label, children, half }: any) {
+  return (
+    <div className={`mb-4 ${half ? 'w-[calc(50%-8px)]' : 'w-full'}`}>
+      <label className="block text-[#8b949e] text-[10px] uppercase font-mono tracking-wider mb-2">{label}</label>
       {children}
     </div>
   )
 }
 
-const inp: React.CSSProperties = {
-  background: C.surface, border: `1px solid ${C.border}`, color: C.text,
-  borderRadius: 6, padding: '8px 11px', width: '100%', fontSize: 13,
-  fontFamily: 'inherit', boxSizing: 'border-box', outline: 'none'
-}
+const inputClass = "bg-[#0d1117] border border-[#2d3139] text-[#f0f6fc] rounded-lg px-3 py-2.5 w-full text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors font-sans"
 
-function Btn({ onClick, children, color = C.surface, textColor = C.text, border = true }: {
-  onClick: () => void; children: React.ReactNode; color?: string; textColor?: string; border?: boolean
-}) {
-  return (
-    <button onClick={onClick} style={{ background: color, border: border ? `1px solid ${C.border}` : 'none', color: textColor, borderRadius: 7, padding: '9px 16px', fontSize: 12, cursor: 'pointer', fontWeight: 600, fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
-      {children}
-    </button>
-  )
-}
-
-// ── MAIN COMPONENT ────────────────────────────────────────────
+// 🚀 MAIN APP
 export default function AdminDashboard() {
   const supabase = createClient()
-
-  // Estado general
   const [tab, setTab] = useState('overview')
   const [modal, setModal] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [editItem, setEditItem] = useState<any>(null)
 
-  // Datos desde Supabase
   const [emergencies, setEmergencies] = useState<any[]>([])
   const [sales, setSales] = useState<any[]>([])
   const [workshops, setWorkshops] = useState<any[]>([])
   const [pipeline, setPipeline] = useState<any[]>([])
-  const [profiles, setProfiles] = useState<{ total: number; withPhone: number; activated: number }>({ total: 0, withPhone: 0, activated: 0 })
+  const [profiles, setProfiles] = useState({ total: 0, withPhone: 0 })
 
-  // Formularios
   const [accForm, setAccForm] = useState({ incident_date: new Date().toISOString().split('T')[0], incident_time: '', estado: 'CDMX', municipio: '', tipo: TIPOS_ACC[0], severidad: 'moderado', chip_folio: '', chip_scanned: false, outcome: OUTCOMES[0], medical_info_used: false, family_notified: false, hospital_notified: false, hospital_name: '', user_age: '', survived: '', user_still_active: '', media_worthy: false, b2b_case_study: false, mins_to_scan: '', mins_to_family_contact: '', mins_to_medical_attention: '', notes: '', paramedic_name: '' })
   const [saleForm, setSaleForm] = useState({ sale_date: new Date().toISOString().split('T')[0], plan: PLANES[0], qty: 1, channel: 'Tienda web', source: '', customer_name: '', customer_phone: '', customer_email: '', notes: '' })
   const [wsForm, setWsForm] = useState({ name: '', owner_name: '', phone: '', email: '', address: '', municipio: '', estado: 'CDMX', status: 'prospecto', chips_consigned: 0, price_per_chip: 299, first_consignment_date: '', notes: '' })
   const [b2bForm, setB2bForm] = useState({ company_name: '', company_type: '', contact_name: '', contact_role: '', contact_phone: '', contact_email: '', stage: 'prospecto', estimated_chips: '', estimated_value: '', probability: 10, first_contact_date: new Date().toISOString().split('T')[0], next_action_date: '', next_action: '', notes: '' })
-  const [editItem, setEditItem] = useState<any>(null)
 
-  // Cargar datos
   const loadData = useCallback(async () => {
     setLoading(true)
     const [emRes, saRes, wsRes, b2bRes, prRes] = await Promise.all([
@@ -138,152 +99,66 @@ export default function AdminDashboard() {
       supabase.from('admin_sales').select('*').order('sale_date', { ascending: false }),
       supabase.from('admin_workshops').select('*').order('created_at', { ascending: false }),
       supabase.from('admin_b2b_pipeline').select('*').order('created_at', { ascending: false }),
-      supabase.from('profiles').select('id, phone, created_at'),
+      supabase.from('profiles').select('id, phone')
     ])
     if (emRes.data) setEmergencies(emRes.data)
     if (saRes.data) setSales(saRes.data)
     if (wsRes.data) setWorkshops(wsRes.data)
     if (b2bRes.data) setPipeline(b2bRes.data)
-    if (prRes.data) {
-      setProfiles({
-        total: prRes.data.length,
-        withPhone: prRes.data.filter((p: any) => p.phone).length,
-        activated: prRes.data.length,
-      })
-    }
+    if (prRes.data) setProfiles({ total: prRes.data.length, withPhone: prRes.data.filter((p: any) => p.phone).length })
     setLoading(false)
   }, [supabase])
 
   useEffect(() => { loadData() }, [loadData])
 
-  // ── COMPUTED ──────────────────────────────────────────────
   const totalRevenue = sales.reduce((s, x) => s + planPrice(x.plan) * (x.qty || 1), 0)
   const totalUnits = sales.reduce((s, x) => s + (x.qty || 1), 0)
   const accidents = emergencies.length
   const scanned = emergencies.filter(e => e.outcome === OUTCOMES[0]).length
   const scanRate = accidents ? Math.round(scanned / accidents * 100) : 0
+  const activeWorkshops = workshops.filter(w => w.status === 'activo').length
+  const wsInventory = workshops.reduce((s, w) => s + (w.chips_consigned - w.chips_sold - w.chips_returned), 0)
+  const b2bValue = pipeline.filter(p => !['cerrado_perdido', 'pausado'].includes(p.stage)).reduce((s, p) => s + (p.estimated_value || 0), 0)
 
   const monthlySales = (() => {
     const m: Record<string, { revenue: number; units: number }> = {}
     sales.forEach(s => {
-      const k = s.sale_date?.slice(0, 7) || ''
-      const p = planPrice(s.plan)
+      const k = s.sale_date?.slice(0, 7) || ''; const p = planPrice(s.plan)
       if (!m[k]) m[k] = { revenue: 0, units: 0 }
-      m[k].revenue += p * (s.qty || 1)
-      m[k].units += (s.qty || 1)
+      m[k].revenue += p * (s.qty || 1); m[k].units += (s.qty || 1)
     })
     return Object.entries(m).sort().map(([k, v]) => ({ mes: k.slice(5), ...v }))
   })()
 
   const channelData = (() => {
-    const c: Record<string, number> = {}
-    sales.forEach(s => { c[s.channel] = (c[s.channel] || 0) + (s.qty || 1) })
+    const c: Record<string, number> = {}; sales.forEach(s => { c[s.channel] = (c[s.channel] || 0) + (s.qty || 1) })
     return Object.entries(c).map(([name, value]) => ({ name, value }))
   })()
 
-  const planData = (() => {
-    const c: Record<string, number> = {}
-    sales.forEach(s => { const k = s.plan.split(' ')[0]; c[k] = (c[k] || 0) + (s.qty || 1) })
-    return Object.entries(c).map(([name, value]) => ({ name, value }))
-  })()
-
-  const byStateData = (() => {
-    const c: Record<string, number> = {}
-    emergencies.forEach(e => { c[e.estado] = (c[e.estado] || 0) + 1 })
-    return Object.entries(c).sort((a, b) => b[1] - a[1]).map(([name, value]) => ({ name, value }))
-  })()
-
-  const b2bPiplineValue = pipeline
-    .filter(p => !['cerrado_perdido', 'pausado'].includes(p.stage))
-    .reduce((s, p) => s + (p.estimated_value || 0), 0)
-
-  const activeWorkshops = workshops.filter(w => w.status === 'activo').length
-  const wsInventory = workshops.reduce((s, w) => s + (w.chips_consigned - w.chips_sold - w.chips_returned), 0)
-  const wsPendingPayment = workshops.reduce((s, w) => s + (w.pending_payment || 0), 0)
-
-  // ── ACTIONS ───────────────────────────────────────────────
-  async function saveEmergency() {
+  // 🛠 ACTIONS
+  async function saveData(table: string, payload: any) {
     setSaving(true)
-    const payload = {
-      ...accForm,
-      user_age: accForm.user_age ? parseInt(accForm.user_age) : null,
+    if (editItem) await supabase.from(table).update(payload).eq('id', editItem.id)
+    else await supabase.from(table).insert(payload)
+    await loadData(); setModal(null); setEditItem(null); setSaving(false)
+  }
+
+  function handleSaveAcc() {
+    saveData('admin_emergencies', {
+      ...accForm, user_age: accForm.user_age ? parseInt(accForm.user_age) : null,
       survived: accForm.survived === '' ? null : accForm.survived === 'true',
-      user_still_active: accForm.user_still_active === '' ? null : accForm.user_still_active === 'true',
-      mins_to_scan: accForm.mins_to_scan ? parseInt(accForm.mins_to_scan) : null,
-      mins_to_family_contact: accForm.mins_to_family_contact ? parseInt(accForm.mins_to_family_contact) : null,
-      mins_to_medical_attention: accForm.mins_to_medical_attention ? parseInt(accForm.mins_to_medical_attention) : null,
-    }
-    if (editItem) {
-      await supabase.from('admin_emergencies').update(payload).eq('id', editItem.id)
-    } else {
-      await supabase.from('admin_emergencies').insert(payload)
-    }
-    await loadData()
-    setModal(null)
-    setEditItem(null)
-    setSaving(false)
+      mins_to_scan: accForm.mins_to_scan ? parseInt(accForm.mins_to_scan) : null
+    })
   }
 
-  async function saveSale() {
-    setSaving(true)
-    const payload = { ...saleForm, unit_price: planPrice(saleForm.plan), entry_type: 'manual' }
-    if (editItem) {
-      await supabase.from('admin_sales').update(payload).eq('id', editItem.id)
-    } else {
-      await supabase.from('admin_sales').insert(payload)
-    }
-    await loadData()
-    setModal(null)
-    setEditItem(null)
-    setSaving(false)
-  }
-
-  async function saveWorkshop() {
-    setSaving(true)
-    if (editItem) {
-      await supabase.from('admin_workshops').update(wsForm).eq('id', editItem.id)
-    } else {
-      await supabase.from('admin_workshops').insert(wsForm)
-    }
-    await loadData()
-    setModal(null)
-    setEditItem(null)
-    setSaving(false)
-  }
-
-  async function saveB2b() {
-    setSaving(true)
-    const payload = {
-      ...b2bForm,
-      estimated_chips: b2bForm.estimated_chips ? parseInt(b2bForm.estimated_chips as string) : null,
-      estimated_value: b2bForm.estimated_value ? parseInt(b2bForm.estimated_value as string) : null,
-    }
-    if (editItem) {
-      await supabase.from('admin_b2b_pipeline').update(payload).eq('id', editItem.id)
-    } else {
-      await supabase.from('admin_b2b_pipeline').insert(payload)
-    }
-    await loadData()
-    setModal(null)
-    setEditItem(null)
-    setSaving(false)
-  }
+  function handleSaveSale() { saveData('admin_sales', { ...saleForm, unit_price: planPrice(saleForm.plan), entry_type: 'manual' }) }
+  function handleSaveWs() { saveData('admin_workshops', wsForm) }
+  function handleSaveB2b() { saveData('admin_b2b_pipeline', { ...b2bForm, estimated_chips: b2bForm.estimated_chips ? parseInt(b2bForm.estimated_chips as string) : null, estimated_value: b2bForm.estimated_value ? parseInt(b2bForm.estimated_value as string) : null }) }
 
   async function deleteItem(table: string, id: string) {
-    if (!confirm('¿Eliminar este registro?')) return
-    await supabase.from(table).delete().eq('id', id)
-    await loadData()
+    if (!confirm('¿Eliminar registro?')) return
+    await supabase.from(table).delete().eq('id', id); await loadData()
   }
-
-  function openEditAcc(item: any) {
-    setEditItem(item)
-    setAccForm({ ...item, user_age: item.user_age?.toString() || '', survived: item.survived === null ? '' : item.survived?.toString(), user_still_active: item.user_still_active === null ? '' : item.user_still_active?.toString(), mins_to_scan: item.mins_to_scan?.toString() || '', mins_to_family_contact: item.mins_to_family_contact?.toString() || '', mins_to_medical_attention: item.mins_to_medical_attention?.toString() || '' })
-    setModal('accident')
-  }
-
-  function openEditSale(item: any) { setEditItem(item); setSaleForm(item); setModal('sale') }
-  function openEditWs(item: any) { setEditItem(item); setWsForm(item); setModal('workshop') }
-  function openEditB2b(item: any) { setEditItem(item); setB2bForm({ ...item, estimated_chips: item.estimated_chips?.toString() || '', estimated_value: item.estimated_value?.toString() || '' }); setModal('b2b') }
 
   function resetForms() {
     setEditItem(null)
@@ -294,183 +169,136 @@ export default function AdminDashboard() {
   }
 
   const TABS = [
-    { id: 'overview', label: 'Overview' },
-    { id: 'emergencies', label: `Emergencias (${accidents})` },
-    { id: 'sales', label: `Ventas (${totalUnits})` },
-    { id: 'workshops', label: `Talleres (${workshops.length})` },
-    { id: 'b2b', label: `B2B (${pipeline.length})` },
-    { id: 'analytics', label: 'Analytics' },
+    { id: 'overview', label: 'Overview', icon: TrendingUp },
+    { id: 'emergencies', label: 'Emergencias', count: accidents, icon: Siren },
+    { id: 'sales', label: 'Ventas', count: totalUnits, icon: CreditCard },
+    { id: 'workshops', label: 'Talleres', count: workshops.length, icon: Store },
+    { id: 'b2b', label: 'B2B', count: pipeline.length, icon: Building2 },
+    { id: 'analytics', label: 'Analytics', icon: Activity },
   ]
 
   if (loading) return (
-    <div style={{ background: C.bg, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ color: C.muted, fontFamily: 'monospace' }}>Cargando datos...</div>
+    <div className="min-h-screen bg-[#0f1117] flex items-center justify-center">
+      <div className="text-[#8b949e] font-mono animate-pulse flex items-center gap-3">
+        <Zap className="text-red-500 animate-bounce" size={20} /> Loading rescue_admin...
+      </div>
     </div>
   )
 
-  // ── RENDER ────────────────────────────────────────────────
   return (
-    <div style={{ background: C.bg, minHeight: '100vh', fontFamily: 'system-ui, sans-serif', color: C.text }}>
+    <div className="min-h-screen bg-[#0f1117] text-[#f0f6fc] font-sans pb-24 selection:bg-red-500/30">
 
-      {/* HEADER */}
-      <div style={{ borderBottom: `1px solid ${C.border}`, padding: '0 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 52, position: 'sticky', top: 0, background: C.bg, zIndex: 100 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 8, height: 8, borderRadius: '50%', background: C.red, boxShadow: `0 0 8px ${C.red}` }} />
-          <span style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: 13, letterSpacing: '0.06em' }}>RESCUECHIP</span>
-          <span style={{ color: C.faint, fontSize: 11, fontFamily: 'monospace' }}>/admin</span>
+      {/* 🧭 HEADER & MOBILE TABS */}
+      <div className="sticky top-0 bg-[#0f1117]/90 backdrop-blur-md border-b border-[#2d3139] z-40">
+        <div className="px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.5)]" />
+            <h1 className="font-mono font-bold tracking-widest text-sm">RESCUECHIP<span className="text-[#8b949e] ml-1">/admin</span></h1>
+          </div>
         </div>
-        <div style={{ display: 'flex', gap: 7 }}>
-          <Btn onClick={() => { resetForms(); setModal('workshop') }}>🏪 Taller</Btn>
-          <Btn onClick={() => { resetForms(); setModal('b2b') }}>🤝 B2B</Btn>
-          <Btn onClick={() => { resetForms(); setModal('sale') }}>+ Venta</Btn>
-          <Btn onClick={() => { resetForms(); setModal('accident') }} color={C.red} textColor="#fff" border={false}>⚡ Emergencia</Btn>
+
+        {/* Scrollable Tabs */}
+        <div className="flex overflow-x-auto no-scrollbar border-t border-[#2d3139]/50 px-2 lg:px-4">
+          {TABS.map(t => (
+            <button key={t.id} onClick={() => setTab(t.id)} className={`flex items-center gap-2 whitespace-nowrap px-4 py-3 text-sm font-medium transition-colors border-b-2 ${tab === t.id ? 'border-white text-white' : 'border-transparent text-[#8b949e] hover:text-white/80'}`}>
+              <t.icon size={16} />
+              {t.label}
+              {t.count !== undefined && <span className="ml-1.5 bg-[#2d3139] text-white text-[10px] font-mono px-1.5 py-0.5 rounded-full">{t.count}</span>}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* TABS */}
-      <div style={{ borderBottom: `1px solid ${C.border}`, padding: '0 20px', display: 'flex', overflowX: 'auto' }}>
-        {TABS.map(t => (
-          <button key={t.id} onClick={() => setTab(t.id)} style={{ background: 'none', border: 'none', borderBottom: tab === t.id ? `2px solid ${C.red}` : '2px solid transparent', color: tab === t.id ? C.text : C.muted, padding: '12px 14px', fontSize: 12, cursor: 'pointer', fontWeight: tab === t.id ? 600 : 400, whiteSpace: 'nowrap', transition: 'all 0.15s' }}>
-            {t.label}
-          </button>
-        ))}
-      </div>
+      <div className="p-4 lg:p-6 max-w-7xl mx-auto">
 
-      <div style={{ padding: 20 }}>
-
-        {/* ── OVERVIEW ─────────────────────────────── */}
+        {/* 1️⃣ OVERVIEW */}
         {tab === 'overview' && (
-          <div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 10, marginBottom: 20 }}>
-              <Stat label="Ingresos totales" value={fmt(totalRevenue)} color={C.green} sub={`${totalUnits} unidades`} />
-              <Stat label="Usuarios totales" value={profiles.total} sub={`${profiles.withPhone} con celular`} color={C.amber} />
-              <Stat label="Emergencias reales" value={accidents} color={C.red} sub="documentadas" />
-              <Stat label="Tasa de escaneo" value={`${scanRate}%`} color={scanRate > 50 ? C.green : C.amber} />
-              <Stat label="Talleres activos" value={activeWorkshops} sub={`${wsInventory} chips en campo`} color={C.blue} />
-              <Stat label="Pipeline B2B" value={fmt(b2bPiplineValue)} sub={`${pipeline.filter(p => !['cerrado_perdido', 'pausado'].includes(p.stage)).length} oportunidades`} color={C.purple} />
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 mb-6">
+              <StatCard label="Ingresos" value={fmt(totalRevenue)} color="text-emerald-400" icon={CreditCard} sub={`${totalUnits} unids`} />
+              <StatCard label="Usuarios" value={profiles.total} icon={Users} color="text-amber-400" sub={`${profiles.withPhone} actv`} />
+              <StatCard label="Emergencias" value={accidents} icon={Siren} color="text-red-500" sub={scanRate > 0 ? `${scanRate}% escaneo` : 'Sin datos'} />
+              <StatCard label="Pipeline" value={fmt(b2bValue)} icon={Building2} color="text-purple-400" sub={`${pipeline.length} opps`} />
             </div>
 
-            {/* North Star */}
-            {accidents === 0 ? (
-              <div style={{ background: C.surface, border: `2px dashed ${C.border}`, borderRadius: 10, padding: '24px 20px', textAlign: 'center', marginBottom: 20 }}>
-                <div style={{ fontSize: 28, marginBottom: 8 }}>🏍️</div>
-                <div style={{ color: C.muted, fontSize: 13 }}>North Star: primer emergencia real documentada</div>
-                <div style={{ color: C.faint, fontSize: 11, marginTop: 4 }}>Ese momento activa todo lo demás.</div>
-              </div>
-            ) : (
-              <div style={{ background: C.redDim, border: `1px solid ${C.red}44`, borderRadius: 10, padding: '16px 20px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 14 }}>
-                <div style={{ fontSize: 24 }}>🚨</div>
-                <div>
-                  <div style={{ color: C.red, fontWeight: 700, fontSize: 14, marginBottom: 3 }}>North Star alcanzado 🎯</div>
-                  <div style={{ color: C.muted, fontSize: 12 }}>{accidents} emergencia{accidents !== 1 ? 's' : ''} real documentada{accidents !== 1 ? 's' : ''}. Dato oro para pitch B2B.</div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <div className="lg:col-span-2 bg-[#161b22] border border-[#2d3139] rounded-xl p-5">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="text-[#8b949e] text-[11px] font-mono uppercase tracking-wider">Flujo de Ingresos (MXN)</div>
                 </div>
-              </div>
-            )}
-
-            {/* Charts */}
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 14 }}>
-              <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 10, padding: 18 }}>
-                <div style={{ color: C.muted, fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 14, fontFamily: 'monospace' }}>Ingresos por mes (MXN)</div>
-                {monthlySales.length === 0 ? (
-                  <div style={{ color: C.faint, fontSize: 12, textAlign: 'center', padding: '36px 0' }}>Registra tu primera venta</div>
-                ) : (
-                  <ResponsiveContainer width="100%" height={160}>
-                    <AreaChart data={monthlySales}>
-                      <defs>
-                        <linearGradient id="rev" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor={C.red} stopOpacity={0.3} />
-                          <stop offset="95%" stopColor={C.red} stopOpacity={0} />
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke={C.border} />
-                      <XAxis dataKey="mes" stroke={C.faint} tick={{ fill: C.muted, fontSize: 10 }} />
-                      <YAxis stroke={C.faint} tick={{ fill: C.muted, fontSize: 10 }} />
-                      <Tooltip contentStyle={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 6, color: C.text, fontSize: 11 }} formatter={(v: any) => [fmt(v), 'Ingresos']} />
-                      <Area type="monotone" dataKey="revenue" stroke={C.red} fill="url(#rev)" strokeWidth={2} />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                )}
-              </div>
-              <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 10, padding: 18 }}>
-                <div style={{ color: C.muted, fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 14, fontFamily: 'monospace' }}>Por plan</div>
-                {planData.length === 0 ? <div style={{ color: C.faint, fontSize: 12, textAlign: 'center', padding: '36px 0' }}>Sin datos</div> : (
-                  <>
-                    <ResponsiveContainer width="100%" height={120}>
-                      <PieChart>
-                        <Pie data={planData} cx="50%" cy="50%" innerRadius={32} outerRadius={52} dataKey="value" paddingAngle={3}>
-                          {planData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
-                        </Pie>
-                        <Tooltip contentStyle={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 6, color: C.text, fontSize: 11 }} />
-                      </PieChart>
+                {monthlySales.length === 0 ? <div className="text-[#8b949e] text-sm text-center py-10">Sin ventas registradas</div> : (
+                  <div className="h-48">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={monthlySales} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                        <defs>
+                          <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                            <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#2d3139" vertical={false} />
+                        <XAxis dataKey="mes" stroke="#8b949e" fontSize={11} tickLine={false} axisLine={false} />
+                        <YAxis stroke="#8b949e" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => `$${v / 1000}k`} />
+                        <Tooltip contentStyle={{ backgroundColor: '#161b22', borderColor: '#2d3139', color: '#f0f6fc', borderRadius: '8px', fontSize: '12px' }} formatter={(v: any) => fmt(v)} />
+                        <Area type="monotone" dataKey="revenue" stroke="#3b82f6" fillOpacity={1} fill="url(#colorRev)" strokeWidth={2} />
+                      </AreaChart>
                     </ResponsiveContainer>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                      {planData.map((p, i) => (
-                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 11 }}>
-                          <div style={{ width: 7, height: 7, borderRadius: 2, background: PIE_COLORS[i % PIE_COLORS.length], flexShrink: 0 }} />
-                          <span style={{ color: C.muted }}>{p.name}</span>
-                          <span style={{ color: C.text, marginLeft: 'auto', fontFamily: 'monospace' }}>{p.value}</span>
-                        </div>
-                      ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="bg-[#161b22] border border-[#2d3139] rounded-xl p-5">
+                {accidents === 0 ? (
+                  <div className="h-full flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-[#2d3139] rounded-xl">
+                    <Target size={32} className="text-[#8b949e] mb-3" />
+                    <h4 className="text-[#f0f6fc] font-medium text-sm mb-1">North Star Pendiente</h4>
+                    <p className="text-[#8b949e] text-xs">Acelera distribución hasta la primera emergencia documentada.</p>
+                  </div>
+                ) : (
+                  <div className="h-full flex flex-col justify-center p-6 bg-red-500/5 border border-red-500/20 rounded-xl relative overflow-hidden">
+                    <div className="absolute -right-4 -top-4 text-red-500/10"><Siren size={100} /></div>
+                    <div className="relative z-10">
+                      <div className="text-red-400 font-mono text-xs uppercase tracking-widest mb-2 flex items-center gap-2"><CheckCircle2 size={12} /> North Star Hit</div>
+                      <div className="text-3xl font-mono font-bold text-white mb-2">{accidents} casos</div>
+                      <p className="text-[#8b949e] text-xs leading-relaxed">Vidas tocadas en el campo. Oro puro para B2B.</p>
                     </div>
-                  </>
+                  </div>
                 )}
               </div>
             </div>
           </div>
         )}
 
-        {/* ── EMERGENCIAS ──────────────────────────── */}
+        {/* 2️⃣ EMERGENCIAS */}
         {tab === 'emergencies' && (
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
-              <div>
-                <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 3 }}>Registro de Emergencias Reales</div>
-                <div style={{ color: C.muted, fontSize: 12 }}>Cada caso es prueba de impacto real y activo B2B.</div>
-              </div>
-              <Btn onClick={() => { resetForms(); setModal('accident') }} color={C.red} textColor="#fff" border={false}>⚡ Registrar</Btn>
-            </div>
-            {accidents > 0 && (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 9, marginBottom: 18 }}>
-                <Stat label="Total" value={accidents} color={C.red} />
-                <Stat label="Chip escaneado" value={emergencies.filter(e => e.chip_scanned).length} color={C.green} />
-                <Stat label="Familia notificada" value={emergencies.filter(e => e.family_notified).length} color={C.amber} />
-                <Stat label="Casos B2B" value={emergencies.filter(e => e.b2b_case_study).length} color={C.blue} />
-                <Stat label="Graves/críticos" value={emergencies.filter(e => ['grave', 'critico'].includes(e.severidad)).length} color={C.red} />
-              </div>
-            )}
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
             {accidents === 0 ? (
-              <div style={{ background: C.surface, border: `2px dashed ${C.border}`, borderRadius: 12, padding: '50px 20px', textAlign: 'center' }}>
-                <div style={{ fontSize: 40, marginBottom: 12 }}>🏍️</div>
-                <div style={{ color: C.text, fontWeight: 600, fontSize: 14, marginBottom: 6 }}>Sin emergencias registradas</div>
-                <div style={{ color: C.muted, fontSize: 12, maxWidth: 320, margin: '0 auto', lineHeight: 1.6 }}>Cuando un usuario tenga un accidente y el chip sea usado, regístralo aquí con todos los detalles.</div>
-              </div>
+              <div className="bg-[#161b22] border border-[#2d3139] rounded-xl p-12 text-center text-[#8b949e]">No hay incidencias registradas.</div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+              <div className="grid gap-3">
                 {emergencies.map(e => (
-                  <div key={e.id} style={{ background: C.card, border: `1px solid ${e.media_worthy ? C.red + '66' : C.border}`, borderRadius: 9, padding: '14px 18px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-                      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
-                        {e.media_worthy && <Tag color={C.red}>⚡ MEDIÁTICO</Tag>}
-                        {e.b2b_case_study && <Tag color={C.purple}>📊 CASO B2B</Tag>}
-                        <Tag color={SEVERIDADES.indexOf(e.severidad) > 1 ? C.red : C.amber}>{e.severidad}</Tag>
-                        <Tag color={C.blue}>{e.tipo}</Tag>
-                        <Tag color={C.muted}>{e.estado}</Tag>
-                        {e.chip_scanned && <Tag color={C.green}>Chip escaneado ✓</Tag>}
-                        {e.family_notified && <Tag color={C.green}>Familia ✓</Tag>}
+                  <div key={e.id} className={`bg-[#161b22] border rounded-xl p-4 ${e.b2b_case_study ? 'border-purple-500/30' : e.media_worthy ? 'border-red-500/30' : 'border-[#2d3139]'}`}>
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="flex flex-wrap gap-2">
+                        {e.media_worthy && <Tag colorClass="bg-red-500/10 text-red-400 border-red-500/20">MEDIÁTICO</Tag>}
+                        {e.b2b_case_study && <Tag colorClass="bg-purple-500/10 text-purple-400 border-purple-500/20">CASO B2B</Tag>}
+                        <Tag colorClass={['grave', 'critico'].includes(e.severidad) ? 'bg-orange-500/10 text-orange-400 border-orange-500/20' : 'bg-blue-500/10 text-blue-400 border-blue-500/20'}>{e.severidad.toUpperCase()}</Tag>
                       </div>
-                      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                        <span style={{ color: C.muted, fontSize: 11, fontFamily: 'monospace' }}>{fmtDate(e.incident_date)}</span>
-                        <button onClick={() => openEditAcc(e)} style={{ background: 'none', border: 'none', color: C.muted, cursor: 'pointer', fontSize: 12 }}>✎</button>
-                        <button onClick={() => deleteItem('admin_emergencies', e.id)} style={{ background: 'none', border: 'none', color: C.faint, cursor: 'pointer', fontSize: 15 }}>×</button>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[#8b949e] font-mono text-xs">{fmtDate(e.incident_date)}</span>
+                        <button onClick={() => { setEditItem(e); setAccForm(e); setModal('accident') }} className="text-[#8b949e] hover:text-white">Editar</button>
                       </div>
                     </div>
-                    <div style={{ color: C.muted, fontSize: 11 }}>
-                      {e.outcome}
-                      {e.chip_folio && <> · <span style={{ color: C.amber, fontFamily: 'monospace' }}>{e.chip_folio}</span></>}
-                      {e.user_age && <> · {e.user_age} años</>}
-                      {e.mins_to_scan && <> · ⏱ {e.mins_to_scan} min al escaneo</>}
+                    <div className="text-sm font-medium mb-1 flex items-center gap-2">
+                      <Siren size={14} className="text-red-500" />
+                      {e.tipo} en {e.estado}
+                      {e.chip_folio && <span className="font-mono text-amber-400 ml-1">[{e.chip_folio}]</span>}
                     </div>
-                    {e.notes && <div style={{ color: C.faint, fontSize: 11, fontStyle: 'italic', borderTop: `1px solid ${C.border}`, paddingTop: 7, marginTop: 6 }}>{e.notes}</div>}
+                    <div className="text-xs text-[#8b949e] flex gap-3 mt-3 pt-3 border-t border-[#2d3139]/50">
+                      {e.chip_scanned && <span className="flex items-center gap-1 text-emerald-400"><CheckCircle2 size={12} /> Escaneado</span>}
+                      {e.family_notified && <span className="flex items-center gap-1 text-emerald-400"><CheckCircle2 size={12} /> Familia</span>}
+                      {e.mins_to_scan && <span className="flex items-center gap-1"><Clock size={12} /> {e.mins_to_scan} min</span>}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -478,421 +306,212 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* ── VENTAS ───────────────────────────────── */}
+        {/* 3️⃣ VENTAS */}
         {tab === 'sales' && (
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
-              <div>
-                <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 3 }}>Registro de Ventas</div>
-                <div style={{ color: C.muted, fontSize: 12 }}>Historial completo. Las ventas de Stripe se registran automáticamente.</div>
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="grid gap-2">
+              <div className="grid grid-cols-4 lg:grid-cols-6 gap-2 px-4 py-2 text-[10px] font-mono uppercase text-[#8b949e]">
+                <div className="col-span-1">Fecha</div>
+                <div className="col-span-2 lg:col-span-3">Detalle</div>
+                <div className="col-span-1 text-right">Monto</div>
               </div>
-              <Btn onClick={() => { resetForms(); setModal('sale') }}>+ Nueva venta</Btn>
-            </div>
-            {sales.length > 0 && (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 9, marginBottom: 18 }}>
-                <Stat label="Ingresos" value={fmt(totalRevenue)} color={C.green} />
-                <Stat label="Unidades" value={totalUnits} />
-                <Stat label="Ticket prom." value={totalUnits ? fmt(Math.round(totalRevenue / totalUnits)) : '$0'} color={C.amber} />
-                <Stat label="Órdenes" value={sales.length} />
-              </div>
-            )}
-            {sales.length === 0 ? (
-              <div style={{ background: C.surface, border: `2px dashed ${C.border}`, borderRadius: 12, padding: '50px 20px', textAlign: 'center' }}>
-                <div style={{ fontSize: 40, marginBottom: 12 }}>💳</div>
-                <div style={{ color: C.text, fontWeight: 600, fontSize: 14 }}>Sin ventas registradas</div>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-                {sales.map(s => (
-                  <div key={s.id} style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 8, padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', gap: 9, alignItems: 'center', flexWrap: 'wrap' }}>
-                      <span style={{ color: C.muted, fontSize: 11, fontFamily: 'monospace', width: 78 }}>{fmtDate(s.sale_date)}</span>
-                      <Tag color={s.entry_type === 'stripe' ? C.green : C.blue}>{s.channel}</Tag>
-                      <span style={{ color: C.text, fontSize: 12 }}>{s.plan}</span>
-                      {s.qty > 1 && <span style={{ color: C.muted, fontSize: 11 }}>×{s.qty}</span>}
-                      {s.customer_name && <span style={{ color: C.muted, fontSize: 11 }}>{s.customer_name}</span>}
-                      {s.entry_type === 'stripe' && <Tag color={C.green}>Stripe ✓</Tag>}
-                    </div>
-                    <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                      <span style={{ color: C.green, fontFamily: 'monospace', fontWeight: 700, fontSize: 14 }}>{fmt(planPrice(s.plan) * (s.qty || 1))}</span>
-                      <button onClick={() => openEditSale(s)} style={{ background: 'none', border: 'none', color: C.muted, cursor: 'pointer', fontSize: 12 }}>✎</button>
-                      <button onClick={() => deleteItem('admin_sales', s.id)} style={{ background: 'none', border: 'none', color: C.faint, cursor: 'pointer', fontSize: 15 }}>×</button>
+              {sales.map(s => (
+                <div key={s.id} onClick={() => { setEditItem(s); setSaleForm(s); setModal('sale') }} className="bg-[#161b22] hover:bg-[#1c2128] border border-[#2d3139] rounded-lg p-3 lg:p-4 flex cursor-pointer transition-colors text-sm">
+                  <div className="w-1/4 font-mono text-[#8b949e] flex items-center">{fmtDate(s.sale_date)}</div>
+                  <div className="w-2/4 lg:w-3/4 flex flex-col lg:flex-row lg:items-center gap-1 lg:gap-3">
+                    <span className="font-medium truncate">{s.plan} {s.qty > 1 && <span className="font-mono text-emerald-400">x{s.qty}</span>}</span>
+                    <div className="flex gap-2 items-center">
+                      <Tag colorClass={s.entry_type === 'stripe' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-gray-800 text-gray-300 border-gray-700'}>{s.channel}</Tag>
+                      {s.customer_name && <span className="text-xs text-[#8b949e] hidden lg:inline">{s.customer_name}</span>}
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
+                  <div className="w-1/4 flex justify-end items-center font-mono font-bold text-emerald-400">
+                    {fmt(planPrice(s.plan) * (s.qty || 1))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
-        {/* ── TALLERES ─────────────────────────────── */}
-        {tab === 'workshops' && (
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
-              <div>
-                <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 3 }}>Talleres en Consignación</div>
-                <div style={{ color: C.muted, fontSize: 12 }}>Inventario, liquidaciones y estado de cada punto de venta.</div>
-              </div>
-              <Btn onClick={() => { resetForms(); setModal('workshop') }}>🏪 Agregar taller</Btn>
-            </div>
-            {workshops.length > 0 && (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 9, marginBottom: 18 }}>
-                <Stat label="Total talleres" value={workshops.length} />
-                <Stat label="Talleres activos" value={activeWorkshops} color={C.green} />
-                <Stat label="Chips en campo" value={wsInventory} color={C.amber} />
-                <Stat label="Por cobrar" value={fmt(wsPendingPayment)} color={wsPendingPayment > 0 ? C.red : C.green} />
-              </div>
-            )}
-            {workshops.length === 0 ? (
-              <div style={{ background: C.surface, border: `2px dashed ${C.border}`, borderRadius: 12, padding: '50px 20px', textAlign: 'center' }}>
-                <div style={{ fontSize: 40, marginBottom: 12 }}>🏪</div>
-                <div style={{ color: C.text, fontWeight: 600, fontSize: 14 }}>Sin talleres registrados</div>
-                <div style={{ color: C.muted, fontSize: 12, marginTop: 6 }}>Agrega talleres donde dejaste chips en consignación.</div>
-              </div>
+        {/* 4️⃣ TALLERES & B2B (Simplified standard table layout for mobile & desktop) */}
+        {(tab === 'workshops' || tab === 'b2b') && (
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 grid gap-3">
+            {(tab === 'workshops' ? workshops : pipeline).length === 0 ? (
+              <div className="bg-[#161b22] border border-[#2d3139] rounded-xl p-12 text-center text-[#8b949e]">Lista vacía.</div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
-                {workshops.map(w => {
-                  const available = w.chips_consigned - w.chips_sold - w.chips_returned
-                  return (
-                    <div key={w.id} style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 9, padding: '14px 18px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-                        <div>
-                          <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 4 }}>{w.name}</div>
-                          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                            <Tag color={w.status === 'activo' ? C.green : w.status === 'prospecto' ? C.blue : C.muted}>{WS_STATUS_LABELS[w.status]}</Tag>
-                            {w.municipio && <Tag color={C.muted}>{w.municipio}</Tag>}
-                          </div>
-                        </div>
-                        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                          <button onClick={() => openEditWs(w)} style={{ background: 'none', border: 'none', color: C.muted, cursor: 'pointer', fontSize: 12 }}>✎</button>
-                          <button onClick={() => deleteItem('admin_workshops', w.id)} style={{ background: 'none', border: 'none', color: C.faint, cursor: 'pointer', fontSize: 15 }}>×</button>
-                        </div>
-                      </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginTop: 10 }}>
-                        {[['Consignados', w.chips_consigned, C.text], ['Vendidos', w.chips_sold, C.green], ['Disponibles', available, available > 0 ? C.amber : C.faint], ['Por cobrar', fmt(w.pending_payment || 0), w.pending_payment > 0 ? C.red : C.green]].map(([label, val, color]: any) => (
-                          <div key={label as string} style={{ background: C.surface, borderRadius: 6, padding: '8px 10px', textAlign: 'center' }}>
-                            <div style={{ color: color, fontWeight: 700, fontSize: 16, fontFamily: 'monospace' }}>{val}</div>
-                            <div style={{ color: C.muted, fontSize: 10, marginTop: 2 }}>{label}</div>
-                          </div>
-                        ))}
-                      </div>
-                      {w.owner_name && <div style={{ color: C.muted, fontSize: 11, marginTop: 8 }}>Contacto: {w.owner_name}{w.phone && ` · ${w.phone}`}</div>}
-                      {w.next_review_date && <div style={{ color: C.amber, fontSize: 11 }}>Próxima revisión: {fmtDate(w.next_review_date)}</div>}
-                    </div>
-                  )
-                })}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ── B2B PIPELINE ─────────────────────────── */}
-        {tab === 'b2b' && (
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
-              <div>
-                <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 3 }}>Pipeline B2B</div>
-                <div style={{ color: C.muted, fontSize: 12 }}>Aseguradoras, ambulancias privadas y distribuidores.</div>
-              </div>
-              <Btn onClick={() => { resetForms(); setModal('b2b') }}>🤝 Agregar</Btn>
-            </div>
-            {pipeline.length > 0 && (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 9, marginBottom: 18 }}>
-                <Stat label="Oportunidades" value={pipeline.filter(p => !['cerrado_perdido', 'pausado'].includes(p.stage)).length} color={C.blue} />
-                <Stat label="Valor pipeline" value={fmt(b2bPiplineValue)} color={C.purple} />
-                <Stat label="Cerrados ganados" value={pipeline.filter(p => p.stage === 'cerrado_ganado').length} color={C.green} />
-                <Stat label="Chips estimados" value={pipeline.filter(p => !['cerrado_perdido', 'pausado'].includes(p.stage)).reduce((s, p) => s + (p.estimated_chips || 0), 0)} color={C.amber} />
-              </div>
-            )}
-            {pipeline.length === 0 ? (
-              <div style={{ background: C.surface, border: `2px dashed ${C.border}`, borderRadius: 12, padding: '50px 20px', textAlign: 'center' }}>
-                <div style={{ fontSize: 40, marginBottom: 12 }}>🏢</div>
-                <div style={{ color: C.text, fontWeight: 600, fontSize: 14 }}>Sin empresas en el pipeline</div>
-                <div style={{ color: C.muted, fontSize: 12, marginTop: 6 }}>Agrega aseguradoras, ambulancias o empresas con las que estés hablando.</div>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
-                {pipeline.map(p => (
-                  <div key={p.id} style={{ background: C.card, border: `1px solid ${p.stage === 'cerrado_ganado' ? C.green + '66' : p.stage === 'cerrado_perdido' ? C.faint : C.border}`, borderRadius: 9, padding: '14px 18px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-                      <div>
-                        <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 4 }}>{p.company_name}</div>
-                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                          <Tag color={p.stage === 'cerrado_ganado' ? C.green : p.stage === 'cerrado_perdido' ? C.faint : C.blue}>{STAGE_LABELS[p.stage]}</Tag>
-                          {p.company_type && <Tag color={C.muted}>{p.company_type}</Tag>}
-                          {p.probability > 0 && <Tag color={C.amber}>{p.probability}% prob.</Tag>}
-                        </div>
-                      </div>
-                      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                        <button onClick={() => openEditB2b(p)} style={{ background: 'none', border: 'none', color: C.muted, cursor: 'pointer', fontSize: 12 }}>✎</button>
-                        <button onClick={() => deleteItem('admin_b2b_pipeline', p.id)} style={{ background: 'none', border: 'none', color: C.faint, cursor: 'pointer', fontSize: 15 }}>×</button>
-                      </div>
-                    </div>
-                    <div style={{ display: 'flex', gap: 16, color: C.muted, fontSize: 11 }}>
-                      {p.contact_name && <span>👤 {p.contact_name}{p.contact_role && ` (${p.contact_role})`}</span>}
-                      {p.estimated_chips && <span>📦 ~{p.estimated_chips} chips</span>}
-                      {p.estimated_value && <span style={{ color: C.green }}>{fmt(p.estimated_value)}</span>}
-                    </div>
-                    {p.next_action && (
-                      <div style={{ marginTop: 8, padding: '6px 10px', background: C.surface, borderRadius: 5, fontSize: 11 }}>
-                        <span style={{ color: C.amber }}>→ {p.next_action}</span>
-                        {p.next_action_date && <span style={{ color: C.muted }}> · {fmtDate(p.next_action_date)}</span>}
-                      </div>
+              (tab === 'workshops' ? workshops : pipeline).map(item => (
+                <div key={item.id} onClick={() => { setEditItem(item); tab === 'workshops' ? setWsForm(item) : setB2bForm(item); setModal(tab) }} className="bg-[#161b22] border border-[#2d3139] hover:bg-[#1c2128] cursor-pointer rounded-xl p-4 transition-colors">
+                  <div className="flex justify-between mb-3">
+                    <h4 className="font-semibold text-[15px]">{tab === 'workshops' ? item.name : item.company_name}</h4>
+                    <Tag colorClass="bg-white/10 text-[#f0f6fc] border-white/10">{tab === 'workshops' ? WS_STATUS_LABELS[item.status] : STAGE_LABELS[item.stage]}</Tag>
+                  </div>
+                  <div className="flex items-center gap-4 text-xs font-mono text-[#8b949e]">
+                    {tab === 'workshops' ? (
+                      <>
+                        <span>Stock: <strong className="text-white">{item.chips_consigned - item.chips_sold - item.chips_returned}</strong></span>
+                        <span className={item.pending_payment > 0 ? 'text-red-400' : ''}>Deuda: {fmt(item.pending_payment || 0)}</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Valor: <strong className="text-emerald-400">{fmt(item.estimated_value)}</strong></span>
+                        <span className="text-amber-400">{item.probability}% Win</span>
+                      </>
                     )}
-                    {p.notes && <div style={{ color: C.faint, fontSize: 11, fontStyle: 'italic', marginTop: 6 }}>{p.notes}</div>}
                   </div>
-                ))}
-              </div>
+                </div>
+              ))
             )}
           </div>
         )}
 
-        {/* ── ANALYTICS ────────────────────────────── */}
+        {/* 5️⃣ ANALYTICS */}
         {tab === 'analytics' && (
-          <div>
-            <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 3 }}>Analytics & Insights</div>
-            <div style={{ color: C.muted, fontSize: 12, marginBottom: 20 }}>Cuanto más registres, más precisos los datos.</div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
-              <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 10, padding: 18 }}>
-                <div style={{ color: C.muted, fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 14, fontFamily: 'monospace' }}>Unidades por canal</div>
-                {channelData.length === 0 ? <div style={{ color: C.faint, fontSize: 12, textAlign: 'center', padding: '36px 0' }}>Sin datos</div> : (
-                  <ResponsiveContainer width="100%" height={180}>
-                    <BarChart data={channelData} layout="vertical">
-                      <CartesianGrid strokeDasharray="3 3" stroke={C.border} horizontal={false} />
-                      <XAxis type="number" stroke={C.faint} tick={{ fill: C.muted, fontSize: 10 }} />
-                      <YAxis type="category" dataKey="name" stroke={C.faint} tick={{ fill: C.muted, fontSize: 10 }} width={90} />
-                      <Tooltip contentStyle={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 6, color: C.text, fontSize: 11 }} />
-                      <Bar dataKey="value" fill={C.red} radius={[0, 4, 4, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                )}
-              </div>
-              <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 10, padding: 18 }}>
-                <div style={{ color: C.muted, fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 14, fontFamily: 'monospace' }}>Emergencias por estado</div>
-                {byStateData.length === 0 ? <div style={{ color: C.faint, fontSize: 12, textAlign: 'center', padding: '36px 0' }}>Sin emergencias</div> : (
-                  <ResponsiveContainer width="100%" height={180}>
-                    <BarChart data={byStateData} layout="vertical">
-                      <CartesianGrid strokeDasharray="3 3" stroke={C.border} horizontal={false} />
-                      <XAxis type="number" stroke={C.faint} tick={{ fill: C.muted, fontSize: 10 }} />
-                      <YAxis type="category" dataKey="name" stroke={C.faint} tick={{ fill: C.muted, fontSize: 10 }} width={90} />
-                      <Tooltip contentStyle={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 6, color: C.text, fontSize: 11 }} />
-                      <Bar dataKey="value" fill={C.amber} radius={[0, 4, 4, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                )}
-              </div>
-            </div>
-
-            {/* Embudo usuarios */}
-            <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 10, padding: 18, marginBottom: 14 }}>
-              <div style={{ color: C.muted, fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 16, fontFamily: 'monospace' }}>Embudo de usuarios</div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 grid gap-4">
+            <div className="bg-[#161b22] border border-[#2d3139] rounded-xl p-5">
+              <h3 className="text-[#8b949e] text-[11px] font-mono uppercase tracking-wider mb-4">Usuarios Funnel</h3>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
                 {[
-                  { label: 'Registrados', value: profiles.total, color: C.text },
-                  { label: 'Con celular', value: profiles.withPhone, color: C.blue },
-                  { label: 'Ventas (chips)', value: totalUnits, color: C.amber },
-                  { label: 'Emergencias', value: accidents, color: C.red },
-                ].map((s, i) => (
-                  <div key={i} style={{ background: s.color + '22', border: `1px solid ${s.color}44`, borderRadius: 8, padding: '16px 12px', textAlign: 'center' }}>
-                    <div style={{ color: s.color, fontSize: 24, fontWeight: 800, fontFamily: 'monospace' }}>{s.value}</div>
-                    <div style={{ color: C.muted, fontSize: 10, marginTop: 4 }}>{s.label}</div>
+                  { l: 'Adquiridos', v: totalUnits, c: 'text-white' },
+                  { l: 'Registrados', v: profiles.total, c: 'text-blue-400' },
+                  { l: 'Con Teléfono', v: profiles.withPhone, c: 'text-amber-400' },
+                  { l: 'Emergencias', v: accidents, c: 'text-red-400' }
+                ].map(x => (
+                  <div key={x.l} className="bg-[#0f1117] border border-[#2d3139] rounded-lg p-3 text-center">
+                    <div className={`text-xl font-mono font-bold mb-1 ${x.c}`}>{x.v}</div>
+                    <div className="text-[10px] text-[#8b949e] uppercase font-mono">{x.l}</div>
                   </div>
                 ))}
               </div>
             </div>
-
-            {/* Insights */}
-            <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 10, padding: 18 }}>
-              <div style={{ color: C.muted, fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 14, fontFamily: 'monospace' }}>Insights clave</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
-                {[
-                  totalUnits < 50 && { icon: '📍', text: 'Fase seed. Enfócate en los primeros 50 usuarios antes de optimizar canales.', color: C.amber },
-                  profiles.withPhone / profiles.total < 0.5 && profiles.total > 5 && { icon: '📱', text: `Solo ${Math.round(profiles.withPhone / profiles.total * 100)}% de usuarios tienen celular registrado. Más campo para el chatbot de N8N.`, color: C.blue },
-                  accidents > 0 && { icon: '🚨', text: `${accidents} emergencia${accidents !== 1 ? 's' : ''} real documentada${accidents !== 1 ? 's' : ''}. Dato oro para pitch B2B con aseguradoras.`, color: C.red },
-                  wsPendingPayment > 0 && { icon: '💸', text: `${fmt(wsPendingPayment)} pendientes de cobro en talleres. Revisa liquidaciones.`, color: C.amber },
-                  pipeline.filter(p => p.stage === 'propuesta_enviada').length > 0 && { icon: '⏳', text: `${pipeline.filter(p => p.stage === 'propuesta_enviada').length} propuesta${pipeline.filter(p => p.stage === 'propuesta_enviada').length > 1 ? 's' : ''} B2B enviada${pipeline.filter(p => p.stage === 'propuesta_enviada').length > 1 ? 's' : ''} sin respuesta. Haz follow up.`, color: C.purple },
-                  accidents === 0 && totalUnits > 0 && { icon: '🎯', text: 'North Star pendiente. Sigue distribuyendo, el primer caso llegará.', color: C.blue },
-                  totalUnits === 0 && { icon: '💡', text: 'Los insights aparecerán conforme registres ventas y emergencias.', color: C.faint },
-                ].filter(Boolean).map((ins: any, i) => (
-                  <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '10px 14px', background: ins.color + '11', border: `1px solid ${ins.color}33`, borderRadius: 7 }}>
-                    <span style={{ fontSize: 14, flexShrink: 0 }}>{ins.icon}</span>
-                    <span style={{ color: C.text, fontSize: 12, lineHeight: 1.5 }}>{ins.text}</span>
-                  </div>
-                ))}
-              </div>
+            {/* Insights Banner */}
+            <div className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-500/20 rounded-xl p-5">
+              <h3 className="text-blue-400 text-sm font-semibold mb-2 flex items-center gap-2"><Zap size={16} /> Insights Generados</h3>
+              <ul className="text-sm text-[#8b949e] space-y-2 list-disc list-inside">
+                {totalUnits < 50 && <li>Fase Seed: Enfócate en los 100 usuarios (hacer de mano en mano)</li>}
+                {profiles.total > 0 && <li>Tasa Veracidad Celular: {Math.round((profiles.withPhone / (profiles.total || 1)) * 100)}% (Potencial N8N)</li>}
+              </ul>
             </div>
           </div>
         )}
+
       </div>
 
-      {/* ══════════════════════════════════════════════
-          MODALES
-      ══════════════════════════════════════════════ */}
+      {/* 🔴 MOBILE FAB (Floating Action Button) */}
+      <div className="fixed bottom-6 right-6 lg:hidden z-30">
+        <button onClick={() => {
+          resetForms()
+          if (tab === 'overview' || tab === 'sales') setModal('sale')
+          else if (tab === 'emergencies') setModal('accident')
+          else if (tab === 'workshops') setModal('workshop')
+          else if (tab === 'b2b') setModal('b2b')
+          else setModal('sale')
+        }} className="bg-red-600 text-white w-14 h-14 rounded-full shadow-lg shadow-red-900/50 flex items-center justify-center border border-red-500 active:scale-95 transition-transform">
+          <Plus size={24} />
+        </button>
+      </div>
 
-      {/* MODAL EMERGENCIA */}
-      {modal === 'accident' && (
-        <Modal title={`${editItem ? '✎ Editar' : '⚡ Registrar'} Emergencia Real`} onClose={() => { setModal(null); setEditItem(null) }} wide>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
-            <Field label="Fecha del incidente" half><input type="date" value={accForm.incident_date} onChange={e => setAccForm({ ...accForm, incident_date: e.target.value })} style={inp} /></Field>
-            <Field label="Hora aprox." half><input type="time" value={accForm.incident_time} onChange={e => setAccForm({ ...accForm, incident_time: e.target.value })} style={inp} /></Field>
-            <Field label="Estado" half>
-              <select value={accForm.estado} onChange={e => setAccForm({ ...accForm, estado: e.target.value })} style={inp}>
-                {ESTADOS.map(s => <option key={s}>{s}</option>)}
+      {/* 🖥 DESKTOP QUICK ACTIONS */}
+      {tab === 'overview' && <div className="hidden lg:flex fixed bottom-6 right-6 z-30 gap-3">
+        <button onClick={() => { resetForms(); setModal('sale') }} className="bg-[#161b22] border border-[#2d3139] text-[#f0f6fc] px-4 py-2 rounded-full shadow-lg text-sm font-medium hover:bg-[#21262d]">Registrar Venta</button>
+        <button onClick={() => { resetForms(); setModal('accident') }} className="bg-red-600 text-white px-4 py-2 rounded-full shadow-lg shadow-red-900/50 border border-red-500 text-sm font-medium hover:bg-red-500">Registrar Emergencia</button>
+      </div>}
+
+      {/* 🔮 MODALS */}
+      {modal === 'sale' && (
+        <Modal title={`${editItem ? 'Editar' : 'Nueva'} Venta`} onClose={() => setModal(null)}>
+          <div className="flex flex-wrap gap-x-3">
+            <Field label="Fecha" half><input type="date" value={saleForm.sale_date} onChange={e => setSaleForm({ ...saleForm, sale_date: e.target.value })} className={inputClass} /></Field>
+            <Field label="Cant." half><input type="number" min={1} value={saleForm.qty} onChange={e => setSaleForm({ ...saleForm, qty: Number(e.target.value) })} className={inputClass} /></Field>
+            <Field label="Plan">
+              <select value={saleForm.plan} onChange={e => setSaleForm({ ...saleForm, plan: e.target.value })} className={inputClass}>
+                {PLANES.map(p => <option key={p}>{p}</option>)}
               </select>
             </Field>
-            <Field label="Municipio/Colonia" half><input placeholder="Iztapalapa, Narvarte..." value={accForm.municipio} onChange={e => setAccForm({ ...accForm, municipio: e.target.value })} style={inp} /></Field>
-            <Field label="Tipo de accidente" half>
-              <select value={accForm.tipo} onChange={e => setAccForm({ ...accForm, tipo: e.target.value })} style={inp}>
-                {TIPOS_ACC.map(t => <option key={t}>{t}</option>)}
+            <Field label="Canal">
+              <select value={saleForm.channel} onChange={e => setSaleForm({ ...saleForm, channel: e.target.value })} className={inputClass}>
+                {CANALES.map(c => <option key={c}>{c}</option>)}
               </select>
+            </Field>
+            <button onClick={handleSaveSale} disabled={saving} className="w-full bg-white text-black font-semibold rounded-lg py-3 mt-4 hover:bg-gray-200">{saving ? 'Guardando...' : 'Guardar Venta'}</button>
+          </div>
+        </Modal>
+      )}
+
+      {modal === 'accident' && (
+        <Modal title={`${editItem ? 'Editar' : 'Registrar'} Emergencia`} onClose={() => setModal(null)} wide>
+          <div className="flex flex-wrap gap-x-3">
+            <Field label="Fecha" half><input type="date" value={accForm.incident_date} onChange={e => setAccForm({ ...accForm, incident_date: e.target.value })} className={inputClass} /></Field>
+            <Field label="Hora aprox." half><input type="time" value={accForm.incident_time} onChange={e => setAccForm({ ...accForm, incident_time: e.target.value })} className={inputClass} /></Field>
+            <Field label="Estado" half>
+              <select value={accForm.estado} onChange={e => setAccForm({ ...accForm, estado: e.target.value })} className={inputClass}>{ESTADOS.map(s => <option key={s}>{s}</option>)}</select>
+            </Field>
+            <Field label="Tipo" half>
+              <select value={accForm.tipo} onChange={e => setAccForm({ ...accForm, tipo: e.target.value })} className={inputClass}>{TIPOS_ACC.map(t => <option key={t}>{t}</option>)}</select>
             </Field>
             <Field label="Severidad" half>
-              <select value={accForm.severidad} onChange={e => setAccForm({ ...accForm, severidad: e.target.value })} style={inp}>
-                {SEVERIDADES.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
-              </select>
+              <select value={accForm.severidad} onChange={e => setAccForm({ ...accForm, severidad: e.target.value })} className={inputClass}>{SEVERIDADES.map(s => <option key={s} value={s}>{s.toUpperCase()}</option>)}</select>
             </Field>
-            <Field label="Folio RSC del chip" half><input placeholder="RSC-XXXXX" value={accForm.chip_folio} onChange={e => setAccForm({ ...accForm, chip_folio: e.target.value })} style={inp} /></Field>
-            <Field label="Edad aprox. del usuario" half><input type="number" placeholder="28" value={accForm.user_age} onChange={e => setAccForm({ ...accForm, user_age: e.target.value })} style={inp} /></Field>
+            <Field label="Folio RSC" half><input placeholder="RSC-XXXXX" value={accForm.chip_folio} onChange={e => setAccForm({ ...accForm, chip_folio: e.target.value })} className={inputClass} /></Field>
           </div>
           <Field label="Outcome del chip">
-            <select value={accForm.outcome} onChange={e => setAccForm({ ...accForm, outcome: e.target.value })} style={inp}>
-              {OUTCOMES.map(o => <option key={o}>{o}</option>)}
-            </select>
+            <select value={accForm.outcome} onChange={e => setAccForm({ ...accForm, outcome: e.target.value })} className={inputClass}>{OUTCOMES.map(o => <option key={o}>{o}</option>)}</select>
           </Field>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
-            <Field label="Tiempo al escaneo (min)" half><input type="number" placeholder="5" value={accForm.mins_to_scan} onChange={e => setAccForm({ ...accForm, mins_to_scan: e.target.value })} style={inp} /></Field>
-            <Field label="Tiempo a contacto familia (min)" half><input type="number" placeholder="15" value={accForm.mins_to_family_contact} onChange={e => setAccForm({ ...accForm, mins_to_family_contact: e.target.value })} style={inp} /></Field>
-            <Field label="Hospital" half><input placeholder="Hospital General, Cruz Roja..." value={accForm.hospital_name} onChange={e => setAccForm({ ...accForm, hospital_name: e.target.value })} style={inp} /></Field>
-            <Field label="Nombre del paramédico" half><input placeholder="Opcional" value={accForm.paramedic_name} onChange={e => setAccForm({ ...accForm, paramedic_name: e.target.value })} style={inp} /></Field>
-            <Field label="¿Sobrevivió?" half>
-              <select value={accForm.survived} onChange={e => setAccForm({ ...accForm, survived: e.target.value })} style={inp}>
-                <option value="">— No confirmado —</option>
-                <option value="true">Sí</option>
-                <option value="false">No</option>
-              </select>
-            </Field>
-            <Field label="¿Sigue activo en RescueChip?" half>
-              <select value={accForm.user_still_active} onChange={e => setAccForm({ ...accForm, user_still_active: e.target.value })} style={inp}>
-                <option value="">— No verificado —</option>
-                <option value="true">Sí</option>
-                <option value="false">No</option>
-              </select>
-            </Field>
-          </div>
-          <div style={{ display: 'flex', gap: 20, marginBottom: 14, flexWrap: 'wrap' }}>
-            {[['chip_scanned', 'Chip escaneado'], ['medical_info_used', 'Info médica usada'], ['family_notified', 'Familia notificada'], ['hospital_notified', 'Hospital notificado'], ['media_worthy', 'Caso mediático'], ['b2b_case_study', 'Caso de estudio B2B']].map(([k, l]) => (
-              <label key={k} style={{ display: 'flex', alignItems: 'center', gap: 5, cursor: 'pointer', fontSize: 12, color: C.muted }}>
-                <input type="checkbox" checked={(accForm as any)[k]} onChange={e => setAccForm({ ...accForm, [k]: e.target.checked })} />
+
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
+            {[['chip_scanned', 'Chip escaneado'], ['medical_info_used', 'Info médica usada'], ['family_notified', 'Familia notificada'], ['hospital_notified', 'Hospital notificado'], ['media_worthy', 'Mediático'], ['b2b_case_study', 'Caso B2B']].map(([k, l]) => (
+              <label key={k} className="flex items-center gap-2 cursor-pointer text-xs text-[#8b949e]">
+                <input type="checkbox" checked={(accForm as any)[k]} onChange={e => setAccForm({ ...accForm, [k]: e.target.checked })} className="accent-red-500 bg-[#0d1117] border-[#2d3139]" />
                 {l}
               </label>
             ))}
           </div>
-          <Field label="Notas / detalles del caso">
-            <textarea placeholder="Contexto, cómo te enteraste, conversación con paramédico, hospital..." value={accForm.notes} onChange={e => setAccForm({ ...accForm, notes: e.target.value })} style={{ ...inp, minHeight: 80, resize: 'vertical' }} />
+
+          <Field label="Detalles del caso">
+            <textarea placeholder="Contexto..." value={accForm.notes} onChange={e => setAccForm({ ...accForm, notes: e.target.value })} className={`${inputClass} min-h-[80px]`} />
           </Field>
-          <button onClick={saveEmergency} disabled={saving} style={{ background: C.red, border: 'none', color: '#fff', borderRadius: 8, padding: '11px 0', fontSize: 13, cursor: 'pointer', fontWeight: 700, width: '100%' }}>
-            {saving ? 'Guardando...' : editItem ? 'Guardar cambios' : 'Registrar emergencia'}
-          </button>
+          <button onClick={handleSaveAcc} disabled={saving} className="w-full bg-red-600 text-white font-semibold rounded-lg py-3 hover:bg-red-500 transition-colors">{saving ? 'Guardando...' : 'Guardar Emergencia'}</button>
         </Modal>
       )}
 
-      {/* MODAL VENTA */}
-      {modal === 'sale' && (
-        <Modal title={`${editItem ? '✎ Editar' : '+'} Venta`} onClose={() => { setModal(null); setEditItem(null) }}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
-            <Field label="Fecha" half><input type="date" value={saleForm.sale_date} onChange={e => setSaleForm({ ...saleForm, sale_date: e.target.value })} style={inp} /></Field>
-            <Field label="Cantidad" half><input type="number" min={1} value={saleForm.qty} onChange={e => setSaleForm({ ...saleForm, qty: Number(e.target.value) })} style={inp} /></Field>
-          </div>
-          <Field label="Plan">
-            <select value={saleForm.plan} onChange={e => setSaleForm({ ...saleForm, plan: e.target.value })} style={inp}>
-              {PLANES.map(p => <option key={p}>{p}</option>)}
-            </select>
-          </Field>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
-            <Field label="Canal" half>
-              <select value={saleForm.channel} onChange={e => setSaleForm({ ...saleForm, channel: e.target.value })} style={inp}>
-                {CANALES.map(c => <option key={c}>{c}</option>)}
-              </select>
-            </Field>
-            <Field label="Fuente (taller, evento...)" half><input placeholder="Rodada Xochimilco, Taller Moto Sur..." value={saleForm.source} onChange={e => setSaleForm({ ...saleForm, source: e.target.value })} style={inp} /></Field>
-            <Field label="Nombre del cliente" half><input value={saleForm.customer_name} onChange={e => setSaleForm({ ...saleForm, customer_name: e.target.value })} style={inp} /></Field>
-            <Field label="Celular del cliente" half><input type="tel" placeholder="5512345678" value={saleForm.customer_phone} onChange={e => setSaleForm({ ...saleForm, customer_phone: e.target.value })} style={inp} /></Field>
-          </div>
-          <Field label="Email del cliente"><input type="email" value={saleForm.customer_email} onChange={e => setSaleForm({ ...saleForm, customer_email: e.target.value })} style={inp} /></Field>
-          <Field label="Notas"><input placeholder="Folios entregados, observaciones..." value={saleForm.notes} onChange={e => setSaleForm({ ...saleForm, notes: e.target.value })} style={inp} /></Field>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', background: C.greenDim, border: `1px solid ${C.green}44`, borderRadius: 7, marginBottom: 14 }}>
-            <span style={{ color: C.muted, fontSize: 12 }}>Total calculado:</span>
-            <span style={{ color: C.green, fontWeight: 700, fontFamily: 'monospace', fontSize: 16 }}>{fmt(planPrice(saleForm.plan) * saleForm.qty)}</span>
-          </div>
-          <button onClick={saveSale} disabled={saving} style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.text, borderRadius: 8, padding: '11px 0', fontSize: 13, cursor: 'pointer', fontWeight: 600, width: '100%' }}>
-            {saving ? 'Guardando...' : editItem ? 'Guardar cambios' : 'Registrar venta'}
-          </button>
-        </Modal>
-      )}
-
-      {/* MODAL TALLER */}
       {modal === 'workshop' && (
-        <Modal title={`${editItem ? '✎ Editar' : '🏪'} Taller`} onClose={() => { setModal(null); setEditItem(null) }} wide>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
-            <Field label="Nombre del taller"><input placeholder="Taller Moto Sur" value={wsForm.name} onChange={e => setWsForm({ ...wsForm, name: e.target.value })} style={inp} /></Field>
-            <Field label="Nombre del dueño/contacto" half><input value={wsForm.owner_name} onChange={e => setWsForm({ ...wsForm, owner_name: e.target.value })} style={inp} /></Field>
-            <Field label="Teléfono" half><input type="tel" placeholder="5512345678" value={wsForm.phone} onChange={e => setWsForm({ ...wsForm, phone: e.target.value })} style={inp} /></Field>
+        <Modal title={`${editItem ? 'Editar' : 'Agregar'} Taller`} onClose={() => setModal(null)} wide>
+          <div className="flex flex-wrap gap-x-3">
+            <Field label="Nombre" half><input placeholder="Taller Sur..." value={wsForm.name} onChange={e => setWsForm({ ...wsForm, name: e.target.value })} className={inputClass} /></Field>
+            <Field label="Dueño/Contacto" half><input value={wsForm.owner_name} onChange={e => setWsForm({ ...wsForm, owner_name: e.target.value })} className={inputClass} /></Field>
+            <Field label="Teléfono" half><input type="tel" value={wsForm.phone} onChange={e => setWsForm({ ...wsForm, phone: e.target.value })} className={inputClass} /></Field>
             <Field label="Estado" half>
-              <select value={wsForm.estado} onChange={e => setWsForm({ ...wsForm, estado: e.target.value })} style={inp}>
-                {ESTADOS.map(s => <option key={s}>{s}</option>)}
-              </select>
+              <select value={wsForm.estado} onChange={e => setWsForm({ ...wsForm, estado: e.target.value })} className={inputClass}>{ESTADOS.map(s => <option key={s}>{s}</option>)}</select>
             </Field>
-            <Field label="Municipio" half><input placeholder="Iztapalapa" value={wsForm.municipio} onChange={e => setWsForm({ ...wsForm, municipio: e.target.value })} style={inp} /></Field>
-            <Field label="Estatus de relación">
-              <select value={wsForm.status} onChange={e => setWsForm({ ...wsForm, status: e.target.value })} style={inp}>
-                {Object.entries(WS_STATUS_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-              </select>
+            <Field label="Estatus">
+              <select value={wsForm.status} onChange={e => setWsForm({ ...wsForm, status: e.target.value })} className={inputClass}>{Object.entries(WS_STATUS_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>
             </Field>
-            <Field label="Chips consignados" half><input type="number" min={0} value={wsForm.chips_consigned} onChange={e => setWsForm({ ...wsForm, chips_consigned: Number(e.target.value) })} style={inp} /></Field>
-            <Field label="Precio por chip (MXN)" half><input type="number" min={0} value={wsForm.price_per_chip} onChange={e => setWsForm({ ...wsForm, price_per_chip: Number(e.target.value) })} style={inp} /></Field>
-            <Field label="Fecha primera consignación" half><input type="date" value={wsForm.first_consignment_date} onChange={e => setWsForm({ ...wsForm, first_consignment_date: e.target.value })} style={inp} /></Field>
+            <Field label="Chips consignados" half><input type="number" min={0} value={wsForm.chips_consigned} onChange={e => setWsForm({ ...wsForm, chips_consigned: Number(e.target.value) })} className={inputClass} /></Field>
+            <Field label="Precio base" half><input type="number" min={0} value={wsForm.price_per_chip} onChange={e => setWsForm({ ...wsForm, price_per_chip: Number(e.target.value) })} className={inputClass} /></Field>
           </div>
-          <Field label="Notas">
-            <textarea value={wsForm.notes} onChange={e => setWsForm({ ...wsForm, notes: e.target.value })} style={{ ...inp, minHeight: 60, resize: 'vertical' }} />
-          </Field>
-          <button onClick={saveWorkshop} disabled={saving} style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.text, borderRadius: 8, padding: '11px 0', fontSize: 13, cursor: 'pointer', fontWeight: 600, width: '100%' }}>
-            {saving ? 'Guardando...' : editItem ? 'Guardar cambios' : 'Agregar taller'}
-          </button>
+          <button onClick={handleSaveWs} disabled={saving} className="w-full bg-white text-black font-semibold rounded-lg py-3 mt-4 hover:bg-gray-200">{saving ? 'Guardando...' : 'Guardar Taller'}</button>
         </Modal>
       )}
 
-      {/* MODAL B2B */}
       {modal === 'b2b' && (
-        <Modal title={`${editItem ? '✎ Editar' : '🤝'} Oportunidad B2B`} onClose={() => { setModal(null); setEditItem(null) }} wide>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
-            <Field label="Nombre de la empresa"><input placeholder="GNP Seguros, Cruz Verde..." value={b2bForm.company_name} onChange={e => setB2bForm({ ...b2bForm, company_name: e.target.value })} style={inp} /></Field>
-            <Field label="Tipo de empresa" half><input placeholder="Aseguradora, Ambulancia, Hospital..." value={b2bForm.company_type} onChange={e => setB2bForm({ ...b2bForm, company_type: e.target.value })} style={inp} /></Field>
-            <Field label="Etapa del pipeline">
-              <select value={b2bForm.stage} onChange={e => setB2bForm({ ...b2bForm, stage: e.target.value })} style={inp}>
-                {Object.entries(STAGE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-              </select>
+        <Modal title={`${editItem ? 'Editar' : 'Nueva'} Oportunidad B2B`} onClose={() => setModal(null)} wide>
+          <div className="flex flex-wrap gap-x-3">
+            <Field label="Empresa" half><input placeholder="GNP..." value={b2bForm.company_name} onChange={e => setB2bForm({ ...b2bForm, company_name: e.target.value })} className={inputClass} /></Field>
+            <Field label="Etapa" half>
+              <select value={b2bForm.stage} onChange={e => setB2bForm({ ...b2bForm, stage: e.target.value })} className={inputClass}>{Object.entries(STAGE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>
             </Field>
-            <Field label="Contacto principal" half><input placeholder="Nombre del ejecutivo" value={b2bForm.contact_name} onChange={e => setB2bForm({ ...b2bForm, contact_name: e.target.value })} style={inp} /></Field>
-            <Field label="Cargo" half><input placeholder="Director de producto, VP..." value={b2bForm.contact_role} onChange={e => setB2bForm({ ...b2bForm, contact_role: e.target.value })} style={inp} /></Field>
-            <Field label="Teléfono contacto" half><input type="tel" value={b2bForm.contact_phone} onChange={e => setB2bForm({ ...b2bForm, contact_phone: e.target.value })} style={inp} /></Field>
-            <Field label="Email contacto" half><input type="email" value={b2bForm.contact_email} onChange={e => setB2bForm({ ...b2bForm, contact_email: e.target.value })} style={inp} /></Field>
-            <Field label="Chips estimados" half><input type="number" placeholder="500" value={b2bForm.estimated_chips} onChange={e => setB2bForm({ ...b2bForm, estimated_chips: e.target.value })} style={inp} /></Field>
-            <Field label="Valor estimado (MXN)" half><input type="number" placeholder="60000" value={b2bForm.estimated_value} onChange={e => setB2bForm({ ...b2bForm, estimated_value: e.target.value })} style={inp} /></Field>
-            <Field label="Probabilidad de cierre (%)">
-              <input type="range" min={0} max={100} step={10} value={b2bForm.probability} onChange={e => setB2bForm({ ...b2bForm, probability: Number(e.target.value) })} style={{ width: '100%' }} />
-              <div style={{ color: C.amber, fontSize: 12, textAlign: 'center', marginTop: 4 }}>{b2bForm.probability}%</div>
+            <Field label="Contacto" half><input value={b2bForm.contact_name} onChange={e => setB2bForm({ ...b2bForm, contact_name: e.target.value })} className={inputClass} /></Field>
+            <Field label="Teléfono" half><input type="tel" value={b2bForm.contact_phone} onChange={e => setB2bForm({ ...b2bForm, contact_phone: e.target.value })} className={inputClass} /></Field>
+            <Field label="Chips estim." half><input type="number" value={b2bForm.estimated_chips} onChange={e => setB2bForm({ ...b2bForm, estimated_chips: e.target.value })} className={inputClass} /></Field>
+            <Field label="Valor (MXN)" half><input type="number" value={b2bForm.estimated_value} onChange={e => setB2bForm({ ...b2bForm, estimated_value: e.target.value })} className={inputClass} /></Field>
+            <Field label={`Probabilidad: ${b2bForm.probability}%`}>
+              <input type="range" min={0} max={100} step={10} value={b2bForm.probability} onChange={e => setB2bForm({ ...b2bForm, probability: Number(e.target.value) })} className="w-full accent-blue-500" />
             </Field>
-            <Field label="Próxima acción"><input placeholder="Enviar propuesta, hacer demo, follow up..." value={b2bForm.next_action} onChange={e => setB2bForm({ ...b2bForm, next_action: e.target.value })} style={inp} /></Field>
-            <Field label="Fecha próxima acción" half><input type="date" value={b2bForm.next_action_date} onChange={e => setB2bForm({ ...b2bForm, next_action_date: e.target.value })} style={inp} /></Field>
-            <Field label="Primer contacto" half><input type="date" value={b2bForm.first_contact_date} onChange={e => setB2bForm({ ...b2bForm, first_contact_date: e.target.value })} style={inp} /></Field>
+            <Field label="Notas">
+              <textarea placeholder="Contexto de la negociación..." value={b2bForm.notes} onChange={e => setB2bForm({ ...b2bForm, notes: e.target.value })} className={`${inputClass} min-h-[60px]`} />
+            </Field>
           </div>
-          <Field label="Notas">
-            <textarea placeholder="Contexto de la relación, intereses, objeciones, historial..." value={b2bForm.notes} onChange={e => setB2bForm({ ...b2bForm, notes: e.target.value })} style={{ ...inp, minHeight: 70, resize: 'vertical' }} />
-          </Field>
-          <button onClick={saveB2b} disabled={saving} style={{ background: C.surface, border: `1px solid ${C.border}`, color: C.text, borderRadius: 8, padding: '11px 0', fontSize: 13, cursor: 'pointer', fontWeight: 600, width: '100%' }}>
-            {saving ? 'Guardando...' : editItem ? 'Guardar cambios' : 'Agregar al pipeline'}
-          </button>
+          <button onClick={handleSaveB2b} disabled={saving} className="w-full bg-white text-black font-semibold rounded-lg py-3 hover:bg-gray-200">{saving ? 'Guardando...' : 'Guardar Oportunidad'}</button>
         </Modal>
       )}
 
