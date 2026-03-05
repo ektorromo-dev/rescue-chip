@@ -82,7 +82,8 @@ export default function DashboardPage() {
     useEffect(() => {
         const sessionCheck = setInterval(async () => {
             console.log('Checking session...');
-            const localDeviceId = localStorage.getItem('rescuechip_device_id');
+            // Leer device_id desde las cookies
+            const localDeviceId = document.cookie.split('; ').find(row => row.startsWith('rescuechip_device_id='))?.split('=')[1];
             if (!localDeviceId) return;
 
             const { data } = await supabase
@@ -176,11 +177,12 @@ export default function DashboardPage() {
                 return false;
             };
 
-            // --- MANEJO DE NUEVO DISPOSITIVO POR EMAIL ---
-            let currentDeviceId = localStorage.getItem("rescuechip_device_id");
+            // --- MANEJO DE NUEVO DISPOSITIVO POR EMAIL CON COOKIES ---
+            let currentDeviceId = document.cookie.split('; ').find(row => row.startsWith('rescuechip_device_id='))?.split('=')[1];
             if (!currentDeviceId) {
                 currentDeviceId = crypto.randomUUID();
-                localStorage.setItem("rescuechip_device_id", currentDeviceId);
+                // Guardar la cookie por 30 días
+                document.cookie = `rescuechip_device_id=${currentDeviceId}; max-age=${30 * 24 * 60 * 60}; path=/; SameSite=Lax`;
             }
             setDeviceId(currentDeviceId);
 
