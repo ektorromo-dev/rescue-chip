@@ -68,13 +68,6 @@ export async function GET(req: NextRequest) {
 
         // 3. Process action
         if (action === 'allow') {
-            // Marca TODAS las otras sesiones de este usuario como 'revoked'
-            await supabaseAdmin
-                .from('user_sessions')
-                .update({ status: 'revoked' })
-                .eq('user_id', session.user_id)
-                .neq('id', session.id);
-
             // Marca esta sesión como verificada y limpia el token para que no se re-use
             await supabaseAdmin
                 .from('user_sessions')
@@ -89,7 +82,7 @@ export async function GET(req: NextRequest) {
                 <html><body>
                 <div style="font-family:sans-serif; text-align:center; padding: 50px; max-width: 500px; margin: 0 auto;">
                     <h2 style="color: #10b981;">Dispositivo Autorizado Exitosamente ✅</h2>
-                    <p style="font-size: 16px; color: #4b5563;">Has permitido el acceso a este nuevo dispositivo. <b>Tus sesiones previas en otros dispositivos han sido cerradas por seguridad (1 activo a la vez).</b></p>
+                    <p style="font-size: 16px; color: #4b5563;">Has permitido el acceso a este nuevo dispositivo. <b>Puedes tener múltiples dispositivos activos conectados al mismo tiempo.</b></p>
                     <p style="margin-top: 30px; font-size: 14px;">Ya puedes volver a la ventana de tu dispositivo e ingresar a tu cuenta automáticamente.</p>
                 </div>
                 </body></html>
