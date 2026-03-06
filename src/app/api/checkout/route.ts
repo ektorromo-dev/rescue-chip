@@ -98,7 +98,10 @@ export async function POST(req: NextRequest) {
                 paquete,
                 factura: factura_id ? "true" : "false",
                 factura_id: factura_id || "none",
-                order_id: order_id
+                order_id: order_id,
+                phone: shippingData?.phone || "Desconocido",
+                name: shippingData?.fullName || "Desconocido",
+                plan: paquete
             }
         });
 
