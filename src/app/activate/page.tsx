@@ -389,6 +389,25 @@ function ActivationFormContent() {
                 throw new Error(`Fallo al vincular el chip (${chipUpdateError.code || 'Desconocido'}). Se deshizo la creación del perfil.`);
             }
 
+            // --- N8N WEBHOOK CALL (New Profile) ---
+            try {
+                await fetch('https://rescuechip.app.n8n.cloud/webhook/4882f6c2-6163-41a3-b60e-556f76717486', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-rescuechip-secret': 'rescuechip2026'
+                    },
+                    body: JSON.stringify({
+                        phone: `+52${phone}`,
+                        name: formData.get("fullName") as string,
+                        folio: chip.folio
+                    })
+                });
+                console.log("N8N Webhook disparado exitosamente (Nuevo Perfil).");
+            } catch (n8nError) {
+                console.error("Fallo al disparar webhook de N8N (ignorado):", n8nError);
+            }
+
             // 4. Redirect to the dashboard to let them edit their new profile instead of returning directly to public profile
             router.push(`/dashboard`);
 
@@ -421,6 +440,25 @@ function ActivationFormContent() {
 
             if (activateError) {
                 throw new Error("Error al vincular el chip con tu perfil.");
+            }
+
+            // --- N8N WEBHOOK CALL (Existing Profile) ---
+            try {
+                await fetch('https://rescuechip.app.n8n.cloud/webhook/4882f6c2-6163-41a3-b60e-556f76717486', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-rescuechip-secret': 'rescuechip2026'
+                    },
+                    body: JSON.stringify({
+                        phone: existingProfileToLink.phone || "Desconocido",
+                        name: existingProfileToLink.full_name || "Desconocido",
+                        folio: pendingChip.folio
+                    })
+                });
+                console.log("N8N Webhook disparado exitosamente (Perfil Existente).");
+            } catch (n8nError) {
+                console.error("Fallo al disparar webhook de N8N (ignorado):", n8nError);
             }
 
             router.push(`/dashboard`);
