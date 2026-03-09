@@ -519,7 +519,7 @@ export default function Home() {
     const forcePlay = (v: HTMLVideoElement) => {
       v.muted = true;
       v.load();
-      const attempt = () => v.play().catch(() => {});
+      const attempt = () => v.play().catch(() => { });
       attempt();
       v.addEventListener("canplay", attempt, { once: true });
       v.addEventListener("loadeddata", attempt, { once: true });
@@ -570,7 +570,7 @@ export default function Home() {
       {/* HERO */}
       <section className="hero">
         <video className="hero-video" autoPlay muted loop playsInline preload="auto"
-          onCanPlay={(e) => { const v = e.currentTarget; v.muted=true; v.play().catch(()=>{}); }}
+          onCanPlay={(e) => { const v = e.currentTarget; v.muted = true; v.play().catch(() => { }); }}
         >
           <source src={`${SB}5052599-hd_1920_1080_30fps.mp4`} type="video/mp4" />
         </video>
@@ -634,7 +634,7 @@ export default function Home() {
       <section className="awareness">
         <div className="aw-video-wrap">
           <video className="aw-video" autoPlay muted loop playsInline preload="auto"
-            onCanPlay={(e) => { const v = e.currentTarget; v.muted=true; v.play().catch(()=>{}); }}
+            onCanPlay={(e) => { const v = e.currentTarget; v.muted = true; v.play().catch(() => { }); }}
           >
             <source src={`${SB}5052599-hd_1920_1080_30fps.mp4`} type="video/mp4" />
           </video>
@@ -886,7 +886,7 @@ export default function Home() {
       {/* CTA FINAL */}
       <section className="cta-final">
         <video className="cta-video" autoPlay muted loop playsInline preload="auto"
-          onCanPlay={(e) => { const v = e.currentTarget; v.muted=true; v.playbackRate=1.6; v.play().catch(()=>{}); }}
+          onCanPlay={(e) => { const v = e.currentTarget; v.muted = true; v.playbackRate = 1.6; v.play().catch(() => { }); }}
         >
           <source src={`${SB}13457171_1920_1080_30fps.mp4`} type="video/mp4" />
           <source src={`${SB}5052676-hd_1920_1080_30fps.mp4`} type="video/mp4" />
