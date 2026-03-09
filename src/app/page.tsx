@@ -306,6 +306,21 @@ export default function Home() {
         fader.observe(el);
       });
 
+    // Forzar play en videos — múltiples estrategias para Next.js + Supabase
+    const forcePlay = (v: HTMLVideoElement) => {
+      v.muted = true;
+      v.load();
+      const attempt = () => v.play().catch(() => {});
+      attempt();
+      v.addEventListener("canplay", attempt, { once: true });
+      v.addEventListener("loadeddata", attempt, { once: true });
+    };
+    const playAllVideos = () => {
+      document.querySelectorAll<HTMLVideoElement>("video").forEach(forcePlay);
+    };
+    playAllVideos();
+    [300, 800, 1500, 3000].forEach(ms => setTimeout(playAllVideos, ms));
+
     // CTA video speed
     document.querySelectorAll<HTMLVideoElement>(".cta-video").forEach((v) => {
       v.addEventListener("loadedmetadata", () => { v.playbackRate = 1.6; });
@@ -332,19 +347,22 @@ export default function Home() {
           <li><a href="#precios">Precios</a></li>
           <li><a href="#comunidad">Comunidad</a></li>
           <li><a href="#agencias">Agencias</a></li>
-          {session ? (
-            <li><Link href="/dashboard" className="nav-cta">Mi panel</Link></li>
-          ) : (
+          <li>
+            <Link href={session ? "/dashboard" : "/login"} className="nav-cta">
+              Mi perfil médico
+            </Link>
+          </li>
+          {!session && (
             <li><Link href="/login" className="nav-login">Iniciar sesión</Link></li>
           )}
-          <li><a href="#precios" className="nav-cta">Protege tu rodada</a></li>
         </ul>
       </nav>
 
       {/* HERO */}
       <section className="hero">
-        <video className="hero-video" autoPlay muted loop playsInline preload="auto">
-          <source src={`${SB}5195181-uhd_4096_2160_25fps.mp4`} type="video/mp4" />
+        <video className="hero-video" autoPlay muted loop playsInline preload="auto"
+          onCanPlay={(e) => { const v = e.currentTarget; v.muted=true; v.play().catch(()=>{}); }}
+        >
           <source src={`${SB}5052599-hd_1920_1080_30fps.mp4`} type="video/mp4" />
         </video>
         <div className="hero-overlay" />
@@ -406,7 +424,9 @@ export default function Home() {
       {/* AWARENESS SPLIT */}
       <section className="awareness">
         <div className="aw-video-wrap">
-          <video className="aw-video" autoPlay muted loop playsInline preload="auto">
+          <video className="aw-video" autoPlay muted loop playsInline preload="auto"
+            onCanPlay={(e) => { const v = e.currentTarget; v.muted=true; v.play().catch(()=>{}); }}
+          >
             <source src={`${SB}5052599-hd_1920_1080_30fps.mp4`} type="video/mp4" />
           </video>
           <div className="aw-overlay" />
@@ -656,7 +676,9 @@ export default function Home() {
 
       {/* CTA FINAL */}
       <section className="cta-final">
-        <video className="cta-video" autoPlay muted loop playsInline preload="auto">
+        <video className="cta-video" autoPlay muted loop playsInline preload="auto"
+          onCanPlay={(e) => { const v = e.currentTarget; v.muted=true; v.playbackRate=1.6; v.play().catch(()=>{}); }}
+        >
           <source src={`${SB}13457171_1920_1080_30fps.mp4`} type="video/mp4" />
           <source src={`${SB}5052676-hd_1920_1080_30fps.mp4`} type="video/mp4" />
         </video>
