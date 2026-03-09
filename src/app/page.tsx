@@ -478,7 +478,7 @@ const LANDING_CSS = `
     .trust-badges{ grid-template-columns:1fr; }
   }
 `
-const SB = "https://kainkhyqjmattriozick.supabase.co/storage/v1/object/public/Media%20Landing%20Page/";
+const SB = "https://kaihkhyqjmattriozick.supabase.co/storage/v1/object/public/Media%20Landing%20Page/";
 
 export default function Home() {
   const [session, setSession] = useState<{ user?: { email?: string } } | null>(null);
