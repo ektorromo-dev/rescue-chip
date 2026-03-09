@@ -193,24 +193,24 @@ export default function ShopPage() {
                     </div>
 
                     <div className="p-6 overflow-y-auto flex-1">
-                        <form id="checkout-form" onSubmit={handleModalSubmit} className="space-y-8">
+                        <form id="checkout-form" onSubmit={handleModalSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
 
                             {/* SECCIÓN 1 - Dirección de Envío */}
-                            <div className="space-y-4">
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                                 <h4 className="font-bold text-base text-foreground flex items-center gap-2 mb-4 border-b border-border pb-2">
                                     <MapPin size={18} className="text-primary" /> Dirección de Envío y Contacto
                                 </h4>
 
                                 <div className="grid md:grid-cols-2 gap-4">
-                                    <div className="space-y-2 md:col-span-2">
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                                         <label className="text-sm font-semibold text-muted-foreground">Nombre de quien recibe *</label>
                                         <input type="text" name="nombre_receptor" value={shippingData.nombre_receptor} onChange={handleShippingChange} required className="w-full flex h-11 rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. Juan Pérez" disabled={loadingPackage !== null} />
                                     </div>
-                                    <div className="space-y-2">
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                         <label className="text-sm font-semibold text-muted-foreground">Teléfono de contacto *</label>
                                         <input type="tel" name="telefono_receptor" value={shippingData.telefono_receptor} onChange={handleShippingChange} required className="w-full flex h-11 rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="10 dígitos" minLength={10} maxLength={10} disabled={loadingPackage !== null} />
                                     </div>
-                                    <div className="space-y-2">
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                         <label className="text-sm font-semibold text-muted-foreground">Email de confirmación *</label>
                                         <input type="email" name="email_cliente" value={shippingData.email_cliente} onChange={handleShippingChange} required className="w-full flex h-11 rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="tu@correo.com" disabled={loadingPackage !== null} />
                                     </div>
@@ -220,16 +220,16 @@ export default function ShopPage() {
                                         <input type="text" name="codigo_postal" value={shippingData.codigo_postal} onChange={handleZipCodeChange} required className="w-full flex h-11 rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. 11000" minLength={5} maxLength={5} disabled={loadingPackage !== null} />
                                         {loadingZip && <Loader2 className="absolute right-3 top-9 animate-spin text-muted-foreground" size={16} />}
                                     </div>
-                                    <div className="space-y-2">
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                         <label className="text-sm font-semibold text-muted-foreground">Estado *</label>
                                         <input type="text" name="estado" value={shippingData.estado} onChange={handleShippingChange} required className="w-full flex h-11 rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" disabled={loadingPackage !== null} />
                                     </div>
 
-                                    <div className="space-y-2">
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                         <label className="text-sm font-semibold text-muted-foreground">Ciudad / Municipio *</label>
                                         <input type="text" name="ciudad" value={shippingData.ciudad} onChange={handleShippingChange} required className="w-full flex h-11 rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" disabled={loadingPackage !== null} />
                                     </div>
-                                    <div className="space-y-2">
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                         <label className="text-sm font-semibold text-muted-foreground">Colonia *</label>
                                         {coloniasOpt.length > 0 ? (
                                             <select name="colonia" value={shippingData.colonia} onChange={handleShippingChange} required className="w-full flex h-11 rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" disabled={loadingPackage !== null}>
@@ -241,16 +241,16 @@ export default function ShopPage() {
                                         )}
                                     </div>
 
-                                    <div className="space-y-2">
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                         <label className="text-sm font-semibold text-muted-foreground">Calle y # Exterior *</label>
                                         <input type="text" name="calle_numero" value={shippingData.calle_numero} onChange={handleShippingChange} required className="w-full flex h-11 rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. Insurgentes Sur 123" disabled={loadingPackage !== null} />
                                     </div>
-                                    <div className="space-y-2">
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                         <label className="text-sm font-semibold text-muted-foreground">Número Interior (Opcional)</label>
                                         <input type="text" name="numero_interior" value={shippingData.numero_interior} onChange={handleShippingChange} className="w-full flex h-11 rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. Depto 4" disabled={loadingPackage !== null} />
                                     </div>
 
-                                    <div className="space-y-2 md:col-span-2">
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                                         <label className="text-sm font-semibold text-muted-foreground">Referencia de entrega *</label>
                                         <textarea name="referencia" value={shippingData.referencia} onChange={handleShippingChange} required rows={2} className="w-full flex min-h-[60px] rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all resize-none" placeholder="Ej: Casa azul con portón negro, entre calle Hidalgo y Morelos, edificio 3 depto 402" disabled={loadingPackage !== null}></textarea>
                                     </div>
@@ -281,21 +281,21 @@ export default function ShopPage() {
                                         <h4 className="font-bold text-sm text-primary uppercase tracking-wider mb-2">Datos Fiscales</h4>
 
                                         <div className="grid md:grid-cols-2 gap-4">
-                                            <div className="space-y-2">
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                 <label className="text-sm font-semibold text-muted-foreground">RFC *</label>
                                                 <input type="text" name="rfc" value={invoiceData.rfc} onChange={handleInvoiceChange} required className="w-full flex h-11 rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring uppercase transition-all" placeholder="ABCD123456XYZ" minLength={12} maxLength={13} disabled={loadingPackage !== null} />
                                             </div>
-                                            <div className="space-y-2">
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                 <label className="text-sm font-semibold text-muted-foreground">Código Postal Fiscal *</label>
                                                 <input type="text" name="codigo_postal_fiscal" value={invoiceData.codigo_postal_fiscal} onChange={handleInvoiceChange} required className="w-full flex h-11 rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. 11000" minLength={5} maxLength={5} disabled={loadingPackage !== null} />
                                             </div>
 
-                                            <div className="space-y-2 md:col-span-2">
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                                                 <label className="text-sm font-semibold text-muted-foreground">Razón Social / Nombre Fiscal *</label>
                                                 <input type="text" name="nombre_fiscal" value={invoiceData.nombre_fiscal} onChange={handleInvoiceChange} required className="w-full flex h-11 rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Nombre completo o Empresa SA de CV" disabled={loadingPackage !== null} />
                                             </div>
 
-                                            <div className="space-y-2 md:col-span-2">
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                                                 <label className="text-sm font-semibold text-muted-foreground">Régimen Fiscal *</label>
                                                 <select name="regimen_fiscal" value={invoiceData.regimen_fiscal} onChange={handleInvoiceChange} required className="w-full flex h-11 rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" disabled={loadingPackage !== null}>
                                                     <option value="">Selecciona tu régimen fiscal</option>
@@ -315,7 +315,7 @@ export default function ShopPage() {
                                                 </select>
                                             </div>
 
-                                            <div className="space-y-2 md:col-span-2">
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                                                 <label className="text-sm font-semibold text-muted-foreground">Uso de CFDI *</label>
                                                 <select name="uso_cfdi" value={invoiceData.uso_cfdi} onChange={handleInvoiceChange} required className="w-full flex h-11 rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" disabled={loadingPackage !== null}>
                                                     <option value="G01 - Adquisición de mercancías">G01 - Adquisición de mercancías</option>
@@ -324,11 +324,11 @@ export default function ShopPage() {
                                                 </select>
                                             </div>
 
-                                            <div className="space-y-2">
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                 <label className="text-sm font-semibold text-muted-foreground">Email (Receptor) *</label>
                                                 <input type="email" name="email_factura" value={invoiceData.email_factura} onChange={handleInvoiceChange} required className="w-full flex h-11 rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="tu@correo.com" disabled={loadingPackage !== null} />
                                             </div>
-                                            <div className="space-y-2">
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                 <label className="text-sm font-semibold text-muted-foreground">WhatsApp (Avisos) *</label>
                                                 <input type="tel" name="whatsapp_factura" value={invoiceData.whatsapp_factura} onChange={handleInvoiceChange} required className="w-full flex h-11 rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="5500000000" disabled={loadingPackage !== null} />
                                             </div>
@@ -396,7 +396,7 @@ export default function ShopPage() {
                             <p className="text-primary font-bold mt-2 bg-primary/10 inline-block px-4 py-1.5 rounded-full">🚚 Envío GRATIS a todo México</p>
                         </div>
 
-                        <div className="grid md:grid-cols-3 gap-8 items-start">
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '32px', alignItems: 'flex-start' }}>
                             {/* Plan Individual */}
                             <div className="bg-[#1A1A18] rounded-3xl p-8 border border-border shadow-sm flex flex-col h-full hover:border-primary/50 transition-all">
                                 <h3 className="text-2xl font-black mb-2">Individual</h3>
@@ -480,7 +480,7 @@ export default function ShopPage() {
                             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">Ofrece seguridad médica como valor agregado a tus clientes y mejora la experiencia de compra en tu negocio.</p>
                         </div>
 
-                        <div className="grid md:grid-cols-3 gap-6">
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '24px' }}>
                             {/* Starter */}
                             <div className="bg-[#1A1A18] rounded-2xl p-6 border border-border shadow-sm flex flex-col justify-between">
                                 <div>

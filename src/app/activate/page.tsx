@@ -481,34 +481,34 @@ function ActivationFormContent() {
 
     if (showLinkPrompt) {
         return (
-            <div className="p-8 md:p-12 text-center space-y-6">
-                <div className="mx-auto w-16 h-16 bg-primary/10 text-primary flex items-center justify-center rounded-full mb-4">
+            <div style={{ colorScheme: 'dark' ,  padding: '32px 48px', textAlign: 'center' }}>
+                <div style={{ margin: '0 auto 16px auto', width: '64px', height: '64px', backgroundColor: 'rgba(232,35,26,0.1)', color: '#E8231A', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
                     <AlertCircle size={32} />
                 </div>
-                <h2 className="text-2xl md:text-3xl font-black text-foreground">Cuenta Existente Encontrada</h2>
-                <p className="text-muted-foreground text-lg max-w-md mx-auto">
-                    Detectamos que el correo <strong>{pendingAuthData?.email}</strong> ya tiene un perfil médico activo.
+                <h2 style={{ fontSize: '28px', fontWeight: 900, color: '#F4F0EB', marginBottom: '16px' }}>Cuenta Existente Encontrada</h2>
+                <p style={{ color: '#9E9A95', fontSize: '18px', maxWidth: '448px', margin: '0 auto' }}>
+                    Detectamos que el correo <strong style={{ color: '#F4F0EB' }}>{pendingAuthData?.email}</strong> ya tiene un perfil médico activo.
                 </p>
 
-                <div className="bg-muted p-6 rounded-2xl border border-border mt-8 max-w-lg mx-auto">
-                    <h3 className="font-bold text-lg mb-2">¿Este chip es para ti o para otra persona?</h3>
-                    <p className="text-sm text-muted-foreground mb-6">
+                <div style={{ backgroundColor: '#1C1C1A', padding: '24px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.08)', marginTop: '32px', maxWidth: '512px', margin: '32px auto 0 auto' }}>
+                    <h3 style={{ fontWeight: 700, fontSize: '18px', color: '#F4F0EB', marginBottom: '8px' }}>¿Este chip es para ti o para otra persona?</h3>
+                    <p style={{ fontSize: '14px', color: '#9E9A95', marginBottom: '24px' }}>
                         Si es para ti, compartirá la misma información médica. Si es para otra persona, deberás usar un correo distinto.
                     </p>
 
-                    <div className="space-y-3">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                         <button
                             onClick={handleLinkToMine}
                             disabled={loading}
-                            className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground h-14 rounded-xl font-bold hover:bg-primary/90 transition-all disabled:opacity-50"
+                            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', backgroundColor: '#E8231A', color: '#fff', height: '56px', borderRadius: '12px', fontWeight: 700, border: 'none', cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.5 : 1, transition: 'background-color 0.2s' }}
                         >
-                            {loading && <Loader2 size={18} className="animate-spin" />}
+                            {loading && <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} />}
                             Es para mí (Vincular a mi perfil)
                         </button>
                         <button
                             onClick={handleLinkToOther}
                             disabled={loading}
-                            className="w-full h-14 rounded-xl border-2 border-primary/20 bg-background font-bold hover:bg-muted text-foreground transition-all disabled:opacity-50"
+                            style={{ width: '100%', height: '56px', borderRadius: '12px', border: '2px solid rgba(232,35,26,0.2)', backgroundColor: '#0A0A08', fontWeight: 700, color: '#F4F0EB', cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.5 : 1, transition: 'background-color 0.2s' }}
                         >
                             Es para otra persona
                         </button>
@@ -520,25 +520,25 @@ function ActivationFormContent() {
 
     if (isLoadingPreCheck) {
         return (
-            <div className="p-24 flex flex-col items-center justify-center text-muted-foreground">
-                <Loader2 size={48} className="animate-spin text-primary/30 mb-4" />
-                <p className="font-medium animate-pulse">Verificando estado del chip...</p>
+            <div style={{ padding: '96px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#9E9A95' }}>
+                <Loader2 size={48} style={{ color: 'rgba(232,35,26,0.3)', marginBottom: '16px' }} />
+                <p style={{ fontWeight: 500, margin: 0 }}>Verificando estado del chip...</p>
             </div>
         );
     }
 
     if (preValidationError) {
         return (
-            <div className="p-8 md:p-12 flex flex-col items-center justify-center text-center space-y-6">
-                <div className="w-20 h-20 bg-destructive/10 text-destructive rounded-full flex items-center justify-center mb-2">
+            <div style={{ padding: '32px 48px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+                <div style={{ width: '80px', height: '80px', backgroundColor: 'rgba(232,35,26,0.1)', color: '#E8231A', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '8px' }}>
                     <AlertCircle size={40} />
                 </div>
-                <h2 className="text-2xl font-black text-foreground">Acceso Denegado</h2>
-                <p className="text-muted-foreground text-lg max-w-md mx-auto leading-relaxed">
+                <h2 style={{ fontSize: '24px', fontWeight: 900, color: '#F4F0EB', margin: '0 0 24px 0' }}>Acceso Denegado</h2>
+                <p style={{ color: '#9E9A95', fontSize: '18px', maxWidth: '448px', margin: '0 auto 24px auto', lineHeight: 1.6 }}>
                     {preValidationError}
                 </p>
-                <div className="pt-6 w-full max-w-sm mx-auto">
-                    <Link href="/shop" className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground h-14 rounded-xl font-bold hover:bg-primary/90 transition-all">
+                <div style={{ paddingTop: '24px', width: '100%', maxWidth: '384px', margin: '0 auto' }}>
+                    <Link href="/shop" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', backgroundColor: '#E8231A', color: '#fff', height: '56px', borderRadius: '12px', fontWeight: 700, textDecoration: 'none' }}>
                         Comprar mi RescueChip
                     </Link>
                 </div>
@@ -554,18 +554,18 @@ function ActivationFormContent() {
         };
 
         return (
-            <div className="p-8 md:p-12 flex flex-col items-center justify-center text-center space-y-6">
-                <div className="w-20 h-20 bg-destructive/10 text-destructive rounded-full flex items-center justify-center mb-2">
+            <div style={{ padding: '32px 48px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+                <div style={{ width: '80px', height: '80px', backgroundColor: 'rgba(232,35,26,0.1)', color: '#E8231A', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '8px' }}>
                     <AlertCircle size={40} />
                 </div>
-                <h2 className="text-2xl font-black text-foreground">Límite de intentos excedido</h2>
-                <p className="text-muted-foreground text-lg max-w-md mx-auto leading-relaxed">
+                <h2 style={{ fontSize: '24px', fontWeight: 900, color: '#F4F0EB', margin: '0 0 24px 0' }}>Límite de intentos excedido</h2>
+                <p style={{ color: '#9E9A95', fontSize: '18px', maxWidth: '448px', margin: '0 auto 24px auto', lineHeight: 1.6 }}>
                     Por motivos de seguridad, los intentos de activación para este folio han sido temporalmente bloqueados.
                 </p>
-                <div className="bg-destructive/10 text-destructive font-mono text-2xl md:text-3xl font-bold py-4 px-8 rounded-xl tracking-wider">
+                <div style={{ backgroundColor: 'rgba(232,35,26,0.1)', color: '#E8231A', fontFamily: 'monospace', fontSize: '24px', fontWeight: 700, padding: '16px 32px', borderRadius: '12px', letterSpacing: '0.05em', marginBottom: '24px' }}>
                     {formatTime(lockCountdown)}
                 </div>
-                <p className="text-sm font-semibold text-muted-foreground">
+                <p style={{ fontSize: '14px', fontWeight: 600, color: '#9E9A95', margin: 0 }}>
                     Podrás intentar activar tu chip de nuevo cuando finalice el contador.
                 </p>
             </div>
@@ -574,14 +574,7 @@ function ActivationFormContent() {
 
     return (
         <div className="p-4 md:p-8">
-            <style dangerouslySetInnerHTML={{
-                __html: `
-        input, select, textarea { background-color: #1C1C1A !important; color: #F4F0EB !important; border: 1px solid rgba(255,255,255,0.25) !important; border-radius: 12px !important; padding: 10px 16px !important; }
-        input::placeholder, textarea::placeholder { color: rgba(244,240,235,0.3) !important; }
-        input:focus, select:focus, textarea:focus { border-color: rgba(232,35,26,0.5) !important; outline: none !important; box-shadow: 0 0 0 2px rgba(232,35,26,0.15) !important; }
-        select option { background-color: #1A1A18; color: #F4F0EB; }
-        label { color: #C8C0B4 !important; }
-      `}} />
+            
 
             <div style={{ display: "flex", alignItems: "flex-start", gap: "16px", padding: "16px", marginBottom: "32px", backgroundColor: "rgba(232,35,26,0.08)", border: "1px solid rgba(232,35,26,0.2)", borderRadius: "12px", color: "#F4F0EB" }}>
                 <div className="mt-1">
@@ -601,57 +594,96 @@ function ActivationFormContent() {
                 </div>
             )}
 
-            <form className="space-y-10" onSubmit={handleSubmit}>
+            <form style={{ display: 'flex', flexDirection: 'column', gap: '40px' }} onSubmit={handleSubmit}>
 
                 {/* Confirmación del Chip */}
-                <section className="space-y-4">
+                <section style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <h3 style={{ fontSize: "18px", fontWeight: 700, display: "flex", alignItems: "center", gap: "10px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "12px", marginBottom: "16px", color: "#F4F0EB" }}>
                         <span style={{ backgroundColor: "rgba(232,35,26,0.12)", color: "#E8231A", width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", flexShrink: 0, fontWeight: 600 }}>✓</span>
                         Verificación del Chip
                     </h3>
-                    <div className="space-y-2">
-                        <label htmlFor="folio" className="text-sm font-semibold">Número de Folio (incluido en tu paquete) *</label>
-                        <input type="text" id="folio" name="folio" value={folio} onChange={(e) => setFolio(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase placeholder:normal-case font-mono" placeholder="Ej. RSC-0001" required />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        <label htmlFor="folio" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Número de Folio (incluido en tu paquete) *</label>
+                        <input type="text" id="folio" name="folio" value={folio} onChange={(e) => setFolio(e.target.value)} style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Ej. RSC-0001" required />
                     </div>
                 </section>
 
                 {/* CREAR CUENTA */}
-                <section className="space-y-4">
+                <section style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <h3 style={{ fontSize: "18px", fontWeight: 700, display: "flex", alignItems: "center", gap: "10px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "12px", marginBottom: "16px", color: "#F4F0EB" }}>
                         <span style={{ backgroundColor: "rgba(232,35,26,0.12)", color: "#E8231A", width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", flexShrink: 0, fontWeight: 600 }}>✉</span>
                         Crear Cuenta
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <label htmlFor="email" className="text-sm font-semibold">Correo Electrónico *</label>
-                            <input type="email" id="email" name="email" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="tu@correo.com" required />
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            <label htmlFor="email" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Correo Electrónico *</label>
+                            <input type="email" id="email" name="email" style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="tu@correo.com" required />
                         </div>
-                        <div className="space-y-2">
-                            <label htmlFor="password" className="text-sm font-semibold">Contraseña *</label>
-                            <div className="relative">
-                                <input type={showPassword ? "text" : "password"} id="password" name="password" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 pr-12 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Mínimo 6 caracteres" required minLength={6} />
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            <label htmlFor="password" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Contraseña *</label>
+                            <div style={{ position: 'relative' }}>
+                                <input type={showPassword ? "text" : "password"} id="password" name="password" style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Mínimo 6 caracteres" required minLength={6} />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-0 top-0 h-12 px-4 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+                                    style={{ position: 'absolute', right: 0, top: 0, height: '48px', padding: '0 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9E9A95', background: 'none', border: 'none', cursor: 'pointer' }}
                                 >
                                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                                 </button>
                             </div>
                         </div>
                     </div>
-                    <p className="text-sm text-muted-foreground font-medium">Esta cuenta te servirá para iniciar sesión en tu panel (dashboard) y actualizar tus datos en el futuro.</p>
+                    <p style={{ fontSize: '14px', color: '#9E9A95', fontWeight: 500, margin: '4px 0 0 0' }}>Esta cuenta te servirá para iniciar sesión en tu panel (dashboard) y actualizar tus datos en el futuro.</p>
                 </section>
 
                 {/* IDENTIFICACIÓN */}
-                <section className="space-y-4">
+                <section style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <h3 style={{ fontSize: "18px", fontWeight: 700, display: "flex", alignItems: "center", gap: "10px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "12px", marginBottom: "16px", color: "#F4F0EB" }}>
                         <span style={{ backgroundColor: "rgba(232,35,26,0.12)", color: "#E8231A", width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", flexShrink: 0, fontWeight: 600 }}>1</span>
                         Identificación
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
                         <div className="space-y-4 md:col-span-2 mt-2 mb-4">
-                            <label className="text-sm font-semibold">Foto de Perfil (Opcional pero Recomendado)</label>
+                            <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Foto de Perfil (Opcional pero Recomendado)</label>
                             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                                 {photoFile ? (
                                     <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-primary bg-muted shrink-0 shadow-md">
@@ -678,12 +710,25 @@ function ActivationFormContent() {
                                 </div>
                             </div>
                         </div>
-                        <div className="space-y-2 md:col-span-2">
-                            <label htmlFor="fullName" className="text-sm font-semibold">Nombre Completo *</label>
-                            <input type="text" id="fullName" name="fullName" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Juan Pérez" required />
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
+                            <label htmlFor="fullName" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Nombre Completo *</label>
+                            <input type="text" id="fullName" name="fullName" style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Juan Pérez" required />
                         </div>
-                        <div className="space-y-2 md:col-span-2">
-                            <label className="text-sm font-semibold">Número de Celular *</label>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
+                            <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Número de Celular *</label>
                             <div className="flex">
                                 <span className="inline-flex items-center px-4 rounded-l-xl border border-r-0 border-input bg-muted text-muted-foreground text-sm font-medium">
                                     🇲🇽 +52
@@ -711,19 +756,45 @@ function ActivationFormContent() {
                                 </span>
                             </label>
                         </div>
-                        <div className="space-y-2">
-                            <label htmlFor="age" className="text-sm font-semibold">Edad (Opcional)</label>
-                            <input type="number" id="age" name="age" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. 30" min="0" max="130" />
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            <label htmlFor="age" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Edad (Opcional)</label>
+                            <input type="number" id="age" name="age" style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Ej. 30" min="0" max="130" />
                         </div>
-                        <div className="space-y-2">
-                            <label htmlFor="location" className="text-sm font-semibold">Ciudad / País *</label>
-                            <input type="text" id="location" name="location" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ciudad de México, México" required />
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            <label htmlFor="location" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Ciudad / País *</label>
+                            <input type="text" id="location" name="location" style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Ciudad de México, México" required />
                         </div>
                     </div>
                 </section>
 
                 {/* CONTACTOS DE EMERGENCIA */}
-                <section className="space-y-4">
+                <section style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <h3 style={{ fontSize: "18px", fontWeight: 700, display: "flex", alignItems: "center", gap: "10px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "12px", marginBottom: "16px", color: "#F4F0EB" }}>
                         <span style={{ backgroundColor: "rgba(232,35,26,0.12)", color: "#E8231A", width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", flexShrink: 0, fontWeight: 600 }}>2</span>
                         Contactos de Emergencia
@@ -731,54 +802,171 @@ function ActivationFormContent() {
 
                     <div className="p-4 border border-border rounded-xl space-y-4 bg-muted/20">
                         <h4 className="text-sm font-bold text-primary">Contacto 1 (Requerido)</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                 <label htmlFor="contact1Name" className="text-sm font-semibold text-muted-foreground">Nombre</label>
-                                <input type="text" id="contact1Name" name="contact1Name" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. María López (Esposa)" required />
+                                <input type="text" id="contact1Name" name="contact1Name" style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Ej. María López (Esposa)" required />
                             </div>
-                            <div className="space-y-2">
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                 <label htmlFor="contact1Phone" className="text-sm font-semibold text-muted-foreground">Teléfono</label>
-                                <input type="tel" id="contact1Phone" name="contact1Phone" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="+52 55 1234 5678" required />
+                                <input type="tel" id="contact1Phone" name="contact1Phone" style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="+52 55 1234 5678" required />
                             </div>
-                            <div className="space-y-2 md:col-span-2">
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                                 <label htmlFor="contact1Email" className="text-sm font-semibold text-muted-foreground">Email (Opcional, para recibir alertas)</label>
-                                <input type="email" id="contact1Email" name="contact1Email" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Email del contacto" />
+                                <input type="email" id="contact1Email" name="contact1Email" style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Email del contacto" />
                             </div>
                         </div>
                     </div>
 
                     <div className="p-4 border border-border rounded-xl space-y-4 bg-muted/10">
                         <h4 className="text-sm font-bold opacity-70">Contacto 2 (Opcional)</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                 <label htmlFor="contact2Name" className="text-sm font-semibold text-muted-foreground">Nombre</label>
-                                <input type="text" id="contact2Name" name="contact2Name" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Nombre completo o parentesco" />
+                                <input type="text" id="contact2Name" name="contact2Name" style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Nombre completo o parentesco" />
                             </div>
-                            <div className="space-y-2">
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                 <label htmlFor="contact2Phone" className="text-sm font-semibold text-muted-foreground">Teléfono</label>
-                                <input type="tel" id="contact2Phone" name="contact2Phone" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="+52 55 0000 0000" />
+                                <input type="tel" id="contact2Phone" name="contact2Phone" style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="+52 55 0000 0000" />
                             </div>
-                            <div className="space-y-2 md:col-span-2">
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                                 <label htmlFor="contact2Email" className="text-sm font-semibold text-muted-foreground">Email (Opcional, para recibir alertas)</label>
-                                <input type="email" id="contact2Email" name="contact2Email" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Email del contacto" />
+                                <input type="email" id="contact2Email" name="contact2Email" style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Email del contacto" />
                             </div>
                         </div>
                     </div>
 
                     <div className="p-4 border border-border rounded-xl space-y-4 bg-muted/10">
                         <h4 className="text-sm font-bold opacity-70">Contacto 3 (Opcional)</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                 <label htmlFor="contact3Name" className="text-sm font-semibold text-muted-foreground">Nombre</label>
-                                <input type="text" id="contact3Name" name="contact3Name" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Nombre completo o parentesco" />
+                                <input type="text" id="contact3Name" name="contact3Name" style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Nombre completo o parentesco" />
                             </div>
-                            <div className="space-y-2">
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                 <label htmlFor="contact3Phone" className="text-sm font-semibold text-muted-foreground">Teléfono</label>
-                                <input type="tel" id="contact3Phone" name="contact3Phone" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="+52 55 0000 0000" />
+                                <input type="tel" id="contact3Phone" name="contact3Phone" style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="+52 55 0000 0000" />
                             </div>
-                            <div className="space-y-2 md:col-span-2">
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                                 <label htmlFor="contact3Email" className="text-sm font-semibold text-muted-foreground">Email (Opcional, para recibir alertas)</label>
-                                <input type="email" id="contact3Email" name="contact3Email" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Email del contacto" />
+                                <input type="email" id="contact3Email" name="contact3Email" style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Email del contacto" />
                             </div>
                         </div>
                     </div>
@@ -786,15 +974,28 @@ function ActivationFormContent() {
                 </section>
 
                 {/* INFORMACIÓN MÉDICA */}
-                <section className="space-y-4">
+                <section style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <h3 style={{ fontSize: "18px", fontWeight: 700, display: "flex", alignItems: "center", gap: "10px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "12px", marginBottom: "16px", color: "#F4F0EB" }}>
                         <span style={{ backgroundColor: "rgba(232,35,26,0.12)", color: "#E8231A", width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", flexShrink: 0, fontWeight: 600 }}>3</span>
                         Información Médica
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <label htmlFor="bloodType" className="text-sm font-semibold">Tipo de Sangre *</label>
-                            <select id="bloodType" name="bloodType" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" required>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            <label htmlFor="bloodType" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Tipo de Sangre *</label>
+                            <select id="bloodType" name="bloodType" style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} required>
                                 <option value="">Selecciona tu tipo de sangre</option>
                                 <option value="A+">A+</option>
                                 <option value="A-">A-</option>
@@ -807,31 +1008,57 @@ function ActivationFormContent() {
                                 <option value="Desconocido">Lo desconozco</option>
                             </select>
                         </div>
-                        <div className="space-y-2 md:col-span-2">
-                            <label htmlFor="allergies" className="text-sm font-semibold">Alergias Conocidas (Opcional)</label>
-                            <input type="text" id="allergies" name="allergies" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. Penicilina, Látex, Mariscos..." />
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
+                            <label htmlFor="allergies" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Alergias Conocidas (Opcional)</label>
+                            <input type="text" id="allergies" name="allergies" style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Ej. Penicilina, Látex, Mariscos..." />
                         </div>
-                        <div className="space-y-2 md:col-span-2">
-                            <label htmlFor="medicalConditions" className="text-sm font-semibold">Condiciones Médicas (Opcional)</label>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
+                            <label htmlFor="medicalConditions" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Condiciones Médicas (Opcional)</label>
                             <textarea id="medicalConditions" name="medicalConditions" className="w-full flex min-h-[100px] rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-3 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. Asma, Diabetes Tipo 1, Hipertensión..." />
                         </div>
-                        <div className="space-y-2 md:col-span-2">
-                            <label htmlFor="importantMedications" className="text-sm font-semibold">Medicamentos Importantes (Opcional)</label>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
+                            <label htmlFor="importantMedications" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Medicamentos Importantes (Opcional)</label>
                             <textarea id="importantMedications" name="importantMedications" className="w-full flex min-h-[100px] rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-3 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. Insulina, anticoagulantes..." />
                         </div>
                     </div>
                 </section>
 
                 {/* SEGURO MÉDICO (UNIFIED) */}
-                <section className="space-y-4">
+                <section style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <h3 style={{ fontSize: "18px", fontWeight: 700, display: "flex", alignItems: "center", gap: "10px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "12px", marginBottom: "16px", color: "#F4F0EB" }}>
                         <span style={{ backgroundColor: "rgba(232,35,26,0.12)", color: "#E8231A", width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", flexShrink: 0, fontWeight: 600 }}>4</span>
                         Mi Seguro Médico <span className="text-muted-foreground font-normal text-sm ml-2">(Opcional)</span>
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-muted/30 p-5 rounded-2xl border border-border">
                         <div className="space-y-2 lg:col-span-2">
-                            <label htmlFor="medicalSystem" className="text-sm font-semibold">Sistema médico</label>
-                            <select id="medicalSystem" name="medicalSystem" value={medicalSystem} onChange={(e) => setMedicalSystem(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all">
+                            <label htmlFor="medicalSystem" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Sistema médico</label>
+                            <select id="medicalSystem" name="medicalSystem" value={medicalSystem} onChange={(e) => setMedicalSystem(e.target.value)} style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}>
                                 <option value="">Selecciona un sistema</option>
                                 <option value="Seguro Privado (Gastos Médicos Mayores)">Seguro Privado (Gastos Médicos Mayores)</option>
                                 <option value="IMSS">IMSS</option>
@@ -847,8 +1074,21 @@ function ActivationFormContent() {
                         {medicalSystem === "Seguro Privado (Gastos Médicos Mayores)" && (
                             <>
                                 <div className="space-y-2 lg:col-span-2">
-                                    <label htmlFor="aseguradora" className="text-sm font-semibold">Aseguradora</label>
-                                    <select id="aseguradora" name="aseguradora" value={aseguradora} onChange={(e) => setAseguradora(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all">
+                                    <label htmlFor="aseguradora" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Aseguradora</label>
+                                    <select id="aseguradora" name="aseguradora" value={aseguradora} onChange={(e) => setAseguradora(e.target.value)} style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}>
                                         <option value="">Selecciona una aseguradora</option>
                                         <option value="AXA">AXA</option>
                                         <option value="GNP">GNP</option>
@@ -868,13 +1108,39 @@ function ActivationFormContent() {
                                         <input type="text" id="aseguradoraOtra" name="aseguradoraOtra" required className="w-full flex h-12 rounded-xl border border-primary/50 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                     </div>
                                 )}
-                                <div className="space-y-2">
-                                    <label htmlFor="numeroPoliza" className="text-sm font-semibold">Número de Póliza *</label>
-                                    <input type="text" id="numeroPoliza" name="numeroPoliza" required className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    <label htmlFor="numeroPoliza" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Número de Póliza *</label>
+                                    <input type="text" id="numeroPoliza" name="numeroPoliza" required style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                 </div>
-                                <div className="space-y-2">
-                                    <label htmlFor="tipoSeguro" className="text-sm font-semibold">Tipo de Seguro</label>
-                                    <select id="tipoSeguro" name="tipoSeguro" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all">
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    <label htmlFor="tipoSeguro" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Tipo de Seguro</label>
+                                    <select id="tipoSeguro" name="tipoSeguro" style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}>
                                         <option value="">Selecciona un tipo</option>
                                         <option value="Gastos Médicos Mayores">Gastos Médicos Mayores</option>
                                         <option value="Seguro de Auto">Seguro de Auto</option>
@@ -883,23 +1149,60 @@ function ActivationFormContent() {
                                         <option value="Otro">Otro</option>
                                     </select>
                                 </div>
-                                <div className="space-y-2">
-                                    <label htmlFor="nombreAsegurado" className="text-sm font-semibold">Nombre Asegurado Titular *</label>
-                                    <input type="text" id="nombreAsegurado" name="nombreAsegurado" required className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    <label htmlFor="nombreAsegurado" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Nombre Asegurado Titular *</label>
+                                    <input type="text" id="nombreAsegurado" name="nombreAsegurado" required style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                 </div>
-                                <div className="space-y-2">
-                                    <label htmlFor="vigenciaPoliza" className="text-sm font-semibold">Vigencia (Opcional)</label>
-                                    <input type="date" id="vigenciaPoliza" name="vigenciaPoliza" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all text-foreground" style={{ colorScheme: 'dark' }} />
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    <label htmlFor="vigenciaPoliza" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Vigencia (Opcional)</label>
+                                    <input type="date" id="vigenciaPoliza" name="vigenciaPoliza" style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }} onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'} onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                 </div>
-                                <div className="space-y-2 md:col-span-2">
-                                    <label htmlFor="telefonoAseguradora" className="text-sm font-semibold">Teléfono de Emergencias (Opcional)</label>
-                                    <input type="tel" id="telefonoAseguradora" name="telefonoAseguradora" placeholder="Ej: 800-123-4567" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
+                                    <label htmlFor="telefonoAseguradora" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Teléfono de Emergencias (Opcional)</label>
+                                    <input type="tel" id="telefonoAseguradora" name="telefonoAseguradora" placeholder="Ej: 800-123-4567" style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                 </div>
 
                                 {/* Subida de Póliza */}
                                 <div className="space-y-4 md:col-span-2 mt-4 pt-4 border-t border-border/50">
                                     <div>
-                                        <label className="text-sm font-semibold">Documento Póliza (PDF, JPG, PNG)</label>
+                                        <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Documento Póliza (PDF, JPG, PNG)</label>
                                         <p className="text-xs text-muted-foreground mt-1">Sube el extracto de tu póliza (máx 5MB). Se mostrará a paramédicos.</p>
                                     </div>
                                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
@@ -933,60 +1236,190 @@ function ActivationFormContent() {
 
                         {medicalSystem === "IMSS" && (
                             <>
-                                <div className="space-y-2">
-                                    <label htmlFor="nss" className="text-sm font-semibold">NSS - Número de Seguridad Social *</label>
-                                    <input type="text" id="nss" name="nss" required maxLength={11} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    <label htmlFor="nss" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>NSS - Número de Seguridad Social *</label>
+                                    <input type="text" id="nss" name="nss" required maxLength={11} style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                 </div>
-                                <div className="space-y-2">
-                                    <label htmlFor="clinicaAsignada" className="text-sm font-semibold">UMF / Clínica asignada (Opcional)</label>
-                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" placeholder="Ej: UMF 28, Monterrey" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    <label htmlFor="clinicaAsignada" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>UMF / Clínica asignada (Opcional)</label>
+                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" placeholder="Ej: UMF 28, Monterrey" style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                 </div>
-                                <div className="space-y-2 md:col-span-2">
-                                    <label htmlFor="curpSeguro" className="text-sm font-semibold">CURP (Opcional)</label>
-                                    <input type="text" id="curpSeguro" name="curpSeguro" maxLength={18} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase" />
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
+                                    <label htmlFor="curpSeguro" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>CURP (Opcional)</label>
+                                    <input type="text" id="curpSeguro" name="curpSeguro" maxLength={18} style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                 </div>
                             </>
                         )}
 
                         {medicalSystem === "ISSSTE" && (
                             <>
-                                <div className="space-y-2 md:col-span-2">
-                                    <label htmlFor="numeroAfiliacion" className="text-sm font-semibold">Número de afiliación ISSSTE *</label>
-                                    <input type="text" id="numeroAfiliacion" name="numeroAfiliacion" required className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
+                                    <label htmlFor="numeroAfiliacion" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Número de afiliación ISSSTE *</label>
+                                    <input type="text" id="numeroAfiliacion" name="numeroAfiliacion" required style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                 </div>
-                                <div className="space-y-2">
-                                    <label htmlFor="clinicaAsignada" className="text-sm font-semibold">Clínica asignada (Opcional)</label>
-                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    <label htmlFor="clinicaAsignada" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Clínica asignada (Opcional)</label>
+                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                 </div>
-                                <div className="space-y-2">
-                                    <label htmlFor="curpSeguro" className="text-sm font-semibold">CURP (Opcional)</label>
-                                    <input type="text" id="curpSeguro" name="curpSeguro" maxLength={18} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase" />
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    <label htmlFor="curpSeguro" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>CURP (Opcional)</label>
+                                    <input type="text" id="curpSeguro" name="curpSeguro" maxLength={18} style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                 </div>
                             </>
                         )}
 
                         {medicalSystem === "IMSS-BIENESTAR" && (
                             <>
-                                <div className="space-y-2">
-                                    <label htmlFor="curpSeguro" className="text-sm font-semibold">CURP *</label>
-                                    <input type="text" id="curpSeguro" name="curpSeguro" required maxLength={18} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase" />
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    <label htmlFor="curpSeguro" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>CURP *</label>
+                                    <input type="text" id="curpSeguro" name="curpSeguro" required maxLength={18} style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                 </div>
-                                <div className="space-y-2">
-                                    <label htmlFor="clinicaAsignada" className="text-sm font-semibold">Centro de salud asignado (Opcional)</label>
-                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    <label htmlFor="clinicaAsignada" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Centro de salud asignado (Opcional)</label>
+                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                 </div>
                             </>
                         )}
 
                         {(medicalSystem === "PEMEX" || medicalSystem === "SEDENA / SEMAR") && (
                             <>
-                                <div className="space-y-2">
-                                    <label htmlFor="numeroAfiliacion" className="text-sm font-semibold">Número de afiliación *</label>
-                                    <input type="text" id="numeroAfiliacion" name="numeroAfiliacion" required className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    <label htmlFor="numeroAfiliacion" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Número de afiliación *</label>
+                                    <input type="text" id="numeroAfiliacion" name="numeroAfiliacion" required style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                 </div>
-                                <div className="space-y-2">
-                                    <label htmlFor="clinicaAsignada" className="text-sm font-semibold">Unidad médica asignada (Opcional)</label>
-                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    <label htmlFor="clinicaAsignada" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Unidad médica asignada (Opcional)</label>
+                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                 </div>
                             </>
                         )}
@@ -1007,7 +1440,7 @@ function ActivationFormContent() {
                 </section>
 
                 {/* NOTAS IMPORTANTES & UBICACION */}
-                <section className="space-y-4">
+                <section style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <h3 style={{ fontSize: "18px", fontWeight: 700, display: "flex", alignItems: "center", gap: "10px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "12px", marginBottom: "16px", color: "#F4F0EB" }}>
                         <span style={{ backgroundColor: "rgba(232,35,26,0.12)", color: "#E8231A", width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", flexShrink: 0, fontWeight: 600 }}>5</span>
                         Notas y Ubicación
@@ -1033,21 +1466,34 @@ function ActivationFormContent() {
                         )}
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2 md:col-span-2">
-                            <label htmlFor="additionalNotes" className="text-sm font-semibold">Notas Adicionales (Opcional)</label>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
+                            <label htmlFor="additionalNotes" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Notas Adicionales (Opcional)</label>
                             <textarea id="additionalNotes" name="additionalNotes" className="w-full flex min-h-[100px] rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-3 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Cualquier información adicional que los paramédicos o doctores deban saber." />
                         </div>
-                        <div className="space-y-2 md:col-span-2">
-                            <label htmlFor="googleMapsLink" className="text-sm font-semibold">Hospital o clínica de preferencia (Opcional)</label>
-                            <input type="text" id="googleMapsLink" name="googleMapsLink" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ejemplo: Hospital Ángeles Lindavista" />
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
+                            <label htmlFor="googleMapsLink" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Hospital o clínica de preferencia (Opcional)</label>
+                            <input type="text" id="googleMapsLink" name="googleMapsLink" style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Ejemplo: Hospital Ángeles Lindavista" />
                             <p className="text-xs text-muted-foreground mt-1">En caso de emergencia, el personal médico determinará el hospital más adecuado según tu estado de salud y criterio profesional. Este dato es solo una referencia.</p>
                         </div>
                     </div>
                 </section>
 
 
-                <button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground h-16 rounded-2xl text-xl font-black hover:scale-[1.02] hover:bg-primary/90 transition-all shadow-xl shadow-primary/20 mt-8 disabled:opacity-70 disabled:pointer-events-none disabled:transform-none">
+                <button type="submit" disabled={loading} style={{ marginTop: '32px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', backgroundColor: '#E8231A', color: '#fff', height: '64px', borderRadius: '16px', fontSize: '20px', fontWeight: 900, border: 'none', cursor: 'pointer', transition: 'background-color 0.2s' }}>
                     {loading ? <Loader2 size={24} className="animate-spin" /> : <CheckCircle2 size={24} />}
                     {loading ? "Registrando Ficha..." : "Aceptar y Activar Chip"}
                 </button>
@@ -1061,28 +1507,27 @@ function ActivationFormContent() {
 
 export default function ActivatePage() {
     return (
-        <div className="min-h-screen bg-[#0A0A08] flex flex-col items-center px-4 py-12">
-            <div style={{ maxWidth: '672px', width: '100%' }} className="bg-[#1A1A18] rounded-2xl shadow-xl border border-red-900/30 overflow-hidden">
+        <div style={{ minHeight: '100vh', backgroundColor: '#0A0A08', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '40px 16px' }}>
+            <div style={{ width: '100%', maxWidth: '680px' }}>
 
                 {/* Header */}
-                <div className="bg-destructive px-8 py-12 text-destructive-foreground relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
-                    <Link href="/" className="inline-flex items-center gap-2 bg-white/20 px-3 py-1.5 rounded-full text-white/90 hover:bg-white/30 hover:text-white transition-colors mb-8 font-medium text-xs uppercase tracking-wider">
+                <div style={{ backgroundColor: '#131311', padding: '48px 32px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px 16px 0 0', position: 'relative', overflow: 'hidden' }}>
+                    <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', backgroundColor: 'rgba(255,255,255,0.05)', padding: '6px 12px', borderRadius: '9999px', color: '#9E9A95', textDecoration: 'none', marginBottom: '32px', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>
                         <ArrowLeft size={16} /> Volver al Inicio
                     </Link>
-                    <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-3 relative z-10">
+                    <h1 style={{ fontSize: '36px', fontWeight: 900, color: '#F4F0EB', margin: '0 0 12px 0', letterSpacing: '-0.02em' }}>
                         Activa tu RescueChip
                     </h1>
-                    <p className="text-white/90 relative z-10 text-lg md:text-xl font-medium max-w-lg">
+                    <p style={{ color: '#9E9A95', fontSize: '18px', fontWeight: 500, margin: 0 }}>
                         Crea tu perfil médico de emergencia en minutos.
                     </p>
                 </div>
 
                 {/* Form Container with Suspense for useSearchParams */}
                 <Suspense fallback={
-                    <div className="p-24 flex flex-col items-center justify-center text-muted-foreground">
-                        <Loader2 size={48} className="animate-spin text-primary/30 mb-4" />
-                        <p className="font-medium animate-pulse">Cargando formulario de registro...</p>
+                    <div style={{ backgroundColor: '#131311', padding: '96px 32px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#9E9A95', border: '1px solid rgba(255,255,255,0.08)', borderTop: 'none', borderRadius: '0 0 16px 16px' }}>
+                        <Loader2 size={48} style={{ color: 'rgba(232,35,26,0.3)', marginBottom: '16px' }} />
+                        <p style={{ fontWeight: 500, margin: 0 }}>Cargando formulario de registro...</p>
                     </div>
                 }>
                     <ActivationFormContent />

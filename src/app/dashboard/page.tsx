@@ -493,7 +493,7 @@ export default function DashboardPage() {
     if (loadingAuth || deviceVerificationStatus === "idle") {
         return (
             <div className="min-h-screen bg-muted flex flex-col items-center justify-center p-4">
-                <Loader2 size={48} className="animate-spin text-primary/30 mb-4" />
+                <Loader2 size={48} style={{ animation: 'spin 1s linear infinite', color: 'rgba(232,35,26,0.3)', marginBottom: '16px' }} />
                 <p className="font-medium animate-pulse text-muted-foreground">Cargando tu panel de control...</p>
             </div>
         );
@@ -522,7 +522,7 @@ export default function DashboardPage() {
 
     return (
         <div className="min-h-screen bg-[#0A0A08] flex flex-col items-center px-4 py-12">
-            <div style={{ maxWidth: '768px', width: '100%' }} className="bg-[#1A1A18] rounded-2xl shadow-xl border border-primary/20 p-8">
+            <div style={{ colorScheme: 'dark' ,  maxWidth: '768px', width: '100%' }} className="bg-[#1A1A18] rounded-2xl shadow-xl border border-primary/20 p-8">
                 {/* Header */}
                 <div className="bg-destructive px-8 pt-10 pb-12 text-destructive-foreground relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
@@ -566,7 +566,7 @@ export default function DashboardPage() {
                         </div>
                     ) : (
                         <>
-                            <form onSubmit={handleUpdate} className="space-y-10">
+                            <form onSubmit={handleUpdate} style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
 
                                 {/* ENLACE PUBLICO */}
                                 {folio && (
@@ -596,14 +596,14 @@ export default function DashboardPage() {
                                 )}
 
                                 {/* IDENTIFICACIÓN */}
-                                <section className="space-y-4">
+                                <section style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                                     <h3 style={{ fontSize: "18px", fontWeight: 700, display: "flex", alignItems: "center", gap: "10px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "12px", marginBottom: "16px", color: "#F4F0EB" }}>
                                         <span style={{ backgroundColor: "rgba(232,35,26,0.12)", color: "#E8231A", width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", flexShrink: 0, fontWeight: 600 }}>1</span>
                                         Identificación
                                     </h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
                                         <div className="space-y-4 md:col-span-2 mt-2 mb-4">
-                                            <label className="text-sm font-semibold">Foto de Perfil</label>
+                                            <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Foto de Perfil</label>
                                             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                                                 {photoFile ? (
                                                     <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-primary bg-muted shrink-0 shadow-md">
@@ -638,23 +638,62 @@ export default function DashboardPage() {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="space-y-2 md:col-span-2">
-                                            <label htmlFor="fullName" className="text-sm font-semibold">Nombre Completo *</label>
-                                            <input type="text" id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" required />
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
+                                            <label htmlFor="fullName" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Nombre Completo *</label>
+                                            <input type="text" id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} required />
                                         </div>
-                                        <div className="space-y-2">
-                                            <label htmlFor="age" className="text-sm font-semibold">Edad</label>
-                                            <input type="number" id="age" value={age} onChange={(e) => setAge(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" min="0" max="130" />
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                            <label htmlFor="age" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Edad</label>
+                                            <input type="number" id="age" value={age} onChange={(e) => setAge(e.target.value)} style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} min="0" max="130" />
                                         </div>
-                                        <div className="space-y-2">
-                                            <label htmlFor="location" className="text-sm font-semibold">Ciudad / País *</label>
-                                            <input type="text" id="location" value={location} onChange={(e) => setLocation(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" required />
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                            <label htmlFor="location" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Ciudad / País *</label>
+                                            <input type="text" id="location" value={location} onChange={(e) => setLocation(e.target.value)} style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} required />
                                         </div>
                                     </div>
                                 </section>
 
                                 {/* CONTACTOS DE EMERGENCIA */}
-                                <section className="space-y-4">
+                                <section style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                                     <h3 style={{ fontSize: "18px", fontWeight: 700, display: "flex", alignItems: "center", gap: "10px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "12px", marginBottom: "16px", color: "#F4F0EB" }}>
                                         <span style={{ backgroundColor: "rgba(232,35,26,0.12)", color: "#E8231A", width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", flexShrink: 0, fontWeight: 600 }}>2</span>
                                         Contactos de Emergencia
@@ -662,69 +701,199 @@ export default function DashboardPage() {
 
                                     <div className="p-4 border border-border rounded-xl space-y-4 bg-muted/20">
                                         <h4 className="text-sm font-bold text-primary">Contacto 1 (Requerido)</h4>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div className="space-y-2">
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                 <label className="text-sm font-semibold text-muted-foreground">Nombre</label>
-                                                <input type="text" value={contact1Name} onChange={(e) => setContact1Name(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" required />
+                                                <input type="text" value={contact1Name} onChange={(e) => setContact1Name(e.target.value)} style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} required />
                                             </div>
-                                            <div className="space-y-2">
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                 <label className="text-sm font-semibold text-muted-foreground">Teléfono</label>
-                                                <input type="tel" value={contact1Phone} onChange={(e) => setContact1Phone(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" required />
+                                                <input type="tel" value={contact1Phone} onChange={(e) => setContact1Phone(e.target.value)} style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} required />
                                             </div>
-                                            <div className="space-y-2 md:col-span-2">
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                                                 <label className="text-sm font-semibold text-muted-foreground">Email (Opcional, para recibir alertas)</label>
-                                                <input type="email" value={contact1Email} onChange={(e) => setContact1Email(e.target.value)} placeholder="Email del contacto" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                <input type="email" value={contact1Email} onChange={(e) => setContact1Email(e.target.value)} placeholder="Email del contacto" style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                             </div>
                                         </div>
                                     </div>
 
                                     <div className="p-4 border border-border rounded-xl space-y-4 bg-muted/10">
                                         <h4 className="text-sm font-bold opacity-70">Contacto 2 (Opcional)</h4>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div className="space-y-2">
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                 <label className="text-sm font-semibold text-muted-foreground">Nombre</label>
-                                                <input type="text" value={contact2Name} onChange={(e) => setContact2Name(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                <input type="text" value={contact2Name} onChange={(e) => setContact2Name(e.target.value)} style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                             </div>
-                                            <div className="space-y-2">
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                 <label className="text-sm font-semibold text-muted-foreground">Teléfono</label>
-                                                <input type="tel" value={contact2Phone} onChange={(e) => setContact2Phone(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                <input type="tel" value={contact2Phone} onChange={(e) => setContact2Phone(e.target.value)} style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                             </div>
-                                            <div className="space-y-2 md:col-span-2">
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                                                 <label className="text-sm font-semibold text-muted-foreground">Email (Opcional, para recibir alertas)</label>
-                                                <input type="email" value={contact2Email} onChange={(e) => setContact2Email(e.target.value)} placeholder="Email del contacto" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                <input type="email" value={contact2Email} onChange={(e) => setContact2Email(e.target.value)} placeholder="Email del contacto" style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                             </div>
                                         </div>
                                     </div>
 
                                     <div className="p-4 border border-border rounded-xl space-y-4 bg-muted/10">
                                         <h4 className="text-sm font-bold opacity-70">Contacto 3 (Opcional)</h4>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div className="space-y-2">
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                 <label className="text-sm font-semibold text-muted-foreground">Nombre</label>
-                                                <input type="text" value={contact3Name} onChange={(e) => setContact3Name(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                <input type="text" value={contact3Name} onChange={(e) => setContact3Name(e.target.value)} style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                             </div>
-                                            <div className="space-y-2">
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                 <label className="text-sm font-semibold text-muted-foreground">Teléfono</label>
-                                                <input type="tel" value={contact3Phone} onChange={(e) => setContact3Phone(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                <input type="tel" value={contact3Phone} onChange={(e) => setContact3Phone(e.target.value)} style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                             </div>
-                                            <div className="space-y-2 md:col-span-2">
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                                                 <label className="text-sm font-semibold text-muted-foreground">Email (Opcional, para recibir alertas)</label>
-                                                <input type="email" value={contact3Email} onChange={(e) => setContact3Email(e.target.value)} placeholder="Email del contacto" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                <input type="email" value={contact3Email} onChange={(e) => setContact3Email(e.target.value)} placeholder="Email del contacto" style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                             </div>
                                         </div>
                                     </div>
                                 </section>
 
                                 {/* INFORMACIÓN MÉDICA */}
-                                <section className="space-y-4">
+                                <section style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                                     <h3 style={{ fontSize: "18px", fontWeight: 700, display: "flex", alignItems: "center", gap: "10px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "12px", marginBottom: "16px", color: "#F4F0EB" }}>
                                         <span style={{ backgroundColor: "rgba(232,35,26,0.12)", color: "#E8231A", width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", flexShrink: 0, fontWeight: 600 }}>3</span>
                                         Información Médica
                                     </h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <label htmlFor="bloodType" className="text-sm font-semibold">Tipo de Sangre *</label>
-                                            <select id="bloodType" value={bloodType} onChange={(e) => setBloodType(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" required>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                            <label htmlFor="bloodType" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Tipo de Sangre *</label>
+                                            <select id="bloodType" value={bloodType} onChange={(e) => setBloodType(e.target.value)} style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} required>
                                                 <option value="">Selecciona tu tipo de sangre</option>
                                                 <option value="A+">A+</option>
                                                 <option value="A-">A-</option>
@@ -737,23 +906,36 @@ export default function DashboardPage() {
                                                 <option value="Desconocido">Lo desconozco</option>
                                             </select>
                                         </div>
-                                        <div className="space-y-2 md:col-span-2">
-                                            <label htmlFor="allergies" className="text-sm font-semibold">Alergias Conocidas</label>
-                                            <input type="text" id="allergies" value={allergies} onChange={(e) => setAllergies(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
+                                            <label htmlFor="allergies" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Alergias Conocidas</label>
+                                            <input type="text" id="allergies" value={allergies} onChange={(e) => setAllergies(e.target.value)} style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                         </div>
-                                        <div className="space-y-2 md:col-span-2">
-                                            <label htmlFor="medicalConditions" className="text-sm font-semibold">Condiciones Médicas</label>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
+                                            <label htmlFor="medicalConditions" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Condiciones Médicas</label>
                                             <textarea id="medicalConditions" value={medicalConditions} onChange={(e) => setMedicalConditions(e.target.value)} className="w-full flex min-h-[100px] rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-3 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                         </div>
-                                        <div className="space-y-2 md:col-span-2">
-                                            <label htmlFor="importantMedications" className="text-sm font-semibold">Medicamentos Importantes</label>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
+                                            <label htmlFor="importantMedications" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Medicamentos Importantes</label>
                                             <textarea id="importantMedications" value={importantMedications} onChange={(e) => setImportantMedications(e.target.value)} className="w-full flex min-h-[100px] rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-3 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                         </div>
                                     </div>
                                 </section>
 
                                 {/* MI SEGURO MÉDICO (UNIFIED) */}
-                                <section className="space-y-4">
+                                <section style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                                     <h3 className="text-xl font-bold flex flex-col sm:flex-row sm:items-center justify-between border-b border-border pb-2 gap-4">
                                         <div className="flex items-center gap-3">
                                             <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0">4</span>
@@ -767,8 +949,21 @@ export default function DashboardPage() {
                                     </h3>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-muted/30 p-5 rounded-2xl border border-border">
                                         <div className="space-y-2 lg:col-span-2">
-                                            <label htmlFor="medicalSystem" className="text-sm font-semibold">Sistema médico *</label>
-                                            <select id="medicalSystem" value={medicalSystem} onChange={(e) => setMedicalSystem(e.target.value)} required className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all">
+                                            <label htmlFor="medicalSystem" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Sistema médico *</label>
+                                            <select id="medicalSystem" value={medicalSystem} onChange={(e) => setMedicalSystem(e.target.value)} required style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}>
                                                 <option value="">Selecciona un sistema</option>
                                                 <option value="Seguro Privado (Gastos Médicos Mayores)">Seguro Privado (Gastos Médicos Mayores)</option>
                                                 <option value="IMSS">IMSS</option>
@@ -784,8 +979,21 @@ export default function DashboardPage() {
                                         {medicalSystem === "Seguro Privado (Gastos Médicos Mayores)" && (
                                             <>
                                                 <div className="space-y-2 lg:col-span-2">
-                                                    <label htmlFor="aseguradora" className="text-sm font-semibold">Aseguradora</label>
-                                                    <select id="aseguradora" value={aseguradora} onChange={(e) => setAseguradora(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all">
+                                                    <label htmlFor="aseguradora" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Aseguradora</label>
+                                                    <select id="aseguradora" value={aseguradora} onChange={(e) => setAseguradora(e.target.value)} style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}>
                                                         <option value="">Selecciona una aseguradora</option>
                                                         <option value="AXA">AXA</option>
                                                         <option value="GNP">GNP</option>
@@ -805,27 +1013,77 @@ export default function DashboardPage() {
                                                         <input type="text" id="aseguradoraOtra" value={aseguradoraOtra} onChange={(e) => setAseguradoraOtra(e.target.value)} required className="w-full flex h-12 rounded-xl border border-primary/50 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                                     </div>
                                                 )}
-                                                <div className="space-y-2">
-                                                    <label htmlFor="numeroPoliza" className="text-sm font-semibold">Número de Póliza *</label>
-                                                    <input type="text" id="numeroPoliza" value={numeroPoliza} onChange={(e) => setNumeroPoliza(e.target.value)} required className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                    <label htmlFor="numeroPoliza" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Número de Póliza *</label>
+                                                    <input type="text" id="numeroPoliza" value={numeroPoliza} onChange={(e) => setNumeroPoliza(e.target.value)} required style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                                 </div>
-                                                <div className="space-y-2">
-                                                    <label htmlFor="nombreAsegurado" className="text-sm font-semibold">Nombre Asegurado Titular *</label>
-                                                    <input type="text" id="nombreAsegurado" value={nombreAsegurado} onChange={(e) => setNombreAsegurado(e.target.value)} required className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                    <label htmlFor="nombreAsegurado" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Nombre Asegurado Titular *</label>
+                                                    <input type="text" id="nombreAsegurado" value={nombreAsegurado} onChange={(e) => setNombreAsegurado(e.target.value)} required style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                                 </div>
-                                                <div className="space-y-2">
-                                                    <label htmlFor="vigenciaPoliza" className="text-sm font-semibold">Vigencia (Opcional)</label>
-                                                    <input type="date" id="vigenciaPoliza" value={vigenciaPoliza} onChange={(e) => setVigenciaPoliza(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all text-foreground" style={{ colorScheme: 'dark' }} />
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                    <label htmlFor="vigenciaPoliza" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Vigencia (Opcional)</label>
+                                                    <input type="date" id="vigenciaPoliza" value={vigenciaPoliza} onChange={(e) => setVigenciaPoliza(e.target.value)} style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }} onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'} onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                                 </div>
-                                                <div className="space-y-2 md:col-span-2">
-                                                    <label htmlFor="telefonoAseguradora" className="text-sm font-semibold">Teléfono de Emergencias (Opcional)</label>
-                                                    <input type="tel" id="telefonoAseguradora" value={telefonoAseguradora} onChange={(e) => setTelefonoAseguradora(e.target.value)} placeholder="Ej: 800-123-4567" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
+                                                    <label htmlFor="telefonoAseguradora" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Teléfono de Emergencias (Opcional)</label>
+                                                    <input type="tel" id="telefonoAseguradora" value={telefonoAseguradora} onChange={(e) => setTelefonoAseguradora(e.target.value)} placeholder="Ej: 800-123-4567" style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                                 </div>
 
                                                 {/* Subida de Póliza */}
                                                 <div className="space-y-4 md:col-span-2 mt-4 pt-4 border-t border-border/50">
                                                     <div>
-                                                        <label className="text-sm font-semibold">Documento Póliza (PDF, JPG, PNG)</label>
+                                                        <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Documento Póliza (PDF, JPG, PNG)</label>
                                                         <p className="text-xs text-muted-foreground mt-1">Sube el extracto de tu póliza (máx 5MB). Se mostrará a paramédicos.</p>
                                                     </div>
                                                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
@@ -864,60 +1122,190 @@ export default function DashboardPage() {
 
                                         {medicalSystem === "IMSS" && (
                                             <>
-                                                <div className="space-y-2">
-                                                    <label htmlFor="nss" className="text-sm font-semibold">NSS - Número de Seguridad Social *</label>
-                                                    <input type="text" id="nss" value={nss} onChange={(e) => setNss(e.target.value)} required maxLength={11} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                    <label htmlFor="nss" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>NSS - Número de Seguridad Social *</label>
+                                                    <input type="text" id="nss" value={nss} onChange={(e) => setNss(e.target.value)} required maxLength={11} style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                                 </div>
-                                                <div className="space-y-2">
-                                                    <label htmlFor="clinicaAsignada" className="text-sm font-semibold">UMF / Clínica asignada (Opcional)</label>
-                                                    <input type="text" id="clinicaAsignada" value={clinicaAsignada} onChange={(e) => setClinicaAsignada(e.target.value)} placeholder="Ej: UMF 28, Monterrey" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                    <label htmlFor="clinicaAsignada" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>UMF / Clínica asignada (Opcional)</label>
+                                                    <input type="text" id="clinicaAsignada" value={clinicaAsignada} onChange={(e) => setClinicaAsignada(e.target.value)} placeholder="Ej: UMF 28, Monterrey" style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                                 </div>
-                                                <div className="space-y-2 md:col-span-2">
-                                                    <label htmlFor="curpSeguro" className="text-sm font-semibold">CURP (Opcional)</label>
-                                                    <input type="text" id="curpSeguro" value={curpSeguro} onChange={(e) => setCurpSeguro(e.target.value.toUpperCase())} maxLength={18} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase" />
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
+                                                    <label htmlFor="curpSeguro" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>CURP (Opcional)</label>
+                                                    <input type="text" id="curpSeguro" value={curpSeguro} onChange={(e) => setCurpSeguro(e.target.value.toUpperCase())} maxLength={18} style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                                 </div>
                                             </>
                                         )}
 
                                         {medicalSystem === "ISSSTE" && (
                                             <>
-                                                <div className="space-y-2 md:col-span-2">
-                                                    <label htmlFor="numeroAfiliacion" className="text-sm font-semibold">Número de afiliación ISSSTE *</label>
-                                                    <input type="text" id="numeroAfiliacion" value={numeroAfiliacion} onChange={(e) => setNumeroAfiliacion(e.target.value)} required className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
+                                                    <label htmlFor="numeroAfiliacion" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Número de afiliación ISSSTE *</label>
+                                                    <input type="text" id="numeroAfiliacion" value={numeroAfiliacion} onChange={(e) => setNumeroAfiliacion(e.target.value)} required style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                                 </div>
-                                                <div className="space-y-2">
-                                                    <label htmlFor="clinicaAsignada" className="text-sm font-semibold">Clínica asignada (Opcional)</label>
-                                                    <input type="text" id="clinicaAsignada" value={clinicaAsignada} onChange={(e) => setClinicaAsignada(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                    <label htmlFor="clinicaAsignada" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Clínica asignada (Opcional)</label>
+                                                    <input type="text" id="clinicaAsignada" value={clinicaAsignada} onChange={(e) => setClinicaAsignada(e.target.value)} style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                                 </div>
-                                                <div className="space-y-2">
-                                                    <label htmlFor="curpSeguro" className="text-sm font-semibold">CURP (Opcional)</label>
-                                                    <input type="text" id="curpSeguro" value={curpSeguro} onChange={(e) => setCurpSeguro(e.target.value.toUpperCase())} maxLength={18} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase" />
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                    <label htmlFor="curpSeguro" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>CURP (Opcional)</label>
+                                                    <input type="text" id="curpSeguro" value={curpSeguro} onChange={(e) => setCurpSeguro(e.target.value.toUpperCase())} maxLength={18} style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                                 </div>
                                             </>
                                         )}
 
                                         {medicalSystem === "IMSS-BIENESTAR" && (
                                             <>
-                                                <div className="space-y-2">
-                                                    <label htmlFor="curpSeguro" className="text-sm font-semibold">CURP *</label>
-                                                    <input type="text" id="curpSeguro" value={curpSeguro} onChange={(e) => setCurpSeguro(e.target.value.toUpperCase())} required maxLength={18} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase" />
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                    <label htmlFor="curpSeguro" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>CURP *</label>
+                                                    <input type="text" id="curpSeguro" value={curpSeguro} onChange={(e) => setCurpSeguro(e.target.value.toUpperCase())} required maxLength={18} style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                                 </div>
-                                                <div className="space-y-2">
-                                                    <label htmlFor="clinicaAsignada" className="text-sm font-semibold">Centro de salud asignado (Opcional)</label>
-                                                    <input type="text" id="clinicaAsignada" value={clinicaAsignada} onChange={(e) => setClinicaAsignada(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                    <label htmlFor="clinicaAsignada" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Centro de salud asignado (Opcional)</label>
+                                                    <input type="text" id="clinicaAsignada" value={clinicaAsignada} onChange={(e) => setClinicaAsignada(e.target.value)} style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                                 </div>
                                             </>
                                         )}
 
                                         {(medicalSystem === "PEMEX" || medicalSystem === "SEDENA / SEMAR") && (
                                             <>
-                                                <div className="space-y-2">
-                                                    <label htmlFor="numeroAfiliacion" className="text-sm font-semibold">Número de afiliación *</label>
-                                                    <input type="text" id="numeroAfiliacion" value={numeroAfiliacion} onChange={(e) => setNumeroAfiliacion(e.target.value)} required className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                    <label htmlFor="numeroAfiliacion" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Número de afiliación *</label>
+                                                    <input type="text" id="numeroAfiliacion" value={numeroAfiliacion} onChange={(e) => setNumeroAfiliacion(e.target.value)} required style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                                 </div>
-                                                <div className="space-y-2">
-                                                    <label htmlFor="clinicaAsignada" className="text-sm font-semibold">Unidad médica asignada (Opcional)</label>
-                                                    <input type="text" id="clinicaAsignada" value={clinicaAsignada} onChange={(e) => setClinicaAsignada(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                    <label htmlFor="clinicaAsignada" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Unidad médica asignada (Opcional)</label>
+                                                    <input type="text" id="clinicaAsignada" value={clinicaAsignada} onChange={(e) => setClinicaAsignada(e.target.value)} style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                                 </div>
                                             </>
                                         )}
@@ -938,7 +1326,7 @@ export default function DashboardPage() {
                                 </section>
 
                                 {/* NOTAS Y UBICACIÓN */}
-                                <section className="space-y-4">
+                                <section style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                                     <h3 style={{ fontSize: "18px", fontWeight: 700, display: "flex", alignItems: "center", gap: "10px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "12px", marginBottom: "16px", color: "#F4F0EB" }}>
                                         <span style={{ backgroundColor: "rgba(232,35,26,0.12)", color: "#E8231A", width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", flexShrink: 0, fontWeight: 600 }}>5</span>
                                         Notas y Ubicación
@@ -949,22 +1337,35 @@ export default function DashboardPage() {
                                         <label htmlFor="isMotorcyclist" className="text-sm font-bold cursor-pointer text-primary">Mostrar Alerta de "No Retirar Casco" (Motociclistas)</label>
                                     </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div className="space-y-2 md:col-span-2">
-                                            <label htmlFor="additionalNotes" className="text-sm font-semibold">Notas Adicionales</label>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
+                                            <label htmlFor="additionalNotes" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Notas Adicionales</label>
                                             <textarea id="additionalNotes" value={additionalNotes} onChange={(e) => setAdditionalNotes(e.target.value)} className="w-full flex min-h-[100px] rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-3 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                         </div>
                                         <div className="space-y-4 md:col-span-2 mt-2">
-                                            <div className="space-y-2">
-                                                <label htmlFor="googleMapsLink" className="text-sm font-semibold">Hospital o clínica de preferencia</label>
-                                                <input type="text" id="googleMapsLink" value={googleMapsLink} onChange={(e) => setGoogleMapsLink(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ejemplo: Hospital Ángeles Lindavista" />
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                <label htmlFor="googleMapsLink" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Hospital o clínica de preferencia</label>
+                                                <input type="text" id="googleMapsLink" value={googleMapsLink} onChange={(e) => setGoogleMapsLink(e.target.value)} style={{
+                                width: '100%',
+                                backgroundColor: '#1A1A18',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '10px',
+                                padding: '12px 16px',
+                                fontSize: '15px',
+                                color: '#F4F0EB',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Ejemplo: Hospital Ángeles Lindavista" />
                                                 <p className="text-xs text-muted-foreground mt-1">En caso de emergencia, el personal médico determinará el hospital más adecuado según tu estado de salud y criterio profesional. Este dato es solo una referencia.</p>
                                             </div>
                                         </div>
                                     </div>
                                 </section>
 
-                                <button type="submit" disabled={saving} className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground h-16 rounded-2xl text-xl font-black hover:scale-[1.02] hover:bg-primary/90 transition-all shadow-xl shadow-primary/20 mt-8 disabled:opacity-70 disabled:pointer-events-none disabled:transform-none">
+                                <button type="submit" disabled={saving} style={{ marginTop: '32px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', backgroundColor: '#E8231A', color: '#fff', height: '64px', borderRadius: '16px', fontSize: '20px', fontWeight: 900, border: 'none', cursor: 'pointer', transition: 'background-color 0.2s' }}>
                                     {saving ? <Loader2 size={24} className="animate-spin" /> : <CheckCircle2 size={24} />}
                                     {saving ? "Guardando Cambios..." : "Guardar Cambios"}
                                 </button>
@@ -986,27 +1387,12 @@ export default function DashboardPage() {
                                         No hay registros de acceso a tu chip todavía.
                                     </div>
                                 ) : (
-                                    <div className="space-y-4">
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                                         {accessLogs.map((log) => {
                                             const isExpanded = expandedLogId === log.id;
                                             return (
                                                 <div key={log.id} className={`rounded-xl border ${log.tipo === 'emergencia' ? 'bg-destructive/10 border-destructive/30' : 'bg-card border-border'} overflow-hidden`}>
-                                                    <style dangerouslySetInnerHTML={{
-                                                        __html: `
-        input, select, textarea { background-color: #1C1C1A !important; color: #F4F0EB !important; border: 1px solid rgba(255,255,255,0.25) !important; border-radius: 12px !important; padding: 10px 16px !important; }
-        input::placeholder, textarea::placeholder { color: rgba(244,240,235,0.3) !important; }
-        input:focus, select:focus, textarea:focus { border-color: rgba(232,35,26,0.5) !important; outline: none !important; }
-        select option { background-color: #1A1A18; color: #F4F0EB; }
-        label { color: #C8C0B4 !important; }
-        .min-h-screen { background-color: #0A0A08 !important; color: #F4F0EB !important; }
-        .bg-card, .bg-muted, .bg-accent { background-color: #131311 !important; }
-        .border { border-color: rgba(255,255,255,0.08) !important; }
-        .text-muted-foreground { color: #9E9A95 !important; }
-        .text-foreground { color: #F4F0EB !important; }
-        .text-primary { color: #E8231A !important; }
-        .bg-primary { background-color: #E8231A !important; }
-        .bg-background { background-color: #0A0A08 !important; }
-      `}} />
+                                                    
                                                     <div className="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                                                         <div>
                                                             <div className="flex items-center gap-2 mb-1">
