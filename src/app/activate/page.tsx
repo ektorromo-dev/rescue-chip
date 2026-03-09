@@ -573,7 +573,7 @@ function ActivationFormContent() {
     }
 
     return (
-        <div style={{ backgroundColor: "#0A0A08", color: "#F4F0EB", padding: "24px 20px", minHeight: "100vh", fontFamily: "Inter,-apple-system,sans-serif" }}>
+        <div style={{ backgroundColor: "#0A0A08", color: "#F4F0EB", minHeight: "100vh", fontFamily: "Inter,-apple-system,sans-serif", padding: "40px max(16px, calc(50vw - 380px))" }}>
             <style dangerouslySetInnerHTML={{
                 __html: `
         input, select, textarea { background-color: #1C1C1A !important; color: #F4F0EB !important; border: 1px solid rgba(255,255,255,0.25) !important; border-radius: 12px !important; padding: 10px 16px !important; }
