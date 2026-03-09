@@ -632,7 +632,7 @@ export default function DashboardPage() {
                                                                 setPhotoFile(e.target.files[0]);
                                                             }
                                                         }}
-                                                        className="w-full flex h-14 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 cursor-pointer shadow-sm"
+                                                        className="w-full flex h-14 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 cursor-pointer shadow-sm"
                                                     />
                                                     <p className="text-xs text-muted-foreground mt-2 leading-relaxed font-medium">Sube una nueva foto si deseas cambiar la actual.</p>
                                                 </div>
@@ -640,15 +640,15 @@ export default function DashboardPage() {
                                         </div>
                                         <div className="space-y-2 md:col-span-2">
                                             <label htmlFor="fullName" className="text-sm font-semibold">Nombre Completo *</label>
-                                            <input type="text" id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" required />
+                                            <input type="text" id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" required />
                                         </div>
                                         <div className="space-y-2">
                                             <label htmlFor="age" className="text-sm font-semibold">Edad</label>
-                                            <input type="number" id="age" value={age} onChange={(e) => setAge(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" min="0" max="130" />
+                                            <input type="number" id="age" value={age} onChange={(e) => setAge(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" min="0" max="130" />
                                         </div>
                                         <div className="space-y-2">
                                             <label htmlFor="location" className="text-sm font-semibold">Ciudad / País *</label>
-                                            <input type="text" id="location" value={location} onChange={(e) => setLocation(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" required />
+                                            <input type="text" id="location" value={location} onChange={(e) => setLocation(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" required />
                                         </div>
                                     </div>
                                 </section>
@@ -665,15 +665,15 @@ export default function DashboardPage() {
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div className="space-y-2">
                                                 <label className="text-sm font-semibold text-muted-foreground">Nombre</label>
-                                                <input type="text" value={contact1Name} onChange={(e) => setContact1Name(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" required />
+                                                <input type="text" value={contact1Name} onChange={(e) => setContact1Name(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" required />
                                             </div>
                                             <div className="space-y-2">
                                                 <label className="text-sm font-semibold text-muted-foreground">Teléfono</label>
-                                                <input type="tel" value={contact1Phone} onChange={(e) => setContact1Phone(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" required />
+                                                <input type="tel" value={contact1Phone} onChange={(e) => setContact1Phone(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" required />
                                             </div>
                                             <div className="space-y-2 md:col-span-2">
                                                 <label className="text-sm font-semibold text-muted-foreground">Email (Opcional, para recibir alertas)</label>
-                                                <input type="email" value={contact1Email} onChange={(e) => setContact1Email(e.target.value)} placeholder="Email del contacto" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                <input type="email" value={contact1Email} onChange={(e) => setContact1Email(e.target.value)} placeholder="Email del contacto" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                             </div>
                                         </div>
                                     </div>
@@ -683,15 +683,15 @@ export default function DashboardPage() {
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div className="space-y-2">
                                                 <label className="text-sm font-semibold text-muted-foreground">Nombre</label>
-                                                <input type="text" value={contact2Name} onChange={(e) => setContact2Name(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                <input type="text" value={contact2Name} onChange={(e) => setContact2Name(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                             </div>
                                             <div className="space-y-2">
                                                 <label className="text-sm font-semibold text-muted-foreground">Teléfono</label>
-                                                <input type="tel" value={contact2Phone} onChange={(e) => setContact2Phone(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                <input type="tel" value={contact2Phone} onChange={(e) => setContact2Phone(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                             </div>
                                             <div className="space-y-2 md:col-span-2">
                                                 <label className="text-sm font-semibold text-muted-foreground">Email (Opcional, para recibir alertas)</label>
-                                                <input type="email" value={contact2Email} onChange={(e) => setContact2Email(e.target.value)} placeholder="Email del contacto" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                <input type="email" value={contact2Email} onChange={(e) => setContact2Email(e.target.value)} placeholder="Email del contacto" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                             </div>
                                         </div>
                                     </div>
@@ -701,15 +701,15 @@ export default function DashboardPage() {
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div className="space-y-2">
                                                 <label className="text-sm font-semibold text-muted-foreground">Nombre</label>
-                                                <input type="text" value={contact3Name} onChange={(e) => setContact3Name(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                <input type="text" value={contact3Name} onChange={(e) => setContact3Name(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                             </div>
                                             <div className="space-y-2">
                                                 <label className="text-sm font-semibold text-muted-foreground">Teléfono</label>
-                                                <input type="tel" value={contact3Phone} onChange={(e) => setContact3Phone(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                <input type="tel" value={contact3Phone} onChange={(e) => setContact3Phone(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                             </div>
                                             <div className="space-y-2 md:col-span-2">
                                                 <label className="text-sm font-semibold text-muted-foreground">Email (Opcional, para recibir alertas)</label>
-                                                <input type="email" value={contact3Email} onChange={(e) => setContact3Email(e.target.value)} placeholder="Email del contacto" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                <input type="email" value={contact3Email} onChange={(e) => setContact3Email(e.target.value)} placeholder="Email del contacto" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                             </div>
                                         </div>
                                     </div>
@@ -724,7 +724,7 @@ export default function DashboardPage() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-2">
                                             <label htmlFor="bloodType" className="text-sm font-semibold">Tipo de Sangre *</label>
-                                            <select id="bloodType" value={bloodType} onChange={(e) => setBloodType(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" required>
+                                            <select id="bloodType" value={bloodType} onChange={(e) => setBloodType(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" required>
                                                 <option value="">Selecciona tu tipo de sangre</option>
                                                 <option value="A+">A+</option>
                                                 <option value="A-">A-</option>
@@ -739,15 +739,15 @@ export default function DashboardPage() {
                                         </div>
                                         <div className="space-y-2 md:col-span-2">
                                             <label htmlFor="allergies" className="text-sm font-semibold">Alergias Conocidas</label>
-                                            <input type="text" id="allergies" value={allergies} onChange={(e) => setAllergies(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                            <input type="text" id="allergies" value={allergies} onChange={(e) => setAllergies(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                         </div>
                                         <div className="space-y-2 md:col-span-2">
                                             <label htmlFor="medicalConditions" className="text-sm font-semibold">Condiciones Médicas</label>
-                                            <textarea id="medicalConditions" value={medicalConditions} onChange={(e) => setMedicalConditions(e.target.value)} className="w-full flex min-h-[100px] rounded-xl border border-input bg-background px-4 py-3 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                            <textarea id="medicalConditions" value={medicalConditions} onChange={(e) => setMedicalConditions(e.target.value)} className="w-full flex min-h-[100px] rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-3 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                         </div>
                                         <div className="space-y-2 md:col-span-2">
                                             <label htmlFor="importantMedications" className="text-sm font-semibold">Medicamentos Importantes</label>
-                                            <textarea id="importantMedications" value={importantMedications} onChange={(e) => setImportantMedications(e.target.value)} className="w-full flex min-h-[100px] rounded-xl border border-input bg-background px-4 py-3 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                            <textarea id="importantMedications" value={importantMedications} onChange={(e) => setImportantMedications(e.target.value)} className="w-full flex min-h-[100px] rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-3 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                         </div>
                                     </div>
                                 </section>
@@ -768,7 +768,7 @@ export default function DashboardPage() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-muted/30 p-5 rounded-2xl border border-border">
                                         <div className="space-y-2 lg:col-span-2">
                                             <label htmlFor="medicalSystem" className="text-sm font-semibold">Sistema médico *</label>
-                                            <select id="medicalSystem" value={medicalSystem} onChange={(e) => setMedicalSystem(e.target.value)} required className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all">
+                                            <select id="medicalSystem" value={medicalSystem} onChange={(e) => setMedicalSystem(e.target.value)} required className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all">
                                                 <option value="">Selecciona un sistema</option>
                                                 <option value="Seguro Privado (Gastos Médicos Mayores)">Seguro Privado (Gastos Médicos Mayores)</option>
                                                 <option value="IMSS">IMSS</option>
@@ -785,7 +785,7 @@ export default function DashboardPage() {
                                             <>
                                                 <div className="space-y-2 lg:col-span-2">
                                                     <label htmlFor="aseguradora" className="text-sm font-semibold">Aseguradora</label>
-                                                    <select id="aseguradora" value={aseguradora} onChange={(e) => setAseguradora(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all">
+                                                    <select id="aseguradora" value={aseguradora} onChange={(e) => setAseguradora(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all">
                                                         <option value="">Selecciona una aseguradora</option>
                                                         <option value="AXA">AXA</option>
                                                         <option value="GNP">GNP</option>
@@ -802,24 +802,24 @@ export default function DashboardPage() {
                                                 {aseguradora === "Otro" && (
                                                     <div className="space-y-2 animate-in fade-in duration-300 md:col-span-2">
                                                         <label htmlFor="aseguradoraOtra" className="text-sm font-semibold text-primary">Especificar Aseguradora *</label>
-                                                        <input type="text" id="aseguradoraOtra" value={aseguradoraOtra} onChange={(e) => setAseguradoraOtra(e.target.value)} required className="w-full flex h-12 rounded-xl border border-primary/50 bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                        <input type="text" id="aseguradoraOtra" value={aseguradoraOtra} onChange={(e) => setAseguradoraOtra(e.target.value)} required className="w-full flex h-12 rounded-xl border border-primary/50 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                                     </div>
                                                 )}
                                                 <div className="space-y-2">
                                                     <label htmlFor="numeroPoliza" className="text-sm font-semibold">Número de Póliza *</label>
-                                                    <input type="text" id="numeroPoliza" value={numeroPoliza} onChange={(e) => setNumeroPoliza(e.target.value)} required className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                    <input type="text" id="numeroPoliza" value={numeroPoliza} onChange={(e) => setNumeroPoliza(e.target.value)} required className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                                 </div>
                                                 <div className="space-y-2">
                                                     <label htmlFor="nombreAsegurado" className="text-sm font-semibold">Nombre Asegurado Titular *</label>
-                                                    <input type="text" id="nombreAsegurado" value={nombreAsegurado} onChange={(e) => setNombreAsegurado(e.target.value)} required className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                    <input type="text" id="nombreAsegurado" value={nombreAsegurado} onChange={(e) => setNombreAsegurado(e.target.value)} required className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                                 </div>
                                                 <div className="space-y-2">
                                                     <label htmlFor="vigenciaPoliza" className="text-sm font-semibold">Vigencia (Opcional)</label>
-                                                    <input type="date" id="vigenciaPoliza" value={vigenciaPoliza} onChange={(e) => setVigenciaPoliza(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all text-foreground" style={{ colorScheme: 'dark' }} />
+                                                    <input type="date" id="vigenciaPoliza" value={vigenciaPoliza} onChange={(e) => setVigenciaPoliza(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all text-foreground" style={{ colorScheme: 'dark' }} />
                                                 </div>
                                                 <div className="space-y-2 md:col-span-2">
                                                     <label htmlFor="telefonoAseguradora" className="text-sm font-semibold">Teléfono de Emergencias (Opcional)</label>
-                                                    <input type="tel" id="telefonoAseguradora" value={telefonoAseguradora} onChange={(e) => setTelefonoAseguradora(e.target.value)} placeholder="Ej: 800-123-4567" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                    <input type="tel" id="telefonoAseguradora" value={telefonoAseguradora} onChange={(e) => setTelefonoAseguradora(e.target.value)} placeholder="Ej: 800-123-4567" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                                 </div>
 
                                                 {/* Subida de Póliza */}
@@ -854,7 +854,7 @@ export default function DashboardPage() {
                                                                         setPolizaFile(file);
                                                                     }
                                                                 }}
-                                                                className="w-full flex h-14 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 cursor-pointer shadow-sm relative z-10"
+                                                                className="w-full flex h-14 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 cursor-pointer shadow-sm relative z-10"
                                                             />
                                                         </div>
                                                     </div>
@@ -866,15 +866,15 @@ export default function DashboardPage() {
                                             <>
                                                 <div className="space-y-2">
                                                     <label htmlFor="nss" className="text-sm font-semibold">NSS - Número de Seguridad Social *</label>
-                                                    <input type="text" id="nss" value={nss} onChange={(e) => setNss(e.target.value)} required maxLength={11} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                    <input type="text" id="nss" value={nss} onChange={(e) => setNss(e.target.value)} required maxLength={11} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                                 </div>
                                                 <div className="space-y-2">
                                                     <label htmlFor="clinicaAsignada" className="text-sm font-semibold">UMF / Clínica asignada (Opcional)</label>
-                                                    <input type="text" id="clinicaAsignada" value={clinicaAsignada} onChange={(e) => setClinicaAsignada(e.target.value)} placeholder="Ej: UMF 28, Monterrey" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                    <input type="text" id="clinicaAsignada" value={clinicaAsignada} onChange={(e) => setClinicaAsignada(e.target.value)} placeholder="Ej: UMF 28, Monterrey" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                                 </div>
                                                 <div className="space-y-2 md:col-span-2">
                                                     <label htmlFor="curpSeguro" className="text-sm font-semibold">CURP (Opcional)</label>
-                                                    <input type="text" id="curpSeguro" value={curpSeguro} onChange={(e) => setCurpSeguro(e.target.value.toUpperCase())} maxLength={18} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase" />
+                                                    <input type="text" id="curpSeguro" value={curpSeguro} onChange={(e) => setCurpSeguro(e.target.value.toUpperCase())} maxLength={18} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase" />
                                                 </div>
                                             </>
                                         )}
@@ -883,15 +883,15 @@ export default function DashboardPage() {
                                             <>
                                                 <div className="space-y-2 md:col-span-2">
                                                     <label htmlFor="numeroAfiliacion" className="text-sm font-semibold">Número de afiliación ISSSTE *</label>
-                                                    <input type="text" id="numeroAfiliacion" value={numeroAfiliacion} onChange={(e) => setNumeroAfiliacion(e.target.value)} required className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                    <input type="text" id="numeroAfiliacion" value={numeroAfiliacion} onChange={(e) => setNumeroAfiliacion(e.target.value)} required className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                                 </div>
                                                 <div className="space-y-2">
                                                     <label htmlFor="clinicaAsignada" className="text-sm font-semibold">Clínica asignada (Opcional)</label>
-                                                    <input type="text" id="clinicaAsignada" value={clinicaAsignada} onChange={(e) => setClinicaAsignada(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                    <input type="text" id="clinicaAsignada" value={clinicaAsignada} onChange={(e) => setClinicaAsignada(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                                 </div>
                                                 <div className="space-y-2">
                                                     <label htmlFor="curpSeguro" className="text-sm font-semibold">CURP (Opcional)</label>
-                                                    <input type="text" id="curpSeguro" value={curpSeguro} onChange={(e) => setCurpSeguro(e.target.value.toUpperCase())} maxLength={18} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase" />
+                                                    <input type="text" id="curpSeguro" value={curpSeguro} onChange={(e) => setCurpSeguro(e.target.value.toUpperCase())} maxLength={18} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase" />
                                                 </div>
                                             </>
                                         )}
@@ -900,11 +900,11 @@ export default function DashboardPage() {
                                             <>
                                                 <div className="space-y-2">
                                                     <label htmlFor="curpSeguro" className="text-sm font-semibold">CURP *</label>
-                                                    <input type="text" id="curpSeguro" value={curpSeguro} onChange={(e) => setCurpSeguro(e.target.value.toUpperCase())} required maxLength={18} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase" />
+                                                    <input type="text" id="curpSeguro" value={curpSeguro} onChange={(e) => setCurpSeguro(e.target.value.toUpperCase())} required maxLength={18} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase" />
                                                 </div>
                                                 <div className="space-y-2">
                                                     <label htmlFor="clinicaAsignada" className="text-sm font-semibold">Centro de salud asignado (Opcional)</label>
-                                                    <input type="text" id="clinicaAsignada" value={clinicaAsignada} onChange={(e) => setClinicaAsignada(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                    <input type="text" id="clinicaAsignada" value={clinicaAsignada} onChange={(e) => setClinicaAsignada(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                                 </div>
                                             </>
                                         )}
@@ -913,11 +913,11 @@ export default function DashboardPage() {
                                             <>
                                                 <div className="space-y-2">
                                                     <label htmlFor="numeroAfiliacion" className="text-sm font-semibold">Número de afiliación *</label>
-                                                    <input type="text" id="numeroAfiliacion" value={numeroAfiliacion} onChange={(e) => setNumeroAfiliacion(e.target.value)} required className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                    <input type="text" id="numeroAfiliacion" value={numeroAfiliacion} onChange={(e) => setNumeroAfiliacion(e.target.value)} required className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                                 </div>
                                                 <div className="space-y-2">
                                                     <label htmlFor="clinicaAsignada" className="text-sm font-semibold">Unidad médica asignada (Opcional)</label>
-                                                    <input type="text" id="clinicaAsignada" value={clinicaAsignada} onChange={(e) => setClinicaAsignada(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                                    <input type="text" id="clinicaAsignada" value={clinicaAsignada} onChange={(e) => setClinicaAsignada(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                                 </div>
                                             </>
                                         )}
@@ -952,12 +952,12 @@ export default function DashboardPage() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-2 md:col-span-2">
                                             <label htmlFor="additionalNotes" className="text-sm font-semibold">Notas Adicionales</label>
-                                            <textarea id="additionalNotes" value={additionalNotes} onChange={(e) => setAdditionalNotes(e.target.value)} className="w-full flex min-h-[100px] rounded-xl border border-input bg-background px-4 py-3 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                            <textarea id="additionalNotes" value={additionalNotes} onChange={(e) => setAdditionalNotes(e.target.value)} className="w-full flex min-h-[100px] rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-3 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                         </div>
                                         <div className="space-y-4 md:col-span-2 mt-2">
                                             <div className="space-y-2">
                                                 <label htmlFor="googleMapsLink" className="text-sm font-semibold">Hospital o clínica de preferencia</label>
-                                                <input type="text" id="googleMapsLink" value={googleMapsLink} onChange={(e) => setGoogleMapsLink(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ejemplo: Hospital Ángeles Lindavista" />
+                                                <input type="text" id="googleMapsLink" value={googleMapsLink} onChange={(e) => setGoogleMapsLink(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ejemplo: Hospital Ángeles Lindavista" />
                                                 <p className="text-xs text-muted-foreground mt-1">En caso de emergencia, el personal médico determinará el hospital más adecuado según tu estado de salud y criterio profesional. Este dato es solo una referencia.</p>
                                             </div>
                                         </div>

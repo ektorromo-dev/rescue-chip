@@ -611,7 +611,7 @@ function ActivationFormContent() {
                     </h3>
                     <div className="space-y-2">
                         <label htmlFor="folio" className="text-sm font-semibold">Número de Folio (incluido en tu paquete) *</label>
-                        <input type="text" id="folio" name="folio" value={folio} onChange={(e) => setFolio(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase placeholder:normal-case font-mono" placeholder="Ej. RSC-0001" required />
+                        <input type="text" id="folio" name="folio" value={folio} onChange={(e) => setFolio(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase placeholder:normal-case font-mono" placeholder="Ej. RSC-0001" required />
                     </div>
                 </section>
 
@@ -624,12 +624,12 @@ function ActivationFormContent() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <label htmlFor="email" className="text-sm font-semibold">Correo Electrónico *</label>
-                            <input type="email" id="email" name="email" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="tu@correo.com" required />
+                            <input type="email" id="email" name="email" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="tu@correo.com" required />
                         </div>
                         <div className="space-y-2">
                             <label htmlFor="password" className="text-sm font-semibold">Contraseña *</label>
                             <div className="relative">
-                                <input type={showPassword ? "text" : "password"} id="password" name="password" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 pr-12 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Mínimo 6 caracteres" required minLength={6} />
+                                <input type={showPassword ? "text" : "password"} id="password" name="password" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 pr-12 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Mínimo 6 caracteres" required minLength={6} />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
@@ -672,7 +672,7 @@ function ActivationFormContent() {
                                                 setPhotoFile(e.target.files[0]);
                                             }
                                         }}
-                                        className="w-full flex h-14 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 cursor-pointer shadow-sm"
+                                        className="w-full flex h-14 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 cursor-pointer shadow-sm"
                                     />
                                     <p className="text-xs text-muted-foreground mt-2 leading-relaxed font-medium">Sube o toma una foto clara de tu rostro.<br />Establece tu identidad rápidamente ante los paramédicos.</p>
                                 </div>
@@ -680,7 +680,7 @@ function ActivationFormContent() {
                         </div>
                         <div className="space-y-2 md:col-span-2">
                             <label htmlFor="fullName" className="text-sm font-semibold">Nombre Completo *</label>
-                            <input type="text" id="fullName" name="fullName" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Juan Pérez" required />
+                            <input type="text" id="fullName" name="fullName" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Juan Pérez" required />
                         </div>
                         <div className="space-y-2 md:col-span-2">
                             <label className="text-sm font-semibold">Número de Celular *</label>
@@ -694,7 +694,7 @@ function ActivationFormContent() {
                                     placeholder="55 1234 5678"
                                     value={phone}
                                     onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                                    className="flex-1 rounded-r-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all"
+                                    className="flex-1 rounded-r-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all"
                                     required
                                 />
                             </div>
@@ -713,11 +713,11 @@ function ActivationFormContent() {
                         </div>
                         <div className="space-y-2">
                             <label htmlFor="age" className="text-sm font-semibold">Edad (Opcional)</label>
-                            <input type="number" id="age" name="age" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. 30" min="0" max="130" />
+                            <input type="number" id="age" name="age" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. 30" min="0" max="130" />
                         </div>
                         <div className="space-y-2">
                             <label htmlFor="location" className="text-sm font-semibold">Ciudad / País *</label>
-                            <input type="text" id="location" name="location" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ciudad de México, México" required />
+                            <input type="text" id="location" name="location" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ciudad de México, México" required />
                         </div>
                     </div>
                 </section>
@@ -734,15 +734,15 @@ function ActivationFormContent() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <label htmlFor="contact1Name" className="text-sm font-semibold text-muted-foreground">Nombre</label>
-                                <input type="text" id="contact1Name" name="contact1Name" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. María López (Esposa)" required />
+                                <input type="text" id="contact1Name" name="contact1Name" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. María López (Esposa)" required />
                             </div>
                             <div className="space-y-2">
                                 <label htmlFor="contact1Phone" className="text-sm font-semibold text-muted-foreground">Teléfono</label>
-                                <input type="tel" id="contact1Phone" name="contact1Phone" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="+52 55 1234 5678" required />
+                                <input type="tel" id="contact1Phone" name="contact1Phone" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="+52 55 1234 5678" required />
                             </div>
                             <div className="space-y-2 md:col-span-2">
                                 <label htmlFor="contact1Email" className="text-sm font-semibold text-muted-foreground">Email (Opcional, para recibir alertas)</label>
-                                <input type="email" id="contact1Email" name="contact1Email" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Email del contacto" />
+                                <input type="email" id="contact1Email" name="contact1Email" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Email del contacto" />
                             </div>
                         </div>
                     </div>
@@ -752,15 +752,15 @@ function ActivationFormContent() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <label htmlFor="contact2Name" className="text-sm font-semibold text-muted-foreground">Nombre</label>
-                                <input type="text" id="contact2Name" name="contact2Name" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Nombre completo o parentesco" />
+                                <input type="text" id="contact2Name" name="contact2Name" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Nombre completo o parentesco" />
                             </div>
                             <div className="space-y-2">
                                 <label htmlFor="contact2Phone" className="text-sm font-semibold text-muted-foreground">Teléfono</label>
-                                <input type="tel" id="contact2Phone" name="contact2Phone" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="+52 55 0000 0000" />
+                                <input type="tel" id="contact2Phone" name="contact2Phone" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="+52 55 0000 0000" />
                             </div>
                             <div className="space-y-2 md:col-span-2">
                                 <label htmlFor="contact2Email" className="text-sm font-semibold text-muted-foreground">Email (Opcional, para recibir alertas)</label>
-                                <input type="email" id="contact2Email" name="contact2Email" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Email del contacto" />
+                                <input type="email" id="contact2Email" name="contact2Email" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Email del contacto" />
                             </div>
                         </div>
                     </div>
@@ -770,15 +770,15 @@ function ActivationFormContent() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <label htmlFor="contact3Name" className="text-sm font-semibold text-muted-foreground">Nombre</label>
-                                <input type="text" id="contact3Name" name="contact3Name" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Nombre completo o parentesco" />
+                                <input type="text" id="contact3Name" name="contact3Name" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Nombre completo o parentesco" />
                             </div>
                             <div className="space-y-2">
                                 <label htmlFor="contact3Phone" className="text-sm font-semibold text-muted-foreground">Teléfono</label>
-                                <input type="tel" id="contact3Phone" name="contact3Phone" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="+52 55 0000 0000" />
+                                <input type="tel" id="contact3Phone" name="contact3Phone" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="+52 55 0000 0000" />
                             </div>
                             <div className="space-y-2 md:col-span-2">
                                 <label htmlFor="contact3Email" className="text-sm font-semibold text-muted-foreground">Email (Opcional, para recibir alertas)</label>
-                                <input type="email" id="contact3Email" name="contact3Email" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Email del contacto" />
+                                <input type="email" id="contact3Email" name="contact3Email" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Email del contacto" />
                             </div>
                         </div>
                     </div>
@@ -794,7 +794,7 @@ function ActivationFormContent() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <label htmlFor="bloodType" className="text-sm font-semibold">Tipo de Sangre *</label>
-                            <select id="bloodType" name="bloodType" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" required>
+                            <select id="bloodType" name="bloodType" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" required>
                                 <option value="">Selecciona tu tipo de sangre</option>
                                 <option value="A+">A+</option>
                                 <option value="A-">A-</option>
@@ -809,15 +809,15 @@ function ActivationFormContent() {
                         </div>
                         <div className="space-y-2 md:col-span-2">
                             <label htmlFor="allergies" className="text-sm font-semibold">Alergias Conocidas (Opcional)</label>
-                            <input type="text" id="allergies" name="allergies" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. Penicilina, Látex, Mariscos..." />
+                            <input type="text" id="allergies" name="allergies" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. Penicilina, Látex, Mariscos..." />
                         </div>
                         <div className="space-y-2 md:col-span-2">
                             <label htmlFor="medicalConditions" className="text-sm font-semibold">Condiciones Médicas (Opcional)</label>
-                            <textarea id="medicalConditions" name="medicalConditions" className="w-full flex min-h-[100px] rounded-xl border border-input bg-background px-4 py-3 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. Asma, Diabetes Tipo 1, Hipertensión..." />
+                            <textarea id="medicalConditions" name="medicalConditions" className="w-full flex min-h-[100px] rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-3 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. Asma, Diabetes Tipo 1, Hipertensión..." />
                         </div>
                         <div className="space-y-2 md:col-span-2">
                             <label htmlFor="importantMedications" className="text-sm font-semibold">Medicamentos Importantes (Opcional)</label>
-                            <textarea id="importantMedications" name="importantMedications" className="w-full flex min-h-[100px] rounded-xl border border-input bg-background px-4 py-3 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. Insulina, anticoagulantes..." />
+                            <textarea id="importantMedications" name="importantMedications" className="w-full flex min-h-[100px] rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-3 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. Insulina, anticoagulantes..." />
                         </div>
                     </div>
                 </section>
@@ -831,7 +831,7 @@ function ActivationFormContent() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-muted/30 p-5 rounded-2xl border border-border">
                         <div className="space-y-2 lg:col-span-2">
                             <label htmlFor="medicalSystem" className="text-sm font-semibold">Sistema médico</label>
-                            <select id="medicalSystem" name="medicalSystem" value={medicalSystem} onChange={(e) => setMedicalSystem(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all">
+                            <select id="medicalSystem" name="medicalSystem" value={medicalSystem} onChange={(e) => setMedicalSystem(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all">
                                 <option value="">Selecciona un sistema</option>
                                 <option value="Seguro Privado (Gastos Médicos Mayores)">Seguro Privado (Gastos Médicos Mayores)</option>
                                 <option value="IMSS">IMSS</option>
@@ -848,7 +848,7 @@ function ActivationFormContent() {
                             <>
                                 <div className="space-y-2 lg:col-span-2">
                                     <label htmlFor="aseguradora" className="text-sm font-semibold">Aseguradora</label>
-                                    <select id="aseguradora" name="aseguradora" value={aseguradora} onChange={(e) => setAseguradora(e.target.value)} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all">
+                                    <select id="aseguradora" name="aseguradora" value={aseguradora} onChange={(e) => setAseguradora(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all">
                                         <option value="">Selecciona una aseguradora</option>
                                         <option value="AXA">AXA</option>
                                         <option value="GNP">GNP</option>
@@ -865,16 +865,16 @@ function ActivationFormContent() {
                                 {aseguradora === "Otro" && (
                                     <div className="space-y-2 animate-in fade-in duration-300 md:col-span-2">
                                         <label htmlFor="aseguradoraOtra" className="text-sm font-semibold text-primary">Especificar Aseguradora *</label>
-                                        <input type="text" id="aseguradoraOtra" name="aseguradoraOtra" required className="w-full flex h-12 rounded-xl border border-primary/50 bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                        <input type="text" id="aseguradoraOtra" name="aseguradoraOtra" required className="w-full flex h-12 rounded-xl border border-primary/50 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                     </div>
                                 )}
                                 <div className="space-y-2">
                                     <label htmlFor="numeroPoliza" className="text-sm font-semibold">Número de Póliza *</label>
-                                    <input type="text" id="numeroPoliza" name="numeroPoliza" required className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                    <input type="text" id="numeroPoliza" name="numeroPoliza" required className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="tipoSeguro" className="text-sm font-semibold">Tipo de Seguro</label>
-                                    <select id="tipoSeguro" name="tipoSeguro" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all">
+                                    <select id="tipoSeguro" name="tipoSeguro" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all">
                                         <option value="">Selecciona un tipo</option>
                                         <option value="Gastos Médicos Mayores">Gastos Médicos Mayores</option>
                                         <option value="Seguro de Auto">Seguro de Auto</option>
@@ -885,15 +885,15 @@ function ActivationFormContent() {
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="nombreAsegurado" className="text-sm font-semibold">Nombre Asegurado Titular *</label>
-                                    <input type="text" id="nombreAsegurado" name="nombreAsegurado" required className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                    <input type="text" id="nombreAsegurado" name="nombreAsegurado" required className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="vigenciaPoliza" className="text-sm font-semibold">Vigencia (Opcional)</label>
-                                    <input type="date" id="vigenciaPoliza" name="vigenciaPoliza" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all text-foreground" style={{ colorScheme: 'dark' }} />
+                                    <input type="date" id="vigenciaPoliza" name="vigenciaPoliza" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all text-foreground" style={{ colorScheme: 'dark' }} />
                                 </div>
                                 <div className="space-y-2 md:col-span-2">
                                     <label htmlFor="telefonoAseguradora" className="text-sm font-semibold">Teléfono de Emergencias (Opcional)</label>
-                                    <input type="tel" id="telefonoAseguradora" name="telefonoAseguradora" placeholder="Ej: 800-123-4567" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                    <input type="tel" id="telefonoAseguradora" name="telefonoAseguradora" placeholder="Ej: 800-123-4567" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                 </div>
 
                                 {/* Subida de Póliza */}
@@ -923,7 +923,7 @@ function ActivationFormContent() {
                                                         setPolizaFile(file);
                                                     }
                                                 }}
-                                                className="w-full flex h-14 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 cursor-pointer shadow-sm relative z-10"
+                                                className="w-full flex h-14 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 cursor-pointer shadow-sm relative z-10"
                                             />
                                         </div>
                                     </div>
@@ -935,15 +935,15 @@ function ActivationFormContent() {
                             <>
                                 <div className="space-y-2">
                                     <label htmlFor="nss" className="text-sm font-semibold">NSS - Número de Seguridad Social *</label>
-                                    <input type="text" id="nss" name="nss" required maxLength={11} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                    <input type="text" id="nss" name="nss" required maxLength={11} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="clinicaAsignada" className="text-sm font-semibold">UMF / Clínica asignada (Opcional)</label>
-                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" placeholder="Ej: UMF 28, Monterrey" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" placeholder="Ej: UMF 28, Monterrey" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                 </div>
                                 <div className="space-y-2 md:col-span-2">
                                     <label htmlFor="curpSeguro" className="text-sm font-semibold">CURP (Opcional)</label>
-                                    <input type="text" id="curpSeguro" name="curpSeguro" maxLength={18} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase" />
+                                    <input type="text" id="curpSeguro" name="curpSeguro" maxLength={18} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase" />
                                 </div>
                             </>
                         )}
@@ -952,15 +952,15 @@ function ActivationFormContent() {
                             <>
                                 <div className="space-y-2 md:col-span-2">
                                     <label htmlFor="numeroAfiliacion" className="text-sm font-semibold">Número de afiliación ISSSTE *</label>
-                                    <input type="text" id="numeroAfiliacion" name="numeroAfiliacion" required className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                    <input type="text" id="numeroAfiliacion" name="numeroAfiliacion" required className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="clinicaAsignada" className="text-sm font-semibold">Clínica asignada (Opcional)</label>
-                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="curpSeguro" className="text-sm font-semibold">CURP (Opcional)</label>
-                                    <input type="text" id="curpSeguro" name="curpSeguro" maxLength={18} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase" />
+                                    <input type="text" id="curpSeguro" name="curpSeguro" maxLength={18} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase" />
                                 </div>
                             </>
                         )}
@@ -969,11 +969,11 @@ function ActivationFormContent() {
                             <>
                                 <div className="space-y-2">
                                     <label htmlFor="curpSeguro" className="text-sm font-semibold">CURP *</label>
-                                    <input type="text" id="curpSeguro" name="curpSeguro" required maxLength={18} className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase" />
+                                    <input type="text" id="curpSeguro" name="curpSeguro" required maxLength={18} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase" />
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="clinicaAsignada" className="text-sm font-semibold">Centro de salud asignado (Opcional)</label>
-                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                 </div>
                             </>
                         )}
@@ -982,11 +982,11 @@ function ActivationFormContent() {
                             <>
                                 <div className="space-y-2">
                                     <label htmlFor="numeroAfiliacion" className="text-sm font-semibold">Número de afiliación *</label>
-                                    <input type="text" id="numeroAfiliacion" name="numeroAfiliacion" required className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                    <input type="text" id="numeroAfiliacion" name="numeroAfiliacion" required className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="clinicaAsignada" className="text-sm font-semibold">Unidad médica asignada (Opcional)</label>
-                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
                                 </div>
                             </>
                         )}
@@ -1036,11 +1036,11 @@ function ActivationFormContent() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2 md:col-span-2">
                             <label htmlFor="additionalNotes" className="text-sm font-semibold">Notas Adicionales (Opcional)</label>
-                            <textarea id="additionalNotes" name="additionalNotes" className="w-full flex min-h-[100px] rounded-xl border border-input bg-background px-4 py-3 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Cualquier información adicional que los paramédicos o doctores deban saber." />
+                            <textarea id="additionalNotes" name="additionalNotes" className="w-full flex min-h-[100px] rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-3 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Cualquier información adicional que los paramédicos o doctores deban saber." />
                         </div>
                         <div className="space-y-2 md:col-span-2">
                             <label htmlFor="googleMapsLink" className="text-sm font-semibold">Hospital o clínica de preferencia (Opcional)</label>
-                            <input type="text" id="googleMapsLink" name="googleMapsLink" className="w-full flex h-12 rounded-xl border border-input bg-background px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ejemplo: Hospital Ángeles Lindavista" />
+                            <input type="text" id="googleMapsLink" name="googleMapsLink" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ejemplo: Hospital Ángeles Lindavista" />
                             <p className="text-xs text-muted-foreground mt-1">En caso de emergencia, el personal médico determinará el hospital más adecuado según tu estado de salud y criterio profesional. Este dato es solo una referencia.</p>
                         </div>
                     </div>
