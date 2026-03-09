@@ -175,7 +175,7 @@ export default function ShopPage() {
 
         return (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-[fade-in_0.2s_ease-out]">
-                <div className="bg-card w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden border border-border/50 max-h-[90vh] flex flex-col animate-[fade-in-up_0.3s_ease-out]">
+                <div className="bg-[#1A1A18] w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden border border-border/50 max-h-[90vh] flex flex-col animate-[fade-in-up_0.3s_ease-out]">
                     <div className="flex items-center justify-between p-6 border-b border-border/50 bg-muted/30 shrink-0">
                         <div>
                             <h3 className="text-xl font-black flex items-center gap-2">
@@ -340,7 +340,7 @@ export default function ShopPage() {
                         </form>
                     </div>
 
-                    <div className="p-6 border-t border-border/50 bg-card flex flex-col sm:flex-row items-center gap-4 justify-end">
+                    <div className="p-6 border-t border-border/50 bg-[#1A1A18] flex flex-col sm:flex-row items-center gap-4 justify-end">
                         <button
                             type="button"
                             onClick={() => { setSelectedPackage(null); setRequiresInvoice(false); }}
@@ -366,7 +366,7 @@ export default function ShopPage() {
 
     return (
         <div className="min-h-screen bg-[#0A0A08] flex items-center justify-center px-4 py-10">
-            <div className="w-full max-w-4xl bg-card rounded-2xl shadow-xl border border-primary/20 p-6 md:p-8 overflow-hidden relative">
+            <div className="w-full max-w-4xl bg-[#1A1A18] rounded-2xl shadow-xl border border-primary/20 p-6 md:p-8 overflow-hidden relative">
                 {renderCheckoutModal()}
 
                 {/* Header / Hero Shop */}
@@ -398,7 +398,7 @@ export default function ShopPage() {
 
                         <div className="grid md:grid-cols-3 gap-8 items-start">
                             {/* Plan Individual */}
-                            <div className="bg-card rounded-3xl p-8 border border-border shadow-sm flex flex-col h-full hover:border-primary/50 transition-all">
+                            <div className="bg-[#1A1A18] rounded-3xl p-8 border border-border shadow-sm flex flex-col h-full hover:border-primary/50 transition-all">
                                 <h3 className="text-2xl font-black mb-2">Individual</h3>
                                 <div className="flex items-baseline gap-2 mb-6">
                                     <span className="text-4xl font-black">$349</span>
@@ -419,7 +419,7 @@ export default function ShopPage() {
                             </div>
 
                             {/* Plan Pareja (Más Popular) */}
-                            <div className="bg-card rounded-3xl p-8 border-2 border-primary shadow-xl relative flex flex-col h-full scale-100 md:scale-105 z-10">
+                            <div className="bg-[#1A1A18] rounded-3xl p-8 border-2 border-primary shadow-xl relative flex flex-col h-full scale-100 md:scale-105 z-10">
                                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-black uppercase tracking-wider">
                                     Más Popular
                                 </div>
@@ -443,7 +443,7 @@ export default function ShopPage() {
                             </div>
 
                             {/* Plan Familiar */}
-                            <div className="bg-card rounded-3xl p-8 border border-border shadow-sm relative flex flex-col h-full hover:border-primary/50 transition-all">
+                            <div className="bg-[#1A1A18] rounded-3xl p-8 border border-border shadow-sm relative flex flex-col h-full hover:border-primary/50 transition-all">
                                 <div className="absolute -top-4 right-8 bg-black text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
                                     Mejor Valor
                                 </div>
@@ -482,7 +482,7 @@ export default function ShopPage() {
 
                         <div className="grid md:grid-cols-3 gap-6">
                             {/* Starter */}
-                            <div className="bg-card rounded-2xl p-6 border border-border shadow-sm flex flex-col justify-between">
+                            <div className="bg-[#1A1A18] rounded-2xl p-6 border border-border shadow-sm flex flex-col justify-between">
                                 <div>
                                     <h3 className="text-xl font-bold mb-1">Starter</h3>
                                     <p className="text-sm font-medium text-muted-foreground mb-4">50 chips a $179 c/u</p>
