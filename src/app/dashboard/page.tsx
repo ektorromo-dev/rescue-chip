@@ -528,10 +528,10 @@ export default function DashboardPage() {
                     <div style={{ position: "absolute", top: 0, right: 0, width: "320px", height: "320px", borderRadius: "9999px" }} />
 
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "32px", position: "relative", zIndex: 10, width: "100%" }}>
-                        <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: "8px", borderRadius: "9999px", transition: "color 0.2s, background-color 0.2s, border-color 0.2s", fontWeight: 500, fontSize: "12px" }}>
+                        <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: "8px", borderRadius: "9999px", transition: "color 0.2s, background-color 0.2s, border-color 0.2s", fontWeight: 700, fontSize: "12px", backgroundColor: "rgba(255,255,255,0.04)", padding: "8px 16px", color: "#F4F0EB", border: "1px solid rgba(255,255,255,0.08)", textDecoration: "none" }}>
                             <ArrowLeft size={16} /> Volver
                         </Link>
-                        <button onClick={handleSignOut} style={{ display: "inline-flex", alignItems: "center", gap: "8px", borderRadius: "9999px", transition: "color 0.2s, background-color 0.2s, border-color 0.2s", fontWeight: 500, fontSize: "12px" }}>
+                        <button onClick={handleSignOut} style={{ display: "inline-flex", alignItems: "center", gap: "8px", borderRadius: "9999px", transition: "color 0.2s, background-color 0.2s, border-color 0.2s", fontWeight: 700, fontSize: "12px", backgroundColor: "rgba(232,35,26,0.1)", color: "#E8231A", padding: "8px 16px", border: "1px solid rgba(232,35,26,0.2)", cursor: "pointer" }}>
                             Cerrar Sesión <LogOut size={16} />
                         </button>
                     </div>
@@ -570,24 +570,24 @@ export default function DashboardPage() {
 
                                 {/* ENLACE PUBLICO */}
                                 {folio && (
-                                    <section style={{ border: "1px solid rgba(255,255,255,0.08)", borderRadius: "16px", padding: "24px", display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: "16px" }}>
+                                    <section style={{ border: "1px solid rgba(255,255,255,0.08)", borderLeft: "4px solid #D97706", borderRadius: "16px", padding: "24px", display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: "16px", backgroundColor: "rgba(217,119,6,0.04)" }}>
                                         <div>
-                                            <h3 style={{ fontWeight: 700, color: "#E8231A", display: "flex", alignItems: "center", gap: "8px" }}>
+                                            <h3 style={{ fontWeight: 900, color: "#D97706", display: "flex", alignItems: "center", gap: "8px", fontSize: "16px", letterSpacing: "0.025em" }}>
                                                 <CheckCircle2 size={18} /> Chips Vinculados: {folio.toUpperCase()}
                                             </h3>
-                                            <p style={{ fontSize: "14px", color: "#9E9A95" }}>Este es el enlace al que accederán los paramédicos al escanear uno de tus chips.</p>
+                                            <p style={{ fontSize: "14px", color: "#9E9A95", marginTop: "4px" }}>Este es el enlace al que accederán los paramédicos al escanear uno de tus chips.</p>
 
                                             {/* Restricción de Perfil Compartido */}
                                             {(window as any)._sharedProfileFlag && (
-                                                <div style={{ marginTop: "16px", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "4px", maxWidth: "576px" }}>
-                                                    <p style={{ fontSize: "12px", fontWeight: 600, display: "flex", alignItems: "center" }}><AlertCircle size={14} /> Perfil Compartido</p>
-                                                    <p style={{ fontSize: "12px", color: "#9E9A95" }}>La configuración maestra y control de desvinculación de este chip es manejada por otra persona. Si precisas desligar este chip contáctanos.</p>
+                                                <div style={{ marginTop: "16px", padding: "12px", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "8px", maxWidth: "576px", backgroundColor: "rgba(255,255,255,0.02)" }}>
+                                                    <p style={{ fontSize: "12px", fontWeight: 700, color: "#F4F0EB", display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}><AlertCircle size={14} style={{ color: "#D97706" }} /> Perfil Compartido</p>
+                                                    <p style={{ fontSize: "12px", color: "#9E9A95", lineHeight: 1.5 }}>La configuración maestra y control de desvinculación de este chip es manejada por otra persona. Si precisas desligar este chip contáctanos.</p>
                                                 </div>
                                             )}
                                         </div>
-                                        <div style={{ display: "flex", flexDirection: "row", gap: "8px", width: "NaNpx" }}>
+                                        <div style={{ display: "flex", flexDirection: "row", gap: "8px" }}>
                                             <a href={`/profile/${folio.split(',')[0].trim()}`} target="_blank" rel="noopener noreferrer"
-                                                style={{ padding: "8px 16px", borderRadius: "8px", fontWeight: 700, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+                                                style={{ padding: "10px 20px", borderRadius: "12px", fontWeight: 700, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", backgroundColor: "#E8231A", color: "#F4F0EB", textDecoration: "none", fontSize: "14px", border: "none" }}>
                                                 Ver mi Perfil Público
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                                             </a>
@@ -606,20 +606,20 @@ export default function DashboardPage() {
                                             <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Foto de Perfil</label>
                                             <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "16px" }}>
                                                 {photoFile ? (
-                                                    <div style={{ width: "80px", height: "80px", borderRadius: "16px", overflow: "hidden", backgroundColor: "#1A1A18", boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)" }}>
+                                                    <div style={{ width: "120px", height: "120px", borderRadius: "50%", overflow: "hidden", backgroundColor: "#1A1A18", border: "4px solid #131311", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.3)" }}>
                                                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                        <img src={URL.createObjectURL(photoFile)} alt="Preview" style={{ width: "100%", height: "100%" }} />
+                                                        <img src={URL.createObjectURL(photoFile)} alt="Preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                                                     </div>
                                                 ) : currentPhotoUrl ? (
-                                                    <div style={{ width: "80px", height: "80px", borderRadius: "16px", backgroundColor: "#1A1A18", boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)", position: "relative" }}>
+                                                    <div style={{ width: "120px", height: "120px", borderRadius: "50%", backgroundColor: "#1A1A18", border: "4px solid #131311", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.3)", position: "relative", overflow: "hidden" }}>
                                                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                        <img src={currentPhotoUrl} alt="Foto actual" style={{ width: "100%", height: "100%" }} />
-                                                        <div style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                                                            <span style={{ fontWeight: 700 }}>Actual</span>
+                                                        <img src={currentPhotoUrl} alt="Foto actual" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                                        <div style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "rgba(0,0,0,0.3)" }}>
+                                                            <span style={{ fontWeight: 700, fontSize: "10px", backgroundColor: "rgba(0,0,0,0.6)", padding: "2px 6px", borderRadius: "4px" }}>Actual</span>
                                                         </div>
                                                     </div>
                                                 ) : (
-                                                    <div style={{ width: "80px", height: "80px", borderRadius: "16px", display: "flex", alignItems: "center", justifyContent: "center", color: "#9E9A95", fontSize: "24px" }}>
+                                                    <div style={{ width: "120px", height: "120px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", color: "#9E9A95", fontSize: "32px", border: "4px solid #131311", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.3)" }}>
                                                         📷
                                                     </div>
                                                 )}
@@ -748,7 +748,7 @@ export default function DashboardPage() {
                                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                             <label htmlFor="bloodType" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Tipo de Sangre *</label>
-                                            <select id="bloodType" value={bloodType} onChange={(e) => setBloodType(e.target.value)} style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                            <select id="bloodType" value={bloodType} onChange={(e) => setBloodType(e.target.value)} style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s', fontFamily: 'monospace' }}
                                                 onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                 onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} required>
                                                 <option value="">Selecciona tu tipo de sangre</option>
@@ -904,7 +904,7 @@ export default function DashboardPage() {
                                             <>
                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                     <label htmlFor="nss" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>NSS - Número de Seguridad Social *</label>
-                                                    <input type="text" id="nss" value={nss} onChange={(e) => setNss(e.target.value)} required maxLength={11} style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                    <input type="text" id="nss" value={nss} onChange={(e) => setNss(e.target.value)} required maxLength={11} style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s', fontFamily: 'monospace' }}
                                                         onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                         onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                                 </div>
@@ -927,7 +927,7 @@ export default function DashboardPage() {
                                             <>
                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                                                     <label htmlFor="numeroAfiliacion" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Número de afiliación ISSSTE *</label>
-                                                    <input type="text" id="numeroAfiliacion" value={numeroAfiliacion} onChange={(e) => setNumeroAfiliacion(e.target.value)} required style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                    <input type="text" id="numeroAfiliacion" value={numeroAfiliacion} onChange={(e) => setNumeroAfiliacion(e.target.value)} required style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s', fontFamily: 'monospace' }}
                                                         onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                         onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                                 </div>
@@ -1031,8 +1031,8 @@ export default function DashboardPage() {
                             </form>
 
                             {/* HISTORIAL DE ACCESOS */}
-                            <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                                <h3 style={{ fontSize: "20px", fontWeight: 700, display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
+                            <div style={{ backgroundColor: "#131311", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "16px", padding: "24px", marginTop: "40px" }}>
+                                <h3 style={{ fontSize: "20px", fontWeight: 700, display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px", color: "#F4F0EB" }}>
                                     <span style={{ backgroundColor: "rgba(232,35,26,0.12)", color: "#E8231A", width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", flexShrink: 0, fontWeight: 600 }}>6</span>
                                     Historial de Accesos al Chip
                                 </h3>
@@ -1050,12 +1050,12 @@ export default function DashboardPage() {
                                         {accessLogs.map((log) => {
                                             const isExpanded = expandedLogId === log.id;
                                             return (
-                                                <div key={log.id} >
+                                                <div key={log.id} style={{ backgroundColor: "rgba(255,255,255,0.02)", border: log.tipo === 'emergencia' ? "1px solid rgba(220,38,38,0.3)" : "1px solid rgba(255,255,255,0.04)", borderRadius: "12px", overflow: "hidden" }}>
 
                                                     <div style={{ padding: "16px", display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: "16px" }}>
                                                         <div>
-                                                            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                                                                <span >
+                                                            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+                                                                <span style={{ backgroundColor: log.tipo === 'emergencia' ? "rgba(220,38,38,0.1)" : "rgba(255,255,255,0.05)", color: log.tipo === 'emergencia' ? "#E8231A" : "#9E9A95", padding: "4px 8px", borderRadius: "6px", fontSize: "11px", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.05em" }}>
                                                                     {log.tipo}
                                                                 </span>
                                                                 <span style={{ fontSize: "14px", fontWeight: 600, color: "#F4F0EB" }}>
@@ -1082,7 +1082,7 @@ export default function DashboardPage() {
                                                         </div>
                                                         <button
                                                             onClick={() => setExpandedLogId(isExpanded ? null : log.id)}
-                                                            style={{ fontSize: "12px", fontWeight: 600, backgroundColor: "#1A1A18", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "6px", transition: "color 0.2s, background-color 0.2s, border-color 0.2s" }}
+                                                            style={{ fontSize: "12px", fontWeight: 600, color: "#F4F0EB", backgroundColor: "rgba(255,255,255,0.05)", padding: "6px 12px", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", cursor: "pointer" }}
                                                             type="button"
                                                         >
                                                             {isExpanded ? "Ocultar" : "Más detalles"}

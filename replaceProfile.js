@@ -1,204 +1,9 @@
-"use client";
+const fs = require('fs');
+let content = fs.readFileSync('src/components/ProfileViewer.tsx', 'utf8');
 
-import { useState, useEffect, useCallback } from "react";
-import { HeartPulse, Droplets, AlertTriangle, PhoneCall, CheckCircle2, FileText, UserSquare2, ArrowLeft, ShieldAlert, Navigation, Info, Lock, Clock, LocateFixed } from "lucide-react";
-import Link from "next/link";
-import FirstAidBanner from "@/components/FirstAidBanner";
+const regex = /\/\/ --- RENDER PROFILE ---[\s\S]*/m;
 
-interface ProfileViewerProps {
-    chip: any;
-    profile: any;
-    isDemo?: boolean;
-    signedPolizaUrl: string | null;
-    emergencyContactsArray: any[];
-    allergiesArray: string[];
-}
-
-export default function ProfileViewer({ chip, profile, isDemo = false, signedPolizaUrl, emergencyContactsArray, allergiesArray }: ProfileViewerProps) {
-    const [hasConsented, setHasConsented] = useState<boolean>(isDemo);
-    const [isEmergency, setIsEmergency] = useState<boolean>(isDemo);
-    const [sessionExpired, setSessionExpired] = useState<boolean>(false);
-    const [timeLeft, setTimeLeft] = useState<number>(420); // 7 minutes
-    const [sessionToken, setSessionToken] = useState<string>("");
-    const [screenshotWarning, setScreenshotWarning] = useState<boolean>(false);
-    const [geoError, setGeoError] = useState<boolean>(false);
-    const [isLoadingConsent, setIsLoadingConsent] = useState<boolean>(false);
-
-    // Generate UUID function
-    const generateUUID = () => {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-            const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
-            return v.toString(16);
-        });
-    };
-
-    const handleConsent = async (type: 'emergencia' | 'prueba') => {
-        setGeoError(false);
-        setIsLoadingConsent(true);
-
-        // Fetch Location Mandaory
-        let lat = null;
-        let lng = null;
-
-        if (navigator.geolocation) {
-            try {
-                const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 15000 });
-                });
-                lat = position.coords.latitude;
-                lng = position.coords.longitude;
-            } catch (err) {
-                console.warn("Geolocation denied or timed out", err);
-                setGeoError(true);
-            }
-        } else {
-            setGeoError(true);
-        }
-
-        const token = generateUUID();
-        setSessionToken(token);
-        sessionStorage.setItem(`rescuechip_session_${chip.folio}`, token);
-
-        const isEmerg = type === 'emergencia';
-        setIsEmergency(isEmerg);
-
-        // Send Log
-        try {
-            await fetch('/api/log-access', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chip_folio: chip.folio,
-                    tipo: type,
-                    latitud: lat,
-                    longitud: lng,
-                    session_token: token
-                })
-            });
-        } catch (e) {
-            console.error("Error logging access", e);
-        }
-
-        setHasConsented(true);
-        setIsLoadingConsent(false);
-    };
-
-    // Timer Logic
-    useEffect(() => {
-        if (!hasConsented || isDemo || sessionExpired) return;
-
-        const timer = setInterval(() => {
-            setTimeLeft((prev) => {
-                if (prev <= 1) {
-                    setSessionExpired(true);
-                    sessionStorage.removeItem(`rescuechip_session_${chip.folio}`);
-                    clearInterval(timer);
-                    return 0;
-                }
-                return prev - 1;
-            });
-        }, 1000);
-
-        return () => clearInterval(timer);
-    }, [hasConsented, isDemo, sessionExpired, chip.folio]);
-
-    // Anti Screenshot Logic
-    useEffect(() => {
-        if (!hasConsented || isDemo || sessionExpired) return;
-
-        const handleVisibilityChange = () => {
-            if (document.hidden) {
-                setScreenshotWarning(true);
-                setTimeout(() => setScreenshotWarning(false), 5000);
-            }
-        };
-
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'PrintScreen') {
-                setScreenshotWarning(true);
-                setTimeout(() => setScreenshotWarning(false), 5000);
-            }
-        };
-
-        document.addEventListener("visibilitychange", handleVisibilityChange);
-        window.addEventListener("keydown", handleKeyDown);
-
-        // Anti History
-        window.history.replaceState(null, '', window.location.href);
-
-        return () => {
-            document.removeEventListener("visibilitychange", handleVisibilityChange);
-            window.removeEventListener("keydown", handleKeyDown);
-        };
-    }, [hasConsented, isDemo, sessionExpired]);
-
-
-    const formatTime = (seconds: number) => {
-        const m = Math.floor(seconds / 60);
-        const s = seconds % 60;
-        return `${m}:${s.toString().padStart(2, '0')}`;
-    };
-
-    const maskNumber = (num: string | null | undefined, visibleDigits = 4) => {
-        if (!num) return num;
-        if (num.length <= visibleDigits) return num;
-        return `****${num.slice(-visibleDigits)}`;
-    };
-
-    // --- RENDER CONSENT SCREEN ---
-    if (!hasConsented && !sessionExpired) {
-        return (
-            <div style={{ minHeight: '100vh', backgroundColor: '#0A0A08', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}>
-                <div style={{ backgroundColor: '#131311', width: '100%', maxWidth: '480px', borderRadius: '20px', padding: '48px 32px', border: '1px solid rgba(255,255,255,0.08)' }}>
-                    <ShieldAlert size={48} style={{ margin: '0 auto', color: '#E8231A', marginBottom: '24px', display: 'block' }} />
-                    <h1 style={{ fontSize: '28px', fontWeight: 900, textAlign: 'center', marginBottom: '16px', color: '#F4F0EB' }}>Acceso Restringido</h1>
-
-                    <div style={{ backgroundColor: 'rgba(255,255,255,0.04)', padding: '16px', borderRadius: '12px', fontSize: '12px', color: '#9E9A95', textAlign: 'justify', lineHeight: 1.6, marginBottom: '24px' }}>
-                        <strong>AVISO DE PRIVACIDAD:</strong> La información contenida en este perfil es confidencial y está protegida por la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP). Este acceso queda registrado con fecha, hora, ubicación aproximada y dispositivo. El uso indebido de esta información será perseguido y sancionado conforme a la legislación mexicana vigente, incluyendo los artículos 67 y 68 de la LFPDPPP que establecen penas de 3 a 5 años de prisión y multas de 100 a 320,000 días de UMA.
-                    </div>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        <button
-                            onClick={() => handleConsent('emergencia')}
-                            disabled={isLoadingConsent}
-                            style={{ width: '100%', backgroundColor: '#E8231A', color: '#F4F0EB', padding: '14px 24px', borderRadius: '12px', fontWeight: 900, fontSize: '14px', border: 'none', cursor: isLoadingConsent ? 'not-allowed' : 'pointer', textTransform: 'uppercase', opacity: isLoadingConsent ? 0.5 : 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px' }}
-                        >
-                            <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                {isLoadingConsent ? "PROCESANDO..." : <><AlertTriangle size={20} /> ES UNA EMERGENCIA REAL</>}
-                            </span>
-                            {!isLoadingConsent && <span style={{ fontSize: '10px', fontWeight: 400, opacity: 0.8, letterSpacing: '0.05em' }}>(Notificará contactos de emergencia)</span>}
-                        </button>
-
-                        <button
-                            onClick={() => handleConsent('prueba')}
-                            disabled={isLoadingConsent}
-                            style={{ width: '100%', backgroundColor: 'transparent', border: '1px solid rgba(255,255,255,0.12)', color: '#9E9A95', padding: '12px 24px', borderRadius: '12px', fontWeight: 600, fontSize: '13px', cursor: isLoadingConsent ? 'not-allowed' : 'pointer', opacity: isLoadingConsent ? 0.5 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-                        >
-                            <Info size={16} /> Solo es una consulta o prueba
-                        </button>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    // --- RENDER EXPIRED SCREEN ---
-    if (sessionExpired) {
-        return (
-            <div style={{ minHeight: '100vh', backgroundColor: '#0A0A08', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}>
-                <div style={{ backgroundColor: '#131311', width: '100%', maxWidth: '480px', borderRadius: '20px', padding: '40px', textAlign: 'center', border: '1px solid rgba(232,35,26,0.3)' }}>
-                    <Clock size={56} style={{ margin: '0 auto', color: '#9E9A95', marginBottom: '24px', display: 'block' }} />
-                    <h2 style={{ fontSize: '24px', fontWeight: 900, marginBottom: '16px', color: '#F4F0EB' }}>Sesión Expirada</h2>
-                    <p style={{ color: '#9E9A95', marginBottom: '32px' }}>Por seguridad, esta sesión ha expirado. Si necesitas ver los datos nuevamente, escanea el chip otra vez.</p>
-                    <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#E8231A', color: '#F4F0EB', padding: '12px 24px', borderRadius: '12px', fontWeight: 700, textDecoration: 'none' }}>
-                        Entendido
-                    </Link>
-                </div>
-            </div>
-        );
-    }
-
-    // --- RENDER PROFILE ---
+const profileReplacement = `// --- RENDER PROFILE ---
     return (
         <div style={{ minHeight: '100vh', backgroundColor: '#0A0A08', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingBottom: '48px', paddingTop: '48px', WebkitTouchCallout: 'none', userSelect: 'none', position: 'relative', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}>
 
@@ -279,7 +84,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
                                 {isDemo ? 'Carlos Martínez' : profile.full_name}
                             </h1>
                             <p style={{ color: 'rgba(255,255,255,0.8)', fontWeight: 500, fontSize: '14px' }}>
-                                {isDemo ? '32 años • Ciudad de México' : `${profile.age ? `${profile.age} años • ` : ''} ${profile.location}`}
+                                {isDemo ? '32 años • Ciudad de México' : \`\${profile.age ? \`\${profile.age} años • \` : ''} \${profile.location}\`}
                             </p>
                         </div>
                     </div>
@@ -411,16 +216,16 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
                                     {(() => {
                                         const sys = profile.medical_system;
                                         let phone = profile.telefono_aseguradora;
-                                        let label = `Llamar Institución`;
+                                        let label = \`Llamar Institución\`;
 
                                         if (sys === "IMSS") { phone = "8002222668"; label = "Llamar a IMSS"; }
                                         else if (sys === "ISSSTE") { phone = "8000190900"; label = "Llamar ISSSTE"; }
                                         else if (sys === "PEMEX") { phone = "5519442500"; label = "Urgencias PEMEX"; }
 
                                         if (phone) {
-                                            const cleanPhone = phone.replace(/\D/g, '');
+                                            const cleanPhone = phone.replace(/\\D/g, '');
                                             return (
-                                                <a href={`tel:${cleanPhone}`} style={{ width: '100%', backgroundColor: 'rgba(255,255,255,0.04)', color: '#F4F0EB', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px', borderRadius: '12px', fontWeight: 700, fontSize: '14px', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.12)' }}>
+                                                <a href={\`tel:\${cleanPhone}\`} style={{ width: '100%', backgroundColor: 'rgba(255,255,255,0.04)', color: '#F4F0EB', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px', borderRadius: '12px', fontWeight: 700, fontSize: '14px', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.12)' }}>
                                                     <PhoneCall size={18} /> {label}
                                                 </a>
                                             );
@@ -448,7 +253,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
 
                                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                                     {emergencyContactsArray.map((contact, idx) => {
-                                        const cleanPhone = contact.phone ? contact.phone.replace(/\D/g, '') : "";
+                                        const cleanPhone = contact.phone ? contact.phone.replace(/\\D/g, '') : "";
                                         const maskedPhone = maskNumber(contact.phone);
                                         const nameParts = contact.name ? contact.name.trim().split(' ') : [];
                                         const maskedName = nameParts.length > 0 ? nameParts[0] : "Contacto";
@@ -461,7 +266,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
                                                         <p style={{ fontSize: '13px', color: '#9E9A95' }}>Familiar / Contacto {idx + 1}</p>
                                                     </div>
                                                     {contact.phone && (
-                                                        <a href={`tel:${cleanPhone}`} style={{ backgroundColor: 'rgba(232,35,26,0.1)', border: '1px solid rgba(232,35,26,0.3)', color: '#E8231A', borderRadius: '8px', padding: '6px 14px', fontSize: '12px', fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
+                                                        <a href={\`tel:\${cleanPhone}\`} style={{ backgroundColor: 'rgba(232,35,26,0.1)', border: '1px solid rgba(232,35,26,0.3)', color: '#E8231A', borderRadius: '8px', padding: '6px 14px', fontSize: '12px', fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
                                                             <PhoneCall size={14} /> Llamar
                                                         </a>
                                                     )}
@@ -527,3 +332,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
         </div>
     );
 }
+`;
+
+content = content.replace(regex, profileReplacement);
+fs.writeFileSync('src/components/ProfileViewer.tsx', content);

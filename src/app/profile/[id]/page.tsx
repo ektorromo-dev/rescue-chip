@@ -71,12 +71,12 @@ export default async function ProfilePage({ params }: ProfileProps) {
     if (chipError || !chip) {
         console.error("Error al buscar el chip o no se encontró:", chipError);
         return (
-            <div className="min-h-screen bg-muted flex flex-col items-center justify-center p-4">
-                <div className="bg-card p-10 rounded-3xl shadow-xl max-w-md text-center border border-border">
-                    <AlertTriangle size={48} className="mx-auto text-destructive mb-6" />
-                    <h1 className="text-2xl font-bold mb-4">Chip no válido</h1>
-                    <p className="text-muted-foreground mb-8">Este folio no existe en nuestro sistema.</p>
-                    <Link href="/" className="bg-primary text-primary-foreground px-6 py-3 rounded-full font-bold hover:bg-primary/90 transition-colors inline-block mt-4">
+            <div style={{ minHeight: '100vh', backgroundColor: '#0A0A08', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '16px', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}>
+                <div style={{ backgroundColor: '#131311', padding: '40px', borderRadius: '24px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)', maxWidth: '448px', width: '100%', textAlign: 'center', border: '1px solid rgba(255,255,255,0.08)' }}>
+                    <AlertTriangle size={48} style={{ margin: '0 auto', color: '#E8231A', marginBottom: '24px' }} />
+                    <h1 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '16px', color: '#F4F0EB' }}>Chip no válido</h1>
+                    <p style={{ color: '#9E9A95', marginBottom: '32px' }}>Este folio no existe en nuestro sistema.</p>
+                    <Link href="/" style={{ backgroundColor: '#E8231A', color: '#F4F0EB', padding: '12px 24px', borderRadius: '9999px', fontWeight: 700, display: 'inline-block', marginTop: '16px', textDecoration: 'none' }}>
                         Volver al inicio
                     </Link>
                 </div>
@@ -90,13 +90,13 @@ export default async function ProfilePage({ params }: ProfileProps) {
     // Si el folio EXISTE pero NO está activado (ej. disponible o vendido)
     if (!isChipFullyActivated) {
         return (
-            <div className="min-h-screen bg-muted flex flex-col items-center justify-center p-4">
-                <div className="bg-card p-10 rounded-3xl shadow-xl max-w-md text-center border border-border">
-                    <HeartPulse size={48} className="mx-auto text-primary/50 mb-6" />
-                    <h1 className="text-2xl font-bold mb-4">Redirigiendo...</h1>
-                    <p className="text-muted-foreground mb-8">Este dispositivo está pendiente de registro.</p>
+            <div style={{ minHeight: '100vh', backgroundColor: '#0A0A08', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '16px', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}>
+                <div style={{ backgroundColor: '#131311', padding: '40px', borderRadius: '24px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)', maxWidth: '448px', width: '100%', textAlign: 'center', border: '1px solid rgba(255,255,255,0.08)' }}>
+                    <HeartPulse size={48} style={{ margin: '0 auto', color: 'rgba(232,35,26,0.5)', marginBottom: '24px' }} />
+                    <h1 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '16px', color: '#F4F0EB' }}>Redirigiendo...</h1>
+                    <p style={{ color: '#9E9A95', marginBottom: '32px' }}>Este dispositivo está pendiente de registro.</p>
                     <meta httpEquiv="refresh" content={`0; url=/activate?folio=${encodeURIComponent(chip.folio)}`} />
-                    <Link href={`/activate?folio=${encodeURIComponent(chip.folio)}`} className="text-primary underline font-bold mt-4">
+                    <Link href={`/activate?folio=${encodeURIComponent(chip.folio)}`} style={{ color: '#E8231A', textDecoration: 'underline', fontWeight: 700, marginTop: '16px', display: 'inline-block' }}>
                         Haz clic aquí si no te redirige automáticamente.
                     </Link>
                 </div>
