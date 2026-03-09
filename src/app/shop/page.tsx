@@ -174,130 +174,130 @@ export default function ShopPage() {
         if (!selectedPackage) return null;
 
         return (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-[fade-in_0.2s_ease-out]">
-                <div className="bg-[#1A1A18] w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden border border-border/50 max-h-[90vh] flex flex-col animate-[fade-in-up_0.3s_ease-out]">
-                    <div className="flex items-center justify-between p-6 border-b border-border/50 bg-muted/30 shrink-0">
+            <div style={{ top: 0, right: 0, bottom: 0, left: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
+                <div style={{ backgroundColor: "#1A1A18", width: "100%", maxWidth: "768px", borderRadius: "24px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)", display: "flex", flexDirection: "column" }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "24px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
                         <div>
-                            <h3 className="text-xl font-black flex items-center gap-2">
-                                <ShoppingCart size={20} className="text-primary" /> Confirmar Compra
+                            <h3 style={{ fontSize: "20px", fontWeight: 900, display: "flex", alignItems: "center", gap: "8px" }}>
+                                <ShoppingCart size={20} style={{ color: "#E8231A" }} /> Confirmar Compra
                             </h3>
-                            <p className="text-sm text-muted-foreground mt-1">Paquete {selectedPackage.charAt(0).toUpperCase() + selectedPackage.slice(1)} - ${packagePrices[selectedPackage]} MXN</p>
+                            <p style={{ fontSize: "14px", color: "#9E9A95" }}>Paquete {selectedPackage.charAt(0).toUpperCase() + selectedPackage.slice(1)} - ${packagePrices[selectedPackage]} MXN</p>
                         </div>
                         <button
                             onClick={() => { setSelectedPackage(null); setRequiresInvoice(false); setLoadingPackage(null); }}
-                            className="p-2 bg-muted hover:bg-muted-foreground/20 rounded-full transition-colors text-muted-foreground hover:text-foreground"
+                            style={{ backgroundColor: "#1A1A18", borderRadius: "9999px", transition: "color 0.2s, background-color 0.2s, border-color 0.2s", color: "#F4F0EB" }}
                             disabled={loadingPackage !== null}
                         >
                             <X size={20} />
                         </button>
                     </div>
 
-                    <div className="p-6 overflow-y-auto flex-1">
+                    <div style={{ padding: "24px" }}>
                         <form id="checkout-form" onSubmit={handleModalSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
 
                             {/* SECCIÓN 1 - Dirección de Envío */}
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                                <h4 className="font-bold text-base text-foreground flex items-center gap-2 mb-4 border-b border-border pb-2">
-                                    <MapPin size={18} className="text-primary" /> Dirección de Envío y Contacto
+                                <h4 style={{ fontWeight: 700, fontSize: "16px", color: "#F4F0EB", display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px", borderBottom: "1px solid rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                                    <MapPin size={18} style={{ color: "#E8231A" }} /> Dirección de Envío y Contacto
                                 </h4>
 
-                                <div className="grid md:grid-cols-2 gap-4">
+                                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "16px" }}>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
-                                        <label className="text-sm font-semibold text-muted-foreground">Nombre de quien recibe *</label>
-                                        <input type="text" name="nombre_receptor" value={shippingData.nombre_receptor} onChange={handleShippingChange} required className="w-full flex h-11 rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. Juan Pérez" disabled={loadingPackage !== null} />
+                                        <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Nombre de quien recibe *</label>
+                                        <input type="text" name="nombre_receptor" value={shippingData.nombre_receptor} onChange={handleShippingChange} required style={{ width: "100%", display: "flex", height: "44px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "8px 0", fontSize: "14px", transition: "all 0.2s ease-in-out" }} placeholder="Ej. Juan Pérez" disabled={loadingPackage !== null} />
                                     </div>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                        <label className="text-sm font-semibold text-muted-foreground">Teléfono de contacto *</label>
-                                        <input type="tel" name="telefono_receptor" value={shippingData.telefono_receptor} onChange={handleShippingChange} required className="w-full flex h-11 rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="10 dígitos" minLength={10} maxLength={10} disabled={loadingPackage !== null} />
+                                        <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Teléfono de contacto *</label>
+                                        <input type="tel" name="telefono_receptor" value={shippingData.telefono_receptor} onChange={handleShippingChange} required style={{ width: "100%", display: "flex", height: "44px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "8px 0", fontSize: "14px", transition: "all 0.2s ease-in-out" }} placeholder="10 dígitos" minLength={10} maxLength={10} disabled={loadingPackage !== null} />
                                     </div>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                        <label className="text-sm font-semibold text-muted-foreground">Email de confirmación *</label>
-                                        <input type="email" name="email_cliente" value={shippingData.email_cliente} onChange={handleShippingChange} required className="w-full flex h-11 rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="tu@correo.com" disabled={loadingPackage !== null} />
+                                        <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Email de confirmación *</label>
+                                        <input type="email" name="email_cliente" value={shippingData.email_cliente} onChange={handleShippingChange} required style={{ width: "100%", display: "flex", height: "44px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "8px 0", fontSize: "14px", transition: "all 0.2s ease-in-out" }} placeholder="tu@correo.com" disabled={loadingPackage !== null} />
                                     </div>
 
-                                    <div className="space-y-2 relative">
-                                        <label className="text-sm font-semibold text-muted-foreground">Código Postal *</label>
-                                        <input type="text" name="codigo_postal" value={shippingData.codigo_postal} onChange={handleZipCodeChange} required className="w-full flex h-11 rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. 11000" minLength={5} maxLength={5} disabled={loadingPackage !== null} />
-                                        {loadingZip && <Loader2 className="absolute right-3 top-9 animate-spin text-muted-foreground" size={16} />}
+                                    <div style={{ display: "flex", flexDirection: "column", gap: "8px", position: "relative" }}>
+                                        <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Código Postal *</label>
+                                        <input type="text" name="codigo_postal" value={shippingData.codigo_postal} onChange={handleZipCodeChange} required style={{ width: "100%", display: "flex", height: "44px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "8px 0", fontSize: "14px", transition: "all 0.2s ease-in-out" }} placeholder="Ej. 11000" minLength={5} maxLength={5} disabled={loadingPackage !== null} />
+                                        {loadingZip && <Loader2 style={{ position: "absolute", color: "#9E9A95" }} size={16} />}
                                     </div>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                        <label className="text-sm font-semibold text-muted-foreground">Estado *</label>
-                                        <input type="text" name="estado" value={shippingData.estado} onChange={handleShippingChange} required className="w-full flex h-11 rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" disabled={loadingPackage !== null} />
+                                        <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Estado *</label>
+                                        <input type="text" name="estado" value={shippingData.estado} onChange={handleShippingChange} required style={{ width: "100%", display: "flex", height: "44px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "8px 0", fontSize: "14px", transition: "all 0.2s ease-in-out" }} disabled={loadingPackage !== null} />
                                     </div>
 
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                        <label className="text-sm font-semibold text-muted-foreground">Ciudad / Municipio *</label>
-                                        <input type="text" name="ciudad" value={shippingData.ciudad} onChange={handleShippingChange} required className="w-full flex h-11 rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" disabled={loadingPackage !== null} />
+                                        <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Ciudad / Municipio *</label>
+                                        <input type="text" name="ciudad" value={shippingData.ciudad} onChange={handleShippingChange} required style={{ width: "100%", display: "flex", height: "44px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "8px 0", fontSize: "14px", transition: "all 0.2s ease-in-out" }} disabled={loadingPackage !== null} />
                                     </div>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                        <label className="text-sm font-semibold text-muted-foreground">Colonia *</label>
+                                        <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Colonia *</label>
                                         {coloniasOpt.length > 0 ? (
-                                            <select name="colonia" value={shippingData.colonia} onChange={handleShippingChange} required className="w-full flex h-11 rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" disabled={loadingPackage !== null}>
+                                            <select name="colonia" value={shippingData.colonia} onChange={handleShippingChange} required style={{ width: "100%", display: "flex", height: "44px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "8px 0", fontSize: "14px", transition: "all 0.2s ease-in-out" }} disabled={loadingPackage !== null}>
                                                 <option value="">Selecciona Colonia</option>
                                                 {coloniasOpt.map(c => <option key={c} value={c}>{c}</option>)}
                                             </select>
                                         ) : (
-                                            <input type="text" name="colonia" value={shippingData.colonia} onChange={handleShippingChange} required className="w-full flex h-11 rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" disabled={loadingPackage !== null} />
+                                            <input type="text" name="colonia" value={shippingData.colonia} onChange={handleShippingChange} required style={{ width: "100%", display: "flex", height: "44px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "8px 0", fontSize: "14px", transition: "all 0.2s ease-in-out" }} disabled={loadingPackage !== null} />
                                         )}
                                     </div>
 
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                        <label className="text-sm font-semibold text-muted-foreground">Calle y # Exterior *</label>
-                                        <input type="text" name="calle_numero" value={shippingData.calle_numero} onChange={handleShippingChange} required className="w-full flex h-11 rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. Insurgentes Sur 123" disabled={loadingPackage !== null} />
+                                        <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Calle y # Exterior *</label>
+                                        <input type="text" name="calle_numero" value={shippingData.calle_numero} onChange={handleShippingChange} required style={{ width: "100%", display: "flex", height: "44px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "8px 0", fontSize: "14px", transition: "all 0.2s ease-in-out" }} placeholder="Ej. Insurgentes Sur 123" disabled={loadingPackage !== null} />
                                     </div>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                        <label className="text-sm font-semibold text-muted-foreground">Número Interior (Opcional)</label>
-                                        <input type="text" name="numero_interior" value={shippingData.numero_interior} onChange={handleShippingChange} className="w-full flex h-11 rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. Depto 4" disabled={loadingPackage !== null} />
+                                        <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Número Interior (Opcional)</label>
+                                        <input type="text" name="numero_interior" value={shippingData.numero_interior} onChange={handleShippingChange} style={{ width: "100%", display: "flex", height: "44px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "8px 0", fontSize: "14px", transition: "all 0.2s ease-in-out" }} placeholder="Ej. Depto 4" disabled={loadingPackage !== null} />
                                     </div>
 
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
-                                        <label className="text-sm font-semibold text-muted-foreground">Referencia de entrega *</label>
-                                        <textarea name="referencia" value={shippingData.referencia} onChange={handleShippingChange} required rows={2} className="w-full flex min-h-[60px] rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all resize-none" placeholder="Ej: Casa azul con portón negro, entre calle Hidalgo y Morelos, edificio 3 depto 402" disabled={loadingPackage !== null}></textarea>
+                                        <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Referencia de entrega *</label>
+                                        <textarea name="referencia" value={shippingData.referencia} onChange={handleShippingChange} required rows={2} style={{ width: "100%", display: "flex", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "8px 0", fontSize: "14px", transition: "all 0.2s ease-in-out" }} placeholder="Ej: Casa azul con portón negro, entre calle Hidalgo y Morelos, edificio 3 depto 402" disabled={loadingPackage !== null}></textarea>
                                     </div>
                                 </div>
                             </div>
 
                             {/* SECCIÓN 2 - Facturación */}
-                            <div className="space-y-4 pt-4 border-t border-border">
-                                <div className="flex items-start gap-3 p-4 bg-primary/5 border border-primary/20 rounded-2xl cursor-pointer" onClick={() => setRequiresInvoice(!requiresInvoice)}>
+                            <div style={{ display: "flex", flexDirection: "column", gap: "16px", paddingTop: "16px", borderTop: "1px solid rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                                <div style={{ display: "flex", alignItems: "flex-start", gap: "12px", padding: "16px", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "16px" }} onClick={() => setRequiresInvoice(!requiresInvoice)}>
                                     <input
                                         type="checkbox"
                                         checked={requiresInvoice}
                                         onChange={(e) => setRequiresInvoice(e.target.checked)}
-                                        className="mt-1 w-5 h-5 rounded border-input accent-primary pointer-events-none"
+                                        style={{ width: "20px", height: "20px", borderRadius: "4px" }}
                                     />
                                     <div>
-                                        <label className="font-bold cursor-pointer text-foreground flex items-center gap-2">
-                                            <FileText size={18} className="text-primary" /> ¿Requieres Factura?
+                                        <label style={{ fontWeight: 700, color: "#F4F0EB", display: "flex", alignItems: "center", gap: "8px" }}>
+                                            <FileText size={18} style={{ color: "#E8231A" }} /> ¿Requieres Factura?
                                         </label>
-                                        <p className="text-sm text-muted-foreground mt-1">
+                                        <p style={{ fontSize: "14px", color: "#9E9A95" }}>
                                             Si necesitas factura, marca esta casilla y completa tus datos fiscales.
                                         </p>
                                     </div>
                                 </div>
 
                                 {requiresInvoice && (
-                                    <div className="space-y-4 animate-[fade-in_0.3s_ease-out] border border-border/50 p-5 rounded-2xl bg-muted/10">
-                                        <h4 className="font-bold text-sm text-primary uppercase tracking-wider mb-2">Datos Fiscales</h4>
+                                    <div style={{ display: "flex", flexDirection: "column", gap: "16px", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "16px" }}>
+                                        <h4 style={{ fontWeight: 700, fontSize: "14px", color: "#E8231A", marginBottom: "8px" }}>Datos Fiscales</h4>
 
-                                        <div className="grid md:grid-cols-2 gap-4">
+                                        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "16px" }}>
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                                <label className="text-sm font-semibold text-muted-foreground">RFC *</label>
-                                                <input type="text" name="rfc" value={invoiceData.rfc} onChange={handleInvoiceChange} required className="w-full flex h-11 rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring uppercase transition-all" placeholder="ABCD123456XYZ" minLength={12} maxLength={13} disabled={loadingPackage !== null} />
+                                                <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>RFC *</label>
+                                                <input type="text" name="rfc" value={invoiceData.rfc} onChange={handleInvoiceChange} required style={{ width: "100%", display: "flex", height: "44px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "8px 0", fontSize: "14px", transition: "all 0.2s ease-in-out" }} placeholder="ABCD123456XYZ" minLength={12} maxLength={13} disabled={loadingPackage !== null} />
                                             </div>
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                                <label className="text-sm font-semibold text-muted-foreground">Código Postal Fiscal *</label>
-                                                <input type="text" name="codigo_postal_fiscal" value={invoiceData.codigo_postal_fiscal} onChange={handleInvoiceChange} required className="w-full flex h-11 rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. 11000" minLength={5} maxLength={5} disabled={loadingPackage !== null} />
+                                                <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Código Postal Fiscal *</label>
+                                                <input type="text" name="codigo_postal_fiscal" value={invoiceData.codigo_postal_fiscal} onChange={handleInvoiceChange} required style={{ width: "100%", display: "flex", height: "44px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "8px 0", fontSize: "14px", transition: "all 0.2s ease-in-out" }} placeholder="Ej. 11000" minLength={5} maxLength={5} disabled={loadingPackage !== null} />
                                             </div>
 
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
-                                                <label className="text-sm font-semibold text-muted-foreground">Razón Social / Nombre Fiscal *</label>
-                                                <input type="text" name="nombre_fiscal" value={invoiceData.nombre_fiscal} onChange={handleInvoiceChange} required className="w-full flex h-11 rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Nombre completo o Empresa SA de CV" disabled={loadingPackage !== null} />
+                                                <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Razón Social / Nombre Fiscal *</label>
+                                                <input type="text" name="nombre_fiscal" value={invoiceData.nombre_fiscal} onChange={handleInvoiceChange} required style={{ width: "100%", display: "flex", height: "44px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "8px 0", fontSize: "14px", transition: "all 0.2s ease-in-out" }} placeholder="Nombre completo o Empresa SA de CV" disabled={loadingPackage !== null} />
                                             </div>
 
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
-                                                <label className="text-sm font-semibold text-muted-foreground">Régimen Fiscal *</label>
-                                                <select name="regimen_fiscal" value={invoiceData.regimen_fiscal} onChange={handleInvoiceChange} required className="w-full flex h-11 rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" disabled={loadingPackage !== null}>
+                                                <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Régimen Fiscal *</label>
+                                                <select name="regimen_fiscal" value={invoiceData.regimen_fiscal} onChange={handleInvoiceChange} required style={{ width: "100%", display: "flex", height: "44px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "8px 0", fontSize: "14px", transition: "all 0.2s ease-in-out" }} disabled={loadingPackage !== null}>
                                                     <option value="">Selecciona tu régimen fiscal</option>
                                                     <option value="601 - General de Ley Personas Morales">601 - General de Ley Personas Morales</option>
                                                     <option value="603 - Personas Morales con Fines no Lucrativos">603 - Personas Morales con Fines no Lucrativos</option>
@@ -316,8 +316,8 @@ export default function ShopPage() {
                                             </div>
 
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
-                                                <label className="text-sm font-semibold text-muted-foreground">Uso de CFDI *</label>
-                                                <select name="uso_cfdi" value={invoiceData.uso_cfdi} onChange={handleInvoiceChange} required className="w-full flex h-11 rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" disabled={loadingPackage !== null}>
+                                                <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Uso de CFDI *</label>
+                                                <select name="uso_cfdi" value={invoiceData.uso_cfdi} onChange={handleInvoiceChange} required style={{ width: "100%", display: "flex", height: "44px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "8px 0", fontSize: "14px", transition: "all 0.2s ease-in-out" }} disabled={loadingPackage !== null}>
                                                     <option value="G01 - Adquisición de mercancías">G01 - Adquisición de mercancías</option>
                                                     <option value="G03 - Gastos en general">G03 - Gastos en general</option>
                                                     <option value="S01 - Sin efectos fiscales">S01 - Sin efectos fiscales</option>
@@ -325,12 +325,12 @@ export default function ShopPage() {
                                             </div>
 
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                                <label className="text-sm font-semibold text-muted-foreground">Email (Receptor) *</label>
-                                                <input type="email" name="email_factura" value={invoiceData.email_factura} onChange={handleInvoiceChange} required className="w-full flex h-11 rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="tu@correo.com" disabled={loadingPackage !== null} />
+                                                <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Email (Receptor) *</label>
+                                                <input type="email" name="email_factura" value={invoiceData.email_factura} onChange={handleInvoiceChange} required style={{ width: "100%", display: "flex", height: "44px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "8px 0", fontSize: "14px", transition: "all 0.2s ease-in-out" }} placeholder="tu@correo.com" disabled={loadingPackage !== null} />
                                             </div>
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                                <label className="text-sm font-semibold text-muted-foreground">WhatsApp (Avisos) *</label>
-                                                <input type="tel" name="whatsapp_factura" value={invoiceData.whatsapp_factura} onChange={handleInvoiceChange} required className="w-full flex h-11 rounded-xl border border-input bg-background/50 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="5500000000" disabled={loadingPackage !== null} />
+                                                <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>WhatsApp (Avisos) *</label>
+                                                <input type="tel" name="whatsapp_factura" value={invoiceData.whatsapp_factura} onChange={handleInvoiceChange} required style={{ width: "100%", display: "flex", height: "44px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "8px 0", fontSize: "14px", transition: "all 0.2s ease-in-out" }} placeholder="5500000000" disabled={loadingPackage !== null} />
                                             </div>
                                         </div>
                                     </div>
@@ -340,11 +340,11 @@ export default function ShopPage() {
                         </form>
                     </div>
 
-                    <div className="p-6 border-t border-border/50 bg-[#1A1A18] flex flex-col sm:flex-row items-center gap-4 justify-end">
+                    <div style={{ padding: "24px", borderTop: "1px solid rgba(255,255,255,0.08)", backgroundColor: "#1A1A18", display: "flex", flexDirection: "row", alignItems: "center", gap: "16px", justifyContent: "flex-end" }}>
                         <button
                             type="button"
                             onClick={() => { setSelectedPackage(null); setRequiresInvoice(false); }}
-                            className="w-full sm:w-auto px-6 py-3 rounded-xl font-bold bg-muted text-foreground hover:bg-muted-foreground/20 transition-all disabled:opacity-50"
+                            style={{ width: "NaNpx", padding: "0 24px", borderRadius: "12px", fontWeight: 700, backgroundColor: "#1A1A18", color: "#F4F0EB", transition: "all 0.2s ease-in-out", opacity: 0.5 }}
                             disabled={loadingPackage !== null}
                         >
                             Cancelar
@@ -353,9 +353,9 @@ export default function ShopPage() {
                             type="submit"
                             form="checkout-form"
                             disabled={loadingPackage !== null}
-                            className="w-full flex justify-center items-center gap-2 sm:w-auto px-8 py-3 rounded-xl font-black bg-primary text-primary-foreground hover:bg-primary/90 hover:scale-[1.02] shadow-lg shadow-primary/20 transition-all disabled:opacity-70 disabled:pointer-events-none disabled:transform-none"
+                            style={{ width: "100%", height: "56px", backgroundColor: "#E8231A", color: "#FFF", display: "flex", justifyContent: "center", alignItems: "center", gap: "8px", borderRadius: "12px", fontWeight: 900, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)", transition: "all 0.2s ease-in-out", border: "none" }}
                         >
-                            {loadingPackage !== null ? <Loader2 className="animate-spin" size={20} /> : <ShoppingCart size={20} />}
+                            {loadingPackage !== null ? <Loader2 size={20} /> : <ShoppingCart size={20} />}
                             {loadingPackage !== null ? "Procesando..." : "Continuar al Pago"}
                         </button>
                     </div>
@@ -365,102 +365,102 @@ export default function ShopPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#0A0A08] flex flex-col items-center px-4 py-12">
-            <div style={{ maxWidth: '896px', width: '100%' }} className="bg-[#1A1A18] rounded-2xl shadow-xl border border-primary/20 p-6 md:p-8 overflow-hidden relative">
+        <div style={{ minHeight: "100vh", backgroundColor: "#0A0A08", display: "flex", flexDirection: "column", alignItems: "center", padding: "48px 0" }}>
+            <div style={{ maxWidth: '896px', width: '100%', backgroundColor: "#1A1A18", borderRadius: "16px", boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)", border: "1px solid rgba(255,255,255,0.08)", padding: "32px", overflow: "hidden", position: "relative" }}>
                 {renderCheckoutModal()}
 
                 {/* Header / Hero Shop */}
-                <div className="bg-destructive px-6 md:px-8 pt-12 pb-16 text-destructive-foreground relative overflow-hidden -mx-6 md:-mx-8 -mt-6 md:-mt-8 rounded-t-2xl">
-                    <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
-                    <div className="w-full mx-auto flex flex-col items-center text-center relative z-10">
-                        <Link href="/" className="inline-flex items-center gap-2 bg-white/20 px-3 py-1.5 rounded-full text-white/90 hover:bg-white/30 hover:text-white transition-colors mb-8 font-medium text-xs uppercase tracking-wider self-start md:self-auto">
+                <div style={{ padding: "0 24px", position: "relative", overflow: "hidden" }}>
+                    <div style={{ position: "absolute", top: 0, right: 0, width: "320px", height: "320px", borderRadius: "9999px" }} />
+                    <div style={{ width: "100%", margin: "0 auto", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", position: "relative", zIndex: 10 }}>
+                        <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: "8px", borderRadius: "9999px", transition: "color 0.2s, background-color 0.2s, border-color 0.2s", marginBottom: "32px", fontWeight: 500, fontSize: "12px" }}>
                             <ArrowLeft size={16} /> Volver al Inicio
                         </Link>
-                        <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4 flex items-center gap-4">
-                            <ShoppingCart size={32} className="hidden sm:block" /> Tienda Oficial
+                        <h1 style={{ fontSize: "36px", fontWeight: 900, marginBottom: "16px", display: "flex", alignItems: "center", gap: "16px" }}>
+                            <ShoppingCart size={32} style={{ display: "block" }} /> Tienda Oficial
                         </h1>
-                        <p className="text-white/90 text-md md:text-lg font-medium max-w-2xl">
+                        <p style={{ fontSize: "18px", fontWeight: 500, maxWidth: "672px" }}>
                             Adquiere tus chips NFC inteligentes y viaja con total tranquilidad.
                         </p>
                     </div>
                 </div>
 
-                <div className="w-full mx-auto -mt-6 relative z-20 pb-12 space-y-16">
+                <div style={{ width: "100%", margin: "0 auto", position: "relative" }}>
 
                     {/* SECCIÓN 1 - PÚBLICO GENERAL */}
                     <section>
-                        <div className="text-center mb-10">
-                            <h2 className="-mt-6 md:mt-0 text-3xl md:text-4xl font-extrabold text-foreground flex items-center justify-center gap-3">
-                                <Users size={32} className="text-primary hidden sm:block" /> Protege tu vida en cada rodada
+                        <div style={{ textAlign: "center" }}>
+                            <h2 style={{ fontSize: "36px", color: "#F4F0EB", display: "flex", alignItems: "center", justifyContent: "center", gap: "12px" }}>
+                                <Users size={32} style={{ color: "#E8231A", display: "block" }} /> Protege tu vida en cada rodada
                             </h2>
-                            <p className="text-primary font-bold mt-2 bg-primary/10 inline-block px-4 py-1.5 rounded-full">🚚 Envío GRATIS a todo México</p>
+                            <p style={{ color: "#E8231A", fontWeight: 700, display: "inline-block", padding: "0 16px", borderRadius: "9999px" }}>🚚 Envío GRATIS a todo México</p>
                         </div>
 
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '32px', alignItems: 'flex-start' }}>
                             {/* Plan Individual */}
-                            <div className="bg-[#1A1A18] rounded-3xl p-8 border border-border shadow-sm flex flex-col h-full hover:border-primary/50 transition-all">
-                                <h3 className="text-2xl font-black mb-2">Individual</h3>
-                                <div className="flex items-baseline gap-2 mb-6">
-                                    <span className="text-4xl font-black">$349</span>
-                                    <span className="text-muted-foreground font-bold">MXN</span>
+                            <div style={{ backgroundColor: "#1A1A18", borderRadius: "24px", padding: "32px", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)", display: "flex", flexDirection: "column", height: "100%", transition: "all 0.2s ease-in-out" }}>
+                                <h3 style={{ fontSize: "24px", fontWeight: 900, marginBottom: "8px" }}>Individual</h3>
+                                <div style={{ display: "flex", gap: "8px", marginBottom: "24px" }}>
+                                    <span style={{ fontSize: "36px", fontWeight: 900 }}>$349</span>
+                                    <span style={{ color: "#9E9A95", fontWeight: 700 }}>MXN</span>
                                 </div>
-                                <ul className="space-y-4 mb-8 flex-1">
-                                    <li className="flex items-start gap-3 text-muted-foreground"><CheckCircle2 className="text-primary shrink-0" size={20} /> 1 chip NFC</li>
-                                    <li className="flex items-start gap-3 text-muted-foreground"><CheckCircle2 className="text-primary shrink-0" size={20} /> 1 sticker protector</li>
-                                    <li className="flex items-start gap-3 text-muted-foreground"><CheckCircle2 className="text-primary shrink-0" size={20} /> Activación digital</li>
-                                    <li className="flex items-start gap-3 text-muted-foreground"><CheckCircle2 className="text-primary shrink-0" size={20} /> Envío gratis (México)</li>
+                                <ul style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "32px" }}>
+                                    <li style={{ display: "flex", alignItems: "flex-start", gap: "12px", color: "#9E9A95" }}><CheckCircle2 style={{ color: "#E8231A" }} size={20} /> 1 chip NFC</li>
+                                    <li style={{ display: "flex", alignItems: "flex-start", gap: "12px", color: "#9E9A95" }}><CheckCircle2 style={{ color: "#E8231A" }} size={20} /> 1 sticker protector</li>
+                                    <li style={{ display: "flex", alignItems: "flex-start", gap: "12px", color: "#9E9A95" }}><CheckCircle2 style={{ color: "#E8231A" }} size={20} /> Activación digital</li>
+                                    <li style={{ display: "flex", alignItems: "flex-start", gap: "12px", color: "#9E9A95" }}><CheckCircle2 style={{ color: "#E8231A" }} size={20} /> Envío gratis (México)</li>
                                 </ul>
                                 <button
                                     onClick={() => setSelectedPackage("individual")}
-                                    className="w-full flex justify-center items-center gap-2 bg-muted text-foreground font-bold h-14 rounded-xl hover:bg-muted-foreground/20 transition-all"
+                                    style={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center", gap: "8px", backgroundColor: "#1A1A18", color: "#F4F0EB", fontWeight: 700, height: "56px", borderRadius: "12px", transition: "all 0.2s ease-in-out" }}
                                 >
                                     Comprar
                                 </button>
                             </div>
 
                             {/* Plan Pareja (Más Popular) */}
-                            <div className="bg-[#1A1A18] rounded-3xl p-8 border-2 border-primary shadow-xl relative flex flex-col h-full scale-100 md:scale-105 z-10">
-                                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-black uppercase tracking-wider">
+                            <div style={{ backgroundColor: "#1A1A18", borderRadius: "24px", padding: "32px", boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)", position: "relative", display: "flex", flexDirection: "column", height: "100%", zIndex: 10 }}>
+                                <div style={{ position: "absolute", padding: "0 16px", borderRadius: "9999px", fontSize: "14px", fontWeight: 900 }}>
                                     Más Popular
                                 </div>
-                                <h3 className="text-2xl font-black mb-2 mt-2">Pareja</h3>
-                                <div className="flex items-baseline gap-2 mb-6">
-                                    <span className="text-4xl font-black">$549</span>
-                                    <span className="text-muted-foreground font-bold">MXN</span>
+                                <h3 style={{ fontSize: "24px", fontWeight: 900, marginBottom: "8px" }}>Pareja</h3>
+                                <div style={{ display: "flex", gap: "8px", marginBottom: "24px" }}>
+                                    <span style={{ fontSize: "36px", fontWeight: 900 }}>$549</span>
+                                    <span style={{ color: "#9E9A95", fontWeight: 700 }}>MXN</span>
                                 </div>
-                                <ul className="space-y-4 mb-8 flex-1">
-                                    <li className="flex items-start gap-3 font-medium"><CheckCircle2 className="text-primary shrink-0" size={20} /> 2 chips NFC</li>
-                                    <li className="flex items-start gap-3 font-medium"><CheckCircle2 className="text-primary shrink-0" size={20} /> 2 stickers protectores</li>
-                                    <li className="flex items-start gap-3 font-medium"><CheckCircle2 className="text-primary shrink-0" size={20} /> Activación digital compartida</li>
-                                    <li className="flex items-start gap-3 font-medium"><CheckCircle2 className="text-primary shrink-0" size={20} /> Envío gratis (México)</li>
+                                <ul style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "32px" }}>
+                                    <li style={{ display: "flex", alignItems: "flex-start", gap: "12px", fontWeight: 500 }}><CheckCircle2 style={{ color: "#E8231A" }} size={20} /> 2 chips NFC</li>
+                                    <li style={{ display: "flex", alignItems: "flex-start", gap: "12px", fontWeight: 500 }}><CheckCircle2 style={{ color: "#E8231A" }} size={20} /> 2 stickers protectores</li>
+                                    <li style={{ display: "flex", alignItems: "flex-start", gap: "12px", fontWeight: 500 }}><CheckCircle2 style={{ color: "#E8231A" }} size={20} /> Activación digital compartida</li>
+                                    <li style={{ display: "flex", alignItems: "flex-start", gap: "12px", fontWeight: 500 }}><CheckCircle2 style={{ color: "#E8231A" }} size={20} /> Envío gratis (México)</li>
                                 </ul>
                                 <button
                                     onClick={() => setSelectedPackage("pareja")}
-                                    className="w-full flex justify-center items-center gap-2 bg-primary text-primary-foreground font-black h-14 rounded-xl hover:bg-primary/90 hover:scale-[1.02] shadow-lg shadow-primary/20 transition-all"
+                                    style={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center", gap: "8px", fontWeight: 900, height: "56px", borderRadius: "12px", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)", transition: "all 0.2s ease-in-out" }}
                                 >
                                     Comprar
                                 </button>
                             </div>
 
                             {/* Plan Familiar */}
-                            <div className="bg-[#1A1A18] rounded-3xl p-8 border border-border shadow-sm relative flex flex-col h-full hover:border-primary/50 transition-all">
-                                <div className="absolute -top-4 right-8 bg-black text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                            <div style={{ backgroundColor: "#1A1A18", borderRadius: "24px", padding: "32px", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)", position: "relative", display: "flex", flexDirection: "column", height: "100%", transition: "all 0.2s ease-in-out" }}>
+                                <div style={{ position: "absolute", borderRadius: "9999px", fontSize: "12px", fontWeight: 700 }}>
                                     Mejor Valor
                                 </div>
-                                <h3 className="text-2xl font-black mb-2">Familiar</h3>
-                                <div className="flex items-baseline gap-2 mb-6">
-                                    <span className="text-4xl font-black">$949</span>
-                                    <span className="text-muted-foreground font-bold">MXN</span>
+                                <h3 style={{ fontSize: "24px", fontWeight: 900, marginBottom: "8px" }}>Familiar</h3>
+                                <div style={{ display: "flex", gap: "8px", marginBottom: "24px" }}>
+                                    <span style={{ fontSize: "36px", fontWeight: 900 }}>$949</span>
+                                    <span style={{ color: "#9E9A95", fontWeight: 700 }}>MXN</span>
                                 </div>
-                                <ul className="space-y-4 mb-8 flex-1">
-                                    <li className="flex items-start gap-3 text-muted-foreground"><CheckCircle2 className="text-primary shrink-0" size={20} /> 4 chips NFC</li>
-                                    <li className="flex items-start gap-3 text-muted-foreground"><CheckCircle2 className="text-primary shrink-0" size={20} /> 4 stickers protectores</li>
-                                    <li className="flex items-start gap-3 text-muted-foreground"><CheckCircle2 className="text-primary shrink-0" size={20} /> Activación digital grupal</li>
-                                    <li className="flex items-start gap-3 text-muted-foreground"><CheckCircle2 className="text-primary shrink-0" size={20} /> Envío gratis (México)</li>
+                                <ul style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "32px" }}>
+                                    <li style={{ display: "flex", alignItems: "flex-start", gap: "12px", color: "#9E9A95" }}><CheckCircle2 style={{ color: "#E8231A" }} size={20} /> 4 chips NFC</li>
+                                    <li style={{ display: "flex", alignItems: "flex-start", gap: "12px", color: "#9E9A95" }}><CheckCircle2 style={{ color: "#E8231A" }} size={20} /> 4 stickers protectores</li>
+                                    <li style={{ display: "flex", alignItems: "flex-start", gap: "12px", color: "#9E9A95" }}><CheckCircle2 style={{ color: "#E8231A" }} size={20} /> Activación digital grupal</li>
+                                    <li style={{ display: "flex", alignItems: "flex-start", gap: "12px", color: "#9E9A95" }}><CheckCircle2 style={{ color: "#E8231A" }} size={20} /> Envío gratis (México)</li>
                                 </ul>
                                 <button
                                     onClick={() => setSelectedPackage("familiar")}
-                                    className="w-full flex justify-center items-center gap-2 bg-muted text-foreground font-bold h-14 rounded-xl hover:bg-muted-foreground/20 transition-all"
+                                    style={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center", gap: "8px", backgroundColor: "#1A1A18", color: "#F4F0EB", fontWeight: 700, height: "56px", borderRadius: "12px", transition: "all 0.2s ease-in-out" }}
                                 >
                                     Comprar
                                 </button>
@@ -469,53 +469,53 @@ export default function ShopPage() {
                     </section>
 
                     {/* DIVISOR */}
-                    <div className="w-full h-px bg-border max-w-4xl mx-auto" />
+                    <div style={{ width: "100%", height: "NaNpx", maxWidth: "896px", margin: "0 auto" }} />
 
                     {/* SECCIÓN 2 - AGENCIAS Y B2B */}
                     <section>
-                        <div className="text-center mb-12">
-                            <h2 className="text-3xl md:text-4xl font-extrabold text-foreground flex items-center justify-center gap-3 mb-4">
-                                <Building2 size={32} className="text-primary hidden sm:block" /> Planes para Agencias de Motos y Empresas
+                        <div style={{ textAlign: "center" }}>
+                            <h2 style={{ fontSize: "36px", color: "#F4F0EB", display: "flex", alignItems: "center", justifyContent: "center", gap: "12px", marginBottom: "16px" }}>
+                                <Building2 size={32} style={{ color: "#E8231A", display: "block" }} /> Planes para Agencias de Motos y Empresas
                             </h2>
-                            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">Ofrece seguridad médica como valor agregado a tus clientes y mejora la experiencia de compra en tu negocio.</p>
+                            <p style={{ fontSize: "18px", color: "#9E9A95", maxWidth: "672px", margin: "0 auto" }}>Ofrece seguridad médica como valor agregado a tus clientes y mejora la experiencia de compra en tu negocio.</p>
                         </div>
 
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '24px' }}>
                             {/* Starter */}
-                            <div className="bg-[#1A1A18] rounded-2xl p-6 border border-border shadow-sm flex flex-col justify-between">
+                            <div style={{ backgroundColor: "#1A1A18", borderRadius: "16px", padding: "24px", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                                 <div>
-                                    <h3 className="text-xl font-bold mb-1">Starter</h3>
-                                    <p className="text-sm font-medium text-muted-foreground mb-4">50 chips a $179 c/u</p>
-                                    <div className="text-3xl font-black mb-6">$8,950 MXN</div>
+                                    <h3 style={{ fontSize: "20px", fontWeight: 700 }}>Starter</h3>
+                                    <p style={{ fontSize: "14px", fontWeight: 500, color: "#9E9A95", marginBottom: "16px" }}>50 chips a $179 c/u</p>
+                                    <div style={{ fontSize: "30px", fontWeight: 900, marginBottom: "24px" }}>$8,950 MXN</div>
                                 </div>
-                                <Link href={getWhatsAppLink("Starter")} target="_blank" className="w-full flex items-center justify-center bg-muted text-foreground font-bold h-12 rounded-xl border border-border hover:bg-muted-foreground/10 transition-colors">
+                                <Link href={getWhatsAppLink("Starter")} target="_blank" style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#1A1A18", color: "#F4F0EB", fontWeight: 700, height: "48px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", transition: "color 0.2s, background-color 0.2s, border-color 0.2s" }}>
                                     Solicitar
                                 </Link>
                             </div>
 
                             {/* Growth */}
-                            <div className="bg-primary/5 rounded-2xl p-6 border-2 border-primary shadow-md relative flex flex-col justify-between">
-                                <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-3 py-1 rounded-bl-xl rounded-tr-xl text-xs font-bold uppercase tracking-wider">
+                            <div style={{ borderRadius: "16px", padding: "24px", boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)", position: "relative", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                                <div style={{ position: "absolute", top: 0, right: 0, fontSize: "12px", fontWeight: 700 }}>
                                     Recomendado
                                 </div>
                                 <div>
-                                    <h3 className="text-xl font-bold mb-1">Growth</h3>
-                                    <p className="text-sm font-medium text-muted-foreground mb-4">100 chips a $149 c/u</p>
-                                    <div className="text-3xl font-black text-primary mb-6">$14,900 MXN</div>
+                                    <h3 style={{ fontSize: "20px", fontWeight: 700 }}>Growth</h3>
+                                    <p style={{ fontSize: "14px", fontWeight: 500, color: "#9E9A95", marginBottom: "16px" }}>100 chips a $149 c/u</p>
+                                    <div style={{ fontSize: "30px", fontWeight: 900, color: "#E8231A", marginBottom: "24px" }}>$14,900 MXN</div>
                                 </div>
-                                <Link href={getWhatsAppLink("Growth")} target="_blank" className="w-full flex items-center justify-center bg-primary text-primary-foreground font-black h-12 rounded-xl shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all hover:scale-[1.02]">
+                                <Link href={getWhatsAppLink("Growth")} target="_blank" style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, height: "48px", borderRadius: "12px", boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)", transition: "all 0.2s ease-in-out" }}>
                                     Solicitar
                                 </Link>
                             </div>
 
                             {/* Premium */}
-                            <div className="bg-[linear-gradient(135deg,#1f2937,#111827)] text-white rounded-2xl p-6 border border-gray-800 shadow-xl flex flex-col justify-between">
+                            <div style={{ borderRadius: "16px", padding: "24px", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                                 <div>
-                                    <h3 className="text-xl font-bold mb-1">Premium</h3>
-                                    <p className="text-sm font-medium text-gray-400 mb-4">300+ chips a $119 c/u</p>
-                                    <div className="text-2xl font-black mb-6 mt-1 text-gray-200">Precio negociable</div>
+                                    <h3 style={{ fontSize: "20px", fontWeight: 700 }}>Premium</h3>
+                                    <p style={{ fontSize: "14px", fontWeight: 500, marginBottom: "16px" }}>300+ chips a $119 c/u</p>
+                                    <div style={{ fontSize: "24px", fontWeight: 900, marginBottom: "24px" }}>Precio negociable</div>
                                 </div>
-                                <Link href={getWhatsAppLink("Premium")} target="_blank" className="w-full flex items-center justify-center bg-white text-black font-black h-12 rounded-xl hover:bg-gray-100 transition-colors">
+                                <Link href={getWhatsAppLink("Premium")} target="_blank" style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, height: "48px", borderRadius: "12px", transition: "color 0.2s, background-color 0.2s, border-color 0.2s" }}>
                                     Contáctanos
                                 </Link>
                             </div>

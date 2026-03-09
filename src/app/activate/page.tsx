@@ -481,7 +481,7 @@ function ActivationFormContent() {
 
     if (showLinkPrompt) {
         return (
-            <div style={{ colorScheme: 'dark' ,  padding: '32px 48px', textAlign: 'center' }}>
+            <div style={{ colorScheme: 'dark', padding: '32px 48px', textAlign: 'center' }}>
                 <div style={{ margin: '0 auto 16px auto', width: '64px', height: '64px', backgroundColor: 'rgba(232,35,26,0.1)', color: '#E8231A', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
                     <AlertCircle size={32} />
                 </div>
@@ -573,16 +573,16 @@ function ActivationFormContent() {
     }
 
     return (
-        <div className="p-4 md:p-8">
-            
+        <div style={{ padding: "32px" }}>
+
 
             <div style={{ display: "flex", alignItems: "flex-start", gap: "16px", padding: "16px", marginBottom: "32px", backgroundColor: "rgba(232,35,26,0.08)", border: "1px solid rgba(232,35,26,0.2)", borderRadius: "12px", color: "#F4F0EB" }}>
-                <div className="mt-1">
+                <div >
                     <AlertCircle size={20} />
                 </div>
                 <div>
-                    <h4 className="font-semibold mb-1">Aviso de Privacidad</h4>
-                    <p className="text-sm opacity-90 leading-relaxed">
+                    <h4 style={{ fontWeight: 600 }}>Aviso de Privacidad</h4>
+                    <p style={{ fontSize: "14px" }}>
                         La información que proporciones aquí será accesible únicamente al escanear físicamente el chip NFC asociado a este folio. Por favor revisa que tus datos sean correctos para asegurar la mejor atención médica posible en caso de emergencia.
                     </p>
                 </div>
@@ -604,18 +604,7 @@ function ActivationFormContent() {
                     </h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         <label htmlFor="folio" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Número de Folio (incluido en tu paquete) *</label>
-                        <input type="text" id="folio" name="folio" value={folio} onChange={(e) => setFolio(e.target.value)} style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
+                        <input type="text" id="folio" name="folio" value={folio} onChange={(e) => setFolio(e.target.value)} style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                             onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                             onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Ej. RSC-0001" required />
                     </div>
@@ -630,38 +619,16 @@ function ActivationFormContent() {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                             <label htmlFor="email" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Correo Electrónico *</label>
-                            <input type="email" id="email" name="email" style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="tu@correo.com" required />
+                            <input type="email" id="email" name="email" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="tu@correo.com" required />
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                             <label htmlFor="password" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Contraseña *</label>
                             <div style={{ position: 'relative' }}>
-                                <input type={showPassword ? "text" : "password"} id="password" name="password" style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Mínimo 6 caracteres" required minLength={6} />
+                                <input type={showPassword ? "text" : "password"} id="password" name="password" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                    onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Mínimo 6 caracteres" required minLength={6} />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
@@ -682,20 +649,20 @@ function ActivationFormContent() {
                         Identificación
                     </h3>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
-                        <div className="space-y-4 md:col-span-2 mt-2 mb-4">
+                        <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "16px" }}>
                             <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Foto de Perfil (Opcional pero Recomendado)</label>
-                            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                            <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "16px" }}>
                                 {photoFile ? (
-                                    <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-primary bg-muted shrink-0 shadow-md">
+                                    <div style={{ width: "80px", height: "80px", borderRadius: "16px", overflow: "hidden", backgroundColor: "#1A1A18", boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)" }}>
                                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                                        <img src={URL.createObjectURL(photoFile)} alt="Preview" className="w-full h-full object-cover" />
+                                        <img src={URL.createObjectURL(photoFile)} alt="Preview" style={{ width: "100%", height: "100%" }} />
                                     </div>
                                 ) : (
-                                    <div className="w-20 h-20 rounded-2xl border-2 border-dashed border-muted-foreground flex items-center justify-center bg-muted/50 text-muted-foreground shrink-0 text-2xl">
+                                    <div style={{ width: "80px", height: "80px", borderRadius: "16px", display: "flex", alignItems: "center", justifyContent: "center", color: "#9E9A95", fontSize: "24px" }}>
                                         📷
                                     </div>
                                 )}
-                                <div className="flex-1">
+                                <div >
                                     <input
                                         type="file"
                                         accept="image/*"
@@ -704,33 +671,22 @@ function ActivationFormContent() {
                                                 setPhotoFile(e.target.files[0]);
                                             }
                                         }}
-                                        className="w-full flex h-14 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 cursor-pointer shadow-sm"
+                                        style={{ width: "100%", display: "flex", height: "56px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", backgroundColor: "#1E1E1C", padding: "8px 16px", fontSize: "14px", transition: "all 0.2s ease-in-out", boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)" }}
                                     />
-                                    <p className="text-xs text-muted-foreground mt-2 leading-relaxed font-medium">Sube o toma una foto clara de tu rostro.<br />Establece tu identidad rápidamente ante los paramédicos.</p>
+                                    <p style={{ fontSize: "12px", color: "#9E9A95", fontWeight: 500 }}>Sube o toma una foto clara de tu rostro.<br />Establece tu identidad rápidamente ante los paramédicos.</p>
                                 </div>
                             </div>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                             <label htmlFor="fullName" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Nombre Completo *</label>
-                            <input type="text" id="fullName" name="fullName" style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Juan Pérez" required />
+                            <input type="text" id="fullName" name="fullName" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Juan Pérez" required />
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                             <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Número de Celular *</label>
-                            <div className="flex">
-                                <span className="inline-flex items-center px-4 rounded-l-xl border border-r-0 border-input bg-muted text-muted-foreground text-sm font-medium">
+                            <div style={{ display: "flex" }}>
+                                <span style={{ display: "inline-flex", alignItems: "center", padding: "0 16px", border: "1px solid rgba(255,255,255,0.08)", backgroundColor: "#1A1A18", color: "#9E9A95", fontSize: "14px", fontWeight: 500 }}>
                                     🇲🇽 +52
                                 </span>
                                 <input
@@ -739,18 +695,18 @@ function ActivationFormContent() {
                                     placeholder="55 1234 5678"
                                     value={phone}
                                     onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                                    className="flex-1 rounded-r-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all"
+                                    style={{ border: "1px solid rgba(255,255,255,0.08)", backgroundColor: "#1E1E1C", padding: "8px 16px", fontSize: "14px", transition: "all 0.2s ease-in-out" }}
                                     required
                                 />
                             </div>
-                            <label className="flex items-start gap-3 cursor-pointer mt-3 p-3 bg-muted/40 rounded-xl border border-border">
+                            <label style={{ display: "flex", alignItems: "flex-start", gap: "12px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)" }}>
                                 <input
                                     type="checkbox"
                                     checked={whatsappOptedIn}
                                     onChange={(e) => setWhatsappOptedIn(e.target.checked)}
-                                    className="mt-0.5 h-4 w-4 rounded border-input text-primary focus:ring-primary"
+                                    style={{ height: "16px", width: "16px", borderRadius: "4px", color: "#E8231A" }}
                                 />
-                                <span className="text-xs text-muted-foreground leading-relaxed">
+                                <span style={{ fontSize: "12px", color: "#9E9A95" }}>
                                     Acepto recibir notificaciones de RescueChip por WhatsApp en este número,
                                     incluyendo confirmación de activación y alertas de emergencia.
                                 </span>
@@ -758,37 +714,15 @@ function ActivationFormContent() {
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                             <label htmlFor="age" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Edad (Opcional)</label>
-                            <input type="number" id="age" name="age" style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Ej. 30" min="0" max="130" />
+                            <input type="number" id="age" name="age" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Ej. 30" min="0" max="130" />
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                             <label htmlFor="location" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Ciudad / País *</label>
-                            <input type="text" id="location" name="location" style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Ciudad de México, México" required />
+                            <input type="text" id="location" name="location" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Ciudad de México, México" required />
                         </div>
                     </div>
                 </section>
@@ -800,173 +734,74 @@ function ActivationFormContent() {
                         Contactos de Emergencia
                     </h3>
 
-                    <div className="p-4 border border-border rounded-xl space-y-4 bg-muted/20">
-                        <h4 className="text-sm font-bold text-primary">Contacto 1 (Requerido)</h4>
+                    <div style={{ padding: "16px", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", display: "flex", flexDirection: "column", gap: "16px" }}>
+                        <h4 style={{ fontSize: "14px", fontWeight: 700, color: "#E8231A" }}>Contacto 1 (Requerido)</h4>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                <label htmlFor="contact1Name" className="text-sm font-semibold text-muted-foreground">Nombre</label>
-                                <input type="text" id="contact1Name" name="contact1Name" style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Ej. María López (Esposa)" required />
+                                <label htmlFor="contact1Name" style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Nombre</label>
+                                <input type="text" id="contact1Name" name="contact1Name" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                    onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Ej. María López (Esposa)" required />
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                <label htmlFor="contact1Phone" className="text-sm font-semibold text-muted-foreground">Teléfono</label>
-                                <input type="tel" id="contact1Phone" name="contact1Phone" style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="+52 55 1234 5678" required />
+                                <label htmlFor="contact1Phone" style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Teléfono</label>
+                                <input type="tel" id="contact1Phone" name="contact1Phone" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                    onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="+52 55 1234 5678" required />
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
-                                <label htmlFor="contact1Email" className="text-sm font-semibold text-muted-foreground">Email (Opcional, para recibir alertas)</label>
-                                <input type="email" id="contact1Email" name="contact1Email" style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Email del contacto" />
+                                <label htmlFor="contact1Email" style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Email (Opcional, para recibir alertas)</label>
+                                <input type="email" id="contact1Email" name="contact1Email" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                    onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Email del contacto" />
                             </div>
                         </div>
                     </div>
 
-                    <div className="p-4 border border-border rounded-xl space-y-4 bg-muted/10">
-                        <h4 className="text-sm font-bold opacity-70">Contacto 2 (Opcional)</h4>
+                    <div style={{ padding: "16px", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", display: "flex", flexDirection: "column", gap: "16px" }}>
+                        <h4 style={{ fontSize: "14px", fontWeight: 700 }}>Contacto 2 (Opcional)</h4>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                <label htmlFor="contact2Name" className="text-sm font-semibold text-muted-foreground">Nombre</label>
-                                <input type="text" id="contact2Name" name="contact2Name" style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Nombre completo o parentesco" />
+                                <label htmlFor="contact2Name" style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Nombre</label>
+                                <input type="text" id="contact2Name" name="contact2Name" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                    onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Nombre completo o parentesco" />
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                <label htmlFor="contact2Phone" className="text-sm font-semibold text-muted-foreground">Teléfono</label>
-                                <input type="tel" id="contact2Phone" name="contact2Phone" style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="+52 55 0000 0000" />
+                                <label htmlFor="contact2Phone" style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Teléfono</label>
+                                <input type="tel" id="contact2Phone" name="contact2Phone" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                    onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="+52 55 0000 0000" />
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
-                                <label htmlFor="contact2Email" className="text-sm font-semibold text-muted-foreground">Email (Opcional, para recibir alertas)</label>
-                                <input type="email" id="contact2Email" name="contact2Email" style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Email del contacto" />
+                                <label htmlFor="contact2Email" style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Email (Opcional, para recibir alertas)</label>
+                                <input type="email" id="contact2Email" name="contact2Email" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                    onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Email del contacto" />
                             </div>
                         </div>
                     </div>
 
-                    <div className="p-4 border border-border rounded-xl space-y-4 bg-muted/10">
-                        <h4 className="text-sm font-bold opacity-70">Contacto 3 (Opcional)</h4>
+                    <div style={{ padding: "16px", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", display: "flex", flexDirection: "column", gap: "16px" }}>
+                        <h4 style={{ fontSize: "14px", fontWeight: 700 }}>Contacto 3 (Opcional)</h4>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                <label htmlFor="contact3Name" className="text-sm font-semibold text-muted-foreground">Nombre</label>
-                                <input type="text" id="contact3Name" name="contact3Name" style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Nombre completo o parentesco" />
+                                <label htmlFor="contact3Name" style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Nombre</label>
+                                <input type="text" id="contact3Name" name="contact3Name" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                    onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Nombre completo o parentesco" />
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                <label htmlFor="contact3Phone" className="text-sm font-semibold text-muted-foreground">Teléfono</label>
-                                <input type="tel" id="contact3Phone" name="contact3Phone" style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="+52 55 0000 0000" />
+                                <label htmlFor="contact3Phone" style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Teléfono</label>
+                                <input type="tel" id="contact3Phone" name="contact3Phone" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                    onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="+52 55 0000 0000" />
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
-                                <label htmlFor="contact3Email" className="text-sm font-semibold text-muted-foreground">Email (Opcional, para recibir alertas)</label>
-                                <input type="email" id="contact3Email" name="contact3Email" style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Email del contacto" />
+                                <label htmlFor="contact3Email" style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Email (Opcional, para recibir alertas)</label>
+                                <input type="email" id="contact3Email" name="contact3Email" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                    onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Email del contacto" />
                             </div>
                         </div>
                     </div>
@@ -982,20 +817,9 @@ function ActivationFormContent() {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                             <label htmlFor="bloodType" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Tipo de Sangre *</label>
-                            <select id="bloodType" name="bloodType" style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} required>
+                            <select id="bloodType" name="bloodType" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} required>
                                 <option value="">Selecciona tu tipo de sangre</option>
                                 <option value="A+">A+</option>
                                 <option value="A-">A-</option>
@@ -1010,28 +834,17 @@ function ActivationFormContent() {
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                             <label htmlFor="allergies" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Alergias Conocidas (Opcional)</label>
-                            <input type="text" id="allergies" name="allergies" style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Ej. Penicilina, Látex, Mariscos..." />
+                            <input type="text" id="allergies" name="allergies" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Ej. Penicilina, Látex, Mariscos..." />
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                             <label htmlFor="medicalConditions" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Condiciones Médicas (Opcional)</label>
-                            <textarea id="medicalConditions" name="medicalConditions" className="w-full flex min-h-[100px] rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-3 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. Asma, Diabetes Tipo 1, Hipertensión..." />
+                            <textarea id="medicalConditions" name="medicalConditions" style={{ width: "100%", display: "flex", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", backgroundColor: "#1E1E1C", padding: "0 16px", fontSize: "14px", transition: "all 0.2s ease-in-out" }} placeholder="Ej. Asma, Diabetes Tipo 1, Hipertensión..." />
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                             <label htmlFor="importantMedications" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Medicamentos Importantes (Opcional)</label>
-                            <textarea id="importantMedications" name="importantMedications" className="w-full flex min-h-[100px] rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-3 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. Insulina, anticoagulantes..." />
+                            <textarea id="importantMedications" name="importantMedications" style={{ width: "100%", display: "flex", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", backgroundColor: "#1E1E1C", padding: "0 16px", fontSize: "14px", transition: "all 0.2s ease-in-out" }} placeholder="Ej. Insulina, anticoagulantes..." />
                         </div>
                     </div>
                 </section>
@@ -1040,25 +853,14 @@ function ActivationFormContent() {
                 <section style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <h3 style={{ fontSize: "18px", fontWeight: 700, display: "flex", alignItems: "center", gap: "10px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "12px", marginBottom: "16px", color: "#F4F0EB" }}>
                         <span style={{ backgroundColor: "rgba(232,35,26,0.12)", color: "#E8231A", width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", flexShrink: 0, fontWeight: 600 }}>4</span>
-                        Mi Seguro Médico <span className="text-muted-foreground font-normal text-sm ml-2">(Opcional)</span>
+                        Mi Seguro Médico <span style={{ color: "#9E9A95", fontSize: "14px", marginLeft: "8px" }}>(Opcional)</span>
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-muted/30 p-5 rounded-2xl border border-border">
-                        <div className="space-y-2 lg:col-span-2">
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "16px", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.08)" }}>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                             <label htmlFor="medicalSystem" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Sistema médico</label>
-                            <select id="medicalSystem" name="medicalSystem" value={medicalSystem} onChange={(e) => setMedicalSystem(e.target.value)} style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}>
+                            <select id="medicalSystem" name="medicalSystem" value={medicalSystem} onChange={(e) => setMedicalSystem(e.target.value)} style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}>
                                 <option value="">Selecciona un sistema</option>
                                 <option value="Seguro Privado (Gastos Médicos Mayores)">Seguro Privado (Gastos Médicos Mayores)</option>
                                 <option value="IMSS">IMSS</option>
@@ -1073,22 +875,11 @@ function ActivationFormContent() {
                         {/* CONDITIONAL RENDERINGS */}
                         {medicalSystem === "Seguro Privado (Gastos Médicos Mayores)" && (
                             <>
-                                <div className="space-y-2 lg:col-span-2">
+                                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                                     <label htmlFor="aseguradora" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Aseguradora</label>
-                                    <select id="aseguradora" name="aseguradora" value={aseguradora} onChange={(e) => setAseguradora(e.target.value)} style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}>
+                                    <select id="aseguradora" name="aseguradora" value={aseguradora} onChange={(e) => setAseguradora(e.target.value)} style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                        onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}>
                                         <option value="">Selecciona una aseguradora</option>
                                         <option value="AXA">AXA</option>
                                         <option value="GNP">GNP</option>
@@ -1103,44 +894,22 @@ function ActivationFormContent() {
                                     </select>
                                 </div>
                                 {aseguradora === "Otro" && (
-                                    <div className="space-y-2 animate-in fade-in duration-300 md:col-span-2">
-                                        <label htmlFor="aseguradoraOtra" className="text-sm font-semibold text-primary">Especificar Aseguradora *</label>
-                                        <input type="text" id="aseguradoraOtra" name="aseguradoraOtra" required className="w-full flex h-12 rounded-xl border border-primary/50 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                                        <label htmlFor="aseguradoraOtra" style={{ fontSize: "14px", fontWeight: 600, color: "#E8231A" }}>Especificar Aseguradora *</label>
+                                        <input type="text" id="aseguradoraOtra" name="aseguradoraOtra" required style={{ width: "100%", display: "flex", height: "48px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", backgroundColor: "#1E1E1C", padding: "8px 16px", fontSize: "14px", transition: "all 0.2s ease-in-out" }} />
                                     </div>
                                 )}
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                     <label htmlFor="numeroPoliza" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Número de Póliza *</label>
-                                    <input type="text" id="numeroPoliza" name="numeroPoliza" required style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
+                                    <input type="text" id="numeroPoliza" name="numeroPoliza" required style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                        onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                 </div>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                     <label htmlFor="tipoSeguro" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Tipo de Seguro</label>
-                                    <select id="tipoSeguro" name="tipoSeguro" style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}>
+                                    <select id="tipoSeguro" name="tipoSeguro" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                        onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}>
                                         <option value="">Selecciona un tipo</option>
                                         <option value="Gastos Médicos Mayores">Gastos Médicos Mayores</option>
                                         <option value="Seguro de Auto">Seguro de Auto</option>
@@ -1151,67 +920,34 @@ function ActivationFormContent() {
                                 </div>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                     <label htmlFor="nombreAsegurado" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Nombre Asegurado Titular *</label>
-                                    <input type="text" id="nombreAsegurado" name="nombreAsegurado" required style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
+                                    <input type="text" id="nombreAsegurado" name="nombreAsegurado" required style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                        onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                 </div>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                     <label htmlFor="vigenciaPoliza" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Vigencia (Opcional)</label>
-                                    <input type="date" id="vigenciaPoliza" name="vigenciaPoliza" style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }} onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'} onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
+                                    <input type="date" id="vigenciaPoliza" name="vigenciaPoliza" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }} onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'} onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                 </div>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                                     <label htmlFor="telefonoAseguradora" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Teléfono de Emergencias (Opcional)</label>
-                                    <input type="tel" id="telefonoAseguradora" name="telefonoAseguradora" placeholder="Ej: 800-123-4567" style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
+                                    <input type="tel" id="telefonoAseguradora" name="telefonoAseguradora" placeholder="Ej: 800-123-4567" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                        onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                 </div>
 
                                 {/* Subida de Póliza */}
-                                <div className="space-y-4 md:col-span-2 mt-4 pt-4 border-t border-border/50">
+                                <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "16px", paddingTop: "16px", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
                                     <div>
                                         <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Documento Póliza (PDF, JPG, PNG)</label>
-                                        <p className="text-xs text-muted-foreground mt-1">Sube el extracto de tu póliza (máx 5MB). Se mostrará a paramédicos.</p>
+                                        <p style={{ fontSize: "12px", color: "#9E9A95" }}>Sube el extracto de tu póliza (máx 5MB). Se mostrará a paramédicos.</p>
                                     </div>
-                                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                                    <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "16px" }}>
                                         {polizaFile ? (
-                                            <div className="px-4 py-3 bg-primary/10 border border-primary/20 rounded-xl text-primary font-bold text-sm flex items-center gap-2">
+                                            <div style={{ padding: "0 16px", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", color: "#E8231A", fontWeight: 700, fontSize: "14px", display: "flex", alignItems: "center", gap: "8px" }}>
                                                 📄 {polizaFile.name}
                                             </div>
                                         ) : null}
-                                        <div className="flex-1 w-full relative">
+                                        <div style={{ width: "100%", position: "relative" }}>
                                             <input
                                                 type="file"
                                                 accept=".pdf,image/png,image/jpeg,image/jpg"
@@ -1226,7 +962,7 @@ function ActivationFormContent() {
                                                         setPolizaFile(file);
                                                     }
                                                 }}
-                                                className="w-full flex h-14 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 cursor-pointer shadow-sm relative z-10"
+                                                style={{ width: "100%", display: "flex", height: "56px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", backgroundColor: "#1E1E1C", padding: "8px 16px", fontSize: "14px", transition: "all 0.2s ease-in-out", boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)", position: "relative", zIndex: 10 }}
                                             />
                                         </div>
                                     </div>
@@ -1238,54 +974,21 @@ function ActivationFormContent() {
                             <>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                     <label htmlFor="nss" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>NSS - Número de Seguridad Social *</label>
-                                    <input type="text" id="nss" name="nss" required maxLength={11} style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
+                                    <input type="text" id="nss" name="nss" required maxLength={11} style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                        onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                 </div>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                     <label htmlFor="clinicaAsignada" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>UMF / Clínica asignada (Opcional)</label>
-                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" placeholder="Ej: UMF 28, Monterrey" style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
+                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" placeholder="Ej: UMF 28, Monterrey" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                        onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                 </div>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                                     <label htmlFor="curpSeguro" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>CURP (Opcional)</label>
-                                    <input type="text" id="curpSeguro" name="curpSeguro" maxLength={18} style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
+                                    <input type="text" id="curpSeguro" name="curpSeguro" maxLength={18} style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                        onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                 </div>
                             </>
                         )}
@@ -1294,54 +997,21 @@ function ActivationFormContent() {
                             <>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                                     <label htmlFor="numeroAfiliacion" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Número de afiliación ISSSTE *</label>
-                                    <input type="text" id="numeroAfiliacion" name="numeroAfiliacion" required style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
+                                    <input type="text" id="numeroAfiliacion" name="numeroAfiliacion" required style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                        onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                 </div>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                     <label htmlFor="clinicaAsignada" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Clínica asignada (Opcional)</label>
-                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
+                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                        onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                 </div>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                     <label htmlFor="curpSeguro" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>CURP (Opcional)</label>
-                                    <input type="text" id="curpSeguro" name="curpSeguro" maxLength={18} style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
+                                    <input type="text" id="curpSeguro" name="curpSeguro" maxLength={18} style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                        onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                 </div>
                             </>
                         )}
@@ -1350,37 +1020,15 @@ function ActivationFormContent() {
                             <>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                     <label htmlFor="curpSeguro" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>CURP *</label>
-                                    <input type="text" id="curpSeguro" name="curpSeguro" required maxLength={18} style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
+                                    <input type="text" id="curpSeguro" name="curpSeguro" required maxLength={18} style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                        onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                 </div>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                     <label htmlFor="clinicaAsignada" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Centro de salud asignado (Opcional)</label>
-                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
+                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                        onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                 </div>
                             </>
                         )}
@@ -1389,51 +1037,29 @@ function ActivationFormContent() {
                             <>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                     <label htmlFor="numeroAfiliacion" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Número de afiliación *</label>
-                                    <input type="text" id="numeroAfiliacion" name="numeroAfiliacion" required style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
+                                    <input type="text" id="numeroAfiliacion" name="numeroAfiliacion" required style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                        onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                 </div>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                     <label htmlFor="clinicaAsignada" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Unidad médica asignada (Opcional)</label>
-                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
+                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                        onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                 </div>
                             </>
                         )}
 
                         {medicalSystem === "Sin seguro médico" && (
-                            <div className="col-span-1 md:col-span-2 p-4 bg-muted/50 rounded-xl border border-border text-sm text-muted-foreground">
-                                <p className="font-semibold text-foreground mb-1">Aviso:</p>
+                            <div style={{ padding: "16px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", fontSize: "14px", color: "#9E9A95" }}>
+                                <p style={{ fontWeight: 600, color: "#F4F0EB" }}>Aviso:</p>
                                 En caso de emergencia serás atendido en el hospital público más cercano. Te recomendamos considerar un seguro de gastos médicos mayores para una mejor atención.
                             </div>
                         )}
 
-                        <div className="space-y-2 flex items-center gap-3 pt-6 rounded-xl border border-border p-4 bg-muted/20 md:col-span-2">
-                            <input type="checkbox" id="organDonor" name="organDonor" className="w-5 h-5 rounded border-input accent-primary text-primary" />
-                            <label htmlFor="organDonor" className="text-sm font-semibold cursor-pointer">Soy donante oficial de órganos</label>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "12px", alignItems: "center", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "16px" }}>
+                            <input type="checkbox" id="organDonor" name="organDonor" style={{ width: "20px", height: "20px", borderRadius: "4px", color: "#E8231A" }} />
+                            <label htmlFor="organDonor" style={{ fontSize: "14px", fontWeight: 600 }}>Soy donante oficial de órganos</label>
                         </div>
 
                     </div>
@@ -1446,20 +1072,20 @@ function ActivationFormContent() {
                         Notas y Ubicación
                     </h3>
 
-                    <div className="space-y-2 flex flex-col gap-2 pt-2 rounded-xl border border-primary/30 p-5 bg-primary/5 mb-6">
-                        <div className="flex items-center gap-3">
+                    <div style={{ display: "flex", flexDirection: "column", gap: "8px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", marginBottom: "24px" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                             <input
                                 type="checkbox"
                                 id="isMotorcyclist"
                                 name="isMotorcyclist"
-                                className="w-5 h-5 rounded border-input accent-primary text-primary"
+                                style={{ width: "20px", height: "20px", borderRadius: "4px", color: "#E8231A" }}
                                 checked={isMotorcyclist}
                                 onChange={(e) => setIsMotorcyclist(e.target.checked)}
                             />
-                            <label htmlFor="isMotorcyclist" className="text-sm font-bold cursor-pointer text-primary">¿Eres Motociclista?</label>
+                            <label htmlFor="isMotorcyclist" style={{ fontSize: "14px", fontWeight: 700, color: "#E8231A" }}>¿Eres Motociclista?</label>
                         </div>
                         {isMotorcyclist && (
-                            <div className="ml-8 mt-2 text-sm text-destructive font-bold flex items-center gap-2 animate-[fade-in-up_0.3s_ease-out_forwards]">
+                            <div style={{ fontSize: "14px", color: "#E8231A", fontWeight: 700, display: "flex", alignItems: "center", gap: "8px" }}>
                                 <AlertCircle size={16} />
                                 Tu perfil mostrará una alerta para los paramédicos pidiendo "NO RETIRAR EL CASCO" si no hay personal médico capacitado.
                             </div>
@@ -1469,35 +1095,24 @@ function ActivationFormContent() {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                             <label htmlFor="additionalNotes" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Notas Adicionales (Opcional)</label>
-                            <textarea id="additionalNotes" name="additionalNotes" className="w-full flex min-h-[100px] rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-3 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Cualquier información adicional que los paramédicos o doctores deban saber." />
+                            <textarea id="additionalNotes" name="additionalNotes" style={{ width: "100%", display: "flex", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", backgroundColor: "#1E1E1C", padding: "0 16px", fontSize: "14px", transition: "all 0.2s ease-in-out" }} placeholder="Cualquier información adicional que los paramédicos o doctores deban saber." />
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                             <label htmlFor="googleMapsLink" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Hospital o clínica de preferencia (Opcional)</label>
-                            <input type="text" id="googleMapsLink" name="googleMapsLink" style={{
-                                width: '100%',
-                                backgroundColor: '#1A1A18',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                fontSize: '15px',
-                                color: '#F4F0EB',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                transition: 'border-color 0.2s',
-                            }}
-                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Ejemplo: Hospital Ángeles Lindavista" />
-                            <p className="text-xs text-muted-foreground mt-1">En caso de emergencia, el personal médico determinará el hospital más adecuado según tu estado de salud y criterio profesional. Este dato es solo una referencia.</p>
+                            <input type="text" id="googleMapsLink" name="googleMapsLink" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Ejemplo: Hospital Ángeles Lindavista" />
+                            <p style={{ fontSize: "12px", color: "#9E9A95" }}>En caso de emergencia, el personal médico determinará el hospital más adecuado según tu estado de salud y criterio profesional. Este dato es solo una referencia.</p>
                         </div>
                     </div>
                 </section>
 
 
                 <button type="submit" disabled={loading} style={{ marginTop: '32px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', backgroundColor: '#E8231A', color: '#fff', height: '64px', borderRadius: '16px', fontSize: '20px', fontWeight: 900, border: 'none', cursor: 'pointer', transition: 'background-color 0.2s' }}>
-                    {loading ? <Loader2 size={24} className="animate-spin" /> : <CheckCircle2 size={24} />}
+                    {loading ? <Loader2 size={24} /> : <CheckCircle2 size={24} />}
                     {loading ? "Registrando Ficha..." : "Aceptar y Activar Chip"}
                 </button>
-                <p className="text-xs text-center text-muted-foreground mt-4 font-medium">
+                <p style={{ fontSize: "12px", textAlign: "center", color: "#9E9A95", marginTop: "16px", fontWeight: 500 }}>
                     Al registrarte, confirmas que la información ingresada es legítima y autorizas su exposición a personal de rescate/primeros auxilios a través de tu RescueChip.
                 </p>
             </form>
