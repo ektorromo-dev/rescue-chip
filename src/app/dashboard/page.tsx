@@ -991,6 +991,21 @@ export default function DashboardPage() {
                                             const isExpanded = expandedLogId === log.id;
                                             return (
                                                 <div key={log.id} className={`rounded-xl border ${log.tipo === 'emergencia' ? 'bg-destructive/10 border-destructive/30' : 'bg-card border-border'} overflow-hidden`}>
+      <style dangerouslySetInnerHTML={{__html: `
+        input, select, textarea { background-color: #1A1A18 !important; color: #F4F0EB !important; border-color: rgba(255,255,255,0.1) !important; }
+        input::placeholder, textarea::placeholder { color: rgba(244,240,235,0.3) !important; }
+        input:focus, select:focus, textarea:focus { border-color: rgba(232,35,26,0.5) !important; outline: none !important; }
+        select option { background-color: #1A1A18; color: #F4F0EB; }
+        label { color: #C8C0B4 !important; }
+        .min-h-screen { background-color: #0A0A08 !important; color: #F4F0EB !important; }
+        .bg-card, .bg-muted, .bg-accent { background-color: #131311 !important; }
+        .border { border-color: rgba(255,255,255,0.08) !important; }
+        .text-muted-foreground { color: #9E9A95 !important; }
+        .text-foreground { color: #F4F0EB !important; }
+        .text-primary { color: #E8231A !important; }
+        .bg-primary { background-color: #E8231A !important; }
+        .bg-background { background-color: #0A0A08 !important; }
+      `}} />
                                                     <div className="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                                                         <div>
                                                             <div className="flex items-center gap-2 mb-1">

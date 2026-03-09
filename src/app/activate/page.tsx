@@ -574,6 +574,13 @@ function ActivationFormContent() {
 
     return (
         <div style={{backgroundColor:"#0A0A08",color:"#F4F0EB",padding:"24px 20px",minHeight:"100vh",fontFamily:"Inter,-apple-system,sans-serif"}}>
+      <style dangerouslySetInnerHTML={{__html: `
+        input, select, textarea { background-color: #1A1A18 !important; color: #F4F0EB !important; border-color: rgba(255,255,255,0.1) !important; }
+        input::placeholder, textarea::placeholder { color: rgba(244,240,235,0.3) !important; }
+        input:focus, select:focus, textarea:focus { border-color: rgba(232,35,26,0.5) !important; outline: none !important; box-shadow: 0 0 0 2px rgba(232,35,26,0.15) !important; }
+        select option { background-color: #1A1A18; color: #F4F0EB; }
+        label { color: #C8C0B4 !important; }
+      `}} />
 
             <div style={{display:"flex",alignItems:"flex-start",gap:"16px",padding:"16px",marginBottom:"32px",backgroundColor:"rgba(232,35,26,0.08)",border:"1px solid rgba(232,35,26,0.2)",borderRadius:"12px",color:"#F4F0EB"}}>
                 <div className="mt-1">
@@ -610,7 +617,7 @@ function ActivationFormContent() {
                 {/* CREAR CUENTA */}
                 <section className="space-y-4">
                     <h3 style={{fontSize:"18px",fontWeight:700,display:"flex",alignItems:"center",gap:"10px",borderBottom:"1px solid rgba(255,255,255,0.08)",paddingBottom:"12px",marginBottom:"16px",color:"#F4F0EB"}}>
-                        <span style={{backgroundColor:"rgba(232,35,26,0.12)",color:"#E8231A",width:"28px",height:"28px",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"12px",flexShrink:0,fontWeight:600}}>Cuenta</span>
+                        <span style={{backgroundColor:"rgba(232,35,26,0.12)",color:"#E8231A",width:"28px",height:"28px",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"12px",flexShrink:0,fontWeight:600}}>✉</span>
                         Crear Cuenta
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
