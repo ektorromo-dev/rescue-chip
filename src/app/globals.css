@@ -3,11 +3,6 @@
 @tailwind utilities;
 
 :root {
-  --rc-red: #E8231A;
-  --rc-white: #F4F0EB;
-  --rc-off-white: #C8C0B4;
-  --rc-dark: #0A0A08;
-  --rc-dark-card: #161614;
   --background: 60 3% 4%;
   --foreground: 40 14% 95%;
   --card: 60 3% 8%;
@@ -29,13 +24,12 @@
   --ring: 2 80% 51%;
   --radius: 0.5rem;
 }
-
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body {
   background-color: #0A0A08;
   color: #F4F0EB;
-  font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: Inter, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
