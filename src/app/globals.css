@@ -37,3 +37,25 @@ body {
 ::-webkit-scrollbar-track { background: #0A0A08; }
 ::-webkit-scrollbar-thumb { background: rgba(232,35,26,0.4); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(232,35,26,0.65); }
+
+/* ===== INPUTS DARK THEME OVERRIDE ===== */
+input:not([type="checkbox"]):not([type="radio"]),
+select,
+textarea {
+  background-color: #1E1E1C !important;
+  color: #F4F0EB !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.4) !important;
+}
+
+input:not([type="checkbox"]):not([type="radio"])::placeholder,
+textarea::placeholder {
+  color: rgba(244, 240, 235, 0.35) !important;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):focus,
+select:focus,
+textarea:focus {
+  border-color: rgba(232, 35, 26, 0.6) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(232, 35, 26, 0.15) !important;
+}
