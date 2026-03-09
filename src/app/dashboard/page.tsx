@@ -501,7 +501,7 @@ export default function DashboardPage() {
 
     if (deviceVerificationStatus === "pending") {
         return (
-            <div className="min-h-screen bg-[#0A0A08] flex items-center justify-center px-4 py-10">
+            <div className="min-h-screen bg-[#0A0A08] flex flex-col items-center px-4 py-12">
                 <div className="bg-card w-full max-w-md p-10 rounded-2xl shadow-xl border border-primary/20 text-center animate-in fade-in zoom-in duration-500">
                     <div className="w-24 h-24 bg-primary/10 text-primary mx-auto rounded-full flex items-center justify-center mb-8 shadow-inner relative">
                         <Loader2 size={48} className="animate-spin absolute opacity-20" />
@@ -521,7 +521,7 @@ export default function DashboardPage() {
     }
 
     return (
-        <div className="min-h-screen bg-[#0A0A08] flex items-center justify-center px-4 py-10">
+        <div className="min-h-screen bg-[#0A0A08] flex flex-col items-center px-4 py-12">
             <div style={{ maxWidth: '768px', width: '100%' }} className="bg-[#1A1A18] rounded-2xl shadow-xl border border-primary/20 p-8">
                 {/* Header */}
                 <div className="bg-destructive px-8 pt-10 pb-12 text-destructive-foreground relative overflow-hidden">

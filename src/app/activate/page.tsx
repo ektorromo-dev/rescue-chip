@@ -1061,7 +1061,7 @@ function ActivationFormContent() {
 
 export default function ActivatePage() {
     return (
-        <div className="min-h-screen bg-[#0A0A08] flex items-center justify-center px-4 py-10">
+        <div className="min-h-screen bg-[#0A0A08] flex flex-col items-center px-4 py-12">
             <div style={{ maxWidth: '672px', width: '100%' }} className="bg-[#1A1A18] rounded-2xl shadow-xl border border-red-900/30 overflow-hidden">
 
                 {/* Header */}
