@@ -1,8 +1,8 @@
-﻿@tailwind base;
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/*  TEMA GLOBAL RESCUECHIP  */
+/* ══ TEMA GLOBAL RESCUECHIP ══════════════════════════════════════════ */
 :root {
   /* Colores RescueChip */
   --rc-red: #E8231A;
@@ -47,15 +47,13 @@ html {
 body {
   background-color: #0A0A08;
   color: #F4F0EB;
-  font-family: 
-\Inter\', -apple-system, BlinkMacSystemFont, \Segoe
-UI\', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
 }
 
-/*  TAILWIND DARK OVERRIDES  */
+/* ══ TAILWIND DARK OVERRIDES ══════════════════════════════════════════ */
 
 /* Cards y contenedores */
 .bg-background { background-color: #0A0A08 !important; }
@@ -109,7 +107,7 @@ a:hover { color: #F4F0EB; }
 ::-webkit-scrollbar-thumb { background: rgba(232,35,26,0.4); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(232,35,26,0.7); }
 
-/*  ANIMACIONES GLOBALES  */
+/* ══ ANIMACIONES GLOBALES ══════════════════════════════════════════ */
 @keyframes fade-in-up {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -120,7 +118,7 @@ a:hover { color: #F4F0EB; }
   50%       { transform: scale(1.05); opacity: 0.6; }
 }
 
-/*  COMPONENTES REUTILIZABLES  */
+/* ══ COMPONENTES REUTILIZABLES ══════════════════════════════════════ */
 
 /* Botón primario rojo */
 .btn-rc-primary {
