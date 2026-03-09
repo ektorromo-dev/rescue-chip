@@ -1091,6 +1091,5 @@ export default function ActivatePage() {
 
             </div>
         </div>
-</div>
     );
 }
