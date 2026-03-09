@@ -573,9 +573,9 @@ function ActivationFormContent() {
     }
 
     return (
-        <div className="p-8 md:p-12">
+        <div style={{backgroundColor:"#0A0A08",color:"#F4F0EB",padding:"24px 20px",minHeight:"100vh",fontFamily:"Inter,-apple-system,sans-serif"}}>
 
-            <div className="flex items-start gap-4 p-4 mb-8 bg-accent/50 text-accent-foreground rounded-2xl border border-accent/20">
+            <div style={{display:"flex",alignItems:"flex-start",gap:"16px",padding:"16px",marginBottom:"32px",backgroundColor:"rgba(232,35,26,0.08)",border:"1px solid rgba(232,35,26,0.2)",borderRadius:"12px",color:"#F4F0EB"}}>
                 <div className="mt-1">
                     <AlertCircle size={20} />
                 </div>
@@ -588,7 +588,7 @@ function ActivationFormContent() {
             </div>
 
             {errorMsg && (
-                <div className="p-4 mb-8 bg-destructive/10 text-destructive border border-destructive/20 rounded-xl text-sm font-semibold flex items-center gap-2">
+                <div style={{padding:"12px 16px",marginBottom:"32px",backgroundColor:"rgba(232,35,26,0.1)",color:"#E8231A",border:"1px solid rgba(232,35,26,0.25)",borderRadius:"10px",fontSize:"13px",fontWeight:600,display:"flex",alignItems:"center",gap:"8px"}}>
                     <AlertCircle size={18} /> {errorMsg}
                 </div>
             )}
@@ -597,8 +597,8 @@ function ActivationFormContent() {
 
                 {/* Confirmación del Chip */}
                 <section className="space-y-4">
-                    <h3 className="text-xl font-bold flex items-center gap-2 border-b border-border pb-2">
-                        <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">✓</span>
+                    <h3 style={{fontSize:"18px",fontWeight:700,display:"flex",alignItems:"center",gap:"10px",borderBottom:"1px solid rgba(255,255,255,0.08)",paddingBottom:"12px",marginBottom:"16px",color:"#F4F0EB"}}>
+                        <span style={{backgroundColor:"rgba(232,35,26,0.12)",color:"#E8231A",width:"28px",height:"28px",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"12px",flexShrink:0,fontWeight:600}}>✓</span>
                         Verificación del Chip
                     </h3>
                     <div className="space-y-2">
@@ -609,8 +609,8 @@ function ActivationFormContent() {
 
                 {/* CREAR CUENTA */}
                 <section className="space-y-4">
-                    <h3 className="text-xl font-bold flex items-center gap-2 border-b border-border pb-2">
-                        <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">Cuenta</span>
+                    <h3 style={{fontSize:"18px",fontWeight:700,display:"flex",alignItems:"center",gap:"10px",borderBottom:"1px solid rgba(255,255,255,0.08)",paddingBottom:"12px",marginBottom:"16px",color:"#F4F0EB"}}>
+                        <span style={{backgroundColor:"rgba(232,35,26,0.12)",color:"#E8231A",width:"28px",height:"28px",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"12px",flexShrink:0,fontWeight:600}}>Cuenta</span>
                         Crear Cuenta
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -637,8 +637,8 @@ function ActivationFormContent() {
 
                 {/* IDENTIFICACIÓN */}
                 <section className="space-y-4">
-                    <h3 className="text-xl font-bold flex items-center gap-2 border-b border-border pb-2">
-                        <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">1</span>
+                    <h3 style={{fontSize:"18px",fontWeight:700,display:"flex",alignItems:"center",gap:"10px",borderBottom:"1px solid rgba(255,255,255,0.08)",paddingBottom:"12px",marginBottom:"16px",color:"#F4F0EB"}}>
+                        <span style={{backgroundColor:"rgba(232,35,26,0.12)",color:"#E8231A",width:"28px",height:"28px",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"12px",flexShrink:0,fontWeight:600}}>1</span>
                         Identificación
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -716,8 +716,8 @@ function ActivationFormContent() {
 
                 {/* CONTACTOS DE EMERGENCIA */}
                 <section className="space-y-4">
-                    <h3 className="text-xl font-bold flex items-center gap-2 border-b border-border pb-2">
-                        <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">2</span>
+                    <h3 style={{fontSize:"18px",fontWeight:700,display:"flex",alignItems:"center",gap:"10px",borderBottom:"1px solid rgba(255,255,255,0.08)",paddingBottom:"12px",marginBottom:"16px",color:"#F4F0EB"}}>
+                        <span style={{backgroundColor:"rgba(232,35,26,0.12)",color:"#E8231A",width:"28px",height:"28px",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"12px",flexShrink:0,fontWeight:600}}>2</span>
                         Contactos de Emergencia
                     </h3>
 
@@ -779,8 +779,8 @@ function ActivationFormContent() {
 
                 {/* INFORMACIÓN MÉDICA */}
                 <section className="space-y-4">
-                    <h3 className="text-xl font-bold flex items-center gap-2 border-b border-border pb-2">
-                        <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">3</span>
+                    <h3 style={{fontSize:"18px",fontWeight:700,display:"flex",alignItems:"center",gap:"10px",borderBottom:"1px solid rgba(255,255,255,0.08)",paddingBottom:"12px",marginBottom:"16px",color:"#F4F0EB"}}>
+                        <span style={{backgroundColor:"rgba(232,35,26,0.12)",color:"#E8231A",width:"28px",height:"28px",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"12px",flexShrink:0,fontWeight:600}}>3</span>
                         Información Médica
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -816,8 +816,8 @@ function ActivationFormContent() {
 
                 {/* SEGURO MÉDICO (UNIFIED) */}
                 <section className="space-y-4">
-                    <h3 className="text-xl font-bold flex items-center gap-2 border-b border-border pb-2">
-                        <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">4</span>
+                    <h3 style={{fontSize:"18px",fontWeight:700,display:"flex",alignItems:"center",gap:"10px",borderBottom:"1px solid rgba(255,255,255,0.08)",paddingBottom:"12px",marginBottom:"16px",color:"#F4F0EB"}}>
+                        <span style={{backgroundColor:"rgba(232,35,26,0.12)",color:"#E8231A",width:"28px",height:"28px",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"12px",flexShrink:0,fontWeight:600}}>4</span>
                         Mi Seguro Médico <span className="text-muted-foreground font-normal text-sm ml-2">(Opcional)</span>
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-muted/30 p-5 rounded-2xl border border-border">
@@ -1000,8 +1000,8 @@ function ActivationFormContent() {
 
                 {/* NOTAS IMPORTANTES & UBICACION */}
                 <section className="space-y-4">
-                    <h3 className="text-xl font-bold flex items-center gap-2 border-b border-border pb-2">
-                        <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">5</span>
+                    <h3 style={{fontSize:"18px",fontWeight:700,display:"flex",alignItems:"center",gap:"10px",borderBottom:"1px solid rgba(255,255,255,0.08)",paddingBottom:"12px",marginBottom:"16px",color:"#F4F0EB"}}>
+                        <span style={{backgroundColor:"rgba(232,35,26,0.12)",color:"#E8231A",width:"28px",height:"28px",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"12px",flexShrink:0,fontWeight:600}}>5</span>
                         Notas y Ubicación
                     </h3>
 

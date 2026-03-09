@@ -597,8 +597,8 @@ export default function DashboardPage() {
 
                                 {/* IDENTIFICACIÓN */}
                                 <section className="space-y-4">
-                                    <h3 className="text-xl font-bold flex items-center gap-2 border-b border-border pb-2">
-                                        <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">1</span>
+                                    <h3 style={{fontSize:"18px",fontWeight:700,display:"flex",alignItems:"center",gap:"10px",borderBottom:"1px solid rgba(255,255,255,0.08)",paddingBottom:"12px",marginBottom:"16px",color:"#F4F0EB"}}>
+                                        <span style={{backgroundColor:"rgba(232,35,26,0.12)",color:"#E8231A",width:"28px",height:"28px",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"12px",flexShrink:0,fontWeight:600}}>1</span>
                                         Identificación
                                     </h3>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -655,8 +655,8 @@ export default function DashboardPage() {
 
                                 {/* CONTACTOS DE EMERGENCIA */}
                                 <section className="space-y-4">
-                                    <h3 className="text-xl font-bold flex items-center gap-2 border-b border-border pb-2">
-                                        <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">2</span>
+                                    <h3 style={{fontSize:"18px",fontWeight:700,display:"flex",alignItems:"center",gap:"10px",borderBottom:"1px solid rgba(255,255,255,0.08)",paddingBottom:"12px",marginBottom:"16px",color:"#F4F0EB"}}>
+                                        <span style={{backgroundColor:"rgba(232,35,26,0.12)",color:"#E8231A",width:"28px",height:"28px",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"12px",flexShrink:0,fontWeight:600}}>2</span>
                                         Contactos de Emergencia
                                     </h3>
 
@@ -717,8 +717,8 @@ export default function DashboardPage() {
 
                                 {/* INFORMACIÓN MÉDICA */}
                                 <section className="space-y-4">
-                                    <h3 className="text-xl font-bold flex items-center gap-2 border-b border-border pb-2">
-                                        <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">3</span>
+                                    <h3 style={{fontSize:"18px",fontWeight:700,display:"flex",alignItems:"center",gap:"10px",borderBottom:"1px solid rgba(255,255,255,0.08)",paddingBottom:"12px",marginBottom:"16px",color:"#F4F0EB"}}>
+                                        <span style={{backgroundColor:"rgba(232,35,26,0.12)",color:"#E8231A",width:"28px",height:"28px",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"12px",flexShrink:0,fontWeight:600}}>3</span>
                                         Información Médica
                                     </h3>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -939,8 +939,8 @@ export default function DashboardPage() {
 
                                 {/* NOTAS Y UBICACIÓN */}
                                 <section className="space-y-4">
-                                    <h3 className="text-xl font-bold flex items-center gap-2 border-b border-border pb-2">
-                                        <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">5</span>
+                                    <h3 style={{fontSize:"18px",fontWeight:700,display:"flex",alignItems:"center",gap:"10px",borderBottom:"1px solid rgba(255,255,255,0.08)",paddingBottom:"12px",marginBottom:"16px",color:"#F4F0EB"}}>
+                                        <span style={{backgroundColor:"rgba(232,35,26,0.12)",color:"#E8231A",width:"28px",height:"28px",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"12px",flexShrink:0,fontWeight:600}}>5</span>
                                         Notas y Ubicación
                                     </h3>
 
@@ -973,7 +973,7 @@ export default function DashboardPage() {
                             {/* HISTORIAL DE ACCESOS */}
                             <div className="mt-12 border-t border-border pt-8 pb-12">
                                 <h3 className="text-xl font-bold flex items-center gap-2 mb-4">
-                                    <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">6</span>
+                                    <span style={{backgroundColor:"rgba(232,35,26,0.12)",color:"#E8231A",width:"28px",height:"28px",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"12px",flexShrink:0,fontWeight:600}}>6</span>
                                     Historial de Accesos al Chip
                                 </h3>
 
