@@ -528,7 +528,7 @@ export default function DashboardPage() {
                     <div style={{ position: "absolute", top: 0, right: 0, width: "320px", height: "320px", borderRadius: "9999px" }} />
 
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "32px", position: "relative", zIndex: 10, width: "100%" }}>
-                        <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: "8px", borderRadius: "9999px", transition: "color 0.2s, background-color 0.2s, border-color 0.2s", fontWeight: 700, fontSize: "12px", backgroundColor: "rgba(255,255,255,0.04)", padding: "8px 16px", color: "#F4F0EB", border: "1px solid rgba(255,255,255,0.08)", textDecoration: "none" }}>
+                        <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: "8px", borderRadius: "9999px", transition: "color 0.2s, background-color 0.2s, border-color 0.2s", fontWeight: 700, fontSize: "12px", backgroundColor: "rgba(255,255,255,0.04)", padding: "8px 16px", color: "#9E9A95", border: "1px solid rgba(255,255,255,0.08)", textDecoration: "none" }}>
                             <ArrowLeft size={16} /> Volver
                         </Link>
                         <button onClick={handleSignOut} style={{ display: "inline-flex", alignItems: "center", gap: "8px", borderRadius: "9999px", transition: "color 0.2s, background-color 0.2s, border-color 0.2s", fontWeight: 700, fontSize: "12px", backgroundColor: "rgba(232,35,26,0.1)", color: "#E8231A", padding: "8px 16px", border: "1px solid rgba(232,35,26,0.2)", cursor: "pointer" }}>
@@ -613,7 +613,7 @@ export default function DashboardPage() {
                                                 ) : currentPhotoUrl ? (
                                                     <div style={{ width: "120px", height: "120px", borderRadius: "50%", backgroundColor: "#1A1A18", border: "4px solid #131311", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.3)", position: "relative", overflow: "hidden" }}>
                                                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                        <img src={currentPhotoUrl} alt="Foto actual" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                                        <img src={currentPhotoUrl} alt="Foto actual" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", borderRadius: "50%" }} />
                                                         <div style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "rgba(0,0,0,0.3)" }}>
                                                             <span style={{ fontWeight: 700, fontSize: "10px", backgroundColor: "rgba(0,0,0,0.6)", padding: "2px 6px", borderRadius: "4px" }}>Actual</span>
                                                         </div>
