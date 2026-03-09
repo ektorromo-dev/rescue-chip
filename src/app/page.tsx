@@ -267,9 +267,218 @@ const LANDING_CSS = `
     .paramedic-content,.cta-content{padding:60px 24px;}
     .rc-footer{padding:32px 24px;flex-direction:column;text-align:center;}
   }
-`;
 
-const SB = "https://kaihkhyqjmattriozick.supabase.co/storage/v1/object/public/Media%20Landing%20Page/";
+  /* ════════════════════════════════════════
+     MÓVIL — 480px
+     Pantallas de celular estándar
+  ════════════════════════════════════════ */
+  @media(max-width:480px){
+
+    /* NAV */
+    .rc-nav{ padding:12px 16px; gap:6px; }
+    .nav-logo{ font-size:17px; letter-spacing:-0.3px; }
+    .nav-links{ display:none; }
+    .nav-cta{
+      padding:8px 12px !important;
+      font-size:12px !important;
+      letter-spacing:0 !important;
+      white-space:nowrap;
+    }
+    .nav-login{
+      font-size:12px !important;
+      padding:8px 10px !important;
+      display:none;
+    }
+
+    /* HERO */
+    .hero{
+      padding: 80px 16px 60px;
+      min-height:100svh;
+      justify-content:flex-end;
+    }
+    .hero-badge{
+      font-size:10px;
+      padding:6px 10px;
+      letter-spacing:1px;
+      margin-bottom:16px;
+    }
+    .hero h1{
+      font-size:52px;
+      line-height:.9;
+      letter-spacing:1px;
+      margin-bottom:20px;
+      word-break:keep-all;
+    }
+    .hero-sub{
+      font-size:13px;
+      line-height:1.6;
+      max-width:100%;
+      margin-bottom:28px;
+    }
+    .hero-ctas{
+      flex-direction:column;
+      gap:10px;
+      align-items:stretch;
+      width:100%;
+    }
+    .btn-primary{
+      width:100%;
+      text-align:center;
+      justify-content:center;
+      font-size:13px;
+      padding:15px 16px;
+    }
+    .btn-ghost{ font-size:13px; justify-content:center; }
+    .hero-scroll{ display:none; }
+
+    /* STATS */
+    .stat-interrupt{
+      flex-direction:column;
+      padding:28px 16px;
+      gap:0;
+    }
+    .si-stat{ padding:16px 0; width:100%; }
+    .si-val{ font-size:40px; }
+    .si-label{ font-size:11px; }
+    .si-sep{ display:none; }
+    .si-cell{ border-bottom:1px solid var(--border); }
+    .si-cell:last-child{ border-bottom:none; }
+
+    /* NARRATIVE */
+    .narrative{ padding:52px 16px; }
+    .narrative-lead{ font-size:26px; line-height:1.2; }
+    .steps{ grid-template-columns:1fr; gap:0; }
+    .step{ padding:20px 16px; border-left:none; border-bottom:1px solid var(--border); }
+    .step:last-child{ border-bottom:none; }
+    .step-num{ font-size:44px; }
+    .step h3{ font-size:17px; }
+    .step p{ font-size:14px; }
+
+    /* AWARENESS */
+    .awareness{ grid-template-columns:1fr; }
+    .aw-video-wrap{ height:260px; }
+    .aw-video{ width:100%; height:100%; object-fit:cover; }
+    .aw-content{ padding:36px 16px; }
+    .aw-content h2{ font-size:28px; line-height:1.1; }
+    .aw-quote{ font-size:14px; }
+
+    /* GRID CONSCIOUSNESS */
+    .pgrid-header{ padding:40px 16px 20px; }
+    .pgrid-header h2{ font-size:28px; }
+    .pgrid{ grid-template-columns:1fr; }
+    .pgrid-cell{ min-height:160px; }
+    .pgrid-cell.tall{ grid-row:span 1; min-height:200px; }
+
+    /* CHIP */
+    .chip-showcase{
+      flex-direction:column;
+      padding:52px 16px;
+      gap:36px;
+      text-align:center;
+      align-items:center;
+    }
+    .chip-info h2{ font-size:28px; }
+    .chip-specs{
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      text-align:center;
+    }
+    .chip-spec-val{ font-size:22px; }
+
+    /* PRODUCT */
+    .product{ grid-template-columns:1fr; }
+    .product-img{ height:260px; }
+    .product-content{ padding:36px 16px; }
+    .product-content h2{ font-size:26px; }
+
+    /* GALERÍA */
+    .helmet-gallery{ padding:40px 16px; }
+    .helmet-grid{ grid-template-columns:1fr 1fr; gap:8px; }
+    .helmet-cell{ height:140px; }
+
+    /* PRICING — columna única */
+    .pricing{ padding:52px 16px; }
+    .pricing-header h2{ font-size:28px; margin-bottom:8px; }
+    .pricing-header p{ font-size:13px; }
+    .pricing-grid{
+      grid-template-columns:1fr !important;
+      gap:12px;
+      margin-top:32px;
+    }
+    .price-card{
+      padding:24px 20px;
+      border-radius:8px;
+    }
+    .price-card.featured{
+      order:-1;
+      border:1px solid var(--red);
+    }
+    .price-name{ font-size:17px; }
+    .price-desc{ font-size:13px; }
+    .price-amount{ font-size:52px; }
+    .price-features li{ font-size:13px; padding:6px 0; }
+    .price-cta{
+      padding:13px;
+      font-size:14px;
+      margin-top:20px;
+      width:100%;
+    }
+
+    /* AGENCIAS */
+    .agency-pricing{ padding:52px 16px; }
+    .agency-header h2{ font-size:26px; }
+    .agency-cards{ grid-template-columns:1fr; gap:10px; }
+    .agency-card{ padding:20px 16px; }
+    .agency-tier{ font-size:18px; }
+
+    /* TRUST */
+    .trust{ padding:52px 16px; }
+    .trust-inner{ grid-template-columns:1fr; gap:36px; }
+    .trust-badges{ grid-template-columns:1fr 1fr; gap:12px; }
+    .trust-badge{ padding:16px; }
+    .testimonial{ padding:20px 16px; }
+    .testimonial-text{ font-size:14px; }
+
+    /* PARAMÉDICO */
+    .paramedic{ min-height:320px; }
+    .paramedic-content{ padding:40px 16px; }
+    .paramedic-content h2{ font-size:26px; }
+
+    /* CTA FINAL */
+    .cta-section{ min-height:320px; }
+    .cta-content{ padding:40px 16px; text-align:center; }
+    .cta-content h2{ font-size:36px; line-height:.95; }
+    .cta-content p{ font-size:13px; }
+    .cta-content .btn-primary{
+      width:100%;
+      justify-content:center;
+      margin-top:24px;
+    }
+
+    /* FOOTER */
+    .rc-footer{
+      padding:20px 16px;
+      flex-direction:column;
+      text-align:center;
+      font-size:12px;
+      gap:10px;
+    }
+  }
+
+  /* ════════════════════════════════════════
+     MÓVIL PEQUEÑO — 375px
+     iPhone SE, Galaxy A series
+  ════════════════════════════════════════ */
+  @media(max-width:375px){
+    .hero h1{ font-size:44px; }
+    .nav-cta{ padding:7px 10px !important; font-size:11px !important; }
+    .price-amount{ font-size:44px; }
+    .helmet-grid{ grid-template-columns:1fr; }
+    .chip-specs{ grid-template-columns:1fr 1fr; }
+    .trust-badges{ grid-template-columns:1fr; }
+  }
+`
+const SB = "https://kainkhyqjmattriozick.supabase.co/storage/v1/object/public/Media%20Landing%20Page/";
 
 export default function Home() {
   const [session, setSession] = useState<{ user?: { email?: string } } | null>(null);
@@ -347,11 +556,11 @@ export default function Home() {
           <li><a href="#precios">Precios</a></li>
           <li><a href="#comunidad">Comunidad</a></li>
           <li><a href="#agencias">Agencias</a></li>
-          <li>
-            <Link href={session ? "/dashboard" : "/login"} className="nav-cta">
-              Mi perfil médico
-            </Link>
-          </li>
+          {session ? (
+            <li><Link href="/dashboard" className="nav-cta">Mi perfil médico</Link></li>
+          ) : (
+            <li><Link href="/activate" className="nav-cta">Activar mi chip</Link></li>
+          )}
           {!session && (
             <li><Link href="/login" className="nav-login">Iniciar sesión</Link></li>
           )}
