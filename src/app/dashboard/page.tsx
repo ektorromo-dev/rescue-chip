@@ -521,8 +521,9 @@ export default function DashboardPage() {
     }
 
     return (
-        <div className="min-h-screen bg-muted flex flex-col items-center justify-center p-0 md:p-4">
-            <div className="w-full max-w-3xl bg-card md:rounded-[2.5rem] shadow-2xl border-x md:border border-border/50 overflow-hidden">
+        <div style={{ backgroundColor: "#0A0A08", color: "#F4F0EB", minHeight: "100vh", fontFamily: "Inter,-apple-system,sans-serif", display:"flex", justifyContent:"center", padding:"40px 16px" }}>
+            <div style={{ width: "100%", maxWidth: "680px" }}>
+            <div className="w-full bg-card md:rounded-[2.5rem] shadow-2xl border-x md:border border-border/50 overflow-hidden">
                 {/* Header */}
                 <div className="bg-destructive px-8 pt-10 pb-12 text-destructive-foreground relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />

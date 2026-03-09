@@ -397,7 +397,7 @@ export default function ShopPage() {
 
                     <div className="grid md:grid-cols-3 gap-8 items-start">
                         {/* Plan Individual */}
-                        <div className="bg-card rounded-3xl p-8 border border-border shadow-sm flex flex-col h-full hover:border-primary/50 transition-all">
+                        <div className="bg-[#1E1E1C] rounded-3xl p-8 border border-white/10 shadow-lg flex flex-col h-full hover:border-primary/50 transition-all">
                             <h3 className="text-2xl font-black mb-2">Individual</h3>
                             <div className="flex items-baseline gap-2 mb-6">
                                 <span className="text-4xl font-black">$349</span>
@@ -411,14 +411,14 @@ export default function ShopPage() {
                             </ul>
                             <button
                                 onClick={() => setSelectedPackage("individual")}
-                                className="w-full flex justify-center items-center gap-2 bg-muted text-foreground font-bold h-14 rounded-xl hover:bg-muted-foreground/20 transition-all"
+                                className="w-full flex justify-center items-center gap-2 bg-primary/20 text-primary font-bold h-14 rounded-xl border border-primary/30 hover:bg-primary hover:text-white transition-all"
                             >
                                 Comprar
                             </button>
                         </div>
 
                         {/* Plan Pareja (Más Popular) */}
-                        <div className="bg-card rounded-3xl p-8 border-2 border-primary shadow-xl relative flex flex-col h-full scale-100 md:scale-105 z-10">
+                        <div className="bg-[#1E1E1C] rounded-3xl p-8 border-2 border-primary shadow-[0_0_30px_rgba(232,35,26,0.15)] relative flex flex-col h-full scale-100 md:scale-105 z-10">
                             <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-black uppercase tracking-wider">
                                 Más Popular
                             </div>
@@ -442,7 +442,7 @@ export default function ShopPage() {
                         </div>
 
                         {/* Plan Familiar */}
-                        <div className="bg-card rounded-3xl p-8 border border-border shadow-sm relative flex flex-col h-full hover:border-primary/50 transition-all">
+                        <div className="bg-[#1E1E1C] rounded-3xl p-8 border border-white/10 shadow-lg relative flex flex-col h-full hover:border-primary/50 transition-all">
                             <div className="absolute -top-4 right-8 bg-black text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
                                 Mejor Valor
                             </div>
@@ -459,7 +459,7 @@ export default function ShopPage() {
                             </ul>
                             <button
                                 onClick={() => setSelectedPackage("familiar")}
-                                className="w-full flex justify-center items-center gap-2 bg-muted text-foreground font-bold h-14 rounded-xl hover:bg-muted-foreground/20 transition-all"
+                                className="w-full flex justify-center items-center gap-2 bg-primary/20 text-primary font-bold h-14 rounded-xl border border-primary/30 hover:bg-primary hover:text-white transition-all"
                             >
                                 Comprar
                             </button>
