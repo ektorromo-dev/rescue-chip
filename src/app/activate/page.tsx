@@ -573,10 +573,9 @@ function ActivationFormContent() {
     }
 
     return (
-        <div className="min-h-screen bg-[#0A0A08] flex items-center justify-center px-4 py-10">
-            <div className="w-full max-w-2xl bg-card rounded-2xl shadow-xl border border-primary/20 p-8">
-                <style dangerouslySetInnerHTML={{
-                    __html: `
+        <div className="p-4 md:p-8">
+            <style dangerouslySetInnerHTML={{
+                __html: `
         input, select, textarea { background-color: #1C1C1A !important; color: #F4F0EB !important; border: 1px solid rgba(255,255,255,0.25) !important; border-radius: 12px !important; padding: 10px 16px !important; }
         input::placeholder, textarea::placeholder { color: rgba(244,240,235,0.3) !important; }
         input:focus, select:focus, textarea:focus { border-color: rgba(232,35,26,0.5) !important; outline: none !important; box-shadow: 0 0 0 2px rgba(232,35,26,0.15) !important; }
@@ -584,479 +583,478 @@ function ActivationFormContent() {
         label { color: #C8C0B4 !important; }
       `}} />
 
-                <div style={{ display: "flex", alignItems: "flex-start", gap: "16px", padding: "16px", marginBottom: "32px", backgroundColor: "rgba(232,35,26,0.08)", border: "1px solid rgba(232,35,26,0.2)", borderRadius: "12px", color: "#F4F0EB" }}>
-                    <div className="mt-1">
-                        <AlertCircle size={20} />
-                    </div>
-                    <div>
-                        <h4 className="font-semibold mb-1">Aviso de Privacidad</h4>
-                        <p className="text-sm opacity-90 leading-relaxed">
-                            La información que proporciones aquí será accesible únicamente al escanear físicamente el chip NFC asociado a este folio. Por favor revisa que tus datos sean correctos para asegurar la mejor atención médica posible en caso de emergencia.
-                        </p>
-                    </div>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: "16px", padding: "16px", marginBottom: "32px", backgroundColor: "rgba(232,35,26,0.08)", border: "1px solid rgba(232,35,26,0.2)", borderRadius: "12px", color: "#F4F0EB" }}>
+                <div className="mt-1">
+                    <AlertCircle size={20} />
                 </div>
+                <div>
+                    <h4 className="font-semibold mb-1">Aviso de Privacidad</h4>
+                    <p className="text-sm opacity-90 leading-relaxed">
+                        La información que proporciones aquí será accesible únicamente al escanear físicamente el chip NFC asociado a este folio. Por favor revisa que tus datos sean correctos para asegurar la mejor atención médica posible en caso de emergencia.
+                    </p>
+                </div>
+            </div>
 
-                {errorMsg && (
-                    <div style={{ padding: "12px 16px", marginBottom: "32px", backgroundColor: "rgba(232,35,26,0.1)", color: "#E8231A", border: "1px solid rgba(232,35,26,0.25)", borderRadius: "10px", fontSize: "13px", fontWeight: 600, display: "flex", alignItems: "center", gap: "8px" }}>
-                        <AlertCircle size={18} /> {errorMsg}
+            {errorMsg && (
+                <div style={{ padding: "12px 16px", marginBottom: "32px", backgroundColor: "rgba(232,35,26,0.1)", color: "#E8231A", border: "1px solid rgba(232,35,26,0.25)", borderRadius: "10px", fontSize: "13px", fontWeight: 600, display: "flex", alignItems: "center", gap: "8px" }}>
+                    <AlertCircle size={18} /> {errorMsg}
+                </div>
+            )}
+
+            <form className="space-y-10" onSubmit={handleSubmit}>
+
+                {/* Confirmación del Chip */}
+                <section className="space-y-4">
+                    <h3 style={{ fontSize: "18px", fontWeight: 700, display: "flex", alignItems: "center", gap: "10px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "12px", marginBottom: "16px", color: "#F4F0EB" }}>
+                        <span style={{ backgroundColor: "rgba(232,35,26,0.12)", color: "#E8231A", width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", flexShrink: 0, fontWeight: 600 }}>✓</span>
+                        Verificación del Chip
+                    </h3>
+                    <div className="space-y-2">
+                        <label htmlFor="folio" className="text-sm font-semibold">Número de Folio (incluido en tu paquete) *</label>
+                        <input type="text" id="folio" name="folio" value={folio} onChange={(e) => setFolio(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase placeholder:normal-case font-mono" placeholder="Ej. RSC-0001" required />
                     </div>
-                )}
+                </section>
 
-                <form className="space-y-10" onSubmit={handleSubmit}>
-
-                    {/* Confirmación del Chip */}
-                    <section className="space-y-4">
-                        <h3 style={{ fontSize: "18px", fontWeight: 700, display: "flex", alignItems: "center", gap: "10px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "12px", marginBottom: "16px", color: "#F4F0EB" }}>
-                            <span style={{ backgroundColor: "rgba(232,35,26,0.12)", color: "#E8231A", width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", flexShrink: 0, fontWeight: 600 }}>✓</span>
-                            Verificación del Chip
-                        </h3>
+                {/* CREAR CUENTA */}
+                <section className="space-y-4">
+                    <h3 style={{ fontSize: "18px", fontWeight: 700, display: "flex", alignItems: "center", gap: "10px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "12px", marginBottom: "16px", color: "#F4F0EB" }}>
+                        <span style={{ backgroundColor: "rgba(232,35,26,0.12)", color: "#E8231A", width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", flexShrink: 0, fontWeight: 600 }}>✉</span>
+                        Crear Cuenta
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <label htmlFor="folio" className="text-sm font-semibold">Número de Folio (incluido en tu paquete) *</label>
-                            <input type="text" id="folio" name="folio" value={folio} onChange={(e) => setFolio(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase placeholder:normal-case font-mono" placeholder="Ej. RSC-0001" required />
+                            <label htmlFor="email" className="text-sm font-semibold">Correo Electrónico *</label>
+                            <input type="email" id="email" name="email" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="tu@correo.com" required />
                         </div>
-                    </section>
-
-                    {/* CREAR CUENTA */}
-                    <section className="space-y-4">
-                        <h3 style={{ fontSize: "18px", fontWeight: 700, display: "flex", alignItems: "center", gap: "10px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "12px", marginBottom: "16px", color: "#F4F0EB" }}>
-                            <span style={{ backgroundColor: "rgba(232,35,26,0.12)", color: "#E8231A", width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", flexShrink: 0, fontWeight: 600 }}>✉</span>
-                            Crear Cuenta
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <label htmlFor="email" className="text-sm font-semibold">Correo Electrónico *</label>
-                                <input type="email" id="email" name="email" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="tu@correo.com" required />
-                            </div>
-                            <div className="space-y-2">
-                                <label htmlFor="password" className="text-sm font-semibold">Contraseña *</label>
-                                <div className="relative">
-                                    <input type={showPassword ? "text" : "password"} id="password" name="password" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 pr-12 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Mínimo 6 caracteres" required minLength={6} />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-0 top-0 h-12 px-4 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-                                    >
-                                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                                    </button>
-                                </div>
+                        <div className="space-y-2">
+                            <label htmlFor="password" className="text-sm font-semibold">Contraseña *</label>
+                            <div className="relative">
+                                <input type={showPassword ? "text" : "password"} id="password" name="password" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 pr-12 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Mínimo 6 caracteres" required minLength={6} />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-0 top-0 h-12 px-4 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+                                >
+                                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                </button>
                             </div>
                         </div>
-                        <p className="text-sm text-muted-foreground font-medium">Esta cuenta te servirá para iniciar sesión en tu panel (dashboard) y actualizar tus datos en el futuro.</p>
-                    </section>
+                    </div>
+                    <p className="text-sm text-muted-foreground font-medium">Esta cuenta te servirá para iniciar sesión en tu panel (dashboard) y actualizar tus datos en el futuro.</p>
+                </section>
 
-                    {/* IDENTIFICACIÓN */}
-                    <section className="space-y-4">
-                        <h3 style={{ fontSize: "18px", fontWeight: 700, display: "flex", alignItems: "center", gap: "10px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "12px", marginBottom: "16px", color: "#F4F0EB" }}>
-                            <span style={{ backgroundColor: "rgba(232,35,26,0.12)", color: "#E8231A", width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", flexShrink: 0, fontWeight: 600 }}>1</span>
-                            Identificación
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-4 md:col-span-2 mt-2 mb-4">
-                                <label className="text-sm font-semibold">Foto de Perfil (Opcional pero Recomendado)</label>
-                                <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                                    {photoFile ? (
-                                        <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-primary bg-muted shrink-0 shadow-md">
-                                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                                            <img src={URL.createObjectURL(photoFile)} alt="Preview" className="w-full h-full object-cover" />
-                                        </div>
-                                    ) : (
-                                        <div className="w-20 h-20 rounded-2xl border-2 border-dashed border-muted-foreground flex items-center justify-center bg-muted/50 text-muted-foreground shrink-0 text-2xl">
-                                            📷
-                                        </div>
-                                    )}
-                                    <div className="flex-1">
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={(e) => {
-                                                if (e.target.files && e.target.files[0]) {
-                                                    setPhotoFile(e.target.files[0]);
-                                                }
-                                            }}
-                                            className="w-full flex h-14 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 cursor-pointer shadow-sm"
-                                        />
-                                        <p className="text-xs text-muted-foreground mt-2 leading-relaxed font-medium">Sube o toma una foto clara de tu rostro.<br />Establece tu identidad rápidamente ante los paramédicos.</p>
+                {/* IDENTIFICACIÓN */}
+                <section className="space-y-4">
+                    <h3 style={{ fontSize: "18px", fontWeight: 700, display: "flex", alignItems: "center", gap: "10px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "12px", marginBottom: "16px", color: "#F4F0EB" }}>
+                        <span style={{ backgroundColor: "rgba(232,35,26,0.12)", color: "#E8231A", width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", flexShrink: 0, fontWeight: 600 }}>1</span>
+                        Identificación
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-4 md:col-span-2 mt-2 mb-4">
+                            <label className="text-sm font-semibold">Foto de Perfil (Opcional pero Recomendado)</label>
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                                {photoFile ? (
+                                    <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-primary bg-muted shrink-0 shadow-md">
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img src={URL.createObjectURL(photoFile)} alt="Preview" className="w-full h-full object-cover" />
                                     </div>
-                                </div>
-                            </div>
-                            <div className="space-y-2 md:col-span-2">
-                                <label htmlFor="fullName" className="text-sm font-semibold">Nombre Completo *</label>
-                                <input type="text" id="fullName" name="fullName" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Juan Pérez" required />
-                            </div>
-                            <div className="space-y-2 md:col-span-2">
-                                <label className="text-sm font-semibold">Número de Celular *</label>
-                                <div className="flex">
-                                    <span className="inline-flex items-center px-4 rounded-l-xl border border-r-0 border-input bg-muted text-muted-foreground text-sm font-medium">
-                                        🇲🇽 +52
-                                    </span>
+                                ) : (
+                                    <div className="w-20 h-20 rounded-2xl border-2 border-dashed border-muted-foreground flex items-center justify-center bg-muted/50 text-muted-foreground shrink-0 text-2xl">
+                                        📷
+                                    </div>
+                                )}
+                                <div className="flex-1">
                                     <input
-                                        type="tel"
-                                        inputMode="numeric"
-                                        placeholder="55 1234 5678"
-                                        value={phone}
-                                        onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                                        className="flex-1 rounded-r-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all"
-                                        required
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) => {
+                                            if (e.target.files && e.target.files[0]) {
+                                                setPhotoFile(e.target.files[0]);
+                                            }
+                                        }}
+                                        className="w-full flex h-14 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 cursor-pointer shadow-sm"
                                     />
-                                </div>
-                                <label className="flex items-start gap-3 cursor-pointer mt-3 p-3 bg-muted/40 rounded-xl border border-border">
-                                    <input
-                                        type="checkbox"
-                                        checked={whatsappOptedIn}
-                                        onChange={(e) => setWhatsappOptedIn(e.target.checked)}
-                                        className="mt-0.5 h-4 w-4 rounded border-input text-primary focus:ring-primary"
-                                    />
-                                    <span className="text-xs text-muted-foreground leading-relaxed">
-                                        Acepto recibir notificaciones de RescueChip por WhatsApp en este número,
-                                        incluyendo confirmación de activación y alertas de emergencia.
-                                    </span>
-                                </label>
-                            </div>
-                            <div className="space-y-2">
-                                <label htmlFor="age" className="text-sm font-semibold">Edad (Opcional)</label>
-                                <input type="number" id="age" name="age" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. 30" min="0" max="130" />
-                            </div>
-                            <div className="space-y-2">
-                                <label htmlFor="location" className="text-sm font-semibold">Ciudad / País *</label>
-                                <input type="text" id="location" name="location" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ciudad de México, México" required />
-                            </div>
-                        </div>
-                    </section>
-
-                    {/* CONTACTOS DE EMERGENCIA */}
-                    <section className="space-y-4">
-                        <h3 style={{ fontSize: "18px", fontWeight: 700, display: "flex", alignItems: "center", gap: "10px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "12px", marginBottom: "16px", color: "#F4F0EB" }}>
-                            <span style={{ backgroundColor: "rgba(232,35,26,0.12)", color: "#E8231A", width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", flexShrink: 0, fontWeight: 600 }}>2</span>
-                            Contactos de Emergencia
-                        </h3>
-
-                        <div className="p-4 border border-border rounded-xl space-y-4 bg-muted/20">
-                            <h4 className="text-sm font-bold text-primary">Contacto 1 (Requerido)</h4>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <label htmlFor="contact1Name" className="text-sm font-semibold text-muted-foreground">Nombre</label>
-                                    <input type="text" id="contact1Name" name="contact1Name" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. María López (Esposa)" required />
-                                </div>
-                                <div className="space-y-2">
-                                    <label htmlFor="contact1Phone" className="text-sm font-semibold text-muted-foreground">Teléfono</label>
-                                    <input type="tel" id="contact1Phone" name="contact1Phone" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="+52 55 1234 5678" required />
-                                </div>
-                                <div className="space-y-2 md:col-span-2">
-                                    <label htmlFor="contact1Email" className="text-sm font-semibold text-muted-foreground">Email (Opcional, para recibir alertas)</label>
-                                    <input type="email" id="contact1Email" name="contact1Email" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Email del contacto" />
+                                    <p className="text-xs text-muted-foreground mt-2 leading-relaxed font-medium">Sube o toma una foto clara de tu rostro.<br />Establece tu identidad rápidamente ante los paramédicos.</p>
                                 </div>
                             </div>
                         </div>
-
-                        <div className="p-4 border border-border rounded-xl space-y-4 bg-muted/10">
-                            <h4 className="text-sm font-bold opacity-70">Contacto 2 (Opcional)</h4>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <label htmlFor="contact2Name" className="text-sm font-semibold text-muted-foreground">Nombre</label>
-                                    <input type="text" id="contact2Name" name="contact2Name" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Nombre completo o parentesco" />
-                                </div>
-                                <div className="space-y-2">
-                                    <label htmlFor="contact2Phone" className="text-sm font-semibold text-muted-foreground">Teléfono</label>
-                                    <input type="tel" id="contact2Phone" name="contact2Phone" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="+52 55 0000 0000" />
-                                </div>
-                                <div className="space-y-2 md:col-span-2">
-                                    <label htmlFor="contact2Email" className="text-sm font-semibold text-muted-foreground">Email (Opcional, para recibir alertas)</label>
-                                    <input type="email" id="contact2Email" name="contact2Email" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Email del contacto" />
-                                </div>
-                            </div>
+                        <div className="space-y-2 md:col-span-2">
+                            <label htmlFor="fullName" className="text-sm font-semibold">Nombre Completo *</label>
+                            <input type="text" id="fullName" name="fullName" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Juan Pérez" required />
                         </div>
-
-                        <div className="p-4 border border-border rounded-xl space-y-4 bg-muted/10">
-                            <h4 className="text-sm font-bold opacity-70">Contacto 3 (Opcional)</h4>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <label htmlFor="contact3Name" className="text-sm font-semibold text-muted-foreground">Nombre</label>
-                                    <input type="text" id="contact3Name" name="contact3Name" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Nombre completo o parentesco" />
-                                </div>
-                                <div className="space-y-2">
-                                    <label htmlFor="contact3Phone" className="text-sm font-semibold text-muted-foreground">Teléfono</label>
-                                    <input type="tel" id="contact3Phone" name="contact3Phone" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="+52 55 0000 0000" />
-                                </div>
-                                <div className="space-y-2 md:col-span-2">
-                                    <label htmlFor="contact3Email" className="text-sm font-semibold text-muted-foreground">Email (Opcional, para recibir alertas)</label>
-                                    <input type="email" id="contact3Email" name="contact3Email" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Email del contacto" />
-                                </div>
+                        <div className="space-y-2 md:col-span-2">
+                            <label className="text-sm font-semibold">Número de Celular *</label>
+                            <div className="flex">
+                                <span className="inline-flex items-center px-4 rounded-l-xl border border-r-0 border-input bg-muted text-muted-foreground text-sm font-medium">
+                                    🇲🇽 +52
+                                </span>
+                                <input
+                                    type="tel"
+                                    inputMode="numeric"
+                                    placeholder="55 1234 5678"
+                                    value={phone}
+                                    onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                                    className="flex-1 rounded-r-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all"
+                                    required
+                                />
                             </div>
-                        </div>
-
-                    </section>
-
-                    {/* INFORMACIÓN MÉDICA */}
-                    <section className="space-y-4">
-                        <h3 style={{ fontSize: "18px", fontWeight: 700, display: "flex", alignItems: "center", gap: "10px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "12px", marginBottom: "16px", color: "#F4F0EB" }}>
-                            <span style={{ backgroundColor: "rgba(232,35,26,0.12)", color: "#E8231A", width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", flexShrink: 0, fontWeight: 600 }}>3</span>
-                            Información Médica
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <label htmlFor="bloodType" className="text-sm font-semibold">Tipo de Sangre *</label>
-                                <select id="bloodType" name="bloodType" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" required>
-                                    <option value="">Selecciona tu tipo de sangre</option>
-                                    <option value="A+">A+</option>
-                                    <option value="A-">A-</option>
-                                    <option value="B+">B+</option>
-                                    <option value="B-">B-</option>
-                                    <option value="AB+">AB+</option>
-                                    <option value="AB-">AB-</option>
-                                    <option value="O+">O+</option>
-                                    <option value="O-">O-</option>
-                                    <option value="Desconocido">Lo desconozco</option>
-                                </select>
-                            </div>
-                            <div className="space-y-2 md:col-span-2">
-                                <label htmlFor="allergies" className="text-sm font-semibold">Alergias Conocidas (Opcional)</label>
-                                <input type="text" id="allergies" name="allergies" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. Penicilina, Látex, Mariscos..." />
-                            </div>
-                            <div className="space-y-2 md:col-span-2">
-                                <label htmlFor="medicalConditions" className="text-sm font-semibold">Condiciones Médicas (Opcional)</label>
-                                <textarea id="medicalConditions" name="medicalConditions" className="w-full flex min-h-[100px] rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-3 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. Asma, Diabetes Tipo 1, Hipertensión..." />
-                            </div>
-                            <div className="space-y-2 md:col-span-2">
-                                <label htmlFor="importantMedications" className="text-sm font-semibold">Medicamentos Importantes (Opcional)</label>
-                                <textarea id="importantMedications" name="importantMedications" className="w-full flex min-h-[100px] rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-3 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. Insulina, anticoagulantes..." />
-                            </div>
-                        </div>
-                    </section>
-
-                    {/* SEGURO MÉDICO (UNIFIED) */}
-                    <section className="space-y-4">
-                        <h3 style={{ fontSize: "18px", fontWeight: 700, display: "flex", alignItems: "center", gap: "10px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "12px", marginBottom: "16px", color: "#F4F0EB" }}>
-                            <span style={{ backgroundColor: "rgba(232,35,26,0.12)", color: "#E8231A", width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", flexShrink: 0, fontWeight: 600 }}>4</span>
-                            Mi Seguro Médico <span className="text-muted-foreground font-normal text-sm ml-2">(Opcional)</span>
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-muted/30 p-5 rounded-2xl border border-border">
-                            <div className="space-y-2 lg:col-span-2">
-                                <label htmlFor="medicalSystem" className="text-sm font-semibold">Sistema médico</label>
-                                <select id="medicalSystem" name="medicalSystem" value={medicalSystem} onChange={(e) => setMedicalSystem(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all">
-                                    <option value="">Selecciona un sistema</option>
-                                    <option value="Seguro Privado (Gastos Médicos Mayores)">Seguro Privado (Gastos Médicos Mayores)</option>
-                                    <option value="IMSS">IMSS</option>
-                                    <option value="ISSSTE">ISSSTE</option>
-                                    <option value="IMSS-BIENESTAR">IMSS-BIENESTAR</option>
-                                    <option value="PEMEX">PEMEX</option>
-                                    <option value="SEDENA / SEMAR">SEDENA / SEMAR</option>
-                                    <option value="Sin seguro médico">Sin seguro médico</option>
-                                </select>
-                            </div>
-
-                            {/* CONDITIONAL RENDERINGS */}
-                            {medicalSystem === "Seguro Privado (Gastos Médicos Mayores)" && (
-                                <>
-                                    <div className="space-y-2 lg:col-span-2">
-                                        <label htmlFor="aseguradora" className="text-sm font-semibold">Aseguradora</label>
-                                        <select id="aseguradora" name="aseguradora" value={aseguradora} onChange={(e) => setAseguradora(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all">
-                                            <option value="">Selecciona una aseguradora</option>
-                                            <option value="AXA">AXA</option>
-                                            <option value="GNP">GNP</option>
-                                            <option value="Seguros Monterrey (SMNYL)">Seguros Monterrey (SMNYL)</option>
-                                            <option value="Allianz">Allianz</option>
-                                            <option value="MetLife">MetLife</option>
-                                            <option value="Zurich">Zurich</option>
-                                            <option value="BUPA">BUPA</option>
-                                            <option value="Mapfre">Mapfre</option>
-                                            <option value="Seguros Atlas">Seguros Atlas</option>
-                                            <option value="Otro">Otro</option>
-                                        </select>
-                                    </div>
-                                    {aseguradora === "Otro" && (
-                                        <div className="space-y-2 animate-in fade-in duration-300 md:col-span-2">
-                                            <label htmlFor="aseguradoraOtra" className="text-sm font-semibold text-primary">Especificar Aseguradora *</label>
-                                            <input type="text" id="aseguradoraOtra" name="aseguradoraOtra" required className="w-full flex h-12 rounded-xl border border-primary/50 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
-                                        </div>
-                                    )}
-                                    <div className="space-y-2">
-                                        <label htmlFor="numeroPoliza" className="text-sm font-semibold">Número de Póliza *</label>
-                                        <input type="text" id="numeroPoliza" name="numeroPoliza" required className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="tipoSeguro" className="text-sm font-semibold">Tipo de Seguro</label>
-                                        <select id="tipoSeguro" name="tipoSeguro" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all">
-                                            <option value="">Selecciona un tipo</option>
-                                            <option value="Gastos Médicos Mayores">Gastos Médicos Mayores</option>
-                                            <option value="Seguro de Auto">Seguro de Auto</option>
-                                            <option value="Seguro de Moto">Seguro de Moto</option>
-                                            <option value="Seguro de Vida">Seguro de Vida</option>
-                                            <option value="Otro">Otro</option>
-                                        </select>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="nombreAsegurado" className="text-sm font-semibold">Nombre Asegurado Titular *</label>
-                                        <input type="text" id="nombreAsegurado" name="nombreAsegurado" required className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="vigenciaPoliza" className="text-sm font-semibold">Vigencia (Opcional)</label>
-                                        <input type="date" id="vigenciaPoliza" name="vigenciaPoliza" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all text-foreground" style={{ colorScheme: 'dark' }} />
-                                    </div>
-                                    <div className="space-y-2 md:col-span-2">
-                                        <label htmlFor="telefonoAseguradora" className="text-sm font-semibold">Teléfono de Emergencias (Opcional)</label>
-                                        <input type="tel" id="telefonoAseguradora" name="telefonoAseguradora" placeholder="Ej: 800-123-4567" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
-                                    </div>
-
-                                    {/* Subida de Póliza */}
-                                    <div className="space-y-4 md:col-span-2 mt-4 pt-4 border-t border-border/50">
-                                        <div>
-                                            <label className="text-sm font-semibold">Documento Póliza (PDF, JPG, PNG)</label>
-                                            <p className="text-xs text-muted-foreground mt-1">Sube el extracto de tu póliza (máx 5MB). Se mostrará a paramédicos.</p>
-                                        </div>
-                                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                                            {polizaFile ? (
-                                                <div className="px-4 py-3 bg-primary/10 border border-primary/20 rounded-xl text-primary font-bold text-sm flex items-center gap-2">
-                                                    📄 {polizaFile.name}
-                                                </div>
-                                            ) : null}
-                                            <div className="flex-1 w-full relative">
-                                                <input
-                                                    type="file"
-                                                    accept=".pdf,image/png,image/jpeg,image/jpg"
-                                                    onChange={(e) => {
-                                                        const file = e.target.files?.[0];
-                                                        if (file) {
-                                                            if (file.size > 5 * 1024 * 1024) {
-                                                                alert("El archivo no debe pesar más de 5MB");
-                                                                e.target.value = '';
-                                                                return;
-                                                            }
-                                                            setPolizaFile(file);
-                                                        }
-                                                    }}
-                                                    className="w-full flex h-14 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 cursor-pointer shadow-sm relative z-10"
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </>
-                            )}
-
-                            {medicalSystem === "IMSS" && (
-                                <>
-                                    <div className="space-y-2">
-                                        <label htmlFor="nss" className="text-sm font-semibold">NSS - Número de Seguridad Social *</label>
-                                        <input type="text" id="nss" name="nss" required maxLength={11} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="clinicaAsignada" className="text-sm font-semibold">UMF / Clínica asignada (Opcional)</label>
-                                        <input type="text" id="clinicaAsignada" name="clinicaAsignada" placeholder="Ej: UMF 28, Monterrey" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
-                                    </div>
-                                    <div className="space-y-2 md:col-span-2">
-                                        <label htmlFor="curpSeguro" className="text-sm font-semibold">CURP (Opcional)</label>
-                                        <input type="text" id="curpSeguro" name="curpSeguro" maxLength={18} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase" />
-                                    </div>
-                                </>
-                            )}
-
-                            {medicalSystem === "ISSSTE" && (
-                                <>
-                                    <div className="space-y-2 md:col-span-2">
-                                        <label htmlFor="numeroAfiliacion" className="text-sm font-semibold">Número de afiliación ISSSTE *</label>
-                                        <input type="text" id="numeroAfiliacion" name="numeroAfiliacion" required className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="clinicaAsignada" className="text-sm font-semibold">Clínica asignada (Opcional)</label>
-                                        <input type="text" id="clinicaAsignada" name="clinicaAsignada" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="curpSeguro" className="text-sm font-semibold">CURP (Opcional)</label>
-                                        <input type="text" id="curpSeguro" name="curpSeguro" maxLength={18} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase" />
-                                    </div>
-                                </>
-                            )}
-
-                            {medicalSystem === "IMSS-BIENESTAR" && (
-                                <>
-                                    <div className="space-y-2">
-                                        <label htmlFor="curpSeguro" className="text-sm font-semibold">CURP *</label>
-                                        <input type="text" id="curpSeguro" name="curpSeguro" required maxLength={18} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="clinicaAsignada" className="text-sm font-semibold">Centro de salud asignado (Opcional)</label>
-                                        <input type="text" id="clinicaAsignada" name="clinicaAsignada" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
-                                    </div>
-                                </>
-                            )}
-
-                            {(medicalSystem === "PEMEX" || medicalSystem === "SEDENA / SEMAR") && (
-                                <>
-                                    <div className="space-y-2">
-                                        <label htmlFor="numeroAfiliacion" className="text-sm font-semibold">Número de afiliación *</label>
-                                        <input type="text" id="numeroAfiliacion" name="numeroAfiliacion" required className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="clinicaAsignada" className="text-sm font-semibold">Unidad médica asignada (Opcional)</label>
-                                        <input type="text" id="clinicaAsignada" name="clinicaAsignada" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
-                                    </div>
-                                </>
-                            )}
-
-                            {medicalSystem === "Sin seguro médico" && (
-                                <div className="col-span-1 md:col-span-2 p-4 bg-muted/50 rounded-xl border border-border text-sm text-muted-foreground">
-                                    <p className="font-semibold text-foreground mb-1">Aviso:</p>
-                                    En caso de emergencia serás atendido en el hospital público más cercano. Te recomendamos considerar un seguro de gastos médicos mayores para una mejor atención.
-                                </div>
-                            )}
-
-                            <div className="space-y-2 flex items-center gap-3 pt-6 rounded-xl border border-border p-4 bg-muted/20 md:col-span-2">
-                                <input type="checkbox" id="organDonor" name="organDonor" className="w-5 h-5 rounded border-input accent-primary text-primary" />
-                                <label htmlFor="organDonor" className="text-sm font-semibold cursor-pointer">Soy donante oficial de órganos</label>
-                            </div>
-
-                        </div>
-                    </section>
-
-                    {/* NOTAS IMPORTANTES & UBICACION */}
-                    <section className="space-y-4">
-                        <h3 style={{ fontSize: "18px", fontWeight: 700, display: "flex", alignItems: "center", gap: "10px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "12px", marginBottom: "16px", color: "#F4F0EB" }}>
-                            <span style={{ backgroundColor: "rgba(232,35,26,0.12)", color: "#E8231A", width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", flexShrink: 0, fontWeight: 600 }}>5</span>
-                            Notas y Ubicación
-                        </h3>
-
-                        <div className="space-y-2 flex flex-col gap-2 pt-2 rounded-xl border border-primary/30 p-5 bg-primary/5 mb-6">
-                            <div className="flex items-center gap-3">
+                            <label className="flex items-start gap-3 cursor-pointer mt-3 p-3 bg-muted/40 rounded-xl border border-border">
                                 <input
                                     type="checkbox"
-                                    id="isMotorcyclist"
-                                    name="isMotorcyclist"
-                                    className="w-5 h-5 rounded border-input accent-primary text-primary"
-                                    checked={isMotorcyclist}
-                                    onChange={(e) => setIsMotorcyclist(e.target.checked)}
+                                    checked={whatsappOptedIn}
+                                    onChange={(e) => setWhatsappOptedIn(e.target.checked)}
+                                    className="mt-0.5 h-4 w-4 rounded border-input text-primary focus:ring-primary"
                                 />
-                                <label htmlFor="isMotorcyclist" className="text-sm font-bold cursor-pointer text-primary">¿Eres Motociclista?</label>
-                            </div>
-                            {isMotorcyclist && (
-                                <div className="ml-8 mt-2 text-sm text-destructive font-bold flex items-center gap-2 animate-[fade-in-up_0.3s_ease-out_forwards]">
-                                    <AlertCircle size={16} />
-                                    Tu perfil mostrará una alerta para los paramédicos pidiendo "NO RETIRAR EL CASCO" si no hay personal médico capacitado.
-                                </div>
-                            )}
+                                <span className="text-xs text-muted-foreground leading-relaxed">
+                                    Acepto recibir notificaciones de RescueChip por WhatsApp en este número,
+                                    incluyendo confirmación de activación y alertas de emergencia.
+                                </span>
+                            </label>
                         </div>
+                        <div className="space-y-2">
+                            <label htmlFor="age" className="text-sm font-semibold">Edad (Opcional)</label>
+                            <input type="number" id="age" name="age" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. 30" min="0" max="130" />
+                        </div>
+                        <div className="space-y-2">
+                            <label htmlFor="location" className="text-sm font-semibold">Ciudad / País *</label>
+                            <input type="text" id="location" name="location" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ciudad de México, México" required />
+                        </div>
+                    </div>
+                </section>
 
+                {/* CONTACTOS DE EMERGENCIA */}
+                <section className="space-y-4">
+                    <h3 style={{ fontSize: "18px", fontWeight: 700, display: "flex", alignItems: "center", gap: "10px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "12px", marginBottom: "16px", color: "#F4F0EB" }}>
+                        <span style={{ backgroundColor: "rgba(232,35,26,0.12)", color: "#E8231A", width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", flexShrink: 0, fontWeight: 600 }}>2</span>
+                        Contactos de Emergencia
+                    </h3>
+
+                    <div className="p-4 border border-border rounded-xl space-y-4 bg-muted/20">
+                        <h4 className="text-sm font-bold text-primary">Contacto 1 (Requerido)</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2 md:col-span-2">
-                                <label htmlFor="additionalNotes" className="text-sm font-semibold">Notas Adicionales (Opcional)</label>
-                                <textarea id="additionalNotes" name="additionalNotes" className="w-full flex min-h-[100px] rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-3 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Cualquier información adicional que los paramédicos o doctores deban saber." />
+                            <div className="space-y-2">
+                                <label htmlFor="contact1Name" className="text-sm font-semibold text-muted-foreground">Nombre</label>
+                                <input type="text" id="contact1Name" name="contact1Name" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. María López (Esposa)" required />
+                            </div>
+                            <div className="space-y-2">
+                                <label htmlFor="contact1Phone" className="text-sm font-semibold text-muted-foreground">Teléfono</label>
+                                <input type="tel" id="contact1Phone" name="contact1Phone" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="+52 55 1234 5678" required />
                             </div>
                             <div className="space-y-2 md:col-span-2">
-                                <label htmlFor="googleMapsLink" className="text-sm font-semibold">Hospital o clínica de preferencia (Opcional)</label>
-                                <input type="text" id="googleMapsLink" name="googleMapsLink" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ejemplo: Hospital Ángeles Lindavista" />
-                                <p className="text-xs text-muted-foreground mt-1">En caso de emergencia, el personal médico determinará el hospital más adecuado según tu estado de salud y criterio profesional. Este dato es solo una referencia.</p>
+                                <label htmlFor="contact1Email" className="text-sm font-semibold text-muted-foreground">Email (Opcional, para recibir alertas)</label>
+                                <input type="email" id="contact1Email" name="contact1Email" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Email del contacto" />
                             </div>
                         </div>
-                    </section>
+                    </div>
+
+                    <div className="p-4 border border-border rounded-xl space-y-4 bg-muted/10">
+                        <h4 className="text-sm font-bold opacity-70">Contacto 2 (Opcional)</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label htmlFor="contact2Name" className="text-sm font-semibold text-muted-foreground">Nombre</label>
+                                <input type="text" id="contact2Name" name="contact2Name" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Nombre completo o parentesco" />
+                            </div>
+                            <div className="space-y-2">
+                                <label htmlFor="contact2Phone" className="text-sm font-semibold text-muted-foreground">Teléfono</label>
+                                <input type="tel" id="contact2Phone" name="contact2Phone" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="+52 55 0000 0000" />
+                            </div>
+                            <div className="space-y-2 md:col-span-2">
+                                <label htmlFor="contact2Email" className="text-sm font-semibold text-muted-foreground">Email (Opcional, para recibir alertas)</label>
+                                <input type="email" id="contact2Email" name="contact2Email" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Email del contacto" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="p-4 border border-border rounded-xl space-y-4 bg-muted/10">
+                        <h4 className="text-sm font-bold opacity-70">Contacto 3 (Opcional)</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label htmlFor="contact3Name" className="text-sm font-semibold text-muted-foreground">Nombre</label>
+                                <input type="text" id="contact3Name" name="contact3Name" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Nombre completo o parentesco" />
+                            </div>
+                            <div className="space-y-2">
+                                <label htmlFor="contact3Phone" className="text-sm font-semibold text-muted-foreground">Teléfono</label>
+                                <input type="tel" id="contact3Phone" name="contact3Phone" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="+52 55 0000 0000" />
+                            </div>
+                            <div className="space-y-2 md:col-span-2">
+                                <label htmlFor="contact3Email" className="text-sm font-semibold text-muted-foreground">Email (Opcional, para recibir alertas)</label>
+                                <input type="email" id="contact3Email" name="contact3Email" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Email del contacto" />
+                            </div>
+                        </div>
+                    </div>
+
+                </section>
+
+                {/* INFORMACIÓN MÉDICA */}
+                <section className="space-y-4">
+                    <h3 style={{ fontSize: "18px", fontWeight: 700, display: "flex", alignItems: "center", gap: "10px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "12px", marginBottom: "16px", color: "#F4F0EB" }}>
+                        <span style={{ backgroundColor: "rgba(232,35,26,0.12)", color: "#E8231A", width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", flexShrink: 0, fontWeight: 600 }}>3</span>
+                        Información Médica
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <label htmlFor="bloodType" className="text-sm font-semibold">Tipo de Sangre *</label>
+                            <select id="bloodType" name="bloodType" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" required>
+                                <option value="">Selecciona tu tipo de sangre</option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                                <option value="Desconocido">Lo desconozco</option>
+                            </select>
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                            <label htmlFor="allergies" className="text-sm font-semibold">Alergias Conocidas (Opcional)</label>
+                            <input type="text" id="allergies" name="allergies" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. Penicilina, Látex, Mariscos..." />
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                            <label htmlFor="medicalConditions" className="text-sm font-semibold">Condiciones Médicas (Opcional)</label>
+                            <textarea id="medicalConditions" name="medicalConditions" className="w-full flex min-h-[100px] rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-3 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. Asma, Diabetes Tipo 1, Hipertensión..." />
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                            <label htmlFor="importantMedications" className="text-sm font-semibold">Medicamentos Importantes (Opcional)</label>
+                            <textarea id="importantMedications" name="importantMedications" className="w-full flex min-h-[100px] rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-3 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ej. Insulina, anticoagulantes..." />
+                        </div>
+                    </div>
+                </section>
+
+                {/* SEGURO MÉDICO (UNIFIED) */}
+                <section className="space-y-4">
+                    <h3 style={{ fontSize: "18px", fontWeight: 700, display: "flex", alignItems: "center", gap: "10px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "12px", marginBottom: "16px", color: "#F4F0EB" }}>
+                        <span style={{ backgroundColor: "rgba(232,35,26,0.12)", color: "#E8231A", width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", flexShrink: 0, fontWeight: 600 }}>4</span>
+                        Mi Seguro Médico <span className="text-muted-foreground font-normal text-sm ml-2">(Opcional)</span>
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-muted/30 p-5 rounded-2xl border border-border">
+                        <div className="space-y-2 lg:col-span-2">
+                            <label htmlFor="medicalSystem" className="text-sm font-semibold">Sistema médico</label>
+                            <select id="medicalSystem" name="medicalSystem" value={medicalSystem} onChange={(e) => setMedicalSystem(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all">
+                                <option value="">Selecciona un sistema</option>
+                                <option value="Seguro Privado (Gastos Médicos Mayores)">Seguro Privado (Gastos Médicos Mayores)</option>
+                                <option value="IMSS">IMSS</option>
+                                <option value="ISSSTE">ISSSTE</option>
+                                <option value="IMSS-BIENESTAR">IMSS-BIENESTAR</option>
+                                <option value="PEMEX">PEMEX</option>
+                                <option value="SEDENA / SEMAR">SEDENA / SEMAR</option>
+                                <option value="Sin seguro médico">Sin seguro médico</option>
+                            </select>
+                        </div>
+
+                        {/* CONDITIONAL RENDERINGS */}
+                        {medicalSystem === "Seguro Privado (Gastos Médicos Mayores)" && (
+                            <>
+                                <div className="space-y-2 lg:col-span-2">
+                                    <label htmlFor="aseguradora" className="text-sm font-semibold">Aseguradora</label>
+                                    <select id="aseguradora" name="aseguradora" value={aseguradora} onChange={(e) => setAseguradora(e.target.value)} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all">
+                                        <option value="">Selecciona una aseguradora</option>
+                                        <option value="AXA">AXA</option>
+                                        <option value="GNP">GNP</option>
+                                        <option value="Seguros Monterrey (SMNYL)">Seguros Monterrey (SMNYL)</option>
+                                        <option value="Allianz">Allianz</option>
+                                        <option value="MetLife">MetLife</option>
+                                        <option value="Zurich">Zurich</option>
+                                        <option value="BUPA">BUPA</option>
+                                        <option value="Mapfre">Mapfre</option>
+                                        <option value="Seguros Atlas">Seguros Atlas</option>
+                                        <option value="Otro">Otro</option>
+                                    </select>
+                                </div>
+                                {aseguradora === "Otro" && (
+                                    <div className="space-y-2 animate-in fade-in duration-300 md:col-span-2">
+                                        <label htmlFor="aseguradoraOtra" className="text-sm font-semibold text-primary">Especificar Aseguradora *</label>
+                                        <input type="text" id="aseguradoraOtra" name="aseguradoraOtra" required className="w-full flex h-12 rounded-xl border border-primary/50 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                    </div>
+                                )}
+                                <div className="space-y-2">
+                                    <label htmlFor="numeroPoliza" className="text-sm font-semibold">Número de Póliza *</label>
+                                    <input type="text" id="numeroPoliza" name="numeroPoliza" required className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label htmlFor="tipoSeguro" className="text-sm font-semibold">Tipo de Seguro</label>
+                                    <select id="tipoSeguro" name="tipoSeguro" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all">
+                                        <option value="">Selecciona un tipo</option>
+                                        <option value="Gastos Médicos Mayores">Gastos Médicos Mayores</option>
+                                        <option value="Seguro de Auto">Seguro de Auto</option>
+                                        <option value="Seguro de Moto">Seguro de Moto</option>
+                                        <option value="Seguro de Vida">Seguro de Vida</option>
+                                        <option value="Otro">Otro</option>
+                                    </select>
+                                </div>
+                                <div className="space-y-2">
+                                    <label htmlFor="nombreAsegurado" className="text-sm font-semibold">Nombre Asegurado Titular *</label>
+                                    <input type="text" id="nombreAsegurado" name="nombreAsegurado" required className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label htmlFor="vigenciaPoliza" className="text-sm font-semibold">Vigencia (Opcional)</label>
+                                    <input type="date" id="vigenciaPoliza" name="vigenciaPoliza" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all text-foreground" style={{ colorScheme: 'dark' }} />
+                                </div>
+                                <div className="space-y-2 md:col-span-2">
+                                    <label htmlFor="telefonoAseguradora" className="text-sm font-semibold">Teléfono de Emergencias (Opcional)</label>
+                                    <input type="tel" id="telefonoAseguradora" name="telefonoAseguradora" placeholder="Ej: 800-123-4567" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                </div>
+
+                                {/* Subida de Póliza */}
+                                <div className="space-y-4 md:col-span-2 mt-4 pt-4 border-t border-border/50">
+                                    <div>
+                                        <label className="text-sm font-semibold">Documento Póliza (PDF, JPG, PNG)</label>
+                                        <p className="text-xs text-muted-foreground mt-1">Sube el extracto de tu póliza (máx 5MB). Se mostrará a paramédicos.</p>
+                                    </div>
+                                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                                        {polizaFile ? (
+                                            <div className="px-4 py-3 bg-primary/10 border border-primary/20 rounded-xl text-primary font-bold text-sm flex items-center gap-2">
+                                                📄 {polizaFile.name}
+                                            </div>
+                                        ) : null}
+                                        <div className="flex-1 w-full relative">
+                                            <input
+                                                type="file"
+                                                accept=".pdf,image/png,image/jpeg,image/jpg"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) {
+                                                        if (file.size > 5 * 1024 * 1024) {
+                                                            alert("El archivo no debe pesar más de 5MB");
+                                                            e.target.value = '';
+                                                            return;
+                                                        }
+                                                        setPolizaFile(file);
+                                                    }
+                                                }}
+                                                className="w-full flex h-14 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 cursor-pointer shadow-sm relative z-10"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {medicalSystem === "IMSS" && (
+                            <>
+                                <div className="space-y-2">
+                                    <label htmlFor="nss" className="text-sm font-semibold">NSS - Número de Seguridad Social *</label>
+                                    <input type="text" id="nss" name="nss" required maxLength={11} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label htmlFor="clinicaAsignada" className="text-sm font-semibold">UMF / Clínica asignada (Opcional)</label>
+                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" placeholder="Ej: UMF 28, Monterrey" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                </div>
+                                <div className="space-y-2 md:col-span-2">
+                                    <label htmlFor="curpSeguro" className="text-sm font-semibold">CURP (Opcional)</label>
+                                    <input type="text" id="curpSeguro" name="curpSeguro" maxLength={18} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase" />
+                                </div>
+                            </>
+                        )}
+
+                        {medicalSystem === "ISSSTE" && (
+                            <>
+                                <div className="space-y-2 md:col-span-2">
+                                    <label htmlFor="numeroAfiliacion" className="text-sm font-semibold">Número de afiliación ISSSTE *</label>
+                                    <input type="text" id="numeroAfiliacion" name="numeroAfiliacion" required className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label htmlFor="clinicaAsignada" className="text-sm font-semibold">Clínica asignada (Opcional)</label>
+                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label htmlFor="curpSeguro" className="text-sm font-semibold">CURP (Opcional)</label>
+                                    <input type="text" id="curpSeguro" name="curpSeguro" maxLength={18} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase" />
+                                </div>
+                            </>
+                        )}
+
+                        {medicalSystem === "IMSS-BIENESTAR" && (
+                            <>
+                                <div className="space-y-2">
+                                    <label htmlFor="curpSeguro" className="text-sm font-semibold">CURP *</label>
+                                    <input type="text" id="curpSeguro" name="curpSeguro" required maxLength={18} className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all uppercase" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label htmlFor="clinicaAsignada" className="text-sm font-semibold">Centro de salud asignado (Opcional)</label>
+                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                </div>
+                            </>
+                        )}
+
+                        {(medicalSystem === "PEMEX" || medicalSystem === "SEDENA / SEMAR") && (
+                            <>
+                                <div className="space-y-2">
+                                    <label htmlFor="numeroAfiliacion" className="text-sm font-semibold">Número de afiliación *</label>
+                                    <input type="text" id="numeroAfiliacion" name="numeroAfiliacion" required className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label htmlFor="clinicaAsignada" className="text-sm font-semibold">Unidad médica asignada (Opcional)</label>
+                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" />
+                                </div>
+                            </>
+                        )}
+
+                        {medicalSystem === "Sin seguro médico" && (
+                            <div className="col-span-1 md:col-span-2 p-4 bg-muted/50 rounded-xl border border-border text-sm text-muted-foreground">
+                                <p className="font-semibold text-foreground mb-1">Aviso:</p>
+                                En caso de emergencia serás atendido en el hospital público más cercano. Te recomendamos considerar un seguro de gastos médicos mayores para una mejor atención.
+                            </div>
+                        )}
+
+                        <div className="space-y-2 flex items-center gap-3 pt-6 rounded-xl border border-border p-4 bg-muted/20 md:col-span-2">
+                            <input type="checkbox" id="organDonor" name="organDonor" className="w-5 h-5 rounded border-input accent-primary text-primary" />
+                            <label htmlFor="organDonor" className="text-sm font-semibold cursor-pointer">Soy donante oficial de órganos</label>
+                        </div>
+
+                    </div>
+                </section>
+
+                {/* NOTAS IMPORTANTES & UBICACION */}
+                <section className="space-y-4">
+                    <h3 style={{ fontSize: "18px", fontWeight: 700, display: "flex", alignItems: "center", gap: "10px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "12px", marginBottom: "16px", color: "#F4F0EB" }}>
+                        <span style={{ backgroundColor: "rgba(232,35,26,0.12)", color: "#E8231A", width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", flexShrink: 0, fontWeight: 600 }}>5</span>
+                        Notas y Ubicación
+                    </h3>
+
+                    <div className="space-y-2 flex flex-col gap-2 pt-2 rounded-xl border border-primary/30 p-5 bg-primary/5 mb-6">
+                        <div className="flex items-center gap-3">
+                            <input
+                                type="checkbox"
+                                id="isMotorcyclist"
+                                name="isMotorcyclist"
+                                className="w-5 h-5 rounded border-input accent-primary text-primary"
+                                checked={isMotorcyclist}
+                                onChange={(e) => setIsMotorcyclist(e.target.checked)}
+                            />
+                            <label htmlFor="isMotorcyclist" className="text-sm font-bold cursor-pointer text-primary">¿Eres Motociclista?</label>
+                        </div>
+                        {isMotorcyclist && (
+                            <div className="ml-8 mt-2 text-sm text-destructive font-bold flex items-center gap-2 animate-[fade-in-up_0.3s_ease-out_forwards]">
+                                <AlertCircle size={16} />
+                                Tu perfil mostrará una alerta para los paramédicos pidiendo "NO RETIRAR EL CASCO" si no hay personal médico capacitado.
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2 md:col-span-2">
+                            <label htmlFor="additionalNotes" className="text-sm font-semibold">Notas Adicionales (Opcional)</label>
+                            <textarea id="additionalNotes" name="additionalNotes" className="w-full flex min-h-[100px] rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-3 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Cualquier información adicional que los paramédicos o doctores deban saber." />
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                            <label htmlFor="googleMapsLink" className="text-sm font-semibold">Hospital o clínica de preferencia (Opcional)</label>
+                            <input type="text" id="googleMapsLink" name="googleMapsLink" className="w-full flex h-12 rounded-xl border border-white/40 bg-[#1E1E1C] px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring transition-all" placeholder="Ejemplo: Hospital Ángeles Lindavista" />
+                            <p className="text-xs text-muted-foreground mt-1">En caso de emergencia, el personal médico determinará el hospital más adecuado según tu estado de salud y criterio profesional. Este dato es solo una referencia.</p>
+                        </div>
+                    </div>
+                </section>
 
 
-                    <button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground h-16 rounded-2xl text-xl font-black hover:scale-[1.02] hover:bg-primary/90 transition-all shadow-xl shadow-primary/20 mt-8 disabled:opacity-70 disabled:pointer-events-none disabled:transform-none">
-                        {loading ? <Loader2 size={24} className="animate-spin" /> : <CheckCircle2 size={24} />}
-                        {loading ? "Registrando Ficha..." : "Aceptar y Activar Chip"}
-                    </button>
-                    <p className="text-xs text-center text-muted-foreground mt-4 font-medium">
-                        Al registrarte, confirmas que la información ingresada es legítima y autorizas su exposición a personal de rescate/primeros auxilios a través de tu RescueChip.
-                    </p>
-                </form>
-            </div>
+                <button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground h-16 rounded-2xl text-xl font-black hover:scale-[1.02] hover:bg-primary/90 transition-all shadow-xl shadow-primary/20 mt-8 disabled:opacity-70 disabled:pointer-events-none disabled:transform-none">
+                    {loading ? <Loader2 size={24} className="animate-spin" /> : <CheckCircle2 size={24} />}
+                    {loading ? "Registrando Ficha..." : "Aceptar y Activar Chip"}
+                </button>
+                <p className="text-xs text-center text-muted-foreground mt-4 font-medium">
+                    Al registrarte, confirmas que la información ingresada es legítima y autorizas su exposición a personal de rescate/primeros auxilios a través de tu RescueChip.
+                </p>
+            </form>
         </div>
     );
 }
