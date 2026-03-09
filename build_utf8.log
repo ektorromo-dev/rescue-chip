@@ -1,0 +1,209 @@
+﻿
+> rescue-chip@0.1.0 build
+> next build
+
+Ôû▓ Next.js 16.1.6 (Turbopack)
+- Environments: .env.local
+- Experiments (use with caution):
+  ┬À clientTraceMetadata
+
+node.exe : ÔÜá The 
+"middleware" file convention 
+is deprecated. Please use 
+"proxy" instead. Learn more: h
+ttps://nextjs.org/docs/message
+s/middleware-to-proxy
+En línea: 1 Carácter: 1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~
+    + CategoryInfo            
+  : NotSpecified:     (ÔÜá 
+The "middle...l    
+eware-to-proxy:Strin    g) 
+[], RemoteExcepti    on
+    + FullyQualifiedErro    
+rId : NativeCommandE    rror
+ 
+  Creating an optimized production build ...
+
+-----
+[1m[31mFATAL[39m[0m: An 
+unexpected Turbopack error 
+occurred. A panic log has 
+been written to C:\Users\Usuar
+io\AppData\Local\Temp\next-pan
+ic-3580325a234331b81906a07e662
+b5d30.log.
+
+To help make Turbopack 
+better, report this error by 
+]8;;https://github.com/vercel/
+next.js/discussions/new?catego
+ry=turbopack-error-report&titl
+e=Turbopack%20Error%3A%20%5Bpr
+oject%5D%2Fsrc%2Fapp%2Fglobals
+.css%20%5Bapp-client%5D%20%28c
+ss%29&body=Turbopack%20version
+%3A%20%6023c46498%60%0ANext.js
+%20version%3A%20%600.0.0%60%0A
+%0AError%20message%3A%0A%60%60
+%60%0A%5Bproject%5D%2Fsrc%2Fap
+p%2Fglobals.css%20%5Bapp-clien
+t%5D%20%28css%29%0A%0ACaused%2
+0by%3A%0A-%20failed%20to%20con
+vert%20rope%20into%20string%0A
+-%20invalid%20utf-8%20sequence
+%20of%201%20bytes%20from%20ind
+ex%200%0A%0ADebug%20info%3A%0A
+-%20Execution%20of%20get_all_w
+ritten_entrypoints_with_issues
+_operation%20failed%0A-%20Exec
+ution%20of%20EntrypointsOperat
+ion%3A%3Anew%20failed%0A-%20Ex
+ecution%20of%20all_entrypoints
+_write_to_disk_operation%20fai
+led%0A-%20Execution%20of%20Pro
+ject%3A%3Aemit_all_output_asse
+ts%20failed%0A-%20Execution%20
+of%20%2Aemit_assets%20failed%0
+A-%20Execution%20of%20all_asse
+ts_from_entries_operation%20fa
+iled%0A-%20Execution%20of%20%2
+Aall_assets_from_entries%20fai
+led%0A-%20Execution%20of%20out
+put_assets_operation%20failed%
+0A-%20Execution%20of%20%3CMidd
+lewareEndpoint%20as%20Endpoint
+%3E%3A%3Aoutput%20failed%0A-%2
+0Execution%20of%20MiddlewareEn
+dpoint%3A%3Aoutput_assets%20fa
+iled%0A-%20Execution%20of%20Mi
+ddlewareEndpoint%3A%3Aedge_chu
+nk_group%20failed%0A-%20Execut
+ion%20of%20%2Aevaluated_chunk_
+group_assets%20failed%0A-%20Ex
+ecution%20of%20Project%3A%3Aed
+ge_chunking_context%20failed%0
+A-%20Execution%20of%20%2Aget_e
+dge_chunking_context%20failed%
+0A-%20Execution%20of%20Project
+%3A%3Amodule_ids%20failed%0A-%
+20Execution%20of%20whole_app_m
+odule_graph_operation%20failed
+%0A-%20Execution%20of%20%2AMod
+uleGraph%3A%3Afrom_single_grap
+h%20failed%0A-%20Execution%20o
+f%20SingleModuleGraph%3A%3Anew
+_with_entries%20failed%0A-%20%
+5Bproject%5D%2Fsrc%2Fapp%2Fglo
+bals.css%20%5Bapp-client%5D%20
+%28css%29%0A-%20Execution%20of
+%20primary_chunkable_reference
+d_modules%20failed%0A-%20Execu
+tion%20of%20%3CCssModuleAsset%
+20as%20Module%3E%3A%3Areferenc
+es%20failed%0A-%20Execution%20
+of%20parse_css%20failed%0A-%20
+Execution%20of%20%3CPostCssTra
+nsformedAsset%20as%20Asset%3E%
+3A%3Acontent%20failed%0A-%20Ex
+ecution%20of%20PostCssTransfor
+medAsset%3A%3Aprocess%20failed
+%0A-%20failed%20to%20convert%2
+0rope%20into%20string%0A-%20in
+valid%20utf-8%20sequence%20of%
+201%20bytes%20from%20index%200
+%0A%60%60%60&labels=Turbopack,
+Turbopack%20Panic%20Backtrace
+\clicking here.]8;;\
+-----
+
+
+> Build error occurred
+Error 
+[TurbopackInternalError]: 
+[project]/src/app/globals.css 
+[app-client] (css)
+
+Caused by:
+- failed to convert rope into 
+string
+- invalid utf-8 sequence of 1 
+bytes from index 0
+
+Debug info:
+- Execution of get_all_written
+_entrypoints_with_issues_opera
+tion failed
+- Execution of 
+EntrypointsOperation::new 
+failed
+- Execution of all_entrypoints
+_write_to_disk_operation 
+failed
+- Execution of Project::emit_a
+ll_output_assets failed
+- Execution of *emit_assets 
+failed
+- Execution of all_assets_from
+_entries_operation failed
+- Execution of 
+*all_assets_from_entries 
+failed
+- Execution of 
+output_assets_operation failed
+- Execution of 
+<MiddlewareEndpoint as 
+Endpoint>::output failed
+- Execution of MiddlewareEndpo
+int::output_assets failed
+- Execution of MiddlewareEndpo
+int::edge_chunk_group failed
+- Execution of 
+*evaluated_chunk_group_assets 
+failed
+- Execution of Project::edge_c
+hunking_context failed
+- Execution of 
+*get_edge_chunking_context 
+failed
+- Execution of 
+Project::module_ids failed
+- Execution of whole_app_modul
+e_graph_operation failed
+- Execution of *ModuleGraph::f
+rom_single_graph failed
+- Execution of SingleModuleGra
+ph::new_with_entries failed
+- 
+[project]/src/app/globals.css 
+[app-client] (css)
+- Execution of primary_chunkab
+le_referenced_modules failed
+- Execution of 
+<CssModuleAsset as 
+Module>::references failed
+- Execution of parse_css 
+failed
+- Execution of 
+<PostCssTransformedAsset as 
+Asset>::content failed
+- Execution of PostCssTransfor
+medAsset::process failed
+- failed to convert rope into 
+string
+- invalid utf-8 sequence of 1 
+bytes from index 0
+    at <unknown> 
+(TurbopackInternalError: 
+[project]/src/app/globals.css 
+[app-client] (css)) {
+  type: 
+'TurbopackInternalError',
+  location: undefined
+}
