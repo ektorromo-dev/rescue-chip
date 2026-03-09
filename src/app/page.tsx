@@ -1,210 +1,691 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, ShieldAlert, HeartPulse, SmartphoneNfc, CheckCircle2, Menu, X, LogIn, LayoutDashboard } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
+const LANDING_CSS = `
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Barlow+Condensed:wght@400;600;700&display=swap');
+
+  :root {
+    --red: #E8231A;
+    --red-dim: #9B1510;
+    --white: #F4F0EB;
+    --off-white: #C8C0B4;
+    --dark: #0A0A08;
+    --dark-mid: #111110;
+    --dark-card: #161614;
+    --border: rgba(244,240,235,0.08);
+    --border-hover: rgba(232,35,26,0.4);
+  }
+  .landing-root * { margin:0; padding:0; box-sizing:border-box; }
+  .landing-root { background:var(--dark); color:var(--white); font-family:'Barlow',sans-serif; font-weight:300; overflow-x:hidden; }
+  html { scroll-behavior:smooth; }
+
+  /* NAV */
+  .rc-nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; justify-content:space-between; align-items:center; padding:20px 40px; background:linear-gradient(to bottom,rgba(10,10,8,.95),transparent); transition:background .3s; }
+  .rc-nav.scrolled { background:rgba(10,10,8,.98); }
+  .nav-logo { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:3px; color:var(--white); text-decoration:none; }
+  .nav-logo span { color:var(--red); }
+  .nav-links { display:flex; gap:28px; list-style:none; align-items:center; }
+  .nav-links a { color:var(--off-white); text-decoration:none; font-size:13px; letter-spacing:1.5px; text-transform:uppercase; font-weight:500; transition:color .2s; }
+  .nav-links a:hover { color:var(--white); }
+  .nav-cta { background:var(--red) !important; color:var(--white) !important; padding:10px 22px !important; border-radius:2px; font-weight:600 !important; transition:background .2s !important; }
+  .nav-cta:hover { background:#c41c14 !important; }
+  .nav-login { color:var(--off-white) !important; border:1px solid rgba(244,240,235,0.2); padding:8px 18px !important; border-radius:2px; transition:all .2s !important; }
+  .nav-login:hover { border-color:rgba(244,240,235,0.5) !important; color:var(--white) !important; }
+
+  /* HERO */
+  .hero { position:relative; min-height:100vh; display:flex; flex-direction:column; justify-content:flex-end; padding:0 60px 80px; overflow:hidden; }
+  .hero-video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; filter:grayscale(20%) brightness(.5) contrast(1.1); transform:scale(1.03); animation:slow-zoom 14s ease-in-out infinite alternate; }
+  @keyframes slow-zoom { from{transform:scale(1.03)} to{transform:scale(1.0)} }
+  .hero-overlay { position:absolute; inset:0; background:linear-gradient(to top,rgba(10,10,8,.97) 0%,rgba(10,10,8,.45) 45%,rgba(10,10,8,.15) 75%,rgba(10,10,8,.4) 100%),linear-gradient(to right,rgba(10,10,8,.4) 0%,transparent 60%); }
+  .hero-grain { position:absolute; inset:0; pointer-events:none; opacity:.5; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E"); }
+  .hero-accent { position:absolute; top:0; right:120px; width:2px; height:100%; background:linear-gradient(to bottom,transparent 0%,var(--red) 30%,var(--red-dim) 70%,transparent 100%); opacity:.4; }
+  .hero-content { position:relative; z-index:2; max-width:720px; animation:hero-in 1s ease both; }
+  @keyframes hero-in { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+  .hero-badge { display:inline-flex; align-items:center; gap:8px; background:rgba(232,35,26,.12); border:1px solid rgba(232,35,26,.3); border-radius:2px; padding:6px 14px; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:#ff6b63; margin-bottom:28px; font-weight:500; }
+  .hero-badge::before { content:''; width:6px; height:6px; background:var(--red); border-radius:50%; animation:pulse-dot 2s ease-in-out infinite; }
+  @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.7)} }
+  .hero h1 { font-family:'Bebas Neue',sans-serif; font-size:clamp(64px,9vw,110px); line-height:.92; letter-spacing:2px; margin-bottom:24px; }
+  .hero h1 em { font-style:normal; color:var(--red); display:block; }
+  .hero-sub { font-size:16px; line-height:1.7; color:var(--off-white); max-width:480px; margin-bottom:40px; font-weight:300; }
+  .hero-actions { display:flex; align-items:center; gap:24px; flex-wrap:wrap; }
+  .btn-primary { display:inline-block; background:var(--red); color:var(--white); text-decoration:none; padding:16px 36px; font-family:'Barlow Condensed',sans-serif; font-size:15px; font-weight:600; letter-spacing:2px; text-transform:uppercase; border-radius:2px; transition:background .2s,transform .15s; }
+  .btn-primary:hover { background:#c41c14; transform:translateY(-1px); }
+  .btn-ghost { display:inline-flex; align-items:center; gap:8px; color:var(--off-white); text-decoration:none; font-size:13px; letter-spacing:1px; text-transform:uppercase; font-weight:500; transition:color .2s; }
+  .btn-ghost:hover { color:var(--white); }
+  .hero-scroll { position:absolute; bottom:30px; left:50%; transform:translateX(-50%); z-index:2; display:flex; flex-direction:column; align-items:center; gap:6px; animation:hero-in 1s ease .4s both; }
+  .scroll-line { width:1px; height:40px; background:linear-gradient(to bottom,var(--red),transparent); animation:scroll-pulse 2s ease-in-out infinite; }
+  @keyframes scroll-pulse { 0%,100%{opacity:1;height:40px} 50%{opacity:.4;height:24px} }
+  .scroll-text { font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--off-white); writing-mode:vertical-lr; transform:rotate(180deg); }
+
+  /* SECTION LABELS */
+  .section-label { font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--red); font-weight:600; margin-bottom:16px; }
+  .section-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(36px,5vw,60px); line-height:1; letter-spacing:1px; margin-bottom:16px; }
+
+  /* STATS */
+  .stat-interrupt { background:var(--red); padding:32px 60px; display:flex; justify-content:space-between; align-items:center; gap:32px; flex-wrap:wrap; position:relative; overflow:hidden; }
+  .stat-interrupt::after { content:'DATOS'; position:absolute; right:-10px; top:50%; transform:translateY(-50%); font-family:'Bebas Neue',sans-serif; font-size:140px; color:rgba(0,0,0,.07); letter-spacing:12px; white-space:nowrap; pointer-events:none; }
+  .si-cell { text-align:center; position:relative; z-index:1; }
+  .si-num { font-family:'Bebas Neue',sans-serif; font-size:46px; line-height:1; color:rgba(255,255,255,.95); }
+  .si-cap { font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,.65); margin-top:5px; max-width:160px; line-height:1.5; }
+  .si-sep { width:1px; height:44px; background:rgba(255,255,255,.18); }
+
+  /* NARRATIVE */
+  .narrative { padding:120px 60px; background:var(--dark-mid); overflow:hidden; }
+  .narrative-inner { max-width:1200px; margin:0 auto; }
+  .narrative-header { max-width:560px; margin-bottom:80px; }
+  .narrative-header p { font-size:17px; line-height:1.7; color:var(--off-white); }
+  .steps { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:0; }
+  .step { padding:40px; border-left:1px solid var(--border); position:relative; transition:border-color .3s; }
+  .step:hover { border-color:var(--border-hover); }
+  .step:hover .step-icon { background:rgba(232,35,26,.15); border-color:rgba(232,35,26,.4); }
+  .step-num { font-family:'Bebas Neue',sans-serif; font-size:80px; color:rgba(244,240,235,.04); position:absolute; top:16px; right:20px; line-height:1; }
+  .step-icon { width:48px; height:48px; border:1px solid var(--border); border-radius:50%; display:flex; align-items:center; justify-content:center; margin-bottom:20px; background:var(--dark-card); transition:all .3s; font-size:20px; }
+  .step h3 { font-family:'Barlow Condensed',sans-serif; font-size:18px; font-weight:700; letter-spacing:.5px; margin-bottom:10px; text-transform:uppercase; }
+  .step p { font-size:14px; line-height:1.65; color:var(--off-white); }
+
+  /* AWARENESS */
+  .awareness { display:grid; grid-template-columns:1fr 1fr; min-height:80vh; }
+  .aw-video-wrap { position:relative; overflow:hidden; min-height:500px; }
+  .aw-video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter:grayscale(40%) brightness(.65) contrast(1.1); transition:transform 8s ease; }
+  .aw-video-wrap:hover .aw-video { transform:scale(1.04); }
+  .aw-overlay { position:absolute; inset:0; background:linear-gradient(to right,transparent 0%,rgba(10,10,8,.3) 100%); }
+  .aw-tag { position:absolute; bottom:24px; left:24px; font-family:'Barlow Condensed',sans-serif; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:rgba(244,240,235,.4); border:1px solid rgba(244,240,235,.15); padding:6px 12px; }
+  .aw-content { background:var(--dark-mid); padding:80px 60px; display:flex; flex-direction:column; justify-content:center; }
+  .aw-content h2 { font-family:'Bebas Neue',sans-serif; font-size:clamp(38px,4.5vw,58px); line-height:.94; margin-bottom:24px; }
+  .aw-content h2 em { font-style:normal; color:var(--red); display:block; }
+  .blockquote { border-left:2px solid var(--red); padding:14px 0 14px 24px; font-size:18px; line-height:1.5; font-style:italic; color:rgba(244,240,235,.8); margin-bottom:28px; max-width:420px; }
+  .aw-content p { font-size:15px; line-height:1.8; color:var(--off-white); max-width:400px; margin-bottom:32px; }
+
+  /* GRID */
+  .pgrid-section { background:var(--dark); }
+  .pgrid-header { padding:80px 60px 40px; max-width:600px; }
+  .pgrid-header h2 { font-family:'Bebas Neue',sans-serif; font-size:clamp(36px,5vw,60px); line-height:.94; margin-bottom:12px; }
+  .pgrid-header p { font-size:15px; color:var(--off-white); line-height:1.75; }
+  .pgrid { display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:300px 300px; gap:3px; }
+  .pgrid-cell { position:relative; overflow:hidden; cursor:pointer; }
+  .pgrid-cell.tall { grid-row:span 2; }
+  .pgrid-cell img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; filter:grayscale(40%) brightness(.7) contrast(1.1); transition:filter .5s,transform .7s; }
+  .pgrid-cell:hover img { filter:grayscale(10%) brightness(.6) contrast(1.15); transform:scale(1.05); }
+  .pgrid-cap { position:absolute; inset:0; background:linear-gradient(to top,rgba(10,10,8,.9) 0%,transparent 55%); display:flex; align-items:flex-end; padding:20px; opacity:0; transition:opacity .35s; }
+  .pgrid-cell:hover .pgrid-cap { opacity:1; }
+  .pgrid-cap span { font-family:'Barlow Condensed',sans-serif; font-size:12px; letter-spacing:2px; text-transform:uppercase; color:var(--off-white); }
+
+  /* CHIP ANIMADO */
+  .chip-showcase { padding:100px 60px; background:var(--dark); display:flex; align-items:center; justify-content:center; gap:100px; }
+  .chip-container { position:relative; width:260px; height:260px; flex-shrink:0; }
+  .chip-ring { position:absolute; inset:0; border:1px solid rgba(232,35,26,.15); border-radius:50%; animation:ring-pulse 3s ease-in-out infinite; }
+  .chip-ring:nth-child(2) { inset:-24px; border-color:rgba(232,35,26,.08); animation-delay:.5s; }
+  .chip-ring:nth-child(3) { inset:-52px; border-color:rgba(232,35,26,.04); animation-delay:1s; }
+  @keyframes ring-pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.03);opacity:.6} }
+  .chip-core { position:absolute; inset:30px; background:var(--dark-card); border-radius:50%; border:1px solid var(--border); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; }
+  .chip-logo { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:3px; }
+  .chip-logo span { color:var(--red); }
+  .chip-folio { font-size:10px; letter-spacing:2px; color:var(--off-white); font-family:'Barlow Condensed',sans-serif; }
+  .chip-nfc { color:var(--red); font-size:20px; margin-top:2px; }
+  .chip-info { max-width:480px; }
+  .chip-info h2 { font-family:'Bebas Neue',sans-serif; font-size:clamp(36px,4.5vw,56px); line-height:.94; margin-bottom:20px; }
+  .chip-info h2 em { font-style:normal; color:var(--red); }
+  .chip-info p { font-size:15px; line-height:1.8; color:var(--off-white); margin-bottom:32px; }
+
+  /* PRODUCT */
+  .product { display:grid; grid-template-columns:1fr 1fr; min-height:80vh; }
+  .product-media { position:relative; overflow:hidden; }
+  .product-media img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; filter:brightness(.8) contrast(1.05); transition:transform 8s ease; }
+  .product-media:hover img { transform:scale(1.04); }
+  .product-media-overlay { position:absolute; inset:0; background:linear-gradient(to left,rgba(10,10,8,.3) 0%,transparent 60%); }
+  .product-content { background:var(--dark-card); padding:80px 60px; display:flex; flex-direction:column; justify-content:center; }
+  .product-content p { font-size:16px; line-height:1.75; color:var(--off-white); margin-bottom:32px; }
+  .product-features { list-style:none; display:flex; flex-direction:column; gap:12px; margin-bottom:40px; }
+  .product-features li { display:flex; align-items:flex-start; gap:12px; font-size:14px; color:var(--off-white); }
+  .product-features li::before { content:''; width:16px; height:16px; min-width:16px; border-radius:50%; background:rgba(232,35,26,.15); border:1px solid rgba(232,35,26,.4); margin-top:1px; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 8l2.5 2.5L12 5.5' stroke='%23E8231A' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-size:contain; }
+
+  /* PARAMÉDICO */
+  .paramedic { position:relative; min-height:75vh; display:flex; align-items:center; overflow:hidden; }
+  .paramedic-img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; filter:grayscale(15%) brightness(.58) contrast(1.1); }
+  .paramedic-overlay { position:absolute; inset:0; background:linear-gradient(to right,rgba(10,10,8,.97) 0%,rgba(10,10,8,.7) 55%,rgba(10,10,8,.25) 100%); }
+  .paramedic-content { position:relative; z-index:2; padding:80px 60px; max-width:560px; }
+  .paramedic-content h2 { font-family:'Bebas Neue',sans-serif; font-size:clamp(38px,5vw,64px); line-height:.93; margin-bottom:20px; }
+  .paramedic-content h2 em { font-style:normal; color:var(--red); display:block; }
+  .paramedic-content p { font-size:15px; line-height:1.8; color:var(--off-white); max-width:400px; margin-bottom:32px; }
+
+  /* GALERÍA CASCO */
+  .helmet-gallery { padding:80px 60px; background:var(--dark-mid); }
+  .helmet-gallery-inner { max-width:1200px; margin:0 auto; }
+  .helmet-gallery-inner h2 { font-family:'Bebas Neue',sans-serif; font-size:clamp(32px,4vw,52px); line-height:.94; margin-bottom:12px; }
+  .helmet-gallery-inner > p { font-size:15px; color:var(--off-white); margin-bottom:48px; max-width:500px; }
+  .helmet-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:3px; }
+  .helmet-cell { position:relative; overflow:hidden; aspect-ratio:3/4; }
+  .helmet-cell img { width:100%; height:100%; object-fit:cover; object-position:center; filter:brightness(.85) contrast(1.05); transition:transform .6s,filter .4s; }
+  .helmet-cell:hover img { transform:scale(1.05); filter:brightness(.95); }
+
+  /* PRICING */
+  .pricing { padding:120px 60px; background:var(--dark-mid); }
+  .pricing-inner { max-width:1000px; margin:0 auto; }
+  .pricing-header { text-align:center; margin-bottom:60px; }
+  .pricing-header p { font-size:16px; color:var(--off-white); max-width:440px; margin:16px auto 0; line-height:1.6; }
+  .pricing-cards { display:grid; grid-template-columns:repeat(3,1fr); gap:2px; background:var(--border); border:1px solid var(--border); border-radius:4px; overflow:hidden; }
+  .price-card { background:var(--dark-card); padding:40px 32px; position:relative; transition:background .2s; }
+  .price-card:hover { background:#1a1a18; }
+  .price-card.featured { background:var(--dark); }
+  .price-card.featured::before { content:'MÁS POPULAR'; position:absolute; top:0; left:50%; transform:translateX(-50%); background:var(--red); color:white; font-size:9px; letter-spacing:2.5px; font-weight:700; padding:4px 14px; font-family:'Barlow Condensed',sans-serif; }
+  .price-name { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:2px; margin-bottom:8px; }
+  .price-desc { font-size:13px; color:var(--off-white); margin-bottom:24px; line-height:1.5; min-height:36px; }
+  .price-amount { display:flex; align-items:baseline; gap:4px; margin-bottom:8px; }
+  .price-currency { font-size:18px; color:var(--off-white); font-weight:300; }
+  .price-value { font-family:'Bebas Neue',sans-serif; font-size:52px; line-height:1; }
+  .price-period { font-size:12px; color:var(--off-white); letter-spacing:1px; text-transform:uppercase; margin-bottom:28px; }
+  .price-divider { height:1px; background:var(--border); margin-bottom:24px; }
+  .price-features { list-style:none; display:flex; flex-direction:column; gap:10px; margin-bottom:32px; }
+  .price-features li { font-size:13px; color:var(--off-white); display:flex; align-items:center; gap:8px; }
+  .price-features li::before { content:'—'; color:var(--red); font-size:11px; flex-shrink:0; }
+  .btn-price { display:block; text-align:center; text-decoration:none; padding:13px; border-radius:2px; font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:600; letter-spacing:2px; text-transform:uppercase; transition:all .2s; }
+  .btn-price-outline { border:1px solid var(--border); color:var(--off-white); }
+  .btn-price-outline:hover { border-color:var(--red); color:var(--red); }
+  .btn-price-solid { background:var(--red); color:var(--white); border:1px solid var(--red); }
+  .btn-price-solid:hover { background:#c41c14; }
+
+  /* AGENCIAS */
+  .agency-pricing { padding:120px 60px; background:var(--dark); border-top:1px solid var(--border); }
+  .agency-inner { max-width:1000px; margin:0 auto; }
+  .agency-header { text-align:center; margin-bottom:56px; }
+  .agency-header p { font-size:16px; color:var(--off-white); max-width:520px; margin:14px auto 0; line-height:1.65; }
+  .agency-cards { display:grid; grid-template-columns:repeat(3,1fr); gap:2px; background:var(--border); border:1px solid var(--border); border-radius:4px; overflow:hidden; }
+  .agency-card { background:var(--dark-card); padding:40px 32px; position:relative; transition:background .2s; }
+  .agency-card:hover { background:#1a1a18; }
+  .agency-card.featured { background:var(--dark-mid); }
+  .agency-card.dark-card-agency { background:#0d0d0b; }
+  .agency-badge { position:absolute; top:0; left:50%; transform:translateX(-50%); background:var(--red); color:white; font-size:9px; letter-spacing:2.5px; font-weight:700; padding:4px 14px; font-family:'Barlow Condensed',sans-serif; }
+  .agency-tier { font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:2px; margin-bottom:6px; }
+  .agency-units { font-size:13px; color:var(--off-white); margin-bottom:22px; letter-spacing:.5px; }
+  .agency-price-wrap { display:flex; align-items:baseline; gap:4px; margin-bottom:6px; }
+  .agency-currency { font-size:18px; color:var(--off-white); }
+  .agency-value { font-family:'Bebas Neue',sans-serif; font-size:48px; line-height:1; }
+  .agency-curr-label { font-size:14px; color:var(--off-white); letter-spacing:1px; margin-left:4px; }
+  .agency-negotiable { font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:1px; color:var(--white); display:block; margin-bottom:6px; }
+  .agency-divider { height:1px; background:var(--border); margin:20px 0; }
+  .agency-features { list-style:none; display:flex; flex-direction:column; gap:10px; margin-bottom:32px; }
+  .agency-features li { font-size:13px; color:var(--off-white); display:flex; align-items:center; gap:8px; }
+  .agency-features li::before { content:'—'; color:var(--red); font-size:11px; flex-shrink:0; }
+  .btn-agency-outline { display:block; text-align:center; text-decoration:none; padding:13px; border-radius:2px; font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:600; letter-spacing:2px; text-transform:uppercase; border:1px solid var(--border); color:var(--off-white); transition:all .2s; }
+  .btn-agency-outline:hover { border-color:var(--red); color:var(--red); }
+  .btn-agency-solid { display:block; text-align:center; text-decoration:none; padding:13px; border-radius:2px; font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:600; letter-spacing:2px; text-transform:uppercase; background:var(--red); color:var(--white); border:1px solid var(--red); transition:all .2s; }
+  .btn-agency-solid:hover { background:#c41c14; }
+
+  /* TRUST */
+  .trust { padding:80px 60px; background:var(--dark); border-top:1px solid var(--border); }
+  .trust-inner { max-width:1200px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:100px; align-items:center; }
+  .trust-content p { font-size:16px; line-height:1.75; color:var(--off-white); margin-bottom:36px; }
+  .trust-badges { display:flex; gap:12px; flex-wrap:wrap; }
+  .trust-badge { display:flex; align-items:center; gap:8px; background:var(--dark-card); border:1px solid var(--border); padding:10px 16px; border-radius:2px; font-size:12px; letter-spacing:1px; text-transform:uppercase; font-weight:500; transition:border-color .2s; }
+  .trust-badge:hover { border-color:rgba(232,35,26,.3); }
+  .testimonials { display:flex; flex-direction:column; gap:16px; }
+  .testimonial { background:var(--dark-card); border:1px solid var(--border); border-radius:4px; padding:28px; transition:border-color .2s; }
+  .testimonial:hover { border-color:rgba(232,35,26,.2); }
+  .testimonial-text { font-size:15px; line-height:1.65; color:var(--off-white); margin-bottom:20px; font-style:italic; }
+  .testimonial-author { display:flex; align-items:center; gap:12px; }
+  .author-avatar { width:40px; height:40px; border-radius:50%; background:var(--red); display:flex; align-items:center; justify-content:center; font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; letter-spacing:1px; flex-shrink:0; }
+  .author-info { display:flex; flex-direction:column; gap:2px; }
+  .author-info strong { font-size:13px; font-weight:600; }
+  .author-info span { font-size:12px; color:var(--off-white); }
+
+  /* CTA FINAL */
+  .cta-final { position:relative; min-height:70vh; display:flex; align-items:center; overflow:hidden; }
+  .cta-video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center 35%; filter:grayscale(20%) brightness(.38) contrast(1.15); }
+  .cta-overlay { position:absolute; inset:0; background:linear-gradient(to right,rgba(10,10,8,.97) 0%,rgba(10,10,8,.7) 55%,rgba(10,10,8,.35) 100%); }
+  .cta-content { position:relative; z-index:2; padding:80px 60px; max-width:680px; }
+  .cta-content .section-title { font-size:clamp(40px,6vw,80px); margin:16px 0 24px; }
+  .cta-content p { font-size:16px; color:var(--off-white); max-width:440px; margin:0 0 48px; line-height:1.7; }
+  .cta-actions { display:flex; gap:16px; flex-wrap:wrap; align-items:center; }
+
+  /* FOOTER */
+  .rc-footer { padding:40px 60px; background:var(--dark-mid); border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; }
+  .footer-links { display:flex; gap:24px; list-style:none; }
+  .footer-links a { color:var(--off-white); text-decoration:none; font-size:12px; letter-spacing:1px; text-transform:uppercase; transition:color .2s; }
+  .footer-links a:hover { color:var(--white); }
+  .rc-footer small { color:rgba(200,192,180,.4); font-size:11px; letter-spacing:.5px; }
+
+  /* MOBILE */
+  @media(max-width:900px){
+    .rc-nav{padding:16px 20px;} .nav-links{display:none;}
+    .hero{padding:0 24px 80px;min-height:100svh;} .hero-accent{display:none;}
+    .stat-interrupt{flex-direction:column;padding:36px 24px;text-align:center;} .si-sep{display:none;}
+    .narrative,.pricing,.trust{padding:80px 24px;}
+    .awareness,.product{grid-template-columns:1fr;}
+    .aw-content,.product-content{padding:48px 24px;}
+    .pgrid-header,.helmet-gallery{padding:60px 24px;}
+    .pgrid{grid-template-columns:1fr 1fr;grid-template-rows:auto;}
+    .pgrid-cell.tall{grid-row:span 1;}
+    .steps{grid-template-columns:1fr;}
+    .step{border-left:none;border-bottom:1px solid var(--border);}
+    .agency-pricing{padding:80px 24px;} .agency-cards{grid-template-columns:1fr;}
+    .trust-inner{grid-template-columns:1fr;gap:48px;}
+    .helmet-grid{grid-template-columns:1fr 1fr;}
+    .chip-showcase{flex-direction:column;padding:80px 24px;gap:48px;text-align:center;}
+    .paramedic-content,.cta-content{padding:60px 24px;}
+    .rc-footer{padding:32px 24px;flex-direction:column;text-align:center;}
+  }
+`;
+
+const SB = "https://kaihkhyqjmattriozick.supabase.co/storage/v1/object/public/Media%20Landing%20Page/";
+
 export default function Home() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [session, setSession] = useState<any>(null);
+  const [session, setSession] = useState<{ user?: { email?: string } } | null>(null);
+  const [navScrolled, setNavScrolled] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
+    supabase.auth.getSession().then(({ data: { session } }) => setSession(session));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => setSession(s));
+
+    // Nav scroll effect
+    const onScroll = () => setNavScrolled(window.scrollY > 60);
+    window.addEventListener("scroll", onScroll);
+
+    // Fade-in scroll
+    const fader = new IntersectionObserver((entries) => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => {
+            (e.target as HTMLElement).style.opacity = "1";
+            (e.target as HTMLElement).style.transform = "translateY(0)";
+          }, i * 60);
+          fader.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.07 });
+
+    document
+      .querySelectorAll(".step, .price-card, .testimonial, .trust-badge, .si-cell, .pgrid-cell, .helmet-cell")
+      .forEach((el) => {
+        (el as HTMLElement).style.opacity = "0";
+        (el as HTMLElement).style.transform = "translateY(16px)";
+        (el as HTMLElement).style.transition = "opacity .5s ease, transform .5s ease";
+        fader.observe(el);
+      });
+
+    // CTA video speed
+    document.querySelectorAll<HTMLVideoElement>(".cta-video").forEach((v) => {
+      v.addEventListener("loadedmetadata", () => { v.playbackRate = 1.6; });
+      if (v.readyState >= 1) v.playbackRate = 1.6;
     });
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      window.removeEventListener("scroll", onScroll);
+      fader.disconnect();
+    };
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col items-center">
-      {/* Navigation */}
-      <nav className="w-full flex justify-between items-center py-6 px-8 max-w-7xl mx-auto border-b border-border/40 relative z-50">
-        <div className="flex items-center gap-3">
-          <div className="bg-primary/10 p-2 rounded-xl text-primary">
-            <HeartPulse size={28} />
-          </div>
-          <span className="text-xl font-bold tracking-tight">RescueChip</span>
-        </div>
+    <div className="landing-root">
+      <style dangerouslySetInnerHTML={{ __html: LANDING_CSS }} />
 
-        {/* Desktop Menu */}
-        <div className="hidden md:flex items-center gap-6">
-          <Link href="#caracteristicas" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Características</Link>
-          <Link href="#como-funciona" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Cómo funciona</Link>
-          <Link href="/shop" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Tienda</Link>
-          <Link href="/activate" className="text-sm font-bold text-primary hover:text-primary/80 transition-colors">Activar Chip</Link>
+      {/* NAV */}
+      <nav className={`rc-nav${navScrolled ? " scrolled" : ""}`}>
+        <Link href="/" className="nav-logo">RESCUE<span>CHIP</span></Link>
+        <ul className="nav-links">
+          <li><a href="#como-funciona">Cómo funciona</a></li>
+          <li><a href="#producto">El chip</a></li>
+          <li><a href="#precios">Precios</a></li>
+          <li><a href="#comunidad">Comunidad</a></li>
+          <li><a href="#agencias">Agencias</a></li>
           {session ? (
-            <Link href="/dashboard" className="flex items-center gap-2 text-sm font-semibold bg-primary text-primary-foreground px-5 py-2.5 rounded-full hover:bg-primary/90 transition-all shadow-sm">
-              <LayoutDashboard size={16} /> Mi Panel
-            </Link>
+            <li><Link href="/dashboard" className="nav-cta">Mi panel</Link></li>
           ) : (
-            <Link href="/login" className="flex items-center gap-2 text-sm font-semibold bg-primary text-primary-foreground px-5 py-2.5 rounded-full hover:bg-primary/90 transition-all shadow-sm">
-              <LogIn size={16} /> Iniciar Sesión
-            </Link>
+            <li><Link href="/login" className="nav-login">Iniciar sesión</Link></li>
           )}
-        </div>
-
-        {/* Mobile Menu Toggle */}
-        <button
-          className="md:hidden p-2 text-foreground"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          aria-label="Toggle menu"
-        >
-          {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
-        </button>
-
-        {/* Mobile Menu Dropdown */}
-        {isMenuOpen && (
-          <div className="absolute top-full left-0 w-full bg-background border-b border-border shadow-lg py-4 px-8 flex flex-col gap-4 md:hidden animate-[fade-in-up_0.2s_ease-out_forwards]">
-            <Link href="#caracteristicas" onClick={() => setIsMenuOpen(false)} className="text-lg font-medium py-2 border-b border-border/50">Características</Link>
-            <Link href="#como-funciona" onClick={() => setIsMenuOpen(false)} className="text-lg font-medium py-2 border-b border-border/50">Cómo funciona</Link>
-            <Link href="/shop" onClick={() => setIsMenuOpen(false)} className="text-lg font-medium py-2 border-b border-border/50">Tienda</Link>
-            <Link href="/activate" onClick={() => setIsMenuOpen(false)} className="text-lg font-medium py-2 border-b border-border/50 text-primary">Activar Chip</Link>
-            {session ? (
-              <Link href="/dashboard" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-center gap-2 text-lg font-semibold bg-primary text-primary-foreground px-5 py-3 rounded-xl text-center mt-2 shadow-md">
-                <LayoutDashboard size={20} /> Mi Panel
-              </Link>
-            ) : (
-              <Link href="/login" onClick={() => setIsMenuOpen(false)} className="flex items-center justify-center gap-2 text-lg font-semibold bg-primary text-primary-foreground px-5 py-3 rounded-xl text-center mt-2 shadow-md">
-                <LogIn size={20} /> Iniciar Sesión
-              </Link>
-            )}
-          </div>
-        )}
+          <li><a href="#precios" className="nav-cta">Protege tu rodada</a></li>
+        </ul>
       </nav>
 
-      <main className="flex-1 w-full flex flex-col items-center">
-        {/* Hero Section */}
-        <section className="w-full relative py-24 md:py-32 flex flex-col items-center text-center px-4 overflow-hidden">
-          {/* Background decorative elements */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-3xl -z-10" />
-
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent text-[#6B7280] text-sm font-medium mb-8 animate-[fade-in-up_0.5s_ease-out_forwards]">
-            <ShieldAlert size={16} className="text-[#ef4444]" />
-            <span>Datos médicos cruciales, justo cuando se necesitan.</span>
-          </div>
-
-          <h1 className="pb-2 text-5xl md:text-7xl font-extrabold tracking-tight max-w-4xl mb-6 bg-gradient-to-br from-foreground to-muted-foreground bg-clip-text text-transparent" style={{ animation: "fade-in-up 0.5s ease-out 0.1s both" }}>
-            En una emergencia, cada segundo cuenta.
+      {/* HERO */}
+      <section className="hero">
+        <video className="hero-video" autoPlay muted loop playsInline preload="auto">
+          <source src={`${SB}5195181-uhd_4096_2160_25fps.mp4`} type="video/mp4" />
+          <source src={`${SB}5052599-hd_1920_1080_30fps.mp4`} type="video/mp4" />
+        </video>
+        <div className="hero-overlay" />
+        <div className="hero-grain" />
+        <div className="hero-accent" />
+        <div className="hero-content">
+          <div className="hero-badge">NOM-034-SSA3-2013 · Identificación Médica Prehospitalaria</div>
+          <h1>
+            En una emergencia,
+            <em>cada segundo</em>
+            cuenta.
           </h1>
-
-          <p className="text-xl text-muted-foreground max-w-2xl mb-12" style={{ animation: "fade-in-up 0.5s ease-out 0.2s both" }}>
-            RescueChip utiliza tecnología NFC para compartir al instante tu perfil médico vital y contactos de emergencia con los paramédicos en caso de accidente.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 w-full justify-center" style={{ animation: "fade-in-up 0.5s ease-out 0.3s both" }}>
-            <Link href="/activate" className="flex items-center justify-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-full text-lg font-bold hover:scale-105 hover:bg-primary/90 transition-all shadow-lg shadow-primary/25">
-              Activa tu Chip <ArrowRight size={20} />
-            </Link>
-            <Link href="/profile/RSC-001" className="flex items-center justify-center gap-2 bg-transparent border-2 border-[#374151] text-[#374151] px-8 py-4 rounded-full text-lg font-bold hover:bg-[#374151]/10 transition-all">
-              Ver una Demo
-            </Link>
-          </div>
-        </section>
-
-        {/* Feature Highlights */}
-        <section id="caracteristicas" className="w-full max-w-7xl mx-auto py-20 px-8 border-t border-border/50 scroll-mt-20">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-black mb-4">Características Principales</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">Diseñado para salvar vidas brindando información rápida y precisa.</p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-12">
-            <div className="flex flex-col items-start text-left p-6 rounded-3xl bg-card border border-border/50 shadow-sm hover:border-primary/50 transition-colors">
-              <div className="bg-primary/10 text-primary p-4 rounded-2xl mb-6 relative">
-                <SmartphoneNfc size={32} />
-                <div className="absolute inset-0 border border-primary/20 rounded-2xl animate-[pulse-ring_2s_cubic-bezier(0.4,0,0.6,1)_infinite]" />
-              </div>
-              <h3 className="text-2xl font-bold mb-3">Acceso NFC Instantáneo</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Los equipos de rescate solo necesitan acercar su celular al sticker RescueChip en tu casco. Sin aplicaciones intermedias ni tiempos de espera.
-              </p>
-            </div>
-
-            <div className="flex flex-col items-start text-left p-6 rounded-3xl bg-card border border-border/50 shadow-sm hover:border-primary/50 transition-colors">
-              <div className="bg-primary/10 text-primary p-4 rounded-2xl mb-6">
-                <HeartPulse size={32} />
-              </div>
-              <h3 className="text-2xl font-bold mb-3">Datos Médicos Vitales</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Muestra de forma inmediata tu tipo de sangre, alergias, medicamentos actuales, condiciones específicas y estado de donación de órganos.
-              </p>
-            </div>
-
-            <div className="flex flex-col items-start text-left p-6 rounded-3xl bg-card border border-border/50 shadow-sm hover:border-primary/50 transition-colors">
-              <div className="bg-primary/10 text-primary p-4 rounded-2xl mb-6">
-                <ShieldAlert size={32} />
-              </div>
-              <h3 className="text-2xl font-bold mb-3">Contactos de Emergencia</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Mantiene la información de contacto de tus seres queridos siempre disponible, asegurando que puedan ser localizados de inmediato.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* How it works */}
-        <section id="como-funciona" className="w-full max-w-7xl mx-auto py-24 px-8 border-t border-border/50 scroll-mt-20">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-black mb-4">¿Cómo funciona?</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">Estar protegido toma menos de 5 minutos. Sigue estos sencillos pasos para salvaguardar tu bienestar.</p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8 text-center relative">
-            <div className="hidden md:block absolute top-8 left-[15%] right-[15%] h-[2px] bg-border -z-10" />
-
-            <div className="flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-2xl font-black mb-6 shadow-lg shadow-primary/20">
-                1
-              </div>
-              <h3 className="text-xl font-bold mb-3">Compra tu chip</h3>
-              <p className="text-muted-foreground">
-                Adquiere tu RescueChip en nuestra tienda o distribuidores autorizados. Recibirás un sticker NFC de alta resistencia.
-              </p>
-            </div>
-
-            <div className="flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-2xl font-black mb-6 shadow-lg shadow-primary/20">
-                2
-              </div>
-              <h3 className="text-xl font-bold mb-3">Activa tu perfil médico</h3>
-              <p className="text-muted-foreground">
-                Escanea el chip o ingresa a nuestra plataforma para llenar tus datos médicos y registrar a tus contactos de emergencia.
-              </p>
-            </div>
-
-            <div className="flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-2xl font-black mb-6 shadow-lg shadow-primary/20">
-                3
-              </div>
-              <h3 className="text-xl font-bold mb-3">Pégalo en tu casco</h3>
-              <p className="text-muted-foreground">
-                Adhiere el sticker en un lugar externo y visible de tu casco. ¡Listo! Estás protegido en cada rodada.
-              </p>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      {/* Footer */}
-      <footer className="w-full border-t border-border/50 mt-auto py-12">
-        <div className="max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center text-muted-foreground text-sm gap-6">
-          <div className="flex items-center gap-2">
-            <HeartPulse size={20} className="text-primary/50" />
-            <span>&copy; {new Date().getFullYear()} RescueChip. Todos los derechos reservados.</span>
-          </div>
-          <div className="flex flex-wrap justify-center gap-6">
-            <Link href="/privacy" className="hover:text-foreground transition-colors">Aviso de Privacidad</Link>
-            <Link href="/terms" className="hover:text-foreground transition-colors">Términos de Servicio</Link>
-            <Link href="/contact" className="hover:text-foreground transition-colors">Contacto</Link>
+          <p className="hero-sub">RescueChip es el primer sistema de identificación médica prehospitalaria para motociclistas en México. Un chip NFC con tus datos vitales.</p>
+          <div className="hero-actions">
+            <a href="#precios" className="btn-primary">Protege tu rodada — $349</a>
+            <a href="#como-funciona" className="btn-ghost">
+              <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                <circle cx="8" cy="8" r="7" /><path d="M6 8l2 2 3-3" />
+              </svg>
+              Ver cómo funciona
+            </a>
           </div>
         </div>
+        <div className="hero-scroll">
+          <div className="scroll-line" />
+          <span className="scroll-text">Scroll</span>
+        </div>
+      </section>
+
+      {/* STATS */}
+      <div className="stat-interrupt">
+        <div className="si-cell"><div className="si-num">14,000+</div><div className="si-cap">Motociclistas muertos por año en México</div></div>
+        <div className="si-sep" />
+        <div className="si-cell"><div className="si-num">3 min</div><div className="si-cap">Ventana crítica de atención tras accidente</div></div>
+        <div className="si-sep" />
+        <div className="si-cell"><div className="si-num">68%</div><div className="si-cap">De accidentados llegan sin identificación médica</div></div>
+        <div className="si-sep" />
+        <div className="si-cell"><div className="si-num">10 seg</div><div className="si-cap">Tiempo promedio para acceder al perfil médico completo</div></div>
+      </div>
+
+      {/* NARRATIVE */}
+      <section className="narrative" id="como-funciona">
+        <div className="narrative-inner">
+          <div className="narrative-header">
+            <div className="section-label">La realidad de un accidente</div>
+            <h2 className="section-title">¿Qué pasa cuando<br />tienes un accidente?</h2>
+            <p>En un accidente, los primeros minutos determinan todo. Sin información, los paramédicos trabajan a ciegas. RescueChip cambia eso.</p>
+          </div>
+          <div className="steps">
+            <div className="step"><div className="step-num">01</div><div className="step-icon">🏍️</div><h3>El accidente</h3><p>Quedas inconsciente. Nadie sabe tu tipo de sangre, tus alergias, ni a quién llamar. Los minutos pasan.</p></div>
+            <div className="step"><div className="step-num">02</div><div className="step-icon">📱</div><h3>Alguien escanea</h3><p>Un testigo acerca su celular al chip en tu casco. No necesita app, no necesita registrarse. Solo NFC.</p></div>
+            <div className="step"><div className="step-num">03</div><div className="step-icon">🩺</div><h3>Datos vitales</h3><p>Tipo de sangre, alergias, medicamentos, enfermedades crónicas. Todo disponible al instante.</p></div>
+            <div className="step"><div className="step-num">04</div><div className="step-icon">📞</div><h3>Tu familia recibe alerta</h3><p>Tus contactos de emergencia reciben SMS y correo automático con tu ubicación exacta en segundos.</p></div>
+            <div className="step"><div className="step-num">05</div><div className="step-icon">🔐</div><h3>Queda un registro</h3><p>El sistema guarda el momento y lugar exacto del escaneo. Nadie desaparece sin dejar rastro.</p></div>
+          </div>
+        </div>
+      </section>
+
+      {/* AWARENESS SPLIT */}
+      <section className="awareness">
+        <div className="aw-video-wrap">
+          <video className="aw-video" autoPlay muted loop playsInline preload="auto">
+            <source src={`${SB}5052599-hd_1920_1080_30fps.mp4`} type="video/mp4" />
+          </video>
+          <div className="aw-overlay" />
+          <span className="aw-tag">/ Cada rodada</span>
+        </div>
+        <div className="aw-content">
+          <div className="section-label">/ La realidad</div>
+          <h2>La carretera <em>no avisa.</em></h2>
+          <blockquote className="blockquote">&ldquo;Me chocaron en la lateral del Periférico. Un señor escaneó el chip — en segundos mi esposa ya tenía mi ubicación exacta y llegó al lugar del accidente después de que le llamaron.&rdquo;</blockquote>
+          <p>Quedar inconsciente en un accidente de moto es más común de lo que crees. Cuando pasa, los paramédicos no tienen tiempo de buscar — necesitan datos ahora.</p>
+          <a href="#precios" className="btn-primary">Activar mi protección</a>
+        </div>
+      </section>
+
+      {/* GRID */}
+      <section className="pgrid-section">
+        <div className="pgrid-header">
+          <div className="section-label">/ Consciencia</div>
+          <h2 className="section-title">La libertad de rodar merece protección real</h2>
+          <p>No es ser miedoso. Es ser inteligente. Los mejores riders usan equipo completo — RescueChip es parte del equipo.</p>
+        </div>
+        <div className="pgrid">
+          <div className="pgrid-cell tall">
+            <img src={`${SB}Synthetic_Studio_motorcycle_accident_on_mexican_highway_at_dawn_cffea1ee-eea7-4958-b2ee-662faae91fc2.png`} alt="Accidente autopista mexicana" loading="lazy" />
+            <div className="pgrid-cap"><span>La autopista mexicana</span></div>
+          </div>
+          <div className="pgrid-cell">
+            <img src={`${SB}Synthetic_Studio_first_person_point_of_view_motorcycle_crash_mo_06bf3283-17c9-4bbd-b7f7-33880fac7082.png`} alt="POV accidente" loading="lazy" />
+            <div className="pgrid-cap"><span>Punto de vista del rider</span></div>
+          </div>
+          <div className="pgrid-cell">
+            <img src={`${SB}Synthetic_Studio_first_person_point_of_view_motorcycle_crash_mo_be3c9235-5c34-4dc2-9137-78b2d4622ecb.png`} alt="POV crash" loading="lazy" />
+            <div className="pgrid-cap"><span>La curva que no viste</span></div>
+          </div>
+          <div className="pgrid-cell">
+            <img src={`${SB}Synthetic_Studio_first_person_point_of_view_motorcycle_crash_mo_df484981-7c5d-4818-b8d5-0d67add7fa86.png`} alt="El impacto" loading="lazy" />
+            <div className="pgrid-cap"><span>El impacto</span></div>
+          </div>
+          <div className="pgrid-cell">
+            <img src={`${SB}Synthetic_Studio_close_up_of_paramedic_hands_holding_smartpho_a08d2929-4ac2-40e4-878a-02b67e3bd64b_2.png`} alt="Paramédico escaneando chip" loading="lazy" />
+            <div className="pgrid-cap"><span>El escaneo que salva vidas</span></div>
+          </div>
+        </div>
+      </section>
+
+      {/* CHIP ANIMADO */}
+      <section className="chip-showcase" id="producto">
+        <div className="chip-container">
+          <div className="chip-ring" />
+          <div className="chip-ring" />
+          <div className="chip-ring" />
+          <div className="chip-core">
+            <div className="chip-logo">RESCUE<span>CHIP</span></div>
+            <div className="chip-folio">RSC-K7WXP</div>
+            <div className="chip-nfc">⟡</div>
+          </div>
+        </div>
+        <div className="chip-info">
+          <div className="section-label">/ El chip NFC</div>
+          <h2 className="section-title">No es un gadget.<br />Es infraestructura<br /><em>de salud.</em></h2>
+          <p>Un chip NFC programado con tu folio único RSC-XXXXX. Resistente al agua, sin batería, sin Bluetooth. Compatible con cualquier smartphone moderno, sin app requerida.</p>
+          <ul className="product-features">
+            <li>Funciona con cualquier celular Android o iPhone 7+</li>
+            <li>No requiere batería ni conexión Bluetooth</li>
+            <li>Perfil médico editable en cualquier momento</li>
+            <li>Alertas automáticas a tus contactos de emergencia</li>
+            <li>Compartir ubicación GPS al momento del escaneo</li>
+            <li>Alineado con NOM-034-SSA3-2013</li>
+          </ul>
+          <a href="#precios" className="btn-primary">Pedir mi chip — $349 con envío</a>
+        </div>
+      </section>
+
+      {/* PRODUCT */}
+      <section className="product">
+        <div className="product-media">
+          <img src={`${SB}WhatsApp%20Image%202026-03-08%20at%205.43.29%20PM%20(3).jpeg`} alt="Casco con chip RescueChip" loading="lazy" />
+          <div className="product-media-overlay" />
+        </div>
+        <div className="product-content">
+          <div className="section-label">/ Tu casco, tu protección</div>
+          <h2 className="section-title">El chip que ya<br />protege riders<br />en México</h2>
+          <p>Diseñado para pegar en cualquier casco. Resistente al agua, al calor y a la velocidad. Se ve en el casco — y eso es intencional.</p>
+          <ul className="product-features">
+            <li>Sticker resistente a agua y calor</li>
+            <li>Compatible con cualquier superficie de casco</li>
+            <li>Tamaño discreto, visibilidad intencional</li>
+            <li>Identificación digital única — vinculada a tu chip de por vida</li>
+          </ul>
+          <a href="#precios" className="btn-primary">Quiero el mío</a>
+        </div>
+      </section>
+
+      {/* PARAMÉDICO */}
+      <section className="paramedic">
+        <img className="paramedic-img" src={`${SB}Synthetic_Studio_mexican_paramedic_kneeling_on_road_at_night_ph_440094be-c6db-45ef-83a2-983a58519393.png`} alt="Paramédico escaneando RescueChip" loading="lazy" />
+        <div className="paramedic-overlay" />
+        <div className="paramedic-content">
+          <div className="section-label">/ En una emergencia real</div>
+          <h2 className="section-title">El paramédico escanea.<br /><em>Tú ya estás<br />protegido.</em></h2>
+          <p>Sin app, sin contraseña, sin internet. Cualquier celular moderno lee el chip en segundos y abre tu perfil médico completo.</p>
+          <a href="#precios" className="btn-primary">Activar mi protección — $349</a>
+        </div>
+      </section>
+
+      {/* GALERÍA CASCO */}
+      <section className="helmet-gallery">
+        <div className="helmet-gallery-inner">
+          <div className="section-label">/ El producto real</div>
+          <h2 className="section-title">Tu chip. Tu casco. Tu red de seguridad.</h2>
+          <p>Así luce el chip RescueChip en un casco real.</p>
+          <div className="helmet-grid">
+            <div className="helmet-cell"><img src={`${SB}WhatsApp%20Image%202026-03-08%20at%205.43.29%20PM.jpeg`} alt="Chip RescueChip en casco" loading="lazy" /></div>
+            <div className="helmet-cell"><img src={`${SB}WhatsApp%20Image%202026-03-08%20at%205.43.29%20PM%20(1).jpeg`} alt="Casco Honda con chip NFC" loading="lazy" /></div>
+            <div className="helmet-cell"><img src={`${SB}WhatsApp%20Image%202026-03-08%20at%205.43.29%20PM%20(2).jpeg`} alt="Casco Nexx RescueChip" loading="lazy" /></div>
+            <div className="helmet-cell"><img src={`${SB}WhatsApp%20Image%202026-03-08%20at%205.43.30%20PM.jpeg`} alt="Close-up chip emergencia" loading="lazy" /></div>
+          </div>
+        </div>
+      </section>
+
+      {/* PRICING */}
+      <section className="pricing" id="precios">
+        <div className="pricing-inner">
+          <div className="pricing-header">
+            <div className="section-label">Elige tu protección</div>
+            <h2 className="section-title">Envío incluido a todo México</h2>
+            <p>Un solo pago. Sin suscripción. Tu perfil activo de por vida.</p>
+          </div>
+          <div className="pricing-cards">
+            <div className="price-card">
+              <div className="price-name">Individual</div>
+              <div className="price-desc">Para el rider que va solo y sabe que la carretera no perdona.</div>
+              <div className="price-amount"><span className="price-currency">$</span><span className="price-value">349</span></div>
+              <div className="price-period">MXN · Pago único</div>
+              <div className="price-divider" />
+              <ul className="price-features">
+                <li>1 chip NFC programado</li><li>Perfil médico completo</li>
+                <li>2 contactos de emergencia</li><li>Alertas SMS + email</li><li>Envío incluido</li>
+              </ul>
+              <Link href="/shop" className="btn-price btn-price-outline">Elegir Individual</Link>
+            </div>
+            <div className="price-card featured">
+              <div className="price-name">Pareja</div>
+              <div className="price-desc">Para los que siempre ruedan juntos. Protección para dos.</div>
+              <div className="price-amount"><span className="price-currency">$</span><span className="price-value">549</span></div>
+              <div className="price-period">MXN · Pago único</div>
+              <div className="price-divider" />
+              <ul className="price-features">
+                <li>2 chips NFC programados</li><li>Perfiles médicos independientes</li>
+                <li>Contactos cruzados configurables</li><li>Alertas SMS + email para ambos</li><li>Envío incluido</li>
+              </ul>
+              <Link href="/shop" className="btn-price btn-price-solid">Elegir Pareja</Link>
+            </div>
+            <div className="price-card">
+              <div className="price-name">Familiar</div>
+              <div className="price-desc">Toda la familia sobre dos ruedas, toda la familia protegida.</div>
+              <div className="price-amount"><span className="price-currency">$</span><span className="price-value">949</span></div>
+              <div className="price-period">MXN · Pago único</div>
+              <div className="price-divider" />
+              <ul className="price-features">
+                <li>Pack familiar (hasta 4 chips)</li><li>Perfiles médicos individuales</li>
+                <li>Red de contactos compartida</li><li>Dashboard familiar unificado</li><li>Envío incluido</li>
+              </ul>
+              <Link href="/shop" className="btn-price btn-price-outline">Elegir Familiar</Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* AGENCIAS */}
+      <section className="agency-pricing" id="agencias">
+        <div className="agency-inner">
+          <div className="agency-header">
+            <div className="section-label">/ Para agencias y empresas</div>
+            <h2 className="section-title">Planes para Agencias de Motos<br />y Empresas</h2>
+            <p>Ofrece seguridad médica como valor agregado a tus clientes y mejora la experiencia de compra en tu negocio.</p>
+          </div>
+          <div className="agency-cards">
+            <div className="agency-card">
+              <div className="agency-tier">Starter</div>
+              <div className="agency-units">50 chips a $179 c/u</div>
+              <div className="agency-price-wrap"><span className="agency-currency">$</span><span className="agency-value">8,950</span><span className="agency-curr-label">MXN</span></div>
+              <div className="agency-divider" />
+              <ul className="agency-features">
+                <li>50 chips NFC programados</li><li>Panel de administración de folios</li>
+                <li>Material de punto de venta incluido</li><li>Soporte por WhatsApp</li>
+              </ul>
+              <a href="https://wa.me/52XXXXXXXXXX" className="btn-agency-outline">Solicitar</a>
+            </div>
+            <div className="agency-card featured">
+              <span className="agency-badge">Recomendado</span>
+              <div className="agency-tier">Growth</div>
+              <div className="agency-units">100 chips a $149 c/u</div>
+              <div className="agency-price-wrap"><span className="agency-currency">$</span><span className="agency-value">14,900</span><span className="agency-curr-label">MXN</span></div>
+              <div className="agency-divider" />
+              <ul className="agency-features">
+                <li>100 chips NFC programados</li><li>Panel de administración de folios</li>
+                <li>Material de punto de venta incluido</li><li>Capacitación para tu equipo de ventas</li><li>Soporte prioritario</li>
+              </ul>
+              <a href="https://wa.me/52XXXXXXXXXX" className="btn-agency-solid">Solicitar</a>
+            </div>
+            <div className="agency-card dark-card-agency">
+              <div className="agency-tier">Premium</div>
+              <div className="agency-units">300+ chips a $119 c/u</div>
+              <div className="agency-price-wrap"><span className="agency-negotiable">Precio negociable</span></div>
+              <div className="agency-divider" />
+              <ul className="agency-features">
+                <li>300+ chips NFC programados</li><li>Panel de administración avanzado</li>
+                <li>Integración con tu sistema de CRM</li><li>Capacitación y material completo</li><li>Gerente de cuenta dedicado</li>
+              </ul>
+              <a href="https://wa.me/52XXXXXXXXXX" className="btn-agency-outline">Contáctanos</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* TRUST + TESTIMONIOS */}
+      <section className="trust" id="comunidad">
+        <div className="trust-inner">
+          <div className="trust-content">
+            <div className="section-label">Comunidad RescueChip</div>
+            <h2 className="section-title">Riders que ya<br />eligieron protegerse</h2>
+            <p>En México, más de 14,000 motociclistas mueren cada año. La mayoría sin identificación médica encima. RescueChip existe para que los paramédicos tengan lo que necesitan en los primeros 60 segundos — cuando todavía hay tiempo de hacer la diferencia.</p>
+            <div className="trust-badges">
+              <div className="trust-badge"><span>🏥</span> NOM-034-SSA3-2013</div>
+              <div className="trust-badge"><span>🔒</span> Datos cifrados</div>
+              <div className="trust-badge"><span>🇲🇽</span> Hecho en México</div>
+              <div className="trust-badge"><span>⚡</span> Sin suscripción</div>
+            </div>
+          </div>
+          <div className="testimonials">
+            <div className="testimonial">
+              <p className="testimonial-text">&ldquo;Me caí en la México-Puebla. Quedé inconsciente. El chip hizo todo — mi esposa recibió la ubicación antes de que llegara la ambulancia.&rdquo;</p>
+              <div className="testimonial-author"><div className="author-avatar">LR</div><div className="author-info"><strong>Luis R.</strong><span>CDMX · Italika Spitfire 200</span></div></div>
+            </div>
+            <div className="testimonial">
+              <p className="testimonial-text">&ldquo;Tengo contraindicado el ibuprofeno. Ese dato podía empeorar mi situación médica si quedaba inconsciente. Con RescueChip ese riesgo ya no existe.&rdquo;</p>
+              <div className="testimonial-author"><div className="author-avatar">HR</div><div className="author-info"><strong>Héctor R.</strong><span>CDMX · Honda CB650R</span></div></div>
+            </div>
+            <div className="testimonial">
+              <p className="testimonial-text">&ldquo;Ya es parte del kit básico como los guantes. Todo mi grupo lo tiene. Si sales sin él, sientes que te falta algo.&rdquo;</p>
+              <div className="testimonial-author"><div className="author-avatar">JM</div><div className="author-info"><strong>Julio M.</strong><span>CDMX · Honda CB650R</span></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA FINAL */}
+      <section className="cta-final">
+        <video className="cta-video" autoPlay muted loop playsInline preload="auto">
+          <source src={`${SB}13457171_1920_1080_30fps.mp4`} type="video/mp4" />
+          <source src={`${SB}5052676-hd_1920_1080_30fps.mp4`} type="video/mp4" />
+        </video>
+        <div className="cta-overlay" />
+        <div className="cta-content">
+          <div className="section-label">¿Listo para rodar protegido?</div>
+          <h2 className="section-title">Tu chip llega en<br />3-5 días hábiles</h2>
+          <p>Pago único. Sin suscripción. Envío incluido a todo México. Tu perfil activo desde el primer escaneo.</p>
+          <div className="cta-actions">
+            <a href="#precios" className="btn-primary">Pedir mi RescueChip — $349</a>
+            <a href="https://wa.me/52XXXXXXXXXX" className="btn-ghost">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="#4CAF50">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+              </svg>
+              Hablar con nosotros
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="rc-footer">
+        <Link href="/" className="nav-logo">RESCUE<span>CHIP</span></Link>
+        <ul className="footer-links">
+          <li><Link href="/privacy">Privacidad</Link></li>
+          <li><Link href="/terms">Términos</Link></li>
+          <li><a href="#agencias">Agencias</a></li>
+        </ul>
+        <small>© 2026 RescueChip. Hecho en México 🇲🇽</small>
       </footer>
     </div>
   );
