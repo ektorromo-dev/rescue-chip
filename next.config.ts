@@ -6,7 +6,7 @@ const cspHeader = `
     script-src 'self' 'unsafe-eval' 'unsafe-inline';
     style-src 'self' 'unsafe-inline';
     img-src 'self' blob: data: https: wss:;
-    media-src 'self' https://kaihkhyqjmattriozick.supabase.co blob: data:;
+    media-src 'self' https://kainkhyqjmattriozick.supabase.co blob: data:;
     font-src 'self' data:;
     connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.sentry.io https://o451098255.ingest.de.sentry.io https://o451098255.ingest.sentry.io;
     object-src 'none';
