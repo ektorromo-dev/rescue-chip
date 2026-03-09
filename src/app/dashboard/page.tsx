@@ -501,8 +501,8 @@ export default function DashboardPage() {
 
     if (deviceVerificationStatus === "pending") {
         return (
-            <div className="min-h-screen bg-muted flex flex-col items-center justify-center p-4">
-                <div className="bg-card w-full max-w-md p-10 rounded-[2rem] shadow-2xl border border-primary/20 text-center animate-in fade-in zoom-in duration-500">
+            <div className="min-h-screen bg-[#0A0A08] flex items-center justify-center px-4 py-10">
+                <div className="bg-card w-full max-w-md p-10 rounded-2xl shadow-xl border border-primary/20 text-center animate-in fade-in zoom-in duration-500">
                     <div className="w-24 h-24 bg-primary/10 text-primary mx-auto rounded-full flex items-center justify-center mb-8 shadow-inner relative">
                         <Loader2 size={48} className="animate-spin absolute opacity-20" />
                         <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.2 8.4c.5.38.8.97.8 1.6v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V10a2 2 0 0 1 .8-1.6l8-6a2 2 0 0 1 2.4 0l8 6Z"></path><path d="m22 10-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 10"></path></svg>

@@ -1063,8 +1063,8 @@ function ActivationFormContent() {
 
 export default function ActivatePage() {
     return (
-        <div className="min-h-screen bg-muted flex flex-col items-center justify-center p-0 md:p-4">
-            <div className="w-full max-w-3xl bg-card md:rounded-[2.5rem] shadow-2xl border-x md:border border-border/50 overflow-hidden">
+        <div className="min-h-screen bg-[#0A0A08] flex items-center justify-center px-4 py-10">
+            <div className="w-full max-w-2xl bg-card rounded-2xl shadow-xl border border-primary/20 overflow-hidden">
 
                 {/* Header */}
                 <div className="bg-destructive px-8 py-12 text-destructive-foreground relative overflow-hidden">
