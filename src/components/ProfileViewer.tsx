@@ -20,7 +20,11 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
         const h = new Date().getHours();
         return (h >= 6 && h < 19) ? 'day' : 'night';
     };
-    const [theme, setTheme] = useState<'day' | 'night'>(getAutoTheme());
+    const [theme, setTheme] = useState<'day' | 'night'>('night');
+
+    useEffect(() => {
+        setTheme(getAutoTheme());
+    }, []);
     const toggleTheme = () => setTheme(t => t === 'day' ? 'night' : 'day');
     const d = theme === 'day';
 
