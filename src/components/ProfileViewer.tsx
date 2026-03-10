@@ -267,31 +267,27 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
     return (
         <>
             {/* Watermark */}
-            <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.055, pointerEvents: 'none', zIndex: 1, overflow: 'hidden' }}>
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(3, 1fr)',
-                    gap: '40px 20px',
-                    padding: '60px 20px',
-                    transform: 'rotate(-35deg)',
-                    transformOrigin: 'center center',
-                    width: '160%',
-                    height: '160%',
-                    marginLeft: '-30%',
-                    marginTop: '-30%',
-                }}>
-                    {Array.from({ length: 60 }).map((_, i) => (
+            <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.06, pointerEvents: 'none', zIndex: 1, overflow: 'hidden' }}>
+                {Array.from({ length: 48 }).map((_, i) => {
+                    const col = i % 4;
+                    const row = Math.floor(i / 4);
+                    return (
                         <span key={i} style={{
+                            position: 'absolute',
+                            left: `${col * 28 - 8}%`,
+                            top: `${row * 13 - 2}%`,
+                            transform: 'rotate(-35deg)',
+                            transformOrigin: 'center center',
                             whiteSpace: 'nowrap',
-                            fontSize: '13px',
+                            fontSize: '15px',
                             fontWeight: 700,
-                            letterSpacing: '0.08em',
+                            letterSpacing: '0.06em',
                             color: C.textMuted,
                         }}>
-                            CONFIDENCIAL — ACCESO REGISTRADO
+                            CONFIDENCIAL · ACCESO REGISTRADO
                         </span>
-                    ))}
-                </div>
+                    );
+                })}
             </div>
 
             <div style={{ minHeight: '100vh', backgroundColor: C.bgPage, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingBottom: '48px', paddingTop: '48px', WebkitTouchCallout: 'none', userSelect: 'none', position: 'relative', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}>
@@ -449,17 +445,20 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
                             <Droplets size={24} style={{ color: C.red, marginBottom: '4px' }} />
                             <span style={{ fontSize: '11px', color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Tipo de Sangre</span>
                             <span style={{
-                                fontSize: (profile.blood_type?.length ?? 0) > 4 ? '10px' : '28px',
+                                fontSize: (profile.blood_type && profile.blood_type.toLowerCase() !== 'desconocido')
+                                    ? ((profile.blood_type.length ?? 0) > 4 ? '11px' : '28px')
+                                    : '28px',
                                 fontWeight: 900,
                                 color: C.red,
-                                whiteSpace: 'normal',
-                                wordBreak: 'break-word',
                                 textAlign: 'center',
-                                overflow: 'visible',
-                                width: '100%',
                                 lineHeight: '1.2',
                                 display: 'block',
-                            }}>{profile.blood_type || "N/A"}</span>
+                                width: '100%',
+                            }}>
+                                {(profile.blood_type && profile.blood_type.toLowerCase() !== 'desconocido')
+                                    ? profile.blood_type
+                                    : '—'}
+                            </span>
                         </div>
                         <div style={{ width: '1px', backgroundColor: C.border }} />
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', flex: 1, minWidth: 0, overflow: 'hidden' }}>
