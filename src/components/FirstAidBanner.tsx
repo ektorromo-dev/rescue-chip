@@ -1,64 +1,120 @@
 "use client";
 
-import { AlertTriangle, ChevronDown, ChevronUp, PhoneCall, Info } from "lucide-react";
 import { useState } from "react";
 
 export default function FirstAidBanner() {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <div className="w-full bg-yellow-500 text-yellow-950 rounded-2xl shadow-lg border-2 border-yellow-600 overflow-hidden mb-6 relative z-30">
-            <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="w-full px-5 py-4 flex items-center justify-between font-black text-left hover:bg-yellow-400 transition-colors"
-                aria-expanded={isOpen}
-            >
-                <div className="flex items-center gap-3">
-                    <AlertTriangle size={28} className={!isOpen ? "animate-pulse delay-75" : ""} />
-                    <span className="text-sm md:text-base leading-tight uppercase tracking-wide">
-                        ¿No eres paramédico?<br />
-                        <span className="underline decoration-2 underline-offset-2">Toca aquí para ver cómo ayudar.</span>
-                    </span>
+        <div style={{
+            width: '100%',
+            backgroundColor: 'rgba(59,130,246,0.08)',
+            border: '1px solid rgba(59,130,246,0.22)',
+            borderRadius: '14px',
+            overflow: 'hidden',
+            marginBottom: '16px',
+            position: 'relative',
+            zIndex: 30
+        }}>
+            {/* Header clickeable */}
+            <button onClick={() => setIsOpen(!isOpen)} style={{
+                width: '100%',
+                padding: '14px 20px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                textAlign: 'left',
+                gap: '12px'
+            }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <span style={{ fontSize: '18px', color: '#3B82F6' }}>⛑️</span>
+                    <div>
+                        <div style={{
+                            fontSize: '12px', fontWeight: 900, color: '#3B82F6',
+                            textTransform: 'uppercase', letterSpacing: '0.08em', lineHeight: 1
+                        }}>
+                            ¿No eres paramédico?
+                        </div>
+                        <div style={{
+                            fontSize: '11px', color: '#9E9A95', marginTop: '2px',
+                            textDecoration: 'underline', textDecorationStyle: 'dotted'
+                        }}>
+                            Toca aquí para ver cómo ayudar
+                        </div>
+                    </div>
                 </div>
-                {isOpen ? <ChevronUp size={28} className="shrink-0" /> : <ChevronDown size={28} className="shrink-0" />}
+                {/* Flecha que rota */}
+                <span style={{
+                    color: '#3B82F6', fontSize: '16px', fontWeight: 900,
+                    transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                    transition: 'transform 0.2s ease',
+                    flexShrink: 0
+                }}>▼</span>
             </button>
 
+            {/* Panel expandido */}
             {isOpen && (
-                <div className="px-5 pb-5 pt-2 space-y-5 animate-in slide-in-from-top-4 duration-300">
-                    <a
-                        href="tel:911"
-                        className="w-full bg-red-600 text-white flex items-center justify-center gap-3 py-4 rounded-xl font-black text-2xl hover:bg-red-700 transition-colors shadow-xl"
-                    >
-                        <PhoneCall size={32} className="animate-pulse" /> LLAMAR AL 911
-                    </a>
+                <div style={{
+                    padding: '0 20px 20px',
+                    borderTop: '1px solid rgba(59,130,246,0.15)'
+                }}>
+                    <div style={{ paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
-                    <div className="bg-yellow-400/40 p-5 rounded-xl border border-yellow-600/30">
-                        <ul className="space-y-4 font-bold text-base md:text-lg">
-                            <li className="flex gap-3 items-start">
-                                <span className="text-red-700 text-xl font-black shrink-0 mt-0.5">❌</span>
-                                <span><span className="text-red-800 font-black">NO</span> muevas al accidentado</span>
-                            </li>
-                            <li className="flex gap-3 items-start">
-                                <span className="text-red-700 text-xl font-black shrink-0 mt-0.5">❌</span>
-                                <span><span className="text-red-800 font-black">NO</span> retires el casco</span>
-                            </li>
-                            <li className="flex gap-3 items-start">
-                                <span className="text-blue-800 text-xl font-black shrink-0 mt-0.5">👁️</span>
-                                <span>Verifica si respira y está consciente</span>
-                            </li>
-                            <li className="flex gap-3 items-start">
-                                <span className="text-red-700 text-xl font-black shrink-0 mt-0.5">🩸</span>
-                                <span>Si hay sangrado, presiona con un trapo limpio</span>
-                            </li>
-                            <li className="flex gap-3 items-start">
-                                <span className="text-green-800 text-xl font-black shrink-0 mt-0.5">🧘</span>
-                                <span>Mantén la calma y espera a los paramédicos</span>
-                            </li>
-                            <li className="flex gap-3 items-start">
-                                <span className="text-yellow-900 text-xl font-black shrink-0 mt-0.5">📱</span>
-                                <span>Comparte esta pantalla con los paramédicos cuando lleguen</span>
-                            </li>
-                        </ul>
+                        {/* Paso 1 */}
+                        <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                            <span style={{ fontSize: '18px', flexShrink: 0, marginTop: '1px' }}>🔴</span>
+                            <div>
+                                <div style={{ fontSize: '13px', fontWeight: 900, color: '#F4F0EB', lineHeight: 1.3 }}>
+                                    Llama al 911 ahora mismo
+                                </div>
+                                <div style={{ fontSize: '12px', color: '#9E9A95', marginTop: '2px', lineHeight: 1.4 }}>
+                                    No muevas al motociclista. Espera a los paramédicos.
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Paso 2 */}
+                        <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                            <span style={{ fontSize: '18px', flexShrink: 0, marginTop: '1px' }}>⛑️</span>
+                            <div>
+                                <div style={{ fontSize: '13px', fontWeight: 900, color: '#F4F0EB', lineHeight: 1.3 }}>
+                                    No retires el casco
+                                </div>
+                                <div style={{ fontSize: '12px', color: '#9E9A95', marginTop: '2px', lineHeight: 1.4 }}>
+                                    Solo personal capacitado debe hacerlo.
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Paso 3 */}
+                        <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                            <span style={{ fontSize: '18px', flexShrink: 0, marginTop: '1px' }}>📍</span>
+                            <div>
+                                <div style={{ fontSize: '13px', fontWeight: 900, color: '#F4F0EB', lineHeight: 1.3 }}>
+                                    Comparte tu ubicación
+                                </div>
+                                <div style={{ fontSize: '12px', color: '#9E9A95', marginTop: '2px', lineHeight: 1.4 }}>
+                                    Describe referencias exactas al operador del 911.
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Paso 4 */}
+                        <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                            <span style={{ fontSize: '18px', flexShrink: 0, marginTop: '1px' }}>📋</span>
+                            <div>
+                                <div style={{ fontSize: '13px', fontWeight: 900, color: '#F4F0EB', lineHeight: 1.3 }}>
+                                    Muestra este perfil al paramédico
+                                </div>
+                                <div style={{ fontSize: '12px', color: '#9E9A95', marginTop: '2px', lineHeight: 1.4 }}>
+                                    Contiene tipo de sangre, alergias y contactos de emergencia.
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             )}
