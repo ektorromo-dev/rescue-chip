@@ -606,20 +606,17 @@ export default function DashboardPage() {
                                             <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Foto de Perfil</label>
                                             <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "16px" }}>
                                                 {photoFile ? (
-                                                    <div style={{ width: "120px", height: "120px", borderRadius: "50%", overflow: "hidden", backgroundColor: "#1A1A18", border: "4px solid #131311", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.3)" }}>
+                                                    <div style={{ width: "120px", height: "120px", minWidth: "120px", minHeight: "120px", borderRadius: "50%", overflow: "hidden", backgroundColor: "#1A1A18", border: "4px solid #131311", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.3)", flexShrink: 0 }}>
                                                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                        <img src={URL.createObjectURL(photoFile)} alt="Preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                                        <img src={URL.createObjectURL(photoFile)} alt="Preview" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", borderRadius: "0" }} />
                                                     </div>
                                                 ) : currentPhotoUrl ? (
-                                                    <div style={{ width: "120px", height: "120px", borderRadius: "50%", backgroundColor: "#1A1A18", border: "4px solid #131311", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.3)", position: "relative", overflow: "hidden" }}>
+                                                    <div style={{ width: "120px", height: "120px", minWidth: "120px", minHeight: "120px", borderRadius: "50%", overflow: "hidden", backgroundColor: "#1A1A18", border: "4px solid #131311", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.3)", flexShrink: 0 }}>
                                                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                        <img src={currentPhotoUrl} alt="Foto actual" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", borderRadius: "50%" }} />
-                                                        <div style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "rgba(0,0,0,0.3)" }}>
-                                                            <span style={{ fontWeight: 700, fontSize: "10px", backgroundColor: "rgba(0,0,0,0.6)", padding: "2px 6px", borderRadius: "4px" }}>Actual</span>
-                                                        </div>
+                                                        <img src={currentPhotoUrl} alt="Foto actual" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", borderRadius: "0" }} />
                                                     </div>
                                                 ) : (
-                                                    <div style={{ width: "120px", height: "120px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", color: "#9E9A95", fontSize: "32px", border: "4px solid #131311", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.3)" }}>
+                                                    <div style={{ width: "120px", height: "120px", minWidth: "120px", minHeight: "120px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", color: "#9E9A95", fontSize: "32px", border: "4px solid #131311", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.3)", flexShrink: 0 }}>
                                                         📷
                                                     </div>
                                                 )}
@@ -788,7 +785,7 @@ export default function DashboardPage() {
                                             <span>Mi Seguro Médico</span>
                                         </div>
                                         {(medicalSystem || currentPolizaUrl) && (
-                                            <button type="button" onClick={handleDeleteInsuranceInfo} style={{ color: "#E8231A", fontSize: "14px", fontWeight: 700, display: "flex", alignItems: "center" }}>
+                                            <button type="button" onClick={handleDeleteInsuranceInfo} style={{ display: "inline-flex", alignItems: "center", gap: "6px", backgroundColor: "transparent", border: "1px solid rgba(232,35,26,0.5)", borderRadius: "8px", padding: "5px 12px", color: "#F4F0EB", fontSize: "12px", fontWeight: 600, cursor: "pointer", background: "none" }}>
                                                 Eliminar información
                                             </button>
                                         )}

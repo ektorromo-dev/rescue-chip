@@ -332,16 +332,16 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
 
                 {/* 3. CARD STATS */}
                 <div style={{ backgroundColor: '#131311', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '20px 24px', display: 'flex', justifyContent: 'space-around' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', flex: 1, minWidth: 0, overflow: 'hidden' }}>
                         <Droplets size={24} style={{ color: '#E8231A', marginBottom: '4px' }} />
                         <span style={{ fontSize: '11px', color: '#9E9A95', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Tipo de Sangre</span>
-                        <span style={{ fontSize: '28px', fontWeight: 900, color: '#F4F0EB' }}>{profile.blood_type || "N/A"}</span>
+                        <span style={{ fontSize: '28px', fontWeight: 900, color: '#F4F0EB', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>{profile.blood_type || "N/A"}</span>
                     </div>
                     <div style={{ width: '1px', backgroundColor: 'rgba(255,255,255,0.08)' }} />
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', flex: 1, minWidth: 0, overflow: 'hidden' }}>
                         <CheckCircle2 size={24} style={{ color: profile.organ_donor ? '#22c55e' : '#9E9A95', marginBottom: '4px' }} />
                         <span style={{ fontSize: '11px', color: '#9E9A95', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Donador</span>
-                        <span style={{ fontSize: '28px', fontWeight: 900, color: '#F4F0EB' }}>{profile.organ_donor ? "SÍ" : "NO"}</span>
+                        <span style={{ fontSize: '28px', fontWeight: 900, color: '#F4F0EB', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>{profile.organ_donor ? "SÍ" : "NO"}</span>
                     </div>
                 </div>
 

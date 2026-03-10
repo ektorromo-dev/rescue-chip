@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { Menu, X } from "lucide-react";
 
 const LANDING_CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Barlow+Condensed:wght@400;600;700&display=swap');
@@ -250,6 +251,7 @@ const LANDING_CSS = `
   /* MOBILE */
   @media(max-width:900px){
     .rc-nav{padding:16px 20px;} .nav-links{display:none;}
+    .hamburger { display:flex !important; }
     .hero{padding:0 24px 80px;min-height:100svh;} .hero-accent{display:none;}
     .stat-interrupt{flex-direction:column;padding:36px 24px;text-align:center;} .si-sep{display:none;}
     .narrative,.pricing,.trust{padding:80px 24px;}
@@ -267,6 +269,14 @@ const LANDING_CSS = `
     .paramedic-content,.cta-content{padding:60px 24px;}
     .rc-footer{padding:32px 24px;flex-direction:column;text-align:center;}
   }
+
+  /* MOBILE MENU OVERLAY */
+  .hamburger { display: none; background: none; border: none; color: var(--white); cursor: pointer; padding: 4px; z-index: 1001; }
+  .mobile-menu-overlay { position: fixed; inset: 0; background: rgba(10,10,8,0.98); z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+  .mobile-menu-overlay.open { opacity: 1; pointer-events: auto; }
+  .mobile-menu-links { list-style: none; display: flex; flex-direction: column; gap: 32px; text-align: center; }
+  .mobile-menu-links a { color: var(--white); text-decoration: none; font-size: 20px; font-weight: 600; font-family: 'Barlow Condensed', sans-serif; letter-spacing: 2px; text-transform: uppercase; }
+  .mobile-menu-links .nav-cta { margin-top: 16px; font-size: 16px !important; }
 
   /* ════════════════════════════════════════
      MÓVIL — 480px
@@ -483,6 +493,7 @@ const SB = "https://kaihkhyqjmattriozick.supabase.co/storage/v1/object/public/Me
 export default function Home() {
   const [session, setSession] = useState<{ user?: { email?: string } } | null>(null);
   const [navScrolled, setNavScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
@@ -565,7 +576,29 @@ export default function Home() {
             <li><Link href="/login" className="nav-login">Iniciar sesión</Link></li>
           )}
         </ul>
+        <button className="hamburger" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label="Abrir menú">
+          {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+        </button>
       </nav>
+
+      {/* MOBILE MENU OVERLAY */}
+      <div className={`mobile-menu-overlay ${mobileMenuOpen ? 'open' : ''}`}>
+        <ul className="mobile-menu-links">
+          <li><a href="#como-funciona" onClick={() => setMobileMenuOpen(false)}>Cómo funciona</a></li>
+          <li><a href="#producto" onClick={() => setMobileMenuOpen(false)}>El chip</a></li>
+          <li><a href="#precios" onClick={() => setMobileMenuOpen(false)}>Precios</a></li>
+          <li><a href="#comunidad" onClick={() => setMobileMenuOpen(false)}>Comunidad</a></li>
+          <li><a href="#agencias" onClick={() => setMobileMenuOpen(false)}>Agencias</a></li>
+          {session ? (
+            <li><Link href="/dashboard" className="nav-cta" onClick={() => setMobileMenuOpen(false)}>Mi perfil médico</Link></li>
+          ) : (
+            <li><Link href="/activate" className="nav-cta" onClick={() => setMobileMenuOpen(false)}>Activar mi chip</Link></li>
+          )}
+          {!session && (
+            <li><Link href="/login" style={{ marginTop: '16px', fontSize: '14px', color: 'var(--off-white)', textDecoration: 'none' }} onClick={() => setMobileMenuOpen(false)}>Iniciar sesión</Link></li>
+          )}
+        </ul>
+      </div>
 
       {/* HERO */}
       <section className="hero">
