@@ -1149,7 +1149,7 @@ export default function ActivatePage() {
             <div style={{ width: '100%', maxWidth: '680px' }}>
 
                 {/* Header */}
-                <div style={{ backgroundColor: '#131311', padding: '48px 32px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px 16px 0 0', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ background: 'linear-gradient(135deg, #1C0A09 0%, #2C1210 60%, #1A0808 100%)', padding: '48px 32px', border: '1px solid rgba(232,35,26,0.35)', borderRadius: '16px 16px 0 0', position: 'relative', overflow: 'hidden' }}>
                     <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', backgroundColor: 'rgba(255,255,255,0.05)', padding: '6px 12px', borderRadius: '9999px', color: '#9E9A95', textDecoration: 'none', marginBottom: '32px', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 500 }}>
                         <ArrowLeft size={16} /> Volver al Inicio
                     </Link>
