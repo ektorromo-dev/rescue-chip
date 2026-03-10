@@ -446,15 +446,20 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
                             <Droplets size={24} style={{ color: C.red, marginBottom: '4px' }} />
                             <span style={{ fontSize: '11px', color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.08em', textAlign: 'center' }}>Tipo de Sangre</span>
                             <span style={{
-                                fontSize: '28px',
+                                fontSize: (profile.blood_type && profile.blood_type.trim() !== '' && !profile.blood_type.toLowerCase().includes('desconoc'))
+                                    ? (profile.blood_type.length > 3 ? '16px' : '28px')
+                                    : '13px',
                                 fontWeight: 900,
                                 color: C.red,
                                 textAlign: 'center',
-                                lineHeight: '1.2',
+                                lineHeight: '1.3',
+                                wordBreak: 'break-word',
+                                width: '100%',
+                                display: 'block',
                             }}>
-                                {(profile.blood_type && !profile.blood_type.toLowerCase().includes('desconoc') && profile.blood_type.trim() !== '')
+                                {(profile.blood_type && profile.blood_type.trim() !== '' && !profile.blood_type.toLowerCase().includes('desconoc'))
                                     ? profile.blood_type
-                                    : '—'}
+                                    : 'Desconocido'}
                             </span>
                         </div>
                         {/* Divider */}
