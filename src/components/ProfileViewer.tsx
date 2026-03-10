@@ -325,7 +325,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
             </div>
 
             {/* Content Body */}
-            <div style={{ width: '100%', padding: '24px 32px', position: 'relative', zIndex: 20, display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <div style={{ width: '100%', maxWidth: '512px', margin: '0 auto', padding: '24px 32px', position: 'relative', zIndex: 20, display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
                 {/* First Aid Banner */}
                 <FirstAidBanner />

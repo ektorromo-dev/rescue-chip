@@ -745,7 +745,8 @@ export default function DashboardPage() {
                                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                             <label htmlFor="bloodType" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Tipo de Sangre *</label>
-                                            <select id="bloodType" value={bloodType} onChange={(e) => setBloodType(e.target.value)} style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s', fontFamily: 'monospace' }}
+                                            <div style={{ position: "relative" }}>
+<select id="bloodType" value={bloodType} onChange={(e) => setBloodType(e.target.value)} style={{ appearance: "none", WebkitAppearance: "none", paddingRight: "36px",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s', fontFamily: 'monospace' }}
                                                 onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                 onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} required>
                                                 <option value="">Selecciona tu tipo de sangre</option>
@@ -759,6 +760,8 @@ export default function DashboardPage() {
                                                 <option value="O-">O-</option>
                                                 <option value="Desconocido">Lo desconozco</option>
                                             </select>
+<span style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#9E9A95", fontSize: "12px" }}>▼</span>
+</div>
                                         </div>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                                             <label htmlFor="allergies" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Alergias Conocidas</label>
@@ -793,7 +796,8 @@ export default function DashboardPage() {
                                     <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "16px", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.08)" }}>
                                         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                                             <label htmlFor="medicalSystem" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Sistema médico *</label>
-                                            <select id="medicalSystem" value={medicalSystem} onChange={(e) => setMedicalSystem(e.target.value)} required style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                            <div style={{ position: "relative" }}>
+<select id="medicalSystem" value={medicalSystem} onChange={(e) => setMedicalSystem(e.target.value)} required style={{ appearance: "none", WebkitAppearance: "none", paddingRight: "36px",  fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                                 onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                 onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}>
                                                 <option value="">Selecciona un sistema</option>
@@ -805,6 +809,8 @@ export default function DashboardPage() {
                                                 <option value="SEDENA / SEMAR">SEDENA / SEMAR</option>
                                                 <option value="Sin seguro médico">Sin seguro médico</option>
                                             </select>
+<span style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#9E9A95", fontSize: "12px" }}>▼</span>
+</div>
                                         </div>
 
                                         {/* CONDITIONAL RENDERINGS */}
@@ -812,7 +818,8 @@ export default function DashboardPage() {
                                             <>
                                                 <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                                                     <label htmlFor="aseguradora" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Aseguradora</label>
-                                                    <select id="aseguradora" value={aseguradora} onChange={(e) => setAseguradora(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                    <div style={{ position: "relative" }}>
+<select id="aseguradora" value={aseguradora} onChange={(e) => setAseguradora(e.target.value)} style={{ appearance: "none", WebkitAppearance: "none", paddingRight: "36px",  fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                                         onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                         onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}>
                                                         <option value="">Selecciona una aseguradora</option>
@@ -827,6 +834,8 @@ export default function DashboardPage() {
                                                         <option value="Seguros Atlas">Seguros Atlas</option>
                                                         <option value="Otro">Otro</option>
                                                     </select>
+<span style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#9E9A95", fontSize: "12px" }}>▼</span>
+</div>
                                                 </div>
                                                 {aseguradora === "Otro" && (
                                                     <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
