@@ -23,6 +23,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
     const [screenshotWarning, setScreenshotWarning] = useState<boolean>(false);
     const [geoError, setGeoError] = useState<boolean>(false);
     const [isLoadingConsent, setIsLoadingConsent] = useState<boolean>(false);
+    const [photoOpen, setPhotoOpen] = useState(false);
 
     // Generate UUID function
     const generateUUID = () => {
@@ -267,16 +268,19 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
                     borderBottom: '1px solid rgba(255,255,255,0.06)'
                 }}>
                     {/* Foto circular */}
-                    <div style={{
-                        width: '120px',
-                        height: '120px',
-                        borderRadius: '50%',
-                        overflow: 'hidden',
-                        border: '3px solid rgba(232,35,26,0.5)',
-                        boxShadow: '0 0 0 1px rgba(255,255,255,0.06), 0 8px 24px rgba(0,0,0,0.4)',
-                        backgroundColor: '#1A1A18',
-                        flexShrink: 0
-                    }}>
+                    <div
+                        onClick={() => profile.photo_url && setPhotoOpen(true)}
+                        style={{
+                            width: '120px',
+                            height: '120px',
+                            borderRadius: '50%',
+                            overflow: 'hidden',
+                            border: '3px solid rgba(232,35,26,0.5)',
+                            boxShadow: '0 0 0 1px rgba(255,255,255,0.06), 0 8px 24px rgba(0,0,0,0.4)',
+                            backgroundColor: '#1A1A18',
+                            flexShrink: 0,
+                            cursor: profile.photo_url ? 'pointer' : 'default'
+                        }}>
                         {isDemo ? (
                             <div style={{
                                 width: '100%', height: '100%',
@@ -359,7 +363,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
                     {/* MEDICAL DETAILS */}
                     {(allergiesArray.length > 0) && (
                         /* 4. SECCIÓN ALERGIAS */
-                        <div style={{ backgroundColor: 'rgba(232,35,26,0.08)', border: '1px solid rgba(232,35,26,0.2)', borderRadius: '16px', padding: '20px 24px' }}>
+                        <div style={{ backgroundColor: 'rgba(232,35,26,0.14)', border: '1px solid rgba(232,35,26,0.2)', borderRadius: '16px', padding: '20px 24px' }}>
                             <h4 style={{ color: '#E8231A', fontSize: '12px', fontWeight: 900, textTransform: 'uppercase', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                                 <AlertTriangle size={16} /> Alergias
                             </h4>
@@ -375,7 +379,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
 
                     {/* 5. SECCIONES INFORMATIVAS */}
                     {(profile.medical_conditions || profile.important_medications) && (
-                        <div style={{ backgroundColor: 'rgba(217,119,6,0.08)', border: '1px solid rgba(217,119,6,0.2)', borderRadius: '16px', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        <div style={{ backgroundColor: 'rgba(217,119,6,0.14)', border: '1px solid rgba(217,119,6,0.2)', borderRadius: '16px', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
                             {profile.medical_conditions && (
                                 <div>
@@ -530,12 +534,17 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
                                     <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
                                         <h4 style={{ fontSize: '11px', fontWeight: 900, color: '#9E9A95', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Hospital / Clínica Preferida</h4>
 
+                                        {profile.hospital_name && (
+                                            <p style={{ fontSize: '15px', fontWeight: 700, color: '#F4F0EB', marginBottom: '8px', textAlign: 'center' }}>
+                                                🏥 {profile.hospital_name}
+                                            </p>
+                                        )}
                                         {profile.google_maps_link.startsWith('http') ? (
                                             <a
                                                 href={profile.google_maps_link}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                style={{ width: '100%', backgroundColor: 'rgba(255,255,255,0.04)', color: '#F4F0EB', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '16px', borderRadius: '12px', fontWeight: 700, fontSize: '14px', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.12)' }}
+                                                style={{ width: '100%', backgroundColor: '#3B82F6', color: '#F4F0EB', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '16px', borderRadius: '12px', fontWeight: 700, fontSize: '14px', textDecoration: 'none', border: '1px solid #2563EB' }}
                                             >
                                                 📍 Abrir en Maps
                                             </a>
@@ -564,6 +573,39 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
                     REF: {chip.folio} | V3
                 </p>
             </div>
+
+            {photoOpen && profile.photo_url && (
+                <div
+                    onClick={() => setPhotoOpen(false)}
+                    style={{
+                        position: 'fixed', inset: 0, zIndex: 9999,
+                        backgroundColor: 'rgba(0,0,0,0.92)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        cursor: 'zoom-out'
+                    }}
+                >
+                    <img
+                        src={profile.photo_url}
+                        alt={profile.full_name}
+                        style={{
+                            maxWidth: '90vw', maxHeight: '85vh',
+                            borderRadius: '16px',
+                            objectFit: 'contain',
+                            boxShadow: '0 25px 60px rgba(0,0,0,0.8)'
+                        }}
+                    />
+                    <button
+                        onClick={(e) => { e.stopPropagation(); setPhotoOpen(false); }}
+                        style={{
+                            position: 'fixed', top: '20px', right: '24px',
+                            background: 'rgba(255,255,255,0.12)', border: 'none',
+                            color: '#F4F0EB', fontSize: '24px', width: '40px', height: '40px',
+                            borderRadius: '50%', cursor: 'pointer', display: 'flex',
+                            alignItems: 'center', justifyContent: 'center', lineHeight: 1
+                        }}
+                    >×</button>
+                </div>
+            )}
         </div>
     );
 }

@@ -61,6 +61,7 @@ export default function DashboardPage() {
     const [isMotorcyclist, setIsMotorcyclist] = useState(false);
     const [additionalNotes, setAdditionalNotes] = useState("");
     const [googleMapsLink, setGoogleMapsLink] = useState("");
+    const [hospitalName, setHospitalName] = useState("");
 
     // Contacts
     const [contact1Name, setContact1Name] = useState("");
@@ -291,6 +292,7 @@ export default function DashboardPage() {
                 setIsMotorcyclist(profile.is_motorcyclist || false);
                 setAdditionalNotes(profile.additional_notes || "");
 
+                setHospitalName(profile.hospital_name || "");
                 setGoogleMapsLink(profile.google_maps_link || "");
 
                 if (profile.emergency_contacts && Array.isArray(profile.emergency_contacts)) {
@@ -412,6 +414,7 @@ export default function DashboardPage() {
                 organ_donor: organDonor,
                 is_motorcyclist: isMotorcyclist,
                 additional_notes: additionalNotes,
+                hospital_name: hospitalName,
                 google_maps_link: googleMapsLink,
                 aseguradora: finalAseguradora,
                 numero_poliza: numeroPoliza || null,

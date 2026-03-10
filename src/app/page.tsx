@@ -620,7 +620,7 @@ export default function Home() {
           <p className="hero-sub">RescueChip es el primer sistema de identificación médica prehospitalaria para motociclistas en México. Un chip NFC con tus datos vitales.</p>
           <div className="hero-actions">
             <a href="#precios" className="btn-primary">Protege tu rodada — $349</a>
-            <a href="/profile/RSC-V2KLB" target="_blank" className="btn-ghost" style={{
+            <a href="/profile/RSC-K7WXP" target="_blank" className="btn-ghost" style={{
               display: 'inline-flex', alignItems: 'center', gap: '8px'
             }}>
               <svg viewBox="0 0 16 16" width="16" height="16" fill="none"

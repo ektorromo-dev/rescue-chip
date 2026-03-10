@@ -8,8 +8,8 @@ export default function FirstAidBanner() {
     return (
         <div style={{
             width: '100%',
-            backgroundColor: 'rgba(59,130,246,0.08)',
-            border: '1px solid rgba(59,130,246,0.22)',
+            backgroundColor: 'rgba(249,115,22,0.08)',
+            border: '1px solid rgba(249,115,22,0.22)',
             borderRadius: '14px',
             overflow: 'hidden',
             marginBottom: '16px',
@@ -30,10 +30,10 @@ export default function FirstAidBanner() {
                 gap: '12px'
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <span style={{ fontSize: '18px', color: '#3B82F6' }}>⛑️</span>
+                    <span style={{ fontSize: '18px', color: '#F97316' }}>⛑️</span>
                     <div>
                         <div style={{
-                            fontSize: '12px', fontWeight: 900, color: '#3B82F6',
+                            fontSize: '12px', fontWeight: 900, color: '#F97316',
                             textTransform: 'uppercase', letterSpacing: '0.08em', lineHeight: 1
                         }}>
                             ¿No eres paramédico?
@@ -48,7 +48,7 @@ export default function FirstAidBanner() {
                 </div>
                 {/* Flecha que rota */}
                 <span style={{
-                    color: '#3B82F6', fontSize: '16px', fontWeight: 900,
+                    color: '#F97316', fontSize: '16px', fontWeight: 900,
                     transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
                     transition: 'transform 0.2s ease',
                     flexShrink: 0
@@ -59,7 +59,7 @@ export default function FirstAidBanner() {
             {isOpen && (
                 <div style={{
                     padding: '0 20px 20px',
-                    borderTop: '1px solid rgba(59,130,246,0.15)'
+                    borderTop: '1px solid rgba(249,115,22,0.15)'
                 }}>
                     <div style={{ paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
