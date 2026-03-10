@@ -421,7 +421,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
             <div style={{ width: '100%', maxWidth: '512px', margin: '0 auto', padding: '24px 32px', position: 'relative', zIndex: 20, display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
                 {/* First Aid Banner */}
-                <FirstAidBanner />
+                <FirstAidBanner textColor={C.textMain} />
 
                 {/* 3. CARD STATS */}
                 <div style={{ backgroundColor: C.bgCard, border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '20px 24px', display: 'flex', justifyContent: 'space-around' }}>

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export default function FirstAidBanner() {
+export default function FirstAidBanner({ textColor = '#F4F0EB' }: { textColor?: string }) {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
@@ -67,7 +67,7 @@ export default function FirstAidBanner() {
                         <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
                             <span style={{ fontSize: '18px', flexShrink: 0, marginTop: '1px' }}>🔴</span>
                             <div>
-                                <div style={{ fontSize: '13px', fontWeight: 900, color: '#F4F0EB', lineHeight: 1.3 }}>
+                                <div style={{ fontSize: '13px', fontWeight: 900, color: textColor, lineHeight: 1.3 }}>
                                     Llama al 911 ahora mismo
                                 </div>
                                 <div style={{ fontSize: '12px', color: '#9E9A95', marginTop: '2px', lineHeight: 1.4 }}>
@@ -80,7 +80,7 @@ export default function FirstAidBanner() {
                         <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
                             <span style={{ fontSize: '18px', flexShrink: 0, marginTop: '1px' }}>⛑️</span>
                             <div>
-                                <div style={{ fontSize: '13px', fontWeight: 900, color: '#F4F0EB', lineHeight: 1.3 }}>
+                                <div style={{ fontSize: '13px', fontWeight: 900, color: textColor, lineHeight: 1.3 }}>
                                     No retires el casco
                                 </div>
                                 <div style={{ fontSize: '12px', color: '#9E9A95', marginTop: '2px', lineHeight: 1.4 }}>
@@ -93,7 +93,7 @@ export default function FirstAidBanner() {
                         <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
                             <span style={{ fontSize: '18px', flexShrink: 0, marginTop: '1px' }}>📍</span>
                             <div>
-                                <div style={{ fontSize: '13px', fontWeight: 900, color: '#F4F0EB', lineHeight: 1.3 }}>
+                                <div style={{ fontSize: '13px', fontWeight: 900, color: textColor, lineHeight: 1.3 }}>
                                     Comparte tu ubicación
                                 </div>
                                 <div style={{ fontSize: '12px', color: '#9E9A95', marginTop: '2px', lineHeight: 1.4 }}>
