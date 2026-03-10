@@ -640,19 +640,19 @@ export default function DashboardPage() {
                                         </div>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                                             <label htmlFor="fullName" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Nombre Completo *</label>
-                                            <input type="text" id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                            <input type="text" id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                                 onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                 onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} required />
                                         </div>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                             <label htmlFor="age" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Edad</label>
-                                            <input type="number" id="age" value={age} onChange={(e) => setAge(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                            <input type="number" id="age" value={age} onChange={(e) => setAge(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                                 onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                 onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} min="0" max="130" />
                                         </div>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                             <label htmlFor="location" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Ciudad / País *</label>
-                                            <input type="text" id="location" value={location} onChange={(e) => setLocation(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                            <input type="text" id="location" value={location} onChange={(e) => setLocation(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                                 onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                 onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} required />
                                         </div>
@@ -671,19 +671,19 @@ export default function DashboardPage() {
                                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                 <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Nombre</label>
-                                                <input type="text" value={contact1Name} onChange={(e) => setContact1Name(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                <input type="text" value={contact1Name} onChange={(e) => setContact1Name(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                                     onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                     onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} required />
                                             </div>
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                 <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Teléfono</label>
-                                                <input type="tel" value={contact1Phone} onChange={(e) => setContact1Phone(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                <input type="tel" value={contact1Phone} onChange={(e) => setContact1Phone(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                                     onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                     onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} required />
                                             </div>
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                                                 <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Email (Opcional, para recibir alertas)</label>
-                                                <input type="email" value={contact1Email} onChange={(e) => setContact1Email(e.target.value)} placeholder="Email del contacto" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                <input type="email" value={contact1Email} onChange={(e) => setContact1Email(e.target.value)} placeholder="Email del contacto" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                                     onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                     onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                             </div>
@@ -695,19 +695,19 @@ export default function DashboardPage() {
                                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                 <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Nombre</label>
-                                                <input type="text" value={contact2Name} onChange={(e) => setContact2Name(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                <input type="text" value={contact2Name} onChange={(e) => setContact2Name(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                                     onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                     onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                             </div>
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                 <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Teléfono</label>
-                                                <input type="tel" value={contact2Phone} onChange={(e) => setContact2Phone(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                <input type="tel" value={contact2Phone} onChange={(e) => setContact2Phone(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                                     onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                     onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                             </div>
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                                                 <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Email (Opcional, para recibir alertas)</label>
-                                                <input type="email" value={contact2Email} onChange={(e) => setContact2Email(e.target.value)} placeholder="Email del contacto" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                <input type="email" value={contact2Email} onChange={(e) => setContact2Email(e.target.value)} placeholder="Email del contacto" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                                     onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                     onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                             </div>
@@ -719,19 +719,19 @@ export default function DashboardPage() {
                                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                 <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Nombre</label>
-                                                <input type="text" value={contact3Name} onChange={(e) => setContact3Name(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                <input type="text" value={contact3Name} onChange={(e) => setContact3Name(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                                     onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                     onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                             </div>
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                 <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Teléfono</label>
-                                                <input type="tel" value={contact3Phone} onChange={(e) => setContact3Phone(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                <input type="tel" value={contact3Phone} onChange={(e) => setContact3Phone(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                                     onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                     onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                             </div>
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                                                 <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Email (Opcional, para recibir alertas)</label>
-                                                <input type="email" value={contact3Email} onChange={(e) => setContact3Email(e.target.value)} placeholder="Email del contacto" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                <input type="email" value={contact3Email} onChange={(e) => setContact3Email(e.target.value)} placeholder="Email del contacto" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                                     onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                     onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                             </div>
@@ -749,36 +749,40 @@ export default function DashboardPage() {
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                             <label htmlFor="bloodType" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Tipo de Sangre *</label>
                                             <div style={{ position: "relative" }}>
-<select id="bloodType" value={bloodType} onChange={(e) => setBloodType(e.target.value)} style={{ appearance: "none", WebkitAppearance: "none", paddingRight: "36px",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s', fontFamily: 'monospace' }}
-                                                onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                                onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} required>
-                                                <option value="">Selecciona tu tipo de sangre</option>
-                                                <option value="A+">A+</option>
-                                                <option value="A-">A-</option>
-                                                <option value="B+">B+</option>
-                                                <option value="B-">B-</option>
-                                                <option value="AB+">AB+</option>
-                                                <option value="AB-">AB-</option>
-                                                <option value="O+">O+</option>
-                                                <option value="O-">O-</option>
-                                                <option value="Desconocido">Lo desconozco</option>
-                                            </select>
-<span style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#9E9A95", fontSize: "12px" }}>▼</span>
-</div>
+                                                <select id="bloodType" value={bloodType} onChange={(e) => setBloodType(e.target.value)} style={{ appearance: "none", WebkitAppearance: "none", paddingRight: "36px", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}
+                                                    onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} required>
+                                                    <option value="">Selecciona tu tipo de sangre</option>
+                                                    <option value="A+">A+</option>
+                                                    <option value="A-">A-</option>
+                                                    <option value="B+">B+</option>
+                                                    <option value="B-">B-</option>
+                                                    <option value="AB+">AB+</option>
+                                                    <option value="AB-">AB-</option>
+                                                    <option value="O+">O+</option>
+                                                    <option value="O-">O-</option>
+                                                    <option value="Desconocido">Lo desconozco</option>
+                                                </select>
+                                                <span style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#9E9A95", fontSize: "12px" }}>▼</span>
+                                            </div>
                                         </div>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                                             <label htmlFor="allergies" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Alergias Conocidas</label>
-                                            <input type="text" id="allergies" value={allergies} onChange={(e) => setAllergies(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                            <input type="text" id="allergies" value={allergies} onChange={(e) => setAllergies(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                                 onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                 onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                         </div>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                                             <label htmlFor="medicalConditions" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Condiciones Médicas</label>
-                                            <textarea id="medicalConditions" value={medicalConditions} onChange={(e) => setMedicalConditions(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: "100%", display: "flex", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", backgroundColor: "#1E1E1C", padding: "0 16px", transition: "all 0.2s ease-in-out" }} />
+                                            <textarea id="medicalConditions" value={medicalConditions} onChange={(e) => setMedicalConditions(e.target.value)} onInput={(e) => {
+                                                const target = e.target as HTMLTextAreaElement;
+                                                target.style.height = 'auto';
+                                                target.style.height = target.scrollHeight + 'px';
+                                            }} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: "100%", display: "flex", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", backgroundColor: "#1E1E1C", padding: "0 16px", transition: "all 0.2s ease-in-out", minHeight: '80px', height: 'auto', overflow: 'hidden', resize: 'none', lineHeight: '1.5', paddingTop: '12px', paddingBottom: '12px' }} />
                                         </div>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                                             <label htmlFor="importantMedications" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Medicamentos Importantes</label>
-                                            <textarea id="importantMedications" value={importantMedications} onChange={(e) => setImportantMedications(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: "100%", display: "flex", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", backgroundColor: "#1E1E1C", padding: "0 16px", transition: "all 0.2s ease-in-out" }} />
+                                            <textarea id="importantMedications" value={importantMedications} onChange={(e) => setImportantMedications(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: "100%", display: "flex", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", backgroundColor: "#1E1E1C", padding: "0 16px", transition: "all 0.2s ease-in-out" }} />
                                         </div>
                                     </div>
                                 </section>
@@ -800,20 +804,20 @@ export default function DashboardPage() {
                                         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                                             <label htmlFor="medicalSystem" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Sistema médico *</label>
                                             <div style={{ position: "relative" }}>
-<select id="medicalSystem" value={medicalSystem} onChange={(e) => setMedicalSystem(e.target.value)} required style={{ appearance: "none", WebkitAppearance: "none", paddingRight: "36px",  fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                                onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                                onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}>
-                                                <option value="">Selecciona un sistema</option>
-                                                <option value="Seguro Privado (Gastos Médicos Mayores)">Seguro Privado (Gastos Médicos Mayores)</option>
-                                                <option value="IMSS">IMSS</option>
-                                                <option value="ISSSTE">ISSSTE</option>
-                                                <option value="IMSS-BIENESTAR">IMSS-BIENESTAR</option>
-                                                <option value="PEMEX">PEMEX</option>
-                                                <option value="SEDENA / SEMAR">SEDENA / SEMAR</option>
-                                                <option value="Sin seguro médico">Sin seguro médico</option>
-                                            </select>
-<span style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#9E9A95", fontSize: "12px" }}>▼</span>
-</div>
+                                                <select id="medicalSystem" value={medicalSystem} onChange={(e) => setMedicalSystem(e.target.value)} required style={{ appearance: "none", WebkitAppearance: "none", paddingRight: "36px", fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                    onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}>
+                                                    <option value="">Selecciona un sistema</option>
+                                                    <option value="Seguro Privado (Gastos Médicos Mayores)">Seguro Privado (Gastos Médicos Mayores)</option>
+                                                    <option value="IMSS">IMSS</option>
+                                                    <option value="ISSSTE">ISSSTE</option>
+                                                    <option value="IMSS-BIENESTAR">IMSS-BIENESTAR</option>
+                                                    <option value="PEMEX">PEMEX</option>
+                                                    <option value="SEDENA / SEMAR">SEDENA / SEMAR</option>
+                                                    <option value="Sin seguro médico">Sin seguro médico</option>
+                                                </select>
+                                                <span style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#9E9A95", fontSize: "12px" }}>▼</span>
+                                            </div>
                                         </div>
 
                                         {/* CONDITIONAL RENDERINGS */}
@@ -822,49 +826,49 @@ export default function DashboardPage() {
                                                 <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                                                     <label htmlFor="aseguradora" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Aseguradora</label>
                                                     <div style={{ position: "relative" }}>
-<select id="aseguradora" value={aseguradora} onChange={(e) => setAseguradora(e.target.value)} style={{ appearance: "none", WebkitAppearance: "none", paddingRight: "36px",  fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                                        onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}>
-                                                        <option value="">Selecciona una aseguradora</option>
-                                                        <option value="AXA">AXA</option>
-                                                        <option value="GNP">GNP</option>
-                                                        <option value="Seguros Monterrey (SMNYL)">Seguros Monterrey (SMNYL)</option>
-                                                        <option value="Allianz">Allianz</option>
-                                                        <option value="MetLife">MetLife</option>
-                                                        <option value="Zurich">Zurich</option>
-                                                        <option value="BUPA">BUPA</option>
-                                                        <option value="Mapfre">Mapfre</option>
-                                                        <option value="Seguros Atlas">Seguros Atlas</option>
-                                                        <option value="Otro">Otro</option>
-                                                    </select>
-<span style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#9E9A95", fontSize: "12px" }}>▼</span>
-</div>
+                                                        <select id="aseguradora" value={aseguradora} onChange={(e) => setAseguradora(e.target.value)} style={{ appearance: "none", WebkitAppearance: "none", paddingRight: "36px", fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                            onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                                            onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}>
+                                                            <option value="">Selecciona una aseguradora</option>
+                                                            <option value="AXA">AXA</option>
+                                                            <option value="GNP">GNP</option>
+                                                            <option value="Seguros Monterrey (SMNYL)">Seguros Monterrey (SMNYL)</option>
+                                                            <option value="Allianz">Allianz</option>
+                                                            <option value="MetLife">MetLife</option>
+                                                            <option value="Zurich">Zurich</option>
+                                                            <option value="BUPA">BUPA</option>
+                                                            <option value="Mapfre">Mapfre</option>
+                                                            <option value="Seguros Atlas">Seguros Atlas</option>
+                                                            <option value="Otro">Otro</option>
+                                                        </select>
+                                                        <span style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#9E9A95", fontSize: "12px" }}>▼</span>
+                                                    </div>
                                                 </div>
                                                 {aseguradora === "Otro" && (
                                                     <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                                                         <label htmlFor="aseguradoraOtra" style={{ fontSize: "14px", fontWeight: 600, color: "#E8231A" }}>Especificar Aseguradora *</label>
-                                                        <input type="text" id="aseguradoraOtra" value={aseguradoraOtra} onChange={(e) => setAseguradoraOtra(e.target.value)} required style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: "100%", display: "flex", height: "48px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", backgroundColor: "#1E1E1C", padding: "8px 16px", transition: "all 0.2s ease-in-out" }} />
+                                                        <input type="text" id="aseguradoraOtra" value={aseguradoraOtra} onChange={(e) => setAseguradoraOtra(e.target.value)} required style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: "100%", display: "flex", height: "48px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", backgroundColor: "#1E1E1C", padding: "8px 16px", transition: "all 0.2s ease-in-out" }} />
                                                     </div>
                                                 )}
                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                     <label htmlFor="numeroPoliza" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Número de Póliza *</label>
-                                                    <input type="text" id="numeroPoliza" value={numeroPoliza} onChange={(e) => setNumeroPoliza(e.target.value)} required style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                    <input type="text" id="numeroPoliza" value={numeroPoliza} onChange={(e) => setNumeroPoliza(e.target.value)} required style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                                         onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                         onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                                 </div>
                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                     <label htmlFor="nombreAsegurado" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Nombre Asegurado Titular *</label>
-                                                    <input type="text" id="nombreAsegurado" value={nombreAsegurado} onChange={(e) => setNombreAsegurado(e.target.value)} required style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                    <input type="text" id="nombreAsegurado" value={nombreAsegurado} onChange={(e) => setNombreAsegurado(e.target.value)} required style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                                         onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                         onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                                 </div>
                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                     <label htmlFor="vigenciaPoliza" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Vigencia (Opcional)</label>
-                                                    <input type="date" id="vigenciaPoliza" value={vigenciaPoliza} onChange={(e) => setVigenciaPoliza(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }} onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'} onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
+                                                    <input type="date" id="vigenciaPoliza" value={vigenciaPoliza} onChange={(e) => setVigenciaPoliza(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }} onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'} onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                                 </div>
                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                                                     <label htmlFor="telefonoAseguradora" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Teléfono de Emergencias (Opcional)</label>
-                                                    <input type="tel" id="telefonoAseguradora" value={telefonoAseguradora} onChange={(e) => setTelefonoAseguradora(e.target.value)} placeholder="Ej: 800-123-4567" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                    <input type="tel" id="telefonoAseguradora" value={telefonoAseguradora} onChange={(e) => setTelefonoAseguradora(e.target.value)} placeholder="Ej: 800-123-4567" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                                         onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                         onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                                 </div>
@@ -919,13 +923,13 @@ export default function DashboardPage() {
                                                 </div>
                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                     <label htmlFor="clinicaAsignada" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>UMF / Clínica asignada (Opcional)</label>
-                                                    <input type="text" id="clinicaAsignada" value={clinicaAsignada} onChange={(e) => setClinicaAsignada(e.target.value)} placeholder="Ej: UMF 28, Monterrey" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                    <input type="text" id="clinicaAsignada" value={clinicaAsignada} onChange={(e) => setClinicaAsignada(e.target.value)} placeholder="Ej: UMF 28, Monterrey" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                                         onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                         onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                                 </div>
                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                                                     <label htmlFor="curpSeguro" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>CURP (Opcional)</label>
-                                                    <input type="text" id="curpSeguro" value={curpSeguro} onChange={(e) => setCurpSeguro(e.target.value.toUpperCase())} maxLength={18} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                    <input type="text" id="curpSeguro" value={curpSeguro} onChange={(e) => setCurpSeguro(e.target.value.toUpperCase())} maxLength={18} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                                         onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                         onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                                 </div>
@@ -942,13 +946,13 @@ export default function DashboardPage() {
                                                 </div>
                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                     <label htmlFor="clinicaAsignada" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Clínica asignada (Opcional)</label>
-                                                    <input type="text" id="clinicaAsignada" value={clinicaAsignada} onChange={(e) => setClinicaAsignada(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                    <input type="text" id="clinicaAsignada" value={clinicaAsignada} onChange={(e) => setClinicaAsignada(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                                         onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                         onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                                 </div>
                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                     <label htmlFor="curpSeguro" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>CURP (Opcional)</label>
-                                                    <input type="text" id="curpSeguro" value={curpSeguro} onChange={(e) => setCurpSeguro(e.target.value.toUpperCase())} maxLength={18} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                    <input type="text" id="curpSeguro" value={curpSeguro} onChange={(e) => setCurpSeguro(e.target.value.toUpperCase())} maxLength={18} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                                         onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                         onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                                 </div>
@@ -959,13 +963,13 @@ export default function DashboardPage() {
                                             <>
                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                     <label htmlFor="curpSeguro" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>CURP *</label>
-                                                    <input type="text" id="curpSeguro" value={curpSeguro} onChange={(e) => setCurpSeguro(e.target.value.toUpperCase())} required maxLength={18} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                    <input type="text" id="curpSeguro" value={curpSeguro} onChange={(e) => setCurpSeguro(e.target.value.toUpperCase())} required maxLength={18} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                                         onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                         onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                                 </div>
                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                     <label htmlFor="clinicaAsignada" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Centro de salud asignado (Opcional)</label>
-                                                    <input type="text" id="clinicaAsignada" value={clinicaAsignada} onChange={(e) => setClinicaAsignada(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                    <input type="text" id="clinicaAsignada" value={clinicaAsignada} onChange={(e) => setClinicaAsignada(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                                         onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                         onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                                 </div>
@@ -976,13 +980,13 @@ export default function DashboardPage() {
                                             <>
                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                     <label htmlFor="numeroAfiliacion" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Número de afiliación *</label>
-                                                    <input type="text" id="numeroAfiliacion" value={numeroAfiliacion} onChange={(e) => setNumeroAfiliacion(e.target.value)} required style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                    <input type="text" id="numeroAfiliacion" value={numeroAfiliacion} onChange={(e) => setNumeroAfiliacion(e.target.value)} required style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                                         onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                         onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                                 </div>
                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                     <label htmlFor="clinicaAsignada" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Unidad médica asignada (Opcional)</label>
-                                                    <input type="text" id="clinicaAsignada" value={clinicaAsignada} onChange={(e) => setClinicaAsignada(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                    <input type="text" id="clinicaAsignada" value={clinicaAsignada} onChange={(e) => setClinicaAsignada(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                                         onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                         onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                                 </div>
@@ -997,7 +1001,7 @@ export default function DashboardPage() {
                                         )}
 
                                         <div style={{ display: "flex", flexDirection: "column", gap: "12px", alignItems: "center", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "16px" }}>
-                                            <input type="checkbox" id="organDonor" checked={organDonor} onChange={(e) => setOrganDonor(e.target.checked)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: "20px", height: "20px", borderRadius: "4px", color: "#E8231A" }} />
+                                            <input type="checkbox" id="organDonor" checked={organDonor} onChange={(e) => setOrganDonor(e.target.checked)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: "20px", height: "20px", borderRadius: "4px", color: "#E8231A" }} />
                                             <label htmlFor="organDonor" style={{ fontSize: "14px", fontWeight: 600 }}>Soy donante oficial de órganos</label>
                                         </div>
 
@@ -1012,19 +1016,19 @@ export default function DashboardPage() {
                                     </h3>
 
                                     <div style={{ display: "flex", flexDirection: "column", gap: "12px", alignItems: "center", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", marginBottom: "24px" }}>
-                                        <input type="checkbox" id="isMotorcyclist" checked={isMotorcyclist} onChange={(e) => setIsMotorcyclist(e.target.checked)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: "20px", height: "20px", borderRadius: "4px", color: "#E8231A" }} />
+                                        <input type="checkbox" id="isMotorcyclist" checked={isMotorcyclist} onChange={(e) => setIsMotorcyclist(e.target.checked)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: "20px", height: "20px", borderRadius: "4px", color: "#E8231A" }} />
                                         <label htmlFor="isMotorcyclist" style={{ fontSize: "14px", fontWeight: 700, color: "#E8231A" }}>Mostrar Alerta de "No Retirar Casco" (Motociclistas)</label>
                                     </div>
 
                                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                                             <label htmlFor="additionalNotes" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Notas Adicionales</label>
-                                            <textarea id="additionalNotes" value={additionalNotes} onChange={(e) => setAdditionalNotes(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: "100%", display: "flex", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", backgroundColor: "#1E1E1C", padding: "0 16px", transition: "all 0.2s ease-in-out" }} />
+                                            <textarea id="additionalNotes" value={additionalNotes} onChange={(e) => setAdditionalNotes(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: "100%", display: "flex", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", backgroundColor: "#1E1E1C", padding: "0 16px", transition: "all 0.2s ease-in-out" }} />
                                         </div>
                                         <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                 <label htmlFor="hospitalName" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Hospital o clínica de preferencia</label>
-                                                <input type="text" id="hospitalName" value={hospitalName} onChange={(e) => setHospitalName(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",  width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                <input type="text" id="hospitalName" value={hospitalName} onChange={(e) => setHospitalName(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                                     onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                     onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Ejemplo: Hospital Ángeles Lindavista" />
                                                 <p style={{ fontSize: "12px", color: "#9E9A95" }}>En caso de emergencia, el personal médico determinará el hospital más adecuado según tu estado de salud y criterio profesional. Este dato es solo una referencia.</p>
