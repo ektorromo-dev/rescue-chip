@@ -210,31 +210,6 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
     if (!hasConsented && !sessionExpired) {
         return (
             <div style={{ minHeight: '100vh', backgroundColor: C.bgPage, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}>
-
-                <button
-                    onClick={toggleTheme}
-                    style={{
-                        position: 'fixed',
-                        top: '12px',
-                        right: '12px',
-                        zIndex: 999,
-                        background: C.bgCard,
-                        border: `1px solid ${C.borderSoft}`,
-                        borderRadius: '999px',
-                        padding: '7px 14px',
-                        cursor: 'pointer',
-                        fontSize: '12px',
-                        fontWeight: 700,
-                        color: C.textMuted,
-                        fontFamily: "'Inter', sans-serif",
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                    }}
-                >
-                    {theme === 'day' ? '🌙 Noche' : '☀️ Día'}
-                </button>
                 <div style={{ backgroundColor: C.bgCard, width: '100%', maxWidth: '480px', borderRadius: '20px', padding: '48px 32px', border: '1px solid rgba(255,255,255,0.08)' }}>
                     <ShieldAlert size={48} style={{ margin: '0 auto', color: C.red, marginBottom: '24px', display: 'block' }} />
                     <h1 style={{ fontSize: '28px', fontWeight: 900, textAlign: 'center', marginBottom: '16px', color: C.textMain }}>Acceso Restringido</h1>
@@ -288,10 +263,35 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
     return (
         <div style={{ minHeight: '100vh', backgroundColor: C.bgPage, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingBottom: '48px', paddingTop: '48px', WebkitTouchCallout: 'none', userSelect: 'none', position: 'relative', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}>
 
+            <button
+                onClick={toggleTheme}
+                style={{
+                    position: 'fixed',
+                    top: '12px',
+                    right: '12px',
+                    zIndex: 999,
+                    background: C.bgCard,
+                    border: `1px solid ${C.borderSoft}`,
+                    borderRadius: '999px',
+                    padding: '7px 14px',
+                    cursor: 'pointer',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    color: C.textMuted,
+                    fontFamily: "'Inter', sans-serif",
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                }}
+            >
+                {theme === 'day' ? '🌙 Noche' : '☀️ Día'}
+            </button>
+
             {/* Watermark */}
-            <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 100, backgroundColor: C.tickerBg, color: C.tickerText, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', opacity: 1 }}>
+            <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 1, backgroundColor: C.tickerBg, color: C.tickerText, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', opacity: 0.045 }}>
                 {Array.from({ length: 20 }).map((_, i) => (
-                    <div key={i} style={{ whiteSpace: 'nowrap', transform: 'rotate(-45deg)', fontSize: '36px', fontWeight: 900, marginBottom: '96px' }}>
+                    <div key={i} style={{ whiteSpace: 'nowrap', transform: 'rotate(-45deg)', fontSize: '11px', fontWeight: 900, marginBottom: '96px' }}>
                         CONFIDENCIAL - ACCESO REGISTRADO - {new Date().toLocaleDateString('es-MX', { timeZone: 'America/Mexico_City' })}
                     </div>
                 ))}
