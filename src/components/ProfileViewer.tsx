@@ -147,6 +147,30 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
     };
 
     // --- RENDER CONSENT SCREEN ---
+    
+    const logScan = async (tipo: 'emergencia' | 'consulta') => {
+        try {
+            let latitud: number | null = null;
+            let longitud: number | null = null;
+            if (navigator.geolocation) {
+                await new Promise<void>((resolve) => {
+                    navigator.geolocation.getCurrentPosition(
+                        (pos) => { latitud = pos.coords.latitude; longitud = pos.coords.longitude; resolve(); },
+                        () => resolve(),
+                        { timeout: 3000 }
+                    );
+                });
+            }
+            await fetch('/api/log-scan', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chip_folio: chip.folio, tipo, latitud, longitud }),
+            });
+        } catch (e) {
+            console.error('logScan error:', e);
+        }
+    };
+
     if (!hasConsented && !sessionExpired) {
         return (
             <div style={{ minHeight: '100vh', backgroundColor: '#0A0A08', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}>
@@ -160,7 +184,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         <button
-                            onClick={() => handleConsent('emergencia')}
+                            onClick={() => { handleConsent('emergencia'); logScan('emergencia'); }}
                             disabled={isLoadingConsent}
                             style={{ width: '100%', backgroundColor: '#E8231A', color: '#F4F0EB', padding: '14px 24px', borderRadius: '12px', fontWeight: 900, fontSize: '14px', border: 'none', cursor: isLoadingConsent ? 'not-allowed' : 'pointer', textTransform: 'uppercase', opacity: isLoadingConsent ? 0.5 : 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px' }}
                         >
@@ -171,7 +195,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
                         </button>
 
                         <button
-                            onClick={() => handleConsent('prueba')}
+                            onClick={() => { handleConsent('prueba'); logScan('consulta'); }}
                             disabled={isLoadingConsent}
                             style={{ width: '100%', backgroundColor: 'transparent', border: '1px solid rgba(255,255,255,0.12)', color: '#9E9A95', padding: '12px 24px', borderRadius: '12px', fontWeight: 600, fontSize: '13px', cursor: isLoadingConsent ? 'not-allowed' : 'pointer', opacity: isLoadingConsent ? 0.5 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
                         >

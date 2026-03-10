@@ -840,11 +840,11 @@ function ActivationFormContent() {
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                             <label htmlFor="medicalConditions" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Condiciones Médicas (Opcional)</label>
-                            <textarea id="medicalConditions" name="medicalConditions" style={{ width: "100%", display: "flex", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", backgroundColor: "#1E1E1C", padding: "0 16px", fontSize: "14px", transition: "all 0.2s ease-in-out" }} placeholder="Ej. Asma, Diabetes Tipo 1, Hipertensión..." />
+                            <textarea id="medicalConditions" name="medicalConditions" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s', minHeight: '80px', resize: 'none', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }} placeholder="Ej. Asma, Diabetes Tipo 1, Hipertensión..." />
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                             <label htmlFor="importantMedications" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Medicamentos Importantes (Opcional)</label>
-                            <textarea id="importantMedications" name="importantMedications" style={{ width: "100%", display: "flex", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", backgroundColor: "#1E1E1C", padding: "0 16px", fontSize: "14px", transition: "all 0.2s ease-in-out" }} placeholder="Ej. Insulina, anticoagulantes..." />
+                            <textarea id="importantMedications" name="importantMedications" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s', minHeight: '80px', resize: 'none', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }} placeholder="Ej. Insulina, anticoagulantes..." />
                         </div>
                     </div>
                 </section>
@@ -1095,7 +1095,7 @@ function ActivationFormContent() {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                             <label htmlFor="additionalNotes" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Notas Adicionales (Opcional)</label>
-                            <textarea id="additionalNotes" name="additionalNotes" style={{ width: "100%", display: "flex", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", backgroundColor: "#1E1E1C", padding: "0 16px", fontSize: "14px", transition: "all 0.2s ease-in-out" }} placeholder="Cualquier información adicional que los paramédicos o doctores deban saber." />
+                            <textarea id="additionalNotes" name="additionalNotes" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s', minHeight: '80px', resize: 'none', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }} placeholder="Cualquier información adicional que los paramédicos o doctores deban saber." />
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                             <label htmlFor="googleMapsLink" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Hospital o clínica de preferencia (Opcional)</label>
