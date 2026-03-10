@@ -440,31 +440,32 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
                     <FirstAidBanner textColor={C.textMain} />
 
                     {/* 3. CARD STATS */}
-                    <div style={{ backgroundColor: C.bgCard, border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '20px 24px', display: 'flex', justifyContent: 'space-around' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', flex: 1, minWidth: 0, width: '100%', overflow: 'visible' }}>
+                    <div style={{ backgroundColor: C.bgCard, border: `1px solid ${C.border}`, borderRadius: '16px', padding: '20px 24px', display: 'grid', gridTemplateColumns: '1fr 1px 1fr' }}>
+                        {/* Tipo de Sangre */}
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', padding: '0 8px' }}>
                             <Droplets size={24} style={{ color: C.red, marginBottom: '4px' }} />
-                            <span style={{ fontSize: '11px', color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Tipo de Sangre</span>
+                            <span style={{ fontSize: '11px', color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.08em', textAlign: 'center' }}>Tipo de Sangre</span>
                             <span style={{
-                                fontSize: (profile.blood_type && profile.blood_type.toLowerCase() !== 'desconocido')
-                                    ? ((profile.blood_type.length ?? 0) > 4 ? '11px' : '28px')
-                                    : '28px',
+                                fontSize: '28px',
                                 fontWeight: 900,
                                 color: C.red,
                                 textAlign: 'center',
                                 lineHeight: '1.2',
-                                display: 'block',
-                                width: '100%',
                             }}>
-                                {(profile.blood_type && profile.blood_type.toLowerCase() !== 'desconocido')
+                                {(profile.blood_type && !profile.blood_type.toLowerCase().includes('desconoc') && profile.blood_type.trim() !== '')
                                     ? profile.blood_type
                                     : '—'}
                             </span>
                         </div>
-                        <div style={{ width: '1px', backgroundColor: C.border }} />
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', flex: 1, minWidth: 0, overflow: 'hidden' }}>
+                        {/* Divider */}
+                        <div style={{ backgroundColor: C.border }} />
+                        {/* Donador */}
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', padding: '0 8px' }}>
                             <CheckCircle2 size={24} style={{ color: profile.organ_donor ? C.green : C.textMuted, marginBottom: '4px' }} />
-                            <span style={{ fontSize: '11px', color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Donador</span>
-                            <span style={{ fontSize: '28px', fontWeight: 900, color: C.textMain, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>{profile.organ_donor ? "SÍ" : "NO"}</span>
+                            <span style={{ fontSize: '11px', color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.08em', textAlign: 'center' }}>Donador</span>
+                            <span style={{ fontSize: '28px', fontWeight: 900, color: C.textMain, textAlign: 'center', lineHeight: '1.2' }}>
+                                {profile.organ_donor ? 'SÍ' : 'NO'}
+                            </span>
                         </div>
                     </div>
 
