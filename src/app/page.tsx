@@ -605,7 +605,7 @@ export default function Home() {
         <video className="hero-video" autoPlay muted loop playsInline preload="auto"
           onCanPlay={(e) => { const v = e.currentTarget; v.muted = true; v.play().catch(() => { }); }}
         >
-          <source src={`${SB}5195181-uhd_4096_2160_25fps.mp4`} type="video/mp4" />
+          <source src={`${SB}Heartbeat%201.mp4`} type="video/mp4" />
         </video>
         <div className="hero-overlay" />
         <div className="hero-grain" />
