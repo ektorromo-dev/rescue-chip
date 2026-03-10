@@ -540,8 +540,7 @@ export default function DashboardPage() {
                     </div>
 
                     <h1 style={{ fontSize: "36px", fontWeight: 900, position: "relative", zIndex: 10, display: "flex", alignItems: "center", gap: "12px" }}>
-                        <LayoutDashboard size={40} style={{ display: "block" }} />
-                        Mi Panel de Control
+                        🏍️ Mi Perfil Médico
                     </h1>
                     <p style={{ position: "relative", zIndex: 10, fontSize: "20px", fontWeight: 500, maxWidth: "512px" }}>
                         Actualiza tu información médica en cualquier momento.
@@ -557,7 +556,7 @@ export default function DashboardPage() {
                     )}
 
                     {successMsg && (
-                        <div style={{ marginBottom: "32px", padding: "16px", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", fontSize: "14px", fontWeight: 600, display: "flex", alignItems: "center", gap: "8px" }}>
+                        <div style={{ marginBottom: "32px", padding: "14px 16px", border: "1px solid rgba(34,197,94,0.4)", borderRadius: "12px", fontSize: "14px", fontWeight: 700, display: "flex", alignItems: "center", gap: "10px", backgroundColor: "rgba(34,197,94,0.08)", color: "#22c55e" }}>
                             <CheckCircle2 size={18} /> {successMsg}
                         </div>
                     )}
