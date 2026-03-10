@@ -66,13 +66,35 @@ export default function FirstAidBanner({ textColor = '#F4F0EB' }: { textColor?: 
                         {/* Paso 1 */}
                         <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
                             <span style={{ fontSize: '18px', flexShrink: 0, marginTop: '1px' }}>🔴</span>
-                            <div>
+                            <div style={{ width: '100%' }}>
                                 <div style={{ fontSize: '13px', fontWeight: 900, color: textColor, lineHeight: 1.3 }}>
                                     Llama al 911 ahora mismo
                                 </div>
                                 <div style={{ fontSize: '12px', color: '#9E9A95', marginTop: '2px', lineHeight: 1.4 }}>
                                     No muevas al motociclista. Espera a los paramédicos.
                                 </div>
+                                <a
+                                    href="tel:911"
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '8px',
+                                        width: '100%',
+                                        padding: '14px',
+                                        margin: '8px 0',
+                                        backgroundColor: '#E8231A',
+                                        color: '#FFFFFF',
+                                        borderRadius: '12px',
+                                        fontWeight: 800,
+                                        fontSize: '16px',
+                                        textDecoration: 'none',
+                                        letterSpacing: '0.04em',
+                                        boxShadow: '0 4px 12px rgba(232,35,26,0.4)',
+                                    }}
+                                >
+                                    🚨 LLAMAR AL 911 AHORA
+                                </a>
                             </div>
                         </div>
 
@@ -106,7 +128,7 @@ export default function FirstAidBanner({ textColor = '#F4F0EB' }: { textColor?: 
                         <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
                             <span style={{ fontSize: '18px', flexShrink: 0, marginTop: '1px' }}>📋</span>
                             <div>
-                                <div style={{ fontSize: '13px', fontWeight: 900, color: '#F4F0EB', lineHeight: 1.3 }}>
+                                <div style={{ fontSize: '13px', fontWeight: 900, color: textColor, lineHeight: 1.3 }}>
                                     Muestra este perfil al paramédico
                                 </div>
                                 <div style={{ fontSize: '12px', color: '#9E9A95', marginTop: '2px', lineHeight: 1.4 }}>
