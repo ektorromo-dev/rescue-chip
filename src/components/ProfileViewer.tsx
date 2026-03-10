@@ -269,7 +269,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
             {/* Watermark */}
             <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.045, pointerEvents: 'none', zIndex: 1, overflow: 'hidden' }}>
                 {Array.from({ length: 20 }).map((_, i) => (
-                    <div key={i} style={{ whiteSpace: 'nowrap', transform: 'rotate(-45deg)', fontSize: '11px', fontWeight: 900, marginBottom: '96px', color: C.tickerText, backgroundColor: C.tickerBg }}>
+                    <div key={i} style={{ whiteSpace: 'nowrap', transform: 'rotate(-45deg)', fontSize: '11px', fontWeight: 900, marginBottom: '96px', color: C.textMuted }}>
                         CONFIDENCIAL - ACCESO REGISTRADO - {new Date().toLocaleDateString('es-MX', { timeZone: 'America/Mexico_City' })}
                     </div>
                 ))}
@@ -426,7 +426,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
 
                     {/* 3. CARD STATS */}
                     <div style={{ backgroundColor: C.bgCard, border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '20px 24px', display: 'flex', justifyContent: 'space-around' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', flex: 1, minWidth: 0, overflow: 'hidden' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', flex: 1, minWidth: 0, width: '100%', overflow: 'visible' }}>
                             <Droplets size={24} style={{ color: C.red, marginBottom: '4px' }} />
                             <span style={{ fontSize: '11px', color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Tipo de Sangre</span>
                             <span style={{

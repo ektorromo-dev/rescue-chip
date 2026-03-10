@@ -39,7 +39,7 @@ export default function FirstAidBanner({ textColor = '#F4F0EB' }: { textColor?: 
                             ¿No eres paramédico?
                         </div>
                         <div style={{
-                            fontSize: '11px', color: '#9E9A95', marginTop: '2px',
+                            fontSize: '11px', color: textColor, marginTop: '2px',
                             textDecoration: 'underline', textDecorationStyle: 'dotted'
                         }}>
                             Toca aquí para ver cómo ayudar
@@ -70,7 +70,7 @@ export default function FirstAidBanner({ textColor = '#F4F0EB' }: { textColor?: 
                                 <div style={{ fontSize: '13px', fontWeight: 900, color: textColor, lineHeight: 1.3 }}>
                                     Llama al 911 ahora mismo
                                 </div>
-                                <div style={{ fontSize: '12px', color: '#9E9A95', marginTop: '2px', lineHeight: 1.4 }}>
+                                <div style={{ fontSize: '12px', color: textColor, marginTop: '2px', lineHeight: 1.4 }}>
                                     No muevas al motociclista. Espera a los paramédicos.
                                 </div>
                                 <a
@@ -105,8 +105,21 @@ export default function FirstAidBanner({ textColor = '#F4F0EB' }: { textColor?: 
                                 <div style={{ fontSize: '13px', fontWeight: 900, color: textColor, lineHeight: 1.3 }}>
                                     No retires el casco
                                 </div>
-                                <div style={{ fontSize: '12px', color: '#9E9A95', marginTop: '2px', lineHeight: 1.4 }}>
+                                <div style={{ fontSize: '12px', color: textColor, marginTop: '2px', lineHeight: 1.4 }}>
                                     Solo personal capacitado debe hacerlo.
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Paso Hemorragia */}
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '8px 0', borderBottom: `1px solid rgba(0,0,0,0.06)` }}>
+                            <span style={{ fontSize: '18px' }}>🩸</span>
+                            <div>
+                                <div style={{ fontSize: '13px', fontWeight: 900, color: textColor, lineHeight: 1.3 }}>
+                                    Controla hemorragias
+                                </div>
+                                <div style={{ fontSize: '12px', color: textColor, marginTop: '2px', lineHeight: 1.4, opacity: 0.7 }}>
+                                    Presiona la herida con un trapo limpio sin soltar. No retires el trapo aunque se empape.
                                 </div>
                             </div>
                         </div>
@@ -118,7 +131,7 @@ export default function FirstAidBanner({ textColor = '#F4F0EB' }: { textColor?: 
                                 <div style={{ fontSize: '13px', fontWeight: 900, color: textColor, lineHeight: 1.3 }}>
                                     Comparte tu ubicación
                                 </div>
-                                <div style={{ fontSize: '12px', color: '#9E9A95', marginTop: '2px', lineHeight: 1.4 }}>
+                                <div style={{ fontSize: '12px', color: textColor, marginTop: '2px', lineHeight: 1.4 }}>
                                     Describe referencias exactas al operador del 911.
                                 </div>
                             </div>
@@ -131,7 +144,7 @@ export default function FirstAidBanner({ textColor = '#F4F0EB' }: { textColor?: 
                                 <div style={{ fontSize: '13px', fontWeight: 900, color: textColor, lineHeight: 1.3 }}>
                                     Muestra este perfil al paramédico
                                 </div>
-                                <div style={{ fontSize: '12px', color: '#9E9A95', marginTop: '2px', lineHeight: 1.4 }}>
+                                <div style={{ fontSize: '12px', color: textColor, marginTop: '2px', lineHeight: 1.4 }}>
                                     Contiene tipo de sangre, alergias y contactos de emergencia.
                                 </div>
                             </div>
