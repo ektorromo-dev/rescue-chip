@@ -316,7 +316,8 @@ function ActivationFormContent() {
                 organ_donor: organDonor,
                 is_motorcyclist: isMotorcyclist,
                 additional_notes: formData.get("additionalNotes") as string,
-                google_maps_link: formData.get("googleMapsLink") as string,
+                hospital_name: formData.get("hospitalName") as string || null,
+                google_maps_link: formData.get("googleMapsLink") as string || null,
                 aseguradora: finalAseguradora || null,
                 numero_poliza: formData.get("numeroPoliza") as string || null,
                 tipo_seguro: formData.get("tipoSeguro") as string || null,
@@ -1098,11 +1099,33 @@ function ActivationFormContent() {
                             <textarea id="additionalNotes" name="additionalNotes" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s', minHeight: '80px', resize: 'none', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }} placeholder="Cualquier información adicional que los paramédicos o doctores deban saber." />
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
-                            <label htmlFor="googleMapsLink" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Hospital o clínica de preferencia (Opcional)</label>
-                            <input type="text" id="googleMapsLink" name="googleMapsLink" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                            <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>
+                                Hospital o clínica de preferencia (Opcional)
+                            </label>
+                            <input
+                                type="text"
+                                id="hospitalName"
+                                name="hospitalName"
+                                style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s', marginBottom: '12px' }}
                                 onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Ejemplo: Hospital Ángeles Lindavista" />
-                            <p style={{ fontSize: "12px", color: "#9E9A95" }}>En caso de emergencia, el personal médico determinará el hospital más adecuado según tu estado de salud y criterio profesional. Este dato es solo una referencia.</p>
+                                onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+                                placeholder="Ejemplo: Hospital Ángeles Lindavista"
+                            />
+                            <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>
+                                Ubicación (Google Maps, Waze u otro link) (Opcional)
+                            </label>
+                            <input
+                                type="url"
+                                id="googleMapsLink"
+                                name="googleMapsLink"
+                                style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s', marginBottom: '8px' }}
+                                onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+                                placeholder="https://maps.google.com/..."
+                            />
+                            <p style={{ fontSize: '12px', color: '#9E9A95' }}>
+                                En caso de emergencia, el personal médico determinará el hospital más adecuado. Este dato es solo una referencia.
+                            </p>
                         </div>
                     </div>
                 </section>

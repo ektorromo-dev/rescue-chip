@@ -1031,6 +1031,19 @@ export default function DashboardPage() {
                                                     onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                     onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Ejemplo: Hospital Ángeles Lindavista" />
                                                 <p style={{ fontSize: "12px", color: "#9E9A95" }}>En caso de emergencia, el personal médico determinará el hospital más adecuado según tu estado de salud y criterio profesional. Este dato es solo una referencia.</p>
+                                                <label htmlFor="googleMapsLink" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px', marginTop: '12px' }}>
+                                                    Ubicación (Google Maps, Waze u otro link)
+                                                </label>
+                                                <input
+                                                    type="url"
+                                                    id="googleMapsLink"
+                                                    value={googleMapsLink}
+                                                    onChange={(e) => setGoogleMapsLink(e.target.value)}
+                                                    style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                    onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+                                                    placeholder="https://maps.google.com/..."
+                                                />
                                             </div>
                                         </div>
                                     </div>
