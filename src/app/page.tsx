@@ -602,11 +602,22 @@ export default function Home() {
 
       {/* HERO */}
       <section className="hero">
-        <video className="hero-video" autoPlay muted loop playsInline preload="auto"
-          onCanPlay={(e) => { const v = e.currentTarget; v.muted = true; v.play().catch(() => { }); }}
-        >
-          <source src="https://kaihkhyqjmattriozick.supabase.co/storage/v1/object/public/Media%20Landing%20Page/Ambulancia%201.mp4" type="video/mp4" />
-        </video>
+        <iframe
+          src="https://www.youtube.com/embed/Fxe5OhX0Ra0?autoplay=1&mute=1&loop=1&playlist=Fxe5OhX0Ra0&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1"
+          allow="autoplay; fullscreen"
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            width: '100vw',
+            height: '56.25vw',
+            minHeight: '100vh',
+            minWidth: '177.78vh',
+            transform: 'translate(-50%, -50%)',
+            border: 'none',
+            pointerEvents: 'none',
+          }}
+        />
         <div className="hero-overlay" />
         <div className="hero-grain" />
         <div className="hero-accent" />
