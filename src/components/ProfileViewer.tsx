@@ -335,7 +335,16 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', flex: 1, minWidth: 0, overflow: 'hidden' }}>
                         <Droplets size={24} style={{ color: '#E8231A', marginBottom: '4px' }} />
                         <span style={{ fontSize: '11px', color: '#9E9A95', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Tipo de Sangre</span>
-                        <span style={{ fontSize: '28px', fontWeight: 900, color: '#F4F0EB', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>{profile.blood_type || "N/A"}</span>
+                        <span style={{
+                            fontSize: (profile.blood_type?.length ?? 0) > 4 ? '14px' : '28px',
+                            fontWeight: 900,
+                            color: '#F4F0EB',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            maxWidth: '100%',
+                            lineHeight: '1.2'
+                        }}>{profile.blood_type || "N/A"}</span>
                     </div>
                     <div style={{ width: '1px', backgroundColor: 'rgba(255,255,255,0.08)' }} />
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', flex: 1, minWidth: 0, overflow: 'hidden' }}>
