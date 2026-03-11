@@ -603,10 +603,10 @@ export default function DashboardPage() {
                                         <span style={{ backgroundColor: "rgba(232,35,26,0.12)", color: "#E8231A", width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", flexShrink: 0, fontWeight: 600 }}>1</span>
                                         Identificación
                                     </h3>
-                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
                                         <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "16px" }}>
                                             <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Foto de Perfil</label>
-                                            <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "16px" }}>
+                                            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "16px" }}>
                                                 {photoFile ? (
                                                     <div style={{ width: "120px", height: "120px", minWidth: "120px", minHeight: "120px", borderRadius: "50%", overflow: "hidden", backgroundColor: "#1A1A18", border: "4px solid #131311", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.3)", flexShrink: 0 }}>
                                                         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -667,7 +667,7 @@ export default function DashboardPage() {
 
                                     <div style={{ padding: "16px", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", display: "flex", flexDirection: "column", gap: "16px" }}>
                                         <h4 style={{ fontSize: "14px", fontWeight: 700, color: "#E8231A" }}>Contacto 1 (Requerido)</h4>
-                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                 <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Nombre</label>
                                                 <input type="text" value={contact1Name} onChange={(e) => setContact1Name(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
@@ -691,7 +691,7 @@ export default function DashboardPage() {
 
                                     <div style={{ padding: "16px", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", display: "flex", flexDirection: "column", gap: "16px" }}>
                                         <h4 style={{ fontSize: "14px", fontWeight: 700 }}>Contacto 2 (Opcional)</h4>
-                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                 <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Nombre</label>
                                                 <input type="text" value={contact2Name} onChange={(e) => setContact2Name(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
@@ -715,7 +715,7 @@ export default function DashboardPage() {
 
                                     <div style={{ padding: "16px", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", display: "flex", flexDirection: "column", gap: "16px" }}>
                                         <h4 style={{ fontSize: "14px", fontWeight: 700 }}>Contacto 3 (Opcional)</h4>
-                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                                 <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Nombre</label>
                                                 <input type="text" value={contact3Name} onChange={(e) => setContact3Name(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
@@ -744,7 +744,7 @@ export default function DashboardPage() {
                                         <span style={{ backgroundColor: "rgba(232,35,26,0.12)", color: "#E8231A", width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", flexShrink: 0, fontWeight: 600 }}>3</span>
                                         Información Médica
                                     </h3>
-                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                             <label htmlFor="bloodType" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Tipo de Sangre *</label>
                                             <div style={{ position: "relative" }}>
@@ -884,7 +884,7 @@ export default function DashboardPage() {
                                                         <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Documento Póliza (PDF, JPG, PNG)</label>
                                                         <p style={{ fontSize: "12px", color: "#9E9A95" }}>Sube el extracto de tu póliza (máx 5MB). Se mostrará a paramédicos.</p>
                                                     </div>
-                                                    <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "16px" }}>
+                                                    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "16px" }}>
                                                         {polizaFile ? (
                                                             <div style={{ padding: "0 16px", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", color: "#E8231A", fontWeight: 700, fontSize: "14px", display: "flex", alignItems: "center", gap: "8px" }}>
                                                                 📄 {polizaFile.name}
@@ -1018,7 +1018,7 @@ export default function DashboardPage() {
                                         <label htmlFor="isMotorcyclist" style={{ fontSize: "14px", fontWeight: 700, color: "#E8231A" }}>Mostrar Alerta de "No Retirar Casco" (Motociclistas)</label>
                                     </div>
 
-                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                                             <label htmlFor="additionalNotes" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Notas Adicionales</label>
                                             <textarea id="additionalNotes" value={additionalNotes} onChange={(e) => setAdditionalNotes(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: "100%", display: "flex", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", backgroundColor: "#1E1E1C", padding: "0 16px", transition: "all 0.2s ease-in-out" }} />
