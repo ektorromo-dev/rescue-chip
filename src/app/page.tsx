@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import CheckoutModal from "@/components/CheckoutModal";
 import { createClient } from "@/lib/supabase/client";
 import { Menu, X } from "lucide-react";
 
@@ -497,6 +498,7 @@ const LANDING_CSS = `
 const SB = "https://kaihkhyqjmattriozick.supabase.co/storage/v1/object/public/Media%20Landing%20Page/";
 
 export default function Home() {
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [session, setSession] = useState<{ user?: { email?: string } } | null>(null);
   const [navScrolled, setNavScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -562,6 +564,7 @@ export default function Home() {
 
   return (
     <div className="landing-root">
+      <CheckoutModal plan={selectedPlan} onClose={() => setSelectedPlan(null)} />
       <style dangerouslySetInnerHTML={{ __html: LANDING_CSS }} />
 
       {/* NAV */}
@@ -834,7 +837,7 @@ export default function Home() {
                 <li>1 chip NFC programado</li><li>Perfil médico completo</li>
                 <li>2 contactos de emergencia</li><li>Alertas SMS + email</li><li>Envío incluido</li>
               </ul>
-              <Link href="/shop" className="btn-price btn-price-outline">Elegir Individual</Link>
+              <button onClick={() => setSelectedPlan("individual")} className="btn-price btn-price-outline">Elegir Individual</button>
             </div>
             <div className="price-card featured">
               <div className="price-name">Pareja</div>
@@ -846,7 +849,7 @@ export default function Home() {
                 <li>2 chips NFC programados</li><li>Perfiles médicos independientes</li>
                 <li>Contactos cruzados configurables</li><li>Alertas SMS + email para ambos</li><li>Envío incluido</li>
               </ul>
-              <Link href="/shop" className="btn-price btn-price-solid">Elegir Pareja</Link>
+              <button onClick={() => setSelectedPlan("pareja")} className="btn-price btn-price-solid">Elegir Pareja</button>
             </div>
             <div className="price-card">
               <div className="price-name">Familiar</div>
@@ -858,7 +861,7 @@ export default function Home() {
                 <li>Pack familiar (hasta 4 chips)</li><li>Perfiles médicos individuales</li>
                 <li>Red de contactos compartida</li><li>Dashboard familiar unificado</li><li>Envío incluido</li>
               </ul>
-              <Link href="/shop" className="btn-price btn-price-outline">Elegir Familiar</Link>
+              <button onClick={() => setSelectedPlan("familiar")} className="btn-price btn-price-outline">Elegir Familiar</button>
             </div>
           </div>
         </div>
