@@ -550,7 +550,7 @@ export default function DashboardPage() {
                 <div style={{ padding: "48px", position: "relative", backgroundColor: "#131311" }}>
 
                     {errorMsg && (
-                        <div style={{ marginBottom: "32px", padding: "16px", color: "#E8231A", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", fontSize: "14px", fontWeight: 600, display: "flex", alignItems: "center", gap: "8px" }}>
+                        <div style={{ marginBottom: "32px", padding: "8px 0", color: "#E8231A", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", fontSize: "14px", fontWeight: 600, display: "flex", alignItems: "center", gap: "8px" }}>
                             <AlertCircle size={18} /> {errorMsg}
                         </div>
                     )}
@@ -665,7 +665,7 @@ export default function DashboardPage() {
                                         Contactos de Emergencia
                                     </h3>
 
-                                    <div style={{ padding: "16px", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", display: "flex", flexDirection: "column", gap: "16px" }}>
+                                    <div style={{ padding: "8px 0", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", display: "flex", flexDirection: "column", gap: "16px" }}>
                                         <h4 style={{ fontSize: "14px", fontWeight: 700, color: "#E8231A" }}>Contacto 1 (Requerido)</h4>
                                         <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -689,7 +689,7 @@ export default function DashboardPage() {
                                         </div>
                                     </div>
 
-                                    <div style={{ padding: "16px", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", display: "flex", flexDirection: "column", gap: "16px" }}>
+                                    <div style={{ padding: "8px 0", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", display: "flex", flexDirection: "column", gap: "16px" }}>
                                         <h4 style={{ fontSize: "14px", fontWeight: 700 }}>Contacto 2 (Opcional)</h4>
                                         <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -713,7 +713,7 @@ export default function DashboardPage() {
                                         </div>
                                     </div>
 
-                                    <div style={{ padding: "16px", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", display: "flex", flexDirection: "column", gap: "16px" }}>
+                                    <div style={{ padding: "8px 0", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", display: "flex", flexDirection: "column", gap: "16px" }}>
                                         <h4 style={{ fontSize: "14px", fontWeight: 700 }}>Contacto 3 (Opcional)</h4>
                                         <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -998,7 +998,7 @@ export default function DashboardPage() {
                                             </>
                                         )}
 
-                                        <div style={{ display: "flex", flexDirection: "column", gap: "12px", alignItems: "center", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "16px" }}>
+                                        <div style={{ display: "flex", flexDirection: "column", gap: "12px", alignItems: "center", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "8px 0" }}>
                                             <input type="checkbox" id="organDonor" checked={organDonor} onChange={(e) => setOrganDonor(e.target.checked)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: "20px", height: "20px", borderRadius: "4px", color: "#E8231A" }} />
                                             <label htmlFor="organDonor" style={{ fontSize: "14px", fontWeight: 600 }}>Soy donante oficial de órganos</label>
                                         </div>
