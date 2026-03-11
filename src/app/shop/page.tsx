@@ -175,7 +175,7 @@ export default function ShopPage() {
 
         return (
             <div style={{ position: 'fixed', top: 0, right: 0, bottom: 0, left: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px", backgroundColor: 'rgba(0,0,0,0.85)', overflowY: 'auto' }}>
-                <div style={{ backgroundColor: "#1A1A18", width: "100%", maxWidth: "768px", borderRadius: "24px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)", display: "flex", flexDirection: "column" }}>
+                <div style={{ backgroundColor: "#1A1A18", width: "100%", maxWidth: "768px", borderRadius: "24px", overflowY: "auto", maxHeight: "90vh", border: "1px solid rgba(255,255,255,0.08)", display: "flex", flexDirection: "column" }}>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "24px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
                         <div>
                             <h3 style={{ fontSize: "20px", fontWeight: 900, display: "flex", alignItems: "center", gap: "8px" }}>

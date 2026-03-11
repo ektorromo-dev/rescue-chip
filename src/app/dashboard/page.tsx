@@ -572,7 +572,7 @@ export default function DashboardPage() {
 
                                 {/* ENLACE PUBLICO */}
                                 {folio && (
-                                    <section style={{ border: "1px solid rgba(255,255,255,0.08)", borderLeft: "4px solid #D97706", borderRadius: "16px", padding: "24px", display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: "16px", backgroundColor: "rgba(217,119,6,0.04)" }}>
+                                    <section style={{ border: "1px solid rgba(255,255,255,0.08)", borderLeft: "4px solid #D97706", borderRadius: "16px", padding: "24px", display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "16px", backgroundColor: "rgba(217,119,6,0.04)" }}>
                                         <div>
                                             <h3 style={{ fontWeight: 900, color: "#D97706", display: "flex", alignItems: "center", gap: "8px", fontSize: "16px", letterSpacing: "0.025em" }}>
                                                 <CheckCircle2 size={18} /> Chips Vinculados: {folio.toUpperCase()}
@@ -817,6 +817,12 @@ export default function DashboardPage() {
                                                 </select>
                                                 <span style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#9E9A95", fontSize: "12px" }}>▼</span>
                                             </div>
+                                            {medicalSystem === "Sin seguro médico" && (
+                                                <div style={{ marginTop: "8px", padding: "12px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", fontSize: "14px", color: "#9E9A95", backgroundColor: "rgba(255,255,255,0.02)" }}>
+                                                    <p style={{ fontWeight: 600, color: "#F4F0EB", marginBottom: "4px" }}>Aviso:</p>
+                                                    En caso de emergencia serás atendido en el hospital público más cercano. Te recomendamos considerar un seguro de gastos médicos mayores para una mejor atención.
+                                                </div>
+                                            )}
                                         </div>
 
                                         {/* CONDITIONAL RENDERINGS */}
@@ -990,13 +996,6 @@ export default function DashboardPage() {
                                                         onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                                 </div>
                                             </>
-                                        )}
-
-                                        {medicalSystem === "Sin seguro médico" && (
-                                            <div style={{ padding: "16px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", fontSize: "14px", color: "#9E9A95" }}>
-                                                <p style={{ fontWeight: 600, color: "#F4F0EB" }}>Aviso:</p>
-                                                En caso de emergencia serás atendido en el hospital público más cercano. Te recomendamos considerar un seguro de gastos médicos mayores para una mejor atención.
-                                            </div>
                                         )}
 
                                         <div style={{ display: "flex", flexDirection: "column", gap: "12px", alignItems: "center", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "16px" }}>
