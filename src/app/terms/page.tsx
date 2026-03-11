@@ -11,7 +11,7 @@ export default function TermsOfService() {
                     <Scale size={48} style={{ color: '#E8231A', margin: '0 auto 16px', display: 'block' }} />
                     <h1 style={{ fontSize: '32px', fontWeight: 900, color: '#F4F0EB', margin: '0 0 8px', letterSpacing: '-0.02em' }}>Términos de Servicio</h1>
                     <p style={{ color: '#9E9A95', fontSize: '14px', margin: 0 }}>
-                        Última actualización: {new Date().toLocaleDateString('es-MX')}
+                        Última actualización: 10 de marzo de 2026
                     </p>
                 </div>
 
