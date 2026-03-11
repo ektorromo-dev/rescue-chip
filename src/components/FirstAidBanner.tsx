@@ -76,21 +76,18 @@ export default function FirstAidBanner({ textColor = '#F4F0EB' }: { textColor?: 
                                 <a
                                     href="tel:911"
                                     style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        gap: '8px',
+                                        display: 'block',
                                         width: '100%',
-                                        padding: '14px',
-                                        margin: '8px 0',
+                                        textAlign: 'center',
                                         backgroundColor: '#E8231A',
-                                        color: '#FFFFFF',
+                                        color: 'white',
+                                        padding: '14px 16px',
                                         borderRadius: '12px',
-                                        fontWeight: 800,
-                                        fontSize: '16px',
+                                        fontWeight: 900,
+                                        fontSize: '15px',
                                         textDecoration: 'none',
-                                        letterSpacing: '0.04em',
-                                        boxShadow: '0 4px 12px rgba(232,35,26,0.4)',
+                                        marginTop: '16px',
+                                        boxSizing: 'border-box'
                                     }}
                                 >
                                     🚨 LLAMAR AL 911 AHORA
