@@ -186,7 +186,7 @@ export default function AdminDashboard() {
   )
 
   return (
-    <div className="min-h-screen bg-[#0f1117] text-[#f0f6fc] font-sans pb-24 selection:bg-red-500/30">
+    <div className="bg-[#0f1117] text-[#f0f6fc] font-sans selection:bg-red-500/30" style={{ minHeight: 'auto', paddingBottom: '32px' }}>
 
       {/* 🧭 HEADER & MOBILE TABS */}
       <div className="sticky top-0 bg-[#0f1117]/90 backdrop-blur-md border-b border-[#2d3139] z-40">

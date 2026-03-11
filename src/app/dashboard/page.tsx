@@ -622,7 +622,7 @@ export default function DashboardPage() {
                                                         📷
                                                     </div>
                                                 )}
-                                                <div >
+                                                <div style={{ overflow: "hidden", maxWidth: "100%" }}>
                                                     <input
                                                         type="file"
                                                         accept="image/*"
@@ -799,7 +799,7 @@ export default function DashboardPage() {
                                             </button>
                                         )}
                                     </h3>
-                                    <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "16px", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.08)" }}>
+                                    <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "16px", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.08)" }}>
                                         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                                             <label htmlFor="medicalSystem" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Sistema médico *</label>
                                             <div style={{ position: "relative" }}>
@@ -818,7 +818,7 @@ export default function DashboardPage() {
                                                 <span style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#9E9A95", fontSize: "12px" }}>▼</span>
                                             </div>
                                             {medicalSystem === "Sin seguro médico" && (
-                                                <div style={{ marginTop: "8px", padding: "12px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", fontSize: "14px", color: "#9E9A95", backgroundColor: "rgba(255,255,255,0.02)" }}>
+                                                <div style={{ marginTop: "8px", padding: "12px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", fontSize: "14px", color: "#9E9A95", backgroundColor: "rgba(255,255,255,0.02)", maxWidth: "100%", boxSizing: "border-box", wordBreak: "break-word" }}>
                                                     <p style={{ fontWeight: 600, color: "#F4F0EB", marginBottom: "4px" }}>Aviso:</p>
                                                     En caso de emergencia serás atendido en el hospital público más cercano. Te recomendamos considerar un seguro de gastos médicos mayores para una mejor atención.
                                                 </div>
