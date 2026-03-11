@@ -427,7 +427,6 @@ const LANDING_CSS = `
       border-radius:8px;
     }
     .price-card.featured{
-      order:-1;
       border:1px solid var(--red);
     }
     .price-name{ font-size:17px; }
