@@ -547,7 +547,7 @@ export default function DashboardPage() {
                     </p>
                 </div>
 
-                <div style={{ padding: "48px", position: "relative", backgroundColor: "#131311" }}>
+                <div style={{ padding: "32px 0", position: "relative", backgroundColor: "#131311" }}>
 
                     {errorMsg && (
                         <div style={{ marginBottom: "32px", padding: "8px 0", color: "#E8231A", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", fontSize: "14px", fontWeight: 600, display: "flex", alignItems: "center", gap: "8px" }}>
