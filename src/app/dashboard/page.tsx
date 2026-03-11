@@ -87,13 +87,13 @@ export default function DashboardPage() {
             const localDeviceId = document.cookie.split('; ').find(row => row.startsWith('rescuechip_device_id='))?.split('=')[1];
             if (!localDeviceId) return;
 
-            const { data } = await supabase
+            const { data, error } = await supabase
                 .from('user_sessions')
                 .select('status')
                 .eq('device_id', localDeviceId)
-                .single();
+                .maybeSingle();
 
-            if (!data || data.status === 'revoked') {
+            if (!error && (!data || data.status === 'revoked')) {
                 clearInterval(sessionCheck);
                 await supabase.auth.signOut();
                 window.location.href = '/login';
