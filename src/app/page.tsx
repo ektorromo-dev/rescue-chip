@@ -415,6 +415,13 @@ const LANDING_CSS = `
       gap:12px;
       margin-top:32px;
     }
+    .pricing-cards { 
+      grid-template-columns: 1fr; 
+      gap: 12px; 
+      border: none; 
+      background: transparent; 
+      border-radius: 0; 
+    }
     .price-card{
       padding:24px 20px;
       border-radius:8px;
