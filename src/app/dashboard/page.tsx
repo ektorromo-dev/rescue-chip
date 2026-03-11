@@ -524,8 +524,8 @@ export default function DashboardPage() {
     }
 
     return (
-        <div style={{ minHeight: "100vh", backgroundColor: "#0A0A08", display: "flex", flexDirection: "column", alignItems: "center", padding: "24px 16px" }}>
-            <div style={{ colorScheme: 'dark', maxWidth: '768px', width: '100%', backgroundColor: "#1A1A18", borderRadius: "16px", boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)", border: "1px solid rgba(255,255,255,0.08)", padding: "clamp(16px, 5vw, 32px)" }}>
+        <div style={{ minHeight: "100vh", backgroundColor: "#0A0A08", display: "flex", flexDirection: "column", alignItems: "stretch", padding: "0" }}>
+            <div style={{ colorScheme: 'dark', maxWidth: '768px', width: '100%', margin: '0 auto', padding: '16px' }}>
                 {/* Header */}
                 <div style={{ position: "relative", overflow: "hidden" }}>
                     <div style={{ position: "absolute", top: 0, right: 0, width: "320px", height: "320px", borderRadius: "9999px" }} />
