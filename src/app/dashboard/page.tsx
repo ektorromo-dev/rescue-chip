@@ -547,7 +547,7 @@ export default function DashboardPage() {
                     </p>
                 </div>
 
-                <div style={{ padding: "32px 0", position: "relative", backgroundColor: "#131311" }}>
+                <div style={{ padding: "32px 16px", position: "relative", backgroundColor: "#131311" }}>
 
                     {errorMsg && (
                         <div style={{ marginBottom: "32px", padding: "8px 0", color: "#E8231A", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", fontSize: "14px", fontWeight: 600, display: "flex", alignItems: "center", gap: "8px" }}>
@@ -606,7 +606,7 @@ export default function DashboardPage() {
                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
                                         <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "16px" }}>
                                             <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Foto de Perfil</label>
-                                            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "16px" }}>
+                                            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "16px" }}>
                                                 {photoFile ? (
                                                     <div style={{ width: "120px", height: "120px", minWidth: "120px", minHeight: "120px", borderRadius: "50%", overflow: "hidden", backgroundColor: "#1A1A18", border: "4px solid #131311", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.3)", flexShrink: 0 }}>
                                                         {/* eslint-disable-next-line @next/next/no-img-element */}
