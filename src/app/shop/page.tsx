@@ -133,7 +133,7 @@ export default function ShopPage() {
                                 <p style={{ fontSize: "13px", color: "#9E9A95", marginBottom: "16px" }}>50 chips a $179 c/u</p>
                                 <div style={{ fontSize: "28px", fontWeight: 900, color: "#F4F0EB", marginBottom: "20px" }}>$8,950 MXN</div>
                             </div>
-                            <Link href="https://wa.me/5215551433904?text=Hola%2C%20me%20interesa%20el%20plan%20Starter%20de%20RescueChip%20(50%20chips)%20para%20mi%20negocio." target="_blank" rel="noopener noreferrer" style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", height: "44px", borderRadius: "12px", fontWeight: 700, fontSize: "14px", backgroundColor: "transparent", color: "#F4F0EB", border: "1px solid rgba(255,255,255,0.15)" }}>
+                            <Link href="https://wa.me/525551433904?text=Hola%2C%20me%20interesa%20el%20plan%20Starter%20de%20RescueChip%20(50%20chips%20a%20%24179%20c%2Fu).%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener noreferrer" style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", height: "44px", borderRadius: "12px", fontWeight: 700, fontSize: "14px", backgroundColor: "transparent", color: "#F4F0EB", border: "1px solid rgba(255,255,255,0.15)" }}>
                                 Solicitar
                             </Link>
                         </div>
@@ -148,7 +148,7 @@ export default function ShopPage() {
                                 <p style={{ fontSize: "13px", color: "#9E9A95", marginBottom: "16px" }}>100 chips a $149 c/u</p>
                                 <div style={{ fontSize: "28px", fontWeight: 900, color: "#E8231A", marginBottom: "20px" }}>$14,900 MXN</div>
                             </div>
-                            <Link href="https://wa.me/5215551433904?text=Hola%2C%20me%20interesa%20el%20plan%20Growth%20de%20RescueChip%20(100%20chips)%20para%20mi%20negocio." target="_blank" rel="noopener noreferrer" style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", height: "44px", borderRadius: "12px", fontWeight: 900, fontSize: "14px", backgroundColor: "#E8231A", color: "#FFF", border: "none" }}>
+                            <Link href="https://wa.me/525551433904?text=Hola%2C%20me%20interesa%20el%20plan%20Growth%20de%20RescueChip%20(100%20chips%20a%20%24149%20c%2Fu).%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener noreferrer" style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", height: "44px", borderRadius: "12px", fontWeight: 900, fontSize: "14px", backgroundColor: "#E8231A", color: "#FFF", border: "none" }}>
                                 Solicitar
                             </Link>
                         </div>
@@ -160,7 +160,7 @@ export default function ShopPage() {
                                 <p style={{ fontSize: "13px", color: "#9E9A95", marginBottom: "16px" }}>300+ chips a $119 c/u</p>
                                 <div style={{ fontSize: "22px", fontWeight: 900, color: "#F4F0EB", marginBottom: "20px" }}>Precio negociable</div>
                             </div>
-                            <Link href="https://wa.me/5215551433904?text=Hola%2C%20me%20interesa%20el%20plan%20Premium%20de%20RescueChip%20(300%2B%20chips)%20para%20mi%20agencia." target="_blank" rel="noopener noreferrer" style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", height: "44px", borderRadius: "12px", fontWeight: 700, fontSize: "14px", backgroundColor: "transparent", color: "#F4F0EB", border: "1px solid rgba(255,255,255,0.15)" }}>
+                            <Link href="https://wa.me/525551433904?text=Hola%2C%20me%20interesa%20el%20plan%20Premium%20de%20RescueChip%20(300%2B%20chips).%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener noreferrer" style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", height: "44px", borderRadius: "12px", fontWeight: 700, fontSize: "14px", backgroundColor: "transparent", color: "#F4F0EB", border: "1px solid rgba(255,255,255,0.15)" }}>
                                 Contáctanos
                             </Link>
                         </div>
