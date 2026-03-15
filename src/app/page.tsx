@@ -885,7 +885,7 @@ export default function Home() {
                 <li>50 chips NFC programados</li><li>Panel de administración de folios</li>
                 <li>Material de punto de venta incluido</li><li>Soporte por WhatsApp</li>
               </ul>
-              <a href="https://wa.me/52XXXXXXXXXX" className="btn-agency-outline">Solicitar</a>
+              <a href="https://wa.me/525551433904?text=Hola%2C%20me%20interesa%20el%20plan%20Starter%20de%20RescueChip%20(50%20chips%20a%20%24179%20c%2Fu).%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener noreferrer" className="btn-agency-outline">Solicitar</a>
             </div>
             <div className="agency-card featured">
               <span className="agency-badge">Recomendado</span>
@@ -897,7 +897,7 @@ export default function Home() {
                 <li>100 chips NFC programados</li><li>Panel de administración de folios</li>
                 <li>Material de punto de venta incluido</li><li>Capacitación para tu equipo de ventas</li><li>Soporte prioritario</li>
               </ul>
-              <a href="https://wa.me/52XXXXXXXXXX" className="btn-agency-solid">Solicitar</a>
+              <a href="https://wa.me/525551433904?text=Hola%2C%20me%20interesa%20el%20plan%20Growth%20de%20RescueChip%20(100%20chips%20a%20%24149%20c%2Fu).%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener noreferrer" className="btn-agency-solid">Solicitar</a>
             </div>
             <div className="agency-card dark-card-agency">
               <div className="agency-tier">Premium</div>
@@ -908,7 +908,7 @@ export default function Home() {
                 <li>300+ chips NFC programados</li><li>Panel de administración avanzado</li>
                 <li>Integración con tu sistema de CRM</li><li>Capacitación y material completo</li><li>Gerente de cuenta dedicado</li>
               </ul>
-              <a href="https://wa.me/52XXXXXXXXXX" className="btn-agency-outline">Contáctanos</a>
+              <a href="https://wa.me/525551433904?text=Hola%2C%20me%20interesa%20el%20plan%20Premium%20de%20RescueChip%20(300%2B%20chips).%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener noreferrer" className="btn-agency-outline">Contáctanos</a>
             </div>
           </div>
         </div>
