@@ -24,6 +24,7 @@ function ActivationFormContent() {
     const [showPassword, setShowPassword] = useState(false);
     const [phone, setPhone] = useState("");
     const [whatsappOptedIn, setWhatsappOptedIn] = useState(true);
+    const [consentimientoPublico, setConsentimientoPublico] = useState(false);
 
     // Estado del flujo "Chip extra"
     const [existingProfileToLink, setExistingProfileToLink] = useState<any>(null);
@@ -1131,7 +1132,24 @@ function ActivationFormContent() {
                 </section>
 
 
-                <button type="submit" disabled={loading} style={{ marginTop: '32px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', backgroundColor: '#E8231A', color: '#fff', height: '64px', borderRadius: '16px', fontSize: '20px', fontWeight: 900, border: 'none', cursor: 'pointer', transition: 'background-color 0.2s' }}>
+                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer', marginBottom: '16px' }}>
+                    <input
+                        type="checkbox"
+                        checked={consentimientoPublico}
+                        onChange={(e) => setConsentimientoPublico(e.target.checked)}
+                        style={{ marginTop: '2px', flexShrink: 0, accentColor: '#E8231A' }}
+                    />
+                    <span style={{ fontSize: '13px', color: '#9E9A95', lineHeight: '1.5' }}>
+                        Entiendo y acepto que mi perfil de emergencia (tipo de sangre, alergias y datos médicos críticos)
+                        será accesible públicamente mediante el escaneo del chip NFC o código QR de mi casco,
+                        como condición esencial del servicio. He leído el{' '}
+                        <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: '#E8231A' }}>
+                            aviso de privacidad
+                        </a>.
+                    </span>
+                </label>
+
+                <button type="submit" disabled={loading || !consentimientoPublico} style={{ marginTop: '16px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', backgroundColor: '#E8231A', color: '#fff', height: '64px', borderRadius: '16px', fontSize: '20px', fontWeight: 900, border: 'none', cursor: (!consentimientoPublico || loading) ? 'not-allowed' : 'pointer', opacity: (!consentimientoPublico) ? 0.4 : 1, transition: 'all 0.2s' }}>
                     {loading ? <Loader2 size={24} /> : <CheckCircle2 size={24} />}
                     {loading ? "Registrando Ficha..." : "Aceptar y Activar Chip"}
                 </button>

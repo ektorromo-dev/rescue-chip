@@ -50,6 +50,10 @@ export default function PrivacyPolicy() {
                         {
                             title: '6. Consentimiento explícito',
                             content: 'Al activar el servicio de RescueChip y completar el formulario de registro, usted otorga su consentimiento expreso para el tratamiento de sus datos personales sensibles según lo estipulado en este aviso de privacidad.'
+                        },
+                        {
+                            title: 'Accesibilidad pública del perfil de emergencia',
+                            content: 'Al activar su chip NFC o código QR RescueChip, el titular otorga consentimiento expreso para que su perfil de emergencia —incluyendo tipo de sangre, alergias, padecimientos, medicamentos críticos y contactos de emergencia— sea accesible públicamente mediante el escaneo del chip NFC o código QR asociado a su folio personal, sin requerir autenticación adicional. Esta accesibilidad pública es condición esencial del servicio y tiene como único propósito facilitar la atención médica prehospitalaria en situaciones de emergencia. El titular puede ejercer su derecho de cancelación en cualquier momento mediante el panel de usuario en rescue-chip.com/dashboard.'
                         }
                     ].map((section, i) => (
                         <div key={i} style={{ marginBottom: '32px' }}>

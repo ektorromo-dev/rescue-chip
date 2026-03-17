@@ -79,6 +79,11 @@ export default function DashboardPage() {
     const [loadingLogs, setLoadingLogs] = useState(false);
     const [expandedLogId, setExpandedLogId] = useState<string | null>(null);
 
+    // Delete Account Data State
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [deletingData, setDeletingData] = useState(false);
+    const [deleteConfirmText, setDeleteConfirmText] = useState('');
+
     // Este useEffect corre SIEMPRE que el usuario esté autenticado en el dashboard
     useEffect(() => {
         const sessionCheck = setInterval(async () => {
@@ -339,6 +344,42 @@ export default function DashboardPage() {
         await supabase.auth.signOut();
         router.push("/login");
     };
+
+    async function handleDeleteData() {
+        if (deleteConfirmText !== 'ELIMINAR') return;
+        setDeletingData(true);
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) throw new Error("No session");
+            const { error } = await supabase
+                .from('profiles')
+                .update({
+                    full_name: null,
+                    blood_type: null,
+                    allergies: null,
+                    medical_conditions: null,
+                    important_medications: null,
+                    emergency_contacts: null,
+                    insurance_provider: null,
+                    policy_number: null,
+                    medical_system: null,
+                    organ_donor: false,
+                    hospital_name: null,
+                    google_maps_link: null,
+                    photo_url: null,
+                })
+                .eq('user_id', session.user.id);
+            if (error) throw error;
+            setShowDeleteConfirm(false);
+            setDeleteConfirmText('');
+            alert('Tus datos han sido eliminados del sistema.');
+            window.location.reload();
+        } catch (err) {
+            alert('Ocurrió un error al eliminar tus datos. Intenta de nuevo.');
+        } finally {
+            setDeletingData(false);
+        }
+    }
 
     // handlers removed since validation happens in email now
 
@@ -1127,6 +1168,72 @@ export default function DashboardPage() {
                                 )}
                             </div>
                         </>
+                    )}
+
+                    {/* ZONA DE PELIGRO - ELIMINAR DATOS */}
+                    <div style={{ backgroundColor: "rgba(220,38,38,0.05)", border: "1px solid rgba(220,38,38,0.3)", borderRadius: "16px", padding: "24px", marginTop: "40px" }}>
+                        <h3 style={{ fontSize: "20px", fontWeight: 700, display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px", color: "#F4F0EB" }}>
+                            Zona de Peligro
+                        </h3>
+                        <p style={{ fontSize: "14px", color: "#9E9A95", marginBottom: "16px", lineHeight: 1.5 }}>
+                            Al eliminar tus datos, tu perfil médico quedará completamente en blanco. Los paramédicos que escaneen tu chip o código QR no podrán ver nombre, tipo de sangre, alergias, contactos de emergencia, ni ninguna otra información crítica. Esta acción es <strong>permanente</strong> y no se puede deshacer.
+                        </p>
+                        <button
+                            onClick={() => setShowDeleteConfirm(true)}
+                            style={{
+                                backgroundColor: "transparent",
+                                color: "#E8231A",
+                                border: "1px solid rgba(232,35,26,0.3)",
+                                padding: "12px 24px",
+                                borderRadius: "12px",
+                                fontSize: "14px",
+                                fontWeight: 700,
+                                cursor: "pointer",
+                                transition: "all 0.2s"
+                            }}
+                            onMouseOver={(e) => { e.currentTarget.style.backgroundColor = "rgba(232,35,26,0.1)"; }}
+                            onMouseOut={(e) => { e.currentTarget.style.backgroundColor = "transparent"; }}
+                        >
+                            Eliminar toda mi información
+                        </button>
+                    </div>
+
+                    {/* Delete Confirmation Modal */}
+                    {showDeleteConfirm && (
+                        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, backgroundColor: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
+                            <div style={{ backgroundColor: '#131311', border: '1px solid rgba(232,35,26,0.4)', borderRadius: '24px', padding: '32px', maxWidth: '440px', width: '100%', textAlign: 'center' }}>
+                                <AlertCircle size={48} style={{ color: '#E8231A', margin: '0 auto 16px' }} />
+                                <h3 style={{ fontSize: '24px', fontWeight: 900, color: '#F4F0EB', marginBottom: '8px' }}>¿Estás seguro?</h3>
+                                <p style={{ fontSize: '14px', color: '#9E9A95', marginBottom: '24px', lineHeight: 1.5 }}>
+                                    Esto borrará permanentemente tu nombre, contactos de emergencia, alergias y toda tu historia médica de RescueChip. Tu chip quedará en blanco.
+                                </p>
+                                <p style={{ fontSize: '14px', color: '#F4F0EB', fontWeight: 700, marginBottom: '16px' }}>
+                                    Para confirmar, escribe <span style={{ color: '#E8231A', userSelect: 'none' }}>ELIMINAR</span> a continuación:
+                                </p>
+                                <input
+                                    type="text"
+                                    value={deleteConfirmText}
+                                    onChange={(e) => setDeleteConfirmText(e.target.value)}
+                                    placeholder="ELIMINAR"
+                                    style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', borderRadius: '12px', color: '#F4F0EB', fontSize: '16px', textAlign: 'center', outline: 'none', marginBottom: '24px', textTransform: 'uppercase' }}
+                                />
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                                    <button
+                                        onClick={() => { setShowDeleteConfirm(false); setDeleteConfirmText(''); }}
+                                        style={{ backgroundColor: 'transparent', color: '#F4F0EB', border: '1px solid rgba(255,255,255,0.2)', padding: '14px', borderRadius: '12px', fontSize: '14px', fontWeight: 700, cursor: 'pointer' }}
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button
+                                        onClick={handleDeleteData}
+                                        disabled={deleteConfirmText !== 'ELIMINAR' || deletingData}
+                                        style={{ backgroundColor: '#E8231A', color: 'white', border: 'none', padding: '14px', borderRadius: '12px', fontSize: '14px', fontWeight: 700, cursor: deleteConfirmText === 'ELIMINAR' && !deletingData ? 'pointer' : 'not-allowed', opacity: deleteConfirmText === 'ELIMINAR' && !deletingData ? 1 : 0.4 }}
+                                    >
+                                        {deletingData ? 'Borrando...' : 'Sí, eliminar datos'}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     )}
                 </div>
             </div>

@@ -172,7 +172,11 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
             window.removeEventListener("keydown", handleKeyDown);
         };
     }, [hasConsented, isDemo, sessionExpired]);
-
+    function nombreCorto(fullName: string | null | undefined): string {
+        if (!fullName?.trim()) return "Motociclista";
+        const partes = fullName.trim().split(/\s+/);
+        return partes.length === 1 ? partes[0] : `${partes[0]} ${partes[1]}`;
+    }
 
     const formatTime = (seconds: number) => {
         const m = Math.floor(seconds / 60);
@@ -397,7 +401,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
                             ) : profile.photo_url ? (
                                 <img
                                     src={profile.photo_url}
-                                    alt={profile.full_name}
+                                    alt={nombreCorto(profile.full_name)}
                                     style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                                 />
                             ) : (
@@ -406,7 +410,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                                     fontSize: '40px', fontWeight: 900, color: C.textMuted
                                 }}>
-                                    {profile.full_name?.charAt(0) || '?'}
+                                    {nombreCorto(profile.full_name)?.charAt(0) || '?'}
                                 </div>
                             )}
                         </div>
@@ -417,7 +421,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
                                 fontSize: '22px', fontWeight: 900, color: C.textMain,
                                 margin: 0, lineHeight: 1.2
                             }}>
-                                {isDemo ? 'Carlos Martínez' : profile.full_name}
+                                {isDemo ? 'Carlos Martínez' : nombreCorto(profile.full_name)}
                             </h2>
                             <p style={{
                                 fontSize: '14px', color: C.textMuted, marginTop: '6px', marginBottom: 0
@@ -702,7 +706,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
                     >
                         <img
                             src={profile.photo_url}
-                            alt={profile.full_name}
+                            alt={nombreCorto(profile.full_name)}
                             style={{
                                 maxWidth: '90vw', maxHeight: '85vh',
                                 borderRadius: '16px',
