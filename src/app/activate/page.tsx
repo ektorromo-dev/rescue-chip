@@ -25,6 +25,7 @@ function ActivationFormContent() {
     const [phone, setPhone] = useState("");
     const [whatsappOptedIn, setWhatsappOptedIn] = useState(true);
     const [consentimientoPublico, setConsentimientoPublico] = useState(false);
+    const [sexo, setSexo] = useState<string>('');
 
     // Estado del flujo "Chip extra"
     const [existingProfileToLink, setExistingProfileToLink] = useState<any>(null);
@@ -93,6 +94,12 @@ function ActivationFormContent() {
 
         if (phone.length < 10) {
             setErrorMsg("El número de celular debe tener 10 dígitos.");
+            setLoading(false);
+            return;
+        }
+
+        if (!sexo) {
+            setErrorMsg("Por favor, selecciona tu sexo.");
             setLoading(false);
             return;
         }
@@ -307,6 +314,7 @@ function ActivationFormContent() {
                 phone: `+52${phone}`,
                 whatsapp_opted_in: whatsappOptedIn,
                 age: age,
+                sexo: sexo,
                 location: formData.get("location") as string,
                 emergency_contacts: emergencyContacts,
                 blood_type: formData.get("bloodType") as string,
@@ -684,6 +692,29 @@ function ActivationFormContent() {
                             <input type="text" id="fullName" name="fullName" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                 onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                 onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Juan Pérez" required />
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                            <label style={{ fontSize: '13px', color: '#9E9A95', fontWeight: 500 }}>
+                                Sexo <span style={{ color: '#E8231A' }}>*</span>
+                            </label>
+                            <select
+                                value={sexo}
+                                onChange={(e) => setSexo(e.target.value)}
+                                style={{
+                                    width: '100%',
+                                    padding: '12px',
+                                    backgroundColor: '#1A1A18',
+                                    border: sexo ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(232,35,26,0.3)',
+                                    borderRadius: '10px',
+                                    color: sexo ? '#F4F0EB' : '#9E9A95',
+                                    fontSize: '14px'
+                                }}
+                            >
+                                <option value="" disabled>Selecciona tu sexo</option>
+                                <option value="masculino">Masculino</option>
+                                <option value="femenino">Femenino</option>
+                                <option value="prefiero_no_decir">Prefiero no decirlo</option>
+                            </select>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                             <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Número de Celular *</label>
@@ -1149,7 +1180,7 @@ function ActivationFormContent() {
                     </span>
                 </label>
 
-                <button type="submit" disabled={loading || !consentimientoPublico} style={{ marginTop: '16px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', backgroundColor: '#E8231A', color: '#fff', height: '64px', borderRadius: '16px', fontSize: '20px', fontWeight: 900, border: 'none', cursor: (!consentimientoPublico || loading) ? 'not-allowed' : 'pointer', opacity: (!consentimientoPublico) ? 0.4 : 1, transition: 'all 0.2s' }}>
+                <button type="submit" disabled={loading || !consentimientoPublico || !sexo} style={{ marginTop: '16px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', backgroundColor: '#E8231A', color: '#fff', height: '64px', borderRadius: '16px', fontSize: '20px', fontWeight: 900, border: 'none', cursor: (!consentimientoPublico || loading || !sexo) ? 'not-allowed' : 'pointer', opacity: (!consentimientoPublico || !sexo) ? 0.4 : 1, transition: 'all 0.2s' }}>
                     {loading ? <Loader2 size={24} /> : <CheckCircle2 size={24} />}
                     {loading ? "Registrando Ficha..." : "Aceptar y Activar Chip"}
                 </button>
