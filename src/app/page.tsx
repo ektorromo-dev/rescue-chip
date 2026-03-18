@@ -799,7 +799,7 @@ export default function Home() {
           <div className="section-label">En una emergencia real</div>
           <h2 className="section-title">El paramédico escanea.<br /><em>Tú ya estás<br />protegido.</em></h2>
           <p>Sin app, sin contraseña, sin internet. Cualquier celular moderno lee el chip en segundos y abre tu perfil médico completo.</p>
-          <a href="#precios" className="btn-primary">Activar mi protección — $349</a>
+          <a href="#precios" className="btn-primary">Activar mi protección — $347</a>
         </div>
       </section>
 
@@ -830,12 +830,12 @@ export default function Home() {
             <div className="price-card">
               <div className="price-name">Individual</div>
               <div className="price-desc">Para el rider que va solo y sabe que la carretera no perdona.</div>
-              <div className="price-amount"><span className="price-currency">$</span><span className="price-value">349</span></div>
+              <div className="price-amount"><span className="price-currency">$</span><span className="price-value">347</span></div>
               <div className="price-period">MXN · Pago único</div>
               <div className="price-divider" />
               <ul className="price-features">
-                <li>1 chip NFC programado</li><li>Perfil médico completo</li>
-                <li>2 contactos de emergencia</li><li>Alertas SMS + email</li><li>Envío incluido</li>
+                <li>1 chip NFC programado listo para activar</li><li>Perfil médico completo</li>
+                <li>3 contactos de emergencia configurables</li><li>Alertas SMS + email al escanear</li><li>Historial de accesos en tu dashboard</li><li>Envío incluido a todo México</li>
               </ul>
               <button onClick={() => setSelectedPlan("individual")} className="btn-price btn-price-outline">Elegir Individual</button>
             </div>
@@ -846,8 +846,8 @@ export default function Home() {
               <div className="price-period">MXN · Pago único</div>
               <div className="price-divider" />
               <ul className="price-features">
-                <li>2 chips NFC programados</li><li>Perfiles médicos independientes</li>
-                <li>Contactos cruzados configurables</li><li>Alertas SMS + email para ambos</li><li>Envío incluido</li>
+                <li>2 chips NFC programados, uno para cada uno</li><li>Perfiles médicos 100% independientes</li>
+                <li>3 contactos de emergencia por perfil</li><li>Alertas SMS + email para ambos</li><li>Dashboard individual para cada usuario</li><li>Envío incluido — $274 por persona</li>
               </ul>
               <button onClick={() => setSelectedPlan("pareja")} className="btn-price btn-price-solid">Elegir Pareja</button>
             </div>
@@ -858,8 +858,8 @@ export default function Home() {
               <div className="price-period">MXN · Pago único</div>
               <div className="price-divider" />
               <ul className="price-features">
-                <li>Pack familiar (hasta 4 chips)</li><li>Perfiles médicos individuales</li>
-                <li>Red de contactos compartida</li><li>Dashboard familiar unificado</li><li>Envío incluido</li>
+                <li>Hasta 4 chips NFC para toda la familia</li><li>Perfil médico completo por cada integrante</li>
+                <li>3 contactos de emergencia por perfil</li><li>Alertas SMS + email por cada chip activado</li><li>Dashboard independiente por usuario</li><li>Envío incluido — desde $237 por persona</li>
               </ul>
               <button onClick={() => setSelectedPlan("familiar")} className="btn-price btn-price-outline">Elegir Familiar</button>
             </div>
@@ -882,8 +882,8 @@ export default function Home() {
               <div className="agency-price-wrap"><span className="agency-currency">$</span><span className="agency-value">8,950</span><span className="agency-curr-label">MXN</span></div>
               <div className="agency-divider" />
               <ul className="agency-features">
-                <li>50 chips NFC programados</li><li>Panel de administración de folios</li>
-                <li>Material de punto de venta incluido</li><li>Soporte por WhatsApp</li>
+                <li>50 chips NFC programados con folios únicos RSC</li><li>Activación directa por el usuario final</li>
+                <li>Perfil médico completo por chip</li><li>Alertas automáticas SMS + email al escanear</li><li>Soporte por WhatsApp durante la implementación</li><li>Factura electrónica CFDI 4.0</li>
               </ul>
               <a href="https://wa.me/525551433904?text=Hola%2C%20me%20interesa%20el%20plan%20Starter%20de%20RescueChip%20(50%20chips%20a%20%24179%20c%2Fu).%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener noreferrer" className="btn-agency-outline">Solicitar</a>
             </div>
@@ -894,8 +894,8 @@ export default function Home() {
               <div className="agency-price-wrap"><span className="agency-currency">$</span><span className="agency-value">14,900</span><span className="agency-curr-label">MXN</span></div>
               <div className="agency-divider" />
               <ul className="agency-features">
-                <li>100 chips NFC programados</li><li>Panel de administración de folios</li>
-                <li>Material de punto de venta incluido</li><li>Capacitación para tu equipo de ventas</li><li>Soporte prioritario</li>
+                <li>100 chips NFC programados con folios únicos RSC</li><li>Todo lo del plan Starter</li>
+                <li>Manual de ventas RescueChip para tu equipo (PDF)</li><li>Capacitación virtual para tu equipo de ventas</li><li>Soporte prioritario por WhatsApp</li><li>Factura electrónica CFDI 4.0</li>
               </ul>
               <a href="https://wa.me/525551433904?text=Hola%2C%20me%20interesa%20el%20plan%20Growth%20de%20RescueChip%20(100%20chips%20a%20%24149%20c%2Fu).%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener noreferrer" className="btn-agency-solid">Solicitar</a>
             </div>
@@ -905,8 +905,8 @@ export default function Home() {
               <div className="agency-price-wrap"><span className="agency-negotiable">Precio negociable</span></div>
               <div className="agency-divider" />
               <ul className="agency-features">
-                <li>300+ chips NFC programados</li><li>Panel de administración avanzado</li>
-                <li>Integración con tu sistema de CRM</li><li>Capacitación y material completo</li><li>Gerente de cuenta dedicado</li>
+                <li>300+ chips NFC, precio negociable por volumen</li><li>Todo lo del plan Growth</li>
+                <li>Sesión de onboarding presencial o virtual</li><li>Material físico de punto de venta incluido</li><li>Gerente de cuenta dedicado</li><li>Factura electrónica CFDI 4.0</li>
               </ul>
               <a href="https://wa.me/525551433904?text=Hola%2C%20me%20interesa%20el%20plan%20Premium%20de%20RescueChip%20(300%2B%20chips).%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener noreferrer" className="btn-agency-outline">Contáctanos</a>
             </div>
