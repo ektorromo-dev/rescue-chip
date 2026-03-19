@@ -1,5 +1,6 @@
 import { HeartPulse, AlertTriangle } from "lucide-react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import ProfileViewer from "@/components/ProfileViewer";
 
@@ -102,6 +103,10 @@ export default async function ProfilePage({ params }: ProfileProps) {
                 </div>
             </div>
         );
+    }
+
+    if (chip && !chip.activated) {
+        redirect(`/activate?folio=${cleanId}`);
     }
 
     // 2. Fetch the profile for this chip if not mocked

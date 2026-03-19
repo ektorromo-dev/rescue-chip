@@ -2,15 +2,6 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { rateLimitActivate } from '@/lib/ratelimit';
 import { createServerClient } from '@supabase/ssr';
-import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
-
-const ratelimitProfile = new Ratelimit({
-    redis: Redis.fromEnv(),
-    limiter: Ratelimit.slidingWindow(7, "1 h"),
-    analytics: true,
-    prefix: "ratelimit:profile",
-});
 
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
@@ -52,7 +43,7 @@ export async function middleware(request: NextRequest) {
     }
 
     // Adaptamos activate para que atrape solo POSTs a la API o interceptaremos el page load pero mejor POST:
-    if (pathname.startsWith('/activate')) {
+    if (pathname.startsWith('/activate') && request.method === 'POST') {
         const folio = request.nextUrl.searchParams.get('folio');
         if (!folio) {
             // Sin folio = acceso directo a la página, no aplicar rate limit
@@ -74,21 +65,10 @@ export async function middleware(request: NextRequest) {
         }
     }
 
-    if (pathname.startsWith('/profile/')) {
-        const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "127.0.0.1";
-        const { success } = await ratelimitProfile.limit(ip);
-        if (!success) {
-            return new Response(
-                '<html><body style="background:#0A0A0A;color:#F4F0EB;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;text-align:center"><div><p style="font-size:48px;margin:0">⏱</p><h1 style="color:#E8231A">Demasiadas consultas</h1><p style="color:#9E9A95">Intenta de nuevo en unos minutos.</p></div></body></html>',
-                { status: 429, headers: { "Content-Type": "text/html" } }
-            );
-        }
-    }
-
     return res;
 }
 
 export const config = {
     // Especificar rutas explícitas para no invocar Redis/Upstash en cada request de assets
-    matcher: ['/activate', '/admin/:path*', '/profile/:path*'],
+    matcher: ['/activate', '/admin/:path*', '/dashboard/:path*'],
 };
