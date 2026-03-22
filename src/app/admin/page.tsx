@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import { Plus, Siren, Store, Building2, CreditCard, Settings, Search, CheckCircle2, XCircle, AlertTriangle, TrendingUp, Users, Package, Clock, Zap, Activity, Target } from 'lucide-react'
+import { Plus, Siren, Store, Building2, CreditCard, Settings, Search, CheckCircle2, XCircle, AlertTriangle, TrendingUp, Users, Package, Clock, Zap, Activity, Target, Power } from 'lucide-react'
 
 // ✨ PALETTE & CONFIG ✨
 const PIE_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#14b8a6']
@@ -79,6 +79,7 @@ export default function AdminDashboard() {
   const [modal, setModal] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [shuttingDown, setShuttingDown] = useState(false)
   const [editItem, setEditItem] = useState<any>(null)
 
   const [emergencies, setEmergencies] = useState<any[]>([])
@@ -177,6 +178,16 @@ export default function AdminDashboard() {
     { id: 'analytics', label: 'Analytics', icon: Activity },
   ]
 
+  async function handleShutdown() {
+    if (!confirm('¿Seguro que quieres apagar la PC?')) return
+    setShuttingDown(true)
+    try {
+      await fetch('/api/shutdown', { method: 'POST' })
+    } finally {
+      setShuttingDown(false)
+    }
+  }
+
   if (loading) return (
     <div className="min-h-screen bg-[#0f1117] flex items-center justify-center">
       <div className="text-[#8b949e] font-mono animate-pulse flex items-center gap-3">
@@ -195,6 +206,15 @@ export default function AdminDashboard() {
             <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.5)]" />
             <h1 className="font-mono font-bold tracking-widest text-sm">RESCUECHIP<span className="text-[#8b949e] ml-1">/admin</span></h1>
           </div>
+          <button
+            onClick={handleShutdown}
+            disabled={shuttingDown}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 transition-colors text-xs font-mono disabled:opacity-50"
+            title="Apagar PC"
+          >
+            <Power size={14} />
+            {shuttingDown ? 'Apagando...' : 'Apagar PC'}
+          </button>
         </div>
 
         {/* Scrollable Tabs */}
