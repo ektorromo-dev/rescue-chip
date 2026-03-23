@@ -32,6 +32,7 @@ interface Props {
 export default function EmergencyFamilyClient({ incidente, profile }: Props) {
   const [enCamino, setEnCamino] = useState(incidente.familiarEnCamino);
   const [sending, setSending] = useState(false);
+  const [checkedItems, setCheckedItems] = useState<Record<number, boolean>>({});
 
   const userName = profile?.fullName || 'Usuario RescueChip';
   const firstName = profile?.fullName?.split(' ')[0] || 'tu ser querido';
@@ -330,14 +331,31 @@ export default function EmergencyFamilyClient({ incidente, profile }: Props) {
               borderBottom: i < checklistItems.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
               fontSize: '14px',
             }}>
-              <div style={{
-                width: '20px',
-                height: '20px',
-                borderRadius: '4px',
-                border: '1.5px solid #9E9A95',
-                flexShrink: 0,
-              }} />
-              {item}
+              <div
+                onClick={() => setCheckedItems(prev => ({ ...prev, [i]: !prev[i] }))}
+                style={{
+                  width: '20px',
+                  height: '20px',
+                  borderRadius: '4px',
+                  border: checkedItems[i] ? '1.5px solid #4ade80' : '1.5px solid #9E9A95',
+                  backgroundColor: checkedItems[i] ? '#166534' : 'transparent',
+                  flexShrink: 0,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s',
+                }}
+              >
+                {checkedItems[i] && (
+                  <span style={{ color: '#4ade80', fontSize: '14px', lineHeight: 1 }}>✓</span>
+                )}
+              </div>
+              <span style={{
+                textDecoration: checkedItems[i] ? 'line-through' : 'none',
+                opacity: checkedItems[i] ? 0.5 : 1,
+                transition: 'all 0.2s',
+              }}>{item}</span>
             </div>
           ))}
         </div>
