@@ -210,11 +210,17 @@ export default function EmergencyFamilyClient({ incidente, profile }: Props) {
           </>
         ) : (
           <div style={cardStyle}>
-            <p style={{ fontSize: '14px', color: '#9E9A95', margin: 0 }}>
-              La persona que escaneó el chip no compartió su ubicación GPS.
-              Si necesitas localizarlo, llama al 911 y proporciona el folio
-              del chip: <strong>{incidente.chipFolio}</strong>
+            <p style={{ fontSize: '14px', color: '#9E9A95', margin: 0, lineHeight: '1.6' }}>
+              La persona que escaneó el chip <strong style={{ color: '#F4F0EB' }}>no compartió su ubicación GPS</strong>, por lo que no podemos mostrarte el punto exacto.
             </p>
+            <p style={{ fontSize: '14px', color: '#9E9A95', margin: '12px 0 0', lineHeight: '1.6' }}>
+              <strong style={{ color: '#F4F0EB' }}>¿Qué puedes hacer?</strong>
+            </p>
+            <ul style={{ fontSize: '14px', color: '#9E9A95', margin: '8px 0 0', paddingLeft: '20px', lineHeight: '1.8' }}>
+              <li>Intenta llamar o enviar mensaje a {firstName} directamente</li>
+              <li>Contacta a otros familiares o amigos que puedan saber su ruta</li>
+              <li>Si no logras contacto en 10 minutos, llama al 911</li>
+            </ul>
           </div>
         )}
       </div>
