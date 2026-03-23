@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { randomBytes } from 'crypto';
 import { createClient } from "@supabase/supabase-js";
 import nodemailer from "nodemailer";
 import twilio from "twilio";
@@ -95,11 +96,38 @@ export async function POST(req: NextRequest) {
             if (chipData) {
                 const { data: profileData } = await supabase
                     .from("profiles")
-                    .select("user_id, full_name, emergency_contacts")
+                    .select("id, user_id, full_name, emergency_contacts")
                     .eq("chip_id", chipData.id)
                     .single();
 
                 if (profileData) {
+                    // ── CREAR INCIDENTE DE EMERGENCIA ──────────────────
+                    const incidentToken = randomBytes(16).toString('hex');
+                    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+                    let incidentUrl: string | null = null;
+
+                    const { error: incidentError } = await supabase
+                        .from('incidentes')
+                        .insert({
+                            token: incidentToken,
+                            chip_folio,
+                            chip_id: chipData.id,
+                            profile_id: profileData.id || null,
+                            latitud: latitud || null,
+                            longitud: longitud || null,
+                            ip_address,
+                            user_agent,
+                            expires_at: expiresAt,
+                            location_shared: !!(latitud && longitud),
+                        });
+
+                    if (incidentError) {
+                        console.error('Error creando incidente:', incidentError);
+                    } else {
+                        incidentUrl = `https://rescue-chip.com/emergencia/${incidentToken}`;
+                        console.log(`Incidente creado: ${incidentUrl}`);
+                    }
+                    // ── FIN CREAR INCIDENTE ──────────────────────────
                     const userName = profileData.full_name || 'Usuario';
                     const contacts = profileData.emergency_contacts || [];
                     const contactEmails = contacts
@@ -128,6 +156,14 @@ export async function POST(req: NextRequest) {
                             <h2 style="color: #e11d48; margin-top: 0; text-align: center;">⚠️ ALERTA DE EMERGENCIA ⚠️</h2>
                             <h3 style="color: #333; text-align: center;">El RescueChip de ${userName} fue escaneado</h3>
                             
+                            ${incidentUrl ? `
+                            <div style="text-align: center; margin: 20px 0;">
+                                <a href="${incidentUrl}" style="display: inline-block; background-color: #e11d48; color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px;">
+                                    Ver instrucciones y datos médicos
+                                </a>
+                                <p style="color: #999; font-size: 12px; margin-top: 8px;">Enlace válido por 24 horas</p>
+                            </div>` : ''}
+
                             <p style="font-size: 16px;">El dispositivo con folio <strong>${chip_folio}</strong> perteneciente a <strong>${userName}</strong> fue escaneado.</p>
                             
                             <div style="background-color: #fef2f2; padding: 15px; border-radius: 8px; margin: 20px 0;">
@@ -188,7 +224,9 @@ export async function POST(req: NextRequest) {
                         : "No disponible";
 
                     // Shortened to < 160 characters for WhatsApp/SMS compatibility
-                    const textMessageBody = `⚠️ RESCUECHIP EMERGENCIA: ${userName} necesita ayuda. GPS: ${plainLocation}. Llama al 911.`;
+                    const textMessageBody = incidentUrl
+                        ? `⚠️ RESCUECHIP EMERGENCIA: ${userName} necesita ayuda. GPS: ${plainLocation}. Instrucciones: ${incidentUrl}`
+                        : `⚠️ RESCUECHIP EMERGENCIA: ${userName} necesita ayuda. GPS: ${plainLocation}. Llama al 911.`;
 
                     const ownerPhones = [];
                     // Extract owner phone if available
