@@ -637,7 +637,7 @@ export default function Home() {
             <em>cada segundo</em>
             cuenta.
           </h1>
-          <p className="hero-sub">RescueChip es el primer sistema de identificación médica prehospitalaria para motociclistas en México. Un chip NFC con tus datos vitales.</p>
+          <p className="hero-sub">RescueChip es el primer sistema de identificación médica prehospitalaria de 3 capas para motociclistas en México: chip NFC + QR de respaldo + tarjeta médica. Tus datos vitales siempre accesibles.</p>
           <div className="hero-actions">
             <a href="#precios" className="btn-primary">Protege tu rodada — $349</a>
             <a href="/profile/RSC-DEMO" target="_blank" className="btn-ghost" style={{
@@ -684,7 +684,7 @@ export default function Home() {
           </div>
           <div className="steps">
             <div className="step"><div className="step-num">01</div><div className="step-icon">🏍️</div><h3>El accidente</h3><p>Quedas inconsciente. Nadie sabe tu tipo de sangre, tus alergias, ni a quién llamar. Los minutos pasan.</p></div>
-            <div className="step"><div className="step-num">02</div><div className="step-icon">📱</div><h3>Alguien escanea</h3><p>Un testigo acerca su celular al chip en tu casco. No necesita app, no necesita registrarse. Solo NFC.</p></div>
+            <div className="step"><div className="step-num">02</div><div className="step-icon">📱</div><h3>Alguien escanea</h3><p>Un testigo o paramédico acerca su celular al chip NFC en tu casco o escanea el QR del sticker. Sin app, sin registro. 3 capas de respaldo: chip NFC, QR y tarjeta médica.</p></div>
             <div className="step"><div className="step-num">03</div><div className="step-icon">🩺</div><h3>Datos vitales</h3><p>Tipo de sangre, alergias, medicamentos, enfermedades crónicas. Todo disponible al instante.</p></div>
             <div className="step"><div className="step-num">04</div><div className="step-icon">📞</div><h3>Tu familia recibe alerta</h3><p>Tus contactos de emergencia reciben SMS y correo automático con tu ubicación exacta en segundos.</p></div>
             <div className="step"><div className="step-num">05</div><div className="step-icon">🔐</div><h3>Queda un registro</h3><p>El sistema guarda el momento y lugar exacto del escaneo. Nadie desaparece sin dejar rastro.</p></div>
@@ -756,9 +756,9 @@ export default function Home() {
           </div>
         </div>
         <div className="chip-info">
-          <div className="section-label">El chip NFC</div>
+          <div className="section-label">El sistema de 3 capas</div>
           <h2 className="section-title">No es un gadget.<br />Es infraestructura<br /><em>de salud.</em></h2>
-          <p>Un chip NFC programado con tu folio único RSC-XXXXX. Resistente al agua, sin batería, sin Bluetooth. Compatible con cualquier smartphone moderno, sin app requerida.</p>
+          <p>Un sistema de identificación médica prehospitalaria de 3 capas: chip NFC programado con tu folio único, QR de respaldo en el sticker y tarjeta médica para tu cartera. Sin batería, sin Bluetooth, sin app.</p>
           <ul className="product-features">
             <li>Funciona con cualquier celular Android o iPhone 7+</li>
             <li>No requiere batería ni conexión Bluetooth</li>
@@ -798,7 +798,7 @@ export default function Home() {
         <div className="paramedic-content">
           <div className="section-label">En una emergencia real</div>
           <h2 className="section-title">El paramédico escanea.<br /><em>Tú ya estás<br />protegido.</em></h2>
-          <p>Sin app, sin contraseña, sin internet. Cualquier celular moderno lee el chip en segundos y abre tu perfil médico completo.</p>
+          <p>Sin app, sin contraseña, sin internet. El chip NFC, el QR de respaldo y tu tarjeta médica garantizan que tus datos vitales sean accesibles en cualquier escenario de emergencia.</p>
           <a href="#precios" className="btn-primary">Activar mi protección — $347</a>
         </div>
       </section>
