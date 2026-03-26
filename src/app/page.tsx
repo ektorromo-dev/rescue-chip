@@ -117,7 +117,8 @@ const LANDING_CSS = `
 
   /* CHIP ANIMADO */
   .chip-showcase { padding:100px 60px; background:var(--dark); display:flex; align-items:center; justify-content:center; gap:100px; }
-  .chip-container { position:relative; width:260px; height:260px; flex-shrink:0; }
+  .chip-container { position:relative; width:420px; height:auto; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+  .chip-container img { width:100%; height:auto; display:block; }
   .chip-ring { position:absolute; inset:0; border:1px solid rgba(232,35,26,.15); border-radius:50%; animation:ring-pulse 3s ease-in-out infinite; }
   .chip-ring:nth-child(2) { inset:-24px; border-color:rgba(232,35,26,.08); animation-delay:.5s; }
   .chip-ring:nth-child(3) { inset:-52px; border-color:rgba(232,35,26,.04); animation-delay:1s; }
@@ -266,7 +267,7 @@ const LANDING_CSS = `
     .agency-pricing{padding:80px 24px;} .agency-cards{grid-template-columns:1fr;}
     .trust-inner{grid-template-columns:1fr;gap:48px;}
     .helmet-grid{grid-template-columns:1fr 1fr;}
-    .chip-showcase{flex-direction:column;padding:80px 24px;gap:48px;text-align:center;}
+    .chip-showcase{flex-direction:column;padding:40px 24px 80px 24px;gap:24px;text-align:center;}
     .paramedic-content,.cta-content{padding:60px 24px;}
     .rc-footer{padding:32px 24px;flex-direction:column;text-align:center;}
   }
@@ -383,8 +384,8 @@ const LANDING_CSS = `
     /* CHIP */
     .chip-showcase{
       flex-direction:column;
-      padding:52px 16px;
-      gap:36px;
+      padding:24px 16px 64px 16px;
+      gap:16px;
       text-align:center;
       align-items:center;
     }
