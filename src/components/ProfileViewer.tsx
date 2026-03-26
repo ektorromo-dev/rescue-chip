@@ -84,7 +84,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
         if (navigator.geolocation) {
             try {
                 const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 15000 });
+                    navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 3000 });
                 });
                 lat = position.coords.latitude;
                 lng = position.coords.longitude;
@@ -104,21 +104,17 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
         setIsEmergency(isEmerg);
 
         // Send Log
-        try {
-            await fetch('/api/log-access', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chip_folio: chip.folio,
-                    tipo: type,
-                    latitud: lat,
-                    longitud: lng,
-                    session_token: token
-                })
-            });
-        } catch (e) {
-            console.error("Error logging access", e);
-        }
+        fetch('/api/log-access', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chip_folio: chip.folio,
+                tipo: type,
+                latitud: lat,
+                longitud: lng,
+                session_token: token
+            })
+        }).catch(e => console.error("Error logging access", e));
 
         setHasConsented(true);
         setIsLoadingConsent(false);
