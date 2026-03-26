@@ -747,7 +747,7 @@ export default function Home() {
       <section className="chip-showcase" id="producto">
         <div className="chip-container">
           <img
-            src="/sticker-demo.png"
+            src="/sticker_demo.png"
             alt="Sticker RescueChip NFC + QR — Sistema de identificación médica prehospitalaria de 3 capas"
             style={{ width: '100%', maxWidth: '340px', height: 'auto', display: 'block', margin: '0 auto' }}
             loading="lazy"
