@@ -746,14 +746,12 @@ export default function Home() {
       {/* CHIP ANIMADO */}
       <section className="chip-showcase" id="producto">
         <div className="chip-container">
-          <div className="chip-ring" />
-          <div className="chip-ring" />
-          <div className="chip-ring" />
-          <div className="chip-core">
-            <div className="chip-logo">RESCUE<span>CHIP</span></div>
-            <div className="chip-folio">RSC-XXXXX</div>
-            <div className="chip-nfc">⟡</div>
-          </div>
+          <img
+            src="/sticker-demo.png"
+            alt="Sticker RescueChip NFC + QR — Sistema de identificación médica prehospitalaria de 3 capas"
+            style={{ width: '100%', maxWidth: '340px', height: 'auto', display: 'block', margin: '0 auto' }}
+            loading="lazy"
+          />
         </div>
         <div className="chip-info">
           <div className="section-label">El sistema de 3 capas</div>
