@@ -165,7 +165,7 @@ export default async function ProfilePage({ params }: ProfileProps) {
         <ProfileViewer
             chip={chip}
             profile={profile}
-            isDemo={cleanId.toUpperCase() === "RSC-001" || cleanId.toUpperCase() === "DEMO"}
+            isDemo={cleanId.toUpperCase() === "RSC-001" || cleanId.toUpperCase() === "DEMO" || cleanId.toUpperCase() === "RSC-DEMO"}
             signedPolizaUrl={signedPolizaUrl}
             emergencyContactsArray={emergencyContactsArray}
             allergiesArray={allergiesArray}
