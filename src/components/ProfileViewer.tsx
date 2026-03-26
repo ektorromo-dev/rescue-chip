@@ -237,14 +237,6 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
                             </span>
                             {!isLoadingConsent && <span style={{ fontSize: '10px', fontWeight: 400, opacity: 0.8, letterSpacing: '0.05em' }}>(Notificará contactos de emergencia)</span>}
                         </button>
-
-                        <button
-                            onClick={() => { handleConsent('prueba'); logScan('consulta'); }}
-                            disabled={isLoadingConsent}
-                            style={{ width: '100%', backgroundColor: 'transparent', border: '1px solid rgba(255,255,255,0.12)', color: C.textMuted, padding: '12px 24px', borderRadius: '12px', fontWeight: 600, fontSize: '13px', cursor: isLoadingConsent ? 'not-allowed' : 'pointer', opacity: isLoadingConsent ? 0.5 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-                        >
-                            <Info size={16} /> Solo es una consulta o prueba
-                        </button>
                     </div>
                 </div>
             </div>
