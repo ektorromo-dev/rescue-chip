@@ -967,11 +967,12 @@ export default function Home() {
       <footer className="rc-footer">
         <Link href="/" className="nav-logo">RESCUE<span>CHIP</span></Link>
         <ul className="footer-links">
-          <li><Link href="/privacy">Privacidad</Link></li>
-          <li><Link href="/terms">Términos</Link></li>
-          <li><a href="#agencias">Agencias</a></li>
+          <li><a href="#como-funciona">Cómo funciona</a></li>
+          <li><a href="#precios">Precios</a></li>
+          <li><Link href="/terminos">Términos y Condiciones</Link></li>
+          <li><Link href="/privacidad">Aviso de Privacidad</Link></li>
         </ul>
-        <small>© 2026 RescueChip. Hecho en México 🇲🇽</small>
+        <small>© 2026 RescueChip. Todos los derechos reservados.</small>
       </footer>
     </div>
   );

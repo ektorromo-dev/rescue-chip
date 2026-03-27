@@ -304,10 +304,23 @@ function ActivationFormContent() {
             // Assigned plan defaults to individual or whatever was set in webhook
             const chipAssignedPlan = chip.assigned_plan || 'individual';
 
+            // Obtener IP del usuario para registro de consentimiento
+            let userIp = '';
+            try {
+                const ipRes = await fetch('/api/get-ip');
+                const ipData = await ipRes.json();
+                userIp = ipData.ip || '';
+            } catch {
+                userIp = '';
+            }
+
             // 2. Insert profile
             const profileToInsert = {
                 chip_id: chip.id,
                 user_id: userId,
+                consent_timestamp: new Date().toISOString(),
+                consent_ip: userIp,
+                consent_version: 'v1.0',
                 plan: chipAssignedPlan,
                 photo_url: photoUrl,
                 full_name: formData.get("fullName") as string,
@@ -1163,22 +1176,40 @@ function ActivationFormContent() {
                 </section>
 
 
-                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer', marginBottom: '16px' }}>
+                {/* CONSENTIMIENTO INFORMADO — Bloque legal v1.0 */}
+                <div style={{
+                  background: 'rgba(232,35,26,0.05)',
+                  border: '1px solid rgba(232,35,26,0.2)',
+                  borderRadius: '8px',
+                  padding: '20px',
+                  marginBottom: '20px',
+                }}>
+                  <p style={{ fontSize: '14px', fontWeight: '600', color: '#F4F0EB', marginBottom: '12px' }}>
+                    CONSENTIMIENTO INFORMADO
+                  </p>
+                  <p style={{ fontSize: '12px', color: '#9E9A95', lineHeight: '1.6', marginBottom: '8px' }}>
+                    Al activar mi chip RESCUECHIP, declaro bajo protesta de decir verdad que:
+                  </p>
+                  <ol style={{ fontSize: '12px', color: '#9E9A95', lineHeight: '1.6', paddingLeft: '20px', marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <li>Entiendo que RESCUECHIP es un sistema de identificación médica, NO un servicio médico ni de emergencia. No garantiza resultados médicos favorables.</li>
+                    <li>Acepto que mi perfil médico será accesible de forma pública al escanear el chip NFC o código QR, sin autenticación previa. Esta es una condición esencial del servicio para funcionar en emergencias donde puedo estar inconsciente.</li>
+                    <li>Me comprometo a proporcionar información médica veraz y mantenerla actualizada. La exactitud de mis datos es mi responsabilidad exclusiva.</li>
+                    <li>Entiendo que la efectividad del sistema depende de terceros (paramédicos, testigos, red celular, estado del chip), y que RESCUECHIP no controla ni garantiza estos factores.</li>
+                    <li>Puedo eliminar mis datos en cualquier momento desde mi dashboard en rescue-chip.com. La eliminación es permanente e irreversible.</li>
+                    <li>He leído y acepto los <a href="/terminos" target="_blank" rel="noopener noreferrer" style={{ color: '#E8231A' }}>Términos y Condiciones</a> y el <a href="/privacidad" target="_blank" rel="noopener noreferrer" style={{ color: '#E8231A' }}>Aviso de Privacidad</a>.</li>
+                  </ol>
+                  <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer' }}>
                     <input
-                        type="checkbox"
-                        checked={consentimientoPublico}
-                        onChange={(e) => setConsentimientoPublico(e.target.checked)}
-                        style={{ marginTop: '2px', flexShrink: 0, accentColor: '#E8231A' }}
+                      type="checkbox"
+                      checked={consentimientoPublico}
+                      onChange={(e) => setConsentimientoPublico(e.target.checked)}
+                      style={{ marginTop: '2px', flexShrink: 0, accentColor: '#E8231A' }}
                     />
-                    <span style={{ fontSize: '13px', color: '#9E9A95', lineHeight: '1.5' }}>
-                        Entiendo y acepto que mi perfil de emergencia (tipo de sangre, alergias y datos médicos críticos)
-                        será accesible públicamente mediante el escaneo del chip NFC o código QR de mi casco,
-                        como condición esencial del servicio. He leído el{' '}
-                        <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: '#E8231A' }}>
-                            aviso de privacidad
-                        </a>.
+                    <span style={{ fontSize: '13px', color: '#C8C0B4', lineHeight: '1.5', fontWeight: '500' }}>
+                      Acepto el consentimiento informado y las condiciones del servicio RESCUECHIP.
                     </span>
-                </label>
+                  </label>
+                </div>
 
                 <button type="submit" disabled={loading || !consentimientoPublico || !sexo} style={{ marginTop: '16px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', backgroundColor: '#E8231A', color: '#fff', height: '64px', borderRadius: '16px', fontSize: '20px', fontWeight: 900, border: 'none', cursor: (!consentimientoPublico || loading || !sexo) ? 'not-allowed' : 'pointer', opacity: (!consentimientoPublico || !sexo) ? 0.4 : 1, transition: 'all 0.2s' }}>
                     {loading ? <Loader2 size={24} /> : <CheckCircle2 size={24} />}
