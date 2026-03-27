@@ -677,7 +677,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, isPreview
                 <div style={{ width: '100%', backgroundColor: C.bgInput, borderTop: '1px solid rgba(255,255,255,0.06)', padding: '20px 24px', textAlign: 'center' }}>
                     <div style={{ fontSize: "11px", color: "#6A6763", lineHeight: 1.6, maxWidth: "380px", margin: "0 auto", textAlign: "center" }}>
                         <p style={{ marginBottom: "8px" }}>
-                            <strong style={{ color: "#9E9A95" }}>RESCUECHIP</strong> es un sistema de identificación médica. No es un servicio médico ni de emergencia. La información mostrada fue proporcionada por el usuario y puede no estar actualizada. En caso de emergencia, llame al <strong style={{ color: "#F4F0EB" }}>911</strong>. RESCUECHIP no se responsabiliza por la exactitud de los datos ni por las acciones tomadas con base en esta información.
+                            <strong style={{ color: "#9E9A95" }}>RESCUECHIP</strong> es un sistema de identificación médica. No es un servicio médico ni de emergencia. La información mostrada fue proporcionada por el usuario y puede no estar actualizada. En caso de emergencia, llame al <strong style={{ color: "#E8231A", fontSize: "12px" }}>911</strong>. RESCUECHIP no se responsabiliza por la exactitud de los datos ni por las acciones tomadas con base en esta información.
                         </p>
                         <p>
                             <a href="/terminos" style={{ color: "#9E9A95", textDecoration: "underline" }}>Términos</a>
