@@ -425,6 +425,16 @@ export default function EmergencyFamilyClient({ incidente, profile }: Props) {
           RescueChip · rescue-chip.com
         </p>
       </div>
+
+            {/* DISCLAIMER LEGAL */}
+            <div style={{ marginTop: "48px", borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: "24px", textAlign: "center", padding: "24px 16px" }}>
+                <p style={{ fontSize: "11px", color: "#6A6763", lineHeight: 1.6, maxWidth: "380px", margin: "0 auto" }}>
+                    <strong style={{ color: "#9E9A95" }}>RESCUECHIP</strong> es un sistema de identificación médica. No sustituye servicios de emergencia. Llame al <strong style={{ color: "#F4F0EB" }}>911</strong> ante cualquier emergencia. La información mostrada fue proporcionada por el usuario y puede no estar actualizada.{" "}
+                    <a href="/terminos" style={{ color: "#9E9A95", textDecoration: "underline" }}>Términos</a>
+                    {" | "}
+                    <a href="/privacidad" style={{ color: "#9E9A95", textDecoration: "underline" }}>Privacidad</a>
+                </p>
+            </div>
     </div>
   );
 }
