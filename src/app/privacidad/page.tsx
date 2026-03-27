@@ -34,7 +34,7 @@ export default function PrivacidadPage() {
             I. IDENTIDAD DEL RESPONSABLE
           </h2>
           <p style={{ fontSize: "15px", lineHeight: 1.75, color: "#C8C0B4", marginBottom: "16px" }}>
-            <span style={{ color: "#F4F0EB", fontWeight: 600 }}>RESCUECHIP</span>, con domicilio en la Ciudad de México, México, y correo electrónico <a href="mailto:contacto@rescue-chip.com" style={{ color: "#E8231A", textDecoration: "none", fontWeight: 500 }}>contacto@rescue-chip.com</a>, es responsable del tratamiento de sus datos personales conforme a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP) y su Reglamento.
+            <span style={{ color: "#F4F0EB", fontWeight: 600 }}>RESCUECHIP</span>, con operaciones en la Ciudad de México, México, y correo electrónico <a href="mailto:contacto@rescue-chip.com" style={{ color: "#E8231A", textDecoration: "none", fontWeight: 500 }}>contacto@rescue-chip.com</a>, es responsable del tratamiento de sus datos personales conforme a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP) y su Reglamento.
           </p>
         </section>
 
@@ -50,7 +50,7 @@ export default function PrivacidadPage() {
             <li><span style={{ color: "#F4F0EB", fontWeight: 600 }}>Datos de contacto:</span> Número telefónico, dirección de correo electrónico.</li>
             <li><span style={{ color: "#F4F0EB", fontWeight: 600 }}>Datos de salud (SENSIBLES):</span> Tipo de sangre, alergias, enfermedades crónicas, medicamentos en uso, condiciones médicas relevantes.</li>
             <li><span style={{ color: "#F4F0EB", fontWeight: 600 }}>Datos de contactos de emergencia:</span> Nombre, teléfono y relación de las personas designadas por el titular.</li>
-            <li><span style={{ color: "#F4F0EB", fontWeight: 600 }}>Datos técnicos de acceso:</span> Dirección IP, geolocalización al momento del escaneo del chip, user agent del dispositivo, fecha y hora de acceso.</li>
+            <li><span style={{ color: "#F4F0EB", fontWeight: 600 }}>Datos técnicos de acceso:</span> Dirección IP, geolocalización al momento del escaneo del chip, tipo de navegador y dispositivo (user agent), fecha y hora de acceso.</li>
           </ul>
         </section>
 
@@ -90,7 +90,7 @@ export default function PrivacidadPage() {
             <span style={{ color: "#F4F0EB", fontWeight: 600 }}>RESCUECHIP</span> recaba y trata datos personales sensibles relativos al estado de salud del titular (tipo de sangre, alergias, enfermedades, medicamentos). Estos datos son estrictamente necesarios para el funcionamiento del servicio de identificación médica prehospitalaria.
           </p>
           <p style={{ fontSize: "15px", lineHeight: 1.75, color: "#C8C0B4", marginBottom: "16px" }}>
-            Al activar su chip y aceptar el consentimiento informado en rescue-chip.com/activar, usted otorga su <span style={{ color: "#F4F0EB", fontWeight: 600 }}>CONSENTIMIENTO EXPRESO</span> para el tratamiento de estos datos sensibles conforme a las finalidades descritas en este aviso.
+            Al activar su chip y aceptar el consentimiento informado en rescue-chip.com/activate, usted otorga su <span style={{ color: "#F4F0EB", fontWeight: 600 }}>CONSENTIMIENTO EXPRESO</span> para el tratamiento de estos datos sensibles conforme a las finalidades descritas en este aviso.
           </p>
         </section>
 

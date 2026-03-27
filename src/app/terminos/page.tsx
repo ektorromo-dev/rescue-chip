@@ -34,7 +34,7 @@ export default function TerminosPage() {
             I. INFORMACIÓN GENERAL
           </h2>
           <p style={{ fontSize: "15px", lineHeight: 1.75, color: "#C8C0B4", marginBottom: "16px" }}>
-            Los presentes Términos y Condiciones de Uso (en adelante, los &quot;Términos&quot;) regulan el acceso y uso de la plataforma digital, productos físicos y servicios ofrecidos por <span style={{ color: "#F4F0EB", fontWeight: 600 }}>RESCUECHIP</span> (en adelante, el &quot;Proveedor&quot;), con domicilio en la Ciudad de México, México, a través del sitio web rescue-chip.com (en adelante, el &quot;Sitio&quot;) y los dispositivos NFC asociados (en adelante, los &quot;Chips&quot; o &quot;Dispositivos&quot;).
+            Los presentes Términos y Condiciones de Uso (en adelante, los &quot;Términos&quot;) regulan el acceso y uso de la plataforma digital, productos físicos y servicios ofrecidos por <span style={{ color: "#F4F0EB", fontWeight: 600 }}>RESCUECHIP</span> (en adelante, el &quot;Proveedor&quot;), con operaciones en la Ciudad de México, México, contacto en contacto@rescue-chip.com, a través del sitio web rescue-chip.com (en adelante, el &quot;Sitio&quot;) y los dispositivos NFC asociados (en adelante, los &quot;Chips&quot; o &quot;Dispositivos&quot;).
           </p>
           <p style={{ fontSize: "15px", lineHeight: 1.75, color: "#C8C0B4", marginBottom: "16px" }}>
             Al adquirir, activar o utilizar cualquier producto o servicio de <span style={{ color: "#F4F0EB", fontWeight: 600 }}>RESCUECHIP</span>, el usuario (en adelante, el &quot;Usuario&quot;) acepta íntegramente estos Términos. Si no está de acuerdo con alguna de las disposiciones aquí establecidas, deberá abstenerse de utilizar los servicios.
@@ -118,7 +118,7 @@ export default function TerminosPage() {
             4.1 Proceso de activación
           </h3>
           <p style={{ fontSize: "15px", lineHeight: 1.75, color: "#C8C0B4", marginBottom: "16px" }}>
-            Una vez recibido el producto, el Usuario deberá activar su chip ingresando a rescue-chip.com/activar e introduciendo el folio RSC-XXXXX impreso en su tarjeta de activación. Durante este proceso, el Usuario proporcionará sus datos médicos y de contacto de emergencia.
+            Una vez recibido el producto, el Usuario deberá activar su chip ingresando a rescue-chip.com/activate e introduciendo el folio RSC-XXXXX impreso en su sticker. Durante este proceso, el Usuario proporcionará sus datos médicos y de contacto de emergencia.
           </p>
 
           <h3 style={{ fontSize: "16px", fontWeight: 600, color: "#C8C0B4", marginTop: "24px", marginBottom: "12px" }}>
@@ -205,7 +205,7 @@ export default function TerminosPage() {
             <li><span style={{ color: "#F4F0EB", fontWeight: 600 }}>Datos de contacto:</span> teléfono, correo electrónico.</li>
             <li><span style={{ color: "#F4F0EB", fontWeight: 600 }}>Datos de salud (sensibles):</span> tipo de sangre, alergias, enfermedades crónicas, medicamentos.</li>
             <li><span style={{ color: "#F4F0EB", fontWeight: 600 }}>Datos de contactos de emergencia:</span> nombre, teléfono, relación.</li>
-            <li><span style={{ color: "#F4F0EB", fontWeight: 600 }}>Datos de acceso:</span> dirección IP, geolocalización al momento del escaneo, user agent.</li>
+            <li><span style={{ color: "#F4F0EB", fontWeight: 600 }}>Datos de acceso:</span> dirección IP, geolocalización al momento del escaneo, tipo de navegador y dispositivo (user agent).</li>
           </ul>
 
           <h3 style={{ fontSize: "16px", fontWeight: 600, color: "#C8C0B4", marginTop: "24px", marginBottom: "12px" }}>
