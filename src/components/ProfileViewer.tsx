@@ -9,12 +9,13 @@ interface ProfileViewerProps {
     chip: any;
     profile: any;
     isDemo?: boolean;
+    isPreview?: boolean;
     signedPolizaUrl: string | null;
     emergencyContactsArray: any[];
     allergiesArray: string[];
 }
 
-export default function ProfileViewer({ chip, profile, isDemo = false, signedPolizaUrl, emergencyContactsArray, allergiesArray }: ProfileViewerProps) {
+export default function ProfileViewer({ chip, profile, isDemo = false, isPreview = false, signedPolizaUrl, emergencyContactsArray, allergiesArray }: ProfileViewerProps) {
 
     const getAutoTheme = () => {
         const h = new Date().getHours();
@@ -55,7 +56,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
         tickerText: d ? 'rgba(26,16,10,0.45)' : 'rgba(244,240,235,0.4)',
     };
 
-    const [hasConsented, setHasConsented] = useState<boolean>(isDemo);
+    const [hasConsented, setHasConsented] = useState<boolean>(isDemo || isPreview);
     const [isEmergency, setIsEmergency] = useState<boolean>(isDemo);
     const [sessionExpired, setSessionExpired] = useState<boolean>(false);
     const [timeLeft, setTimeLeft] = useState<number>(420); // 7 minutes
@@ -189,6 +190,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, signedPol
     // --- RENDER CONSENT SCREEN ---
 
     const logScan = async (tipo: 'emergencia' | 'consulta') => {
+        if (isDemo || isPreview || !chip.folio) return;
         try {
             let latitud: number | null = null;
             let longitud: number | null = null;

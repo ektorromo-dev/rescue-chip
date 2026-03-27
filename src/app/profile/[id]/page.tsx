@@ -6,11 +6,16 @@ import ProfileViewer from "@/components/ProfileViewer";
 
 interface ProfileProps {
     params: Promise<{ id: string }>;
+    searchParams?: Promise<{ preview?: string }>;
 }
 
-export default async function ProfilePage({ params }: ProfileProps) {
+export default async function ProfilePage({ params, searchParams }: ProfileProps) {
     const { id: rawId } = await params;
     const id = decodeURIComponent(rawId);
+    
+    // Support preview mode
+    const resolvedSearchParams = searchParams ? await searchParams : undefined;
+    const isPreview = resolvedSearchParams?.preview === 'true';
 
     const supabase = await createClient();
 
@@ -169,6 +174,7 @@ export default async function ProfilePage({ params }: ProfileProps) {
             signedPolizaUrl={signedPolizaUrl}
             emergencyContactsArray={emergencyContactsArray}
             allergiesArray={allergiesArray}
+            isPreview={isPreview}
         />
     );
 }

@@ -629,7 +629,7 @@ export default function DashboardPage() {
                                             )}
                                         </div>
                                         <div style={{ display: "flex", flexDirection: "row", gap: "8px" }}>
-                                            <a href={`/profile/${folio.split(',')[0].trim()}`} target="_blank" rel="noopener noreferrer"
+                                            <a href={`/profile/${folio.split(',')[0].trim()}?preview=true`} target="_blank" rel="noopener noreferrer"
                                                 style={{ padding: "10px 20px", borderRadius: "12px", fontWeight: 700, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", backgroundColor: "#E8231A", color: "#F4F0EB", textDecoration: "none", fontSize: "14px", border: "none" }}>
                                                 Ver mi Perfil Público
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
