@@ -128,6 +128,8 @@ export default function AdminDashboard() {
     envio: true,
     notas: '',
   })
+  const [precioLibre, setPrecioLibre] = useState(false)
+  const [precioCustom, setPrecioCustom] = useState(347)
 
   const loadData = useCallback(async () => {
     setLoading(true)
@@ -219,8 +221,7 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-[#0f1117] flex flex-col items-center justify-center gap-6">
       <div className="flex flex-col items-center gap-1">
         <span style={{ fontSize: '32px', fontWeight: 900, letterSpacing: '-1px', lineHeight: 1 }}>
-          <span style={{ color: '#F4F0EB' }}>RESCUE</span>
-          <span style={{ color: '#E8231A' }}>CHIP</span>
+          <span style={{ color: '#F4F0EB' }}>RESCUE</span><span style={{ color: '#E8231A' }}>CHIP</span>
         </span>
         <span style={{ color: '#8b949e', fontSize: '11px', fontFamily: 'monospace', letterSpacing: '3px' }}>ADMIN</span>
       </div>
@@ -478,7 +479,8 @@ export default function AdminDashboard() {
         {/* 6️⃣ COTIZADOR */}
         {tab === 'cotizador' && (() => {
           const tier = calcPrecio(cotForm.qty)
-          const subtotal = tier.precio * cotForm.qty
+          const precioUnitario = precioLibre ? precioCustom : tier.precio
+          const subtotal = precioUnitario * cotForm.qty
           const iva = Math.round(subtotal * 0.16)
           const total = subtotal + iva
           const fechaEntrega = calcFechaEntrega(cotForm.qty, cotForm.envio)
@@ -486,7 +488,7 @@ export default function AdminDashboard() {
           const folioCot = `COT-${Date.now().toString().slice(-6)}`
           const isPremium = cotForm.qty >= 300
 
-          const textoWA = `Hola, te comparto la cotización ${folioCot} de RescueChip:\n\n👤 Cliente: ${cotForm.cliente}${cotForm.empresa ? ` (${cotForm.empresa})` : ''}\n📦 Cantidad: ${cotForm.qty} chips\n💰 Plan: ${tier.label} — $${tier.precio}/u\n💵 Total con IVA: $${total.toLocaleString('es-MX')} MXN\n📅 Entrega estimada: ${fechaEntrega}\n${cotForm.notas ? `📝 Notas: ${cotForm.notas}\n` : ''}\nPago 100% anticipado. Vigencia cotización: 15 días.\n\nrescue-chip.com`
+          const textoWA = `Hola, te comparto la cotización ${folioCot} de RescueChip:\n\n👤 Cliente: ${cotForm.cliente}${cotForm.empresa ? ` (${cotForm.empresa})` : ''}\n📦 Cantidad: ${cotForm.qty} chips\n💰 Plan: ${precioLibre ? 'Personalizado' : tier.label} — $${precioUnitario}/u\n💵 Total con IVA: $${total.toLocaleString('es-MX')} MXN\n📅 Entrega estimada: ${fechaEntrega}\n${cotForm.notas ? `📝 Notas: ${cotForm.notas}\n` : ''}\nPago 100% anticipado. Vigencia cotización: 15 días.\n\nrescue-chip.com`
 
           return (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 grid gap-4 max-w-2xl">
@@ -530,17 +532,45 @@ export default function AdminDashboard() {
                 {/* Tabla de precios */}
                 <div className="grid grid-cols-4 gap-1 mb-4">
                   {PRECIOS_B2B.map(p => (
-                    <div key={p.label} className={`rounded-lg p-2 text-center border transition-all ${tier.label === p.label ? 'border-red-500 bg-red-500/10' : 'border-[#2d3139] bg-[#0f1117]'}`}>
-                      <div className={`text-xs font-mono font-bold ${tier.label === p.label ? 'text-red-400' : 'text-[#8b949e]'}`}>${p.precio}</div>
+                    <div key={p.label} className={`rounded-lg p-2 text-center border transition-all ${!precioLibre && tier.label === p.label ? 'border-red-500 bg-red-500/10' : 'border-[#2d3139] bg-[#0f1117]'}`}>
+                      <div className={`text-xs font-mono font-bold ${!precioLibre && tier.label === p.label ? 'text-red-400' : 'text-[#8b949e]'}`}>${p.precio}</div>
                       <div className="text-[9px] text-[#8b949e] mt-0.5">{p.min === 300 ? '300+' : `${p.min}–${p.max}`} u</div>
                     </div>
                   ))}
                 </div>
 
+                <div style={{ marginTop: '12px', marginBottom: '16px', padding: '12px', background: '#0f1117', borderRadius: '10px', border: '1px solid #2d3139' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', marginBottom: precioLibre ? '12px' : '0' }}>
+                    <input
+                      type="checkbox"
+                      checked={precioLibre}
+                      onChange={e => setPrecioLibre(e.target.checked)}
+                      style={{ accentColor: '#E8231A', width: '16px', height: '16px' }}
+                    />
+                    <span style={{ fontSize: '13px', color: '#f0f6fc', fontWeight: 500 }}>Precio personalizado</span>
+                    <span style={{ fontSize: '11px', color: '#8b949e', marginLeft: 'auto' }}>Para negociaciones especiales</span>
+                  </label>
+                  {precioLibre && (
+                    <div>
+                      <label style={{ display: 'block', color: '#8b949e', fontSize: '10px', fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '6px' }}>
+                        Precio por unidad (MXN, sin IVA)
+                      </label>
+                      <input
+                        type="number"
+                        min={1}
+                        value={precioCustom}
+                        onChange={e => setPrecioCustom(Math.max(1, parseInt(e.target.value) || 1))}
+                        className={inputClass}
+                        style={{ fontFamily: 'monospace', fontSize: '18px', fontWeight: 700, color: '#E8231A' }}
+                      />
+                    </div>
+                  )}
+                </div>
+
                 <div className="bg-[#0f1117] border border-[#2d3139] rounded-xl p-4 space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-[#8b949e]">Plan activo</span>
-                    <span className="text-white font-medium">{tier.label}</span>
+                    <span className="text-white font-medium">{precioLibre ? 'Personalizado' : tier.label}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-[#8b949e]">Subtotal</span>
