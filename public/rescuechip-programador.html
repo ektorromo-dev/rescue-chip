@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>RescueChip — Programador de chips</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0D0D0C;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  #header {
+    padding: 16px 20px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #222;
+    flex-shrink: 0;
+  }
+  #header .logo { font-size: 15px; font-weight: 600; color: #fff; }
+  #header .logo span { color: #E11D48; }
+  #counter {
+    font-size: 13px;
+    color: #888;
+    background: #1a1a18;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid #333;
+  }
+  #counter b { color: #E11D48; }
+
+  #main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    gap: 20px;
+  }
+
+  #camera-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 340px;
+    aspect-ratio: 1;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #111;
+  }
+  #video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  #canvas { display: none; }
+  #overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .corner {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+  }
+  .corner svg { position: absolute; inset: 0; }
+  .tl { top: 24px; left: 24px; }
+  .tr { top: 24px; right: 24px; transform: scaleX(-1); }
+  .bl { bottom: 24px; left: 24px; transform: scaleY(-1); }
+  .br { bottom: 24px; right: 24px; transform: scale(-1); }
+  .scan-line {
+    position: absolute;
+    left: 24px; right: 24px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #E11D48, transparent);
+    animation: scan 2s ease-in-out infinite;
+  }
+  @keyframes scan {
+    0% { top: 24px; opacity: 1; }
+    90% { opacity: 1; }
+    100% { top: calc(100% - 24px); opacity: 0; }
+  }
+
+  #status-area {
+    width: 100%;
+    max-width: 340px;
+    text-align: center;
+  }
+  #status-label {
+    font-size: 13px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+  }
+  #status-main {
+    font-size: 22px;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: 0.05em;
+    min-height: 32px;
+  }
+  #status-sub {
+    font-size: 13px;
+    color: #666;
+    margin-top: 4px;
+    word-break: break-all;
+  }
+
+  #btn-area {
+    width: 100%;
+    max-width: 340px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  button {
+    width: 100%;
+    padding: 18px;
+    border-radius: 14px;
+    border: none;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  button:active { transform: scale(0.98); opacity: 0.9; }
+  #btn-primary {
+    background: #E11D48;
+    color: #fff;
+  }
+  #btn-primary:disabled {
+    background: #3a0a14;
+    color: #7a2030;
+    cursor: not-allowed;
+  }
+  #btn-secondary {
+    background: #1a1a18;
+    color: #888;
+    border: 1px solid #333;
+    font-size: 15px;
+    padding: 14px;
+  }
+
+  #feedback {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+    background: rgba(0,0,0,0.92);
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  #feedback.show { opacity: 1; pointer-events: all; }
+  #feedback .icon {
+    font-size: 72px;
+    line-height: 1;
+  }
+  #feedback .msg {
+    font-size: 22px;
+    font-weight: 600;
+    text-align: center;
+  }
+  #feedback .sub {
+    font-size: 16px;
+    color: #888;
+    text-align: center;
+  }
+
+  #warning {
+    background: #2a1500;
+    border: 1px solid #7a3500;
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 13px;
+    color: #f59e0b;
+    max-width: 340px;
+    width: 100%;
+    line-height: 1.5;
+    display: none;
+  }
+
+  #state-writing {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+  }
+  .pulse-ring {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid #E11D48;
+    animation: pulse 1.2s ease-out infinite;
+  }
+  @keyframes pulse {
+    0% { transform: scale(0.8); opacity: 1; }
+    100% { transform: scale(1.6); opacity: 0; }
+  }
+  .pulse-inner {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #1a0308;
+    border: 3px solid #E11D48;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+  }
+  .pulse-container {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .nfc-icon {
+    font-size: 32px;
+  }
+  .writing-msg {
+    font-size: 20px;
+    font-weight: 600;
+    text-align: center;
+  }
+  .writing-sub {
+    font-size: 14px;
+    color: #888;
+    text-align: center;
+  }
+  .writing-folio {
+    font-size: 24px;
+    font-weight: 700;
+    color: #E11D48;
+    letter-spacing: 0.1em;
+    font-family: 'Courier New', monospace;
+  }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div class="logo">Rescue<span>Chip</span></div>
+  <div id="counter">Grabados: <b id="count-num">0</b></div>
+</div>
+
+<div id="main">
+
+  <div id="camera-wrap">
+    <video id="video" autoplay muted playsinline></video>
+    <canvas id="canvas"></canvas>
+    <div id="overlay">
+      <div class="corner tl">
+        <svg viewBox="0 0 40 40"><path d="M 2 20 L 2 2 L 20 2" stroke="#E11D48" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+      </div>
+      <div class="corner tr">
+        <svg viewBox="0 0 40 40"><path d="M 2 20 L 2 2 L 20 2" stroke="#E11D48" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+      </div>
+      <div class="corner bl">
+        <svg viewBox="0 0 40 40"><path d="M 2 20 L 2 2 L 20 2" stroke="#E11D48" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+      </div>
+      <div class="corner br">
+        <svg viewBox="0 0 40 40"><path d="M 2 20 L 2 2 L 20 2" stroke="#E11D48" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+      </div>
+      <div class="scan-line" id="scan-line"></div>
+    </div>
+  </div>
+
+  <div id="state-writing">
+    <div class="writing-folio" id="writing-folio">RSC-XXXXX</div>
+    <div class="pulse-container">
+      <div class="pulse-ring"></div>
+      <div class="pulse-inner">
+        <span class="nfc-icon">📶</span>
+      </div>
+    </div>
+    <div class="writing-msg">Acerca el chip al teléfono</div>
+    <div class="writing-sub">Mantén el chip pegado a la parte trasera</div>
+  </div>
+
+  <div id="status-area">
+    <div id="status-label">Estado</div>
+    <div id="status-main">Apunta al QR del sticker</div>
+    <div id="status-sub"></div>
+  </div>
+
+  <div id="warning" id="warning-box">
+    ⚠️ Web NFC solo funciona en Chrome para Android. Asegúrate de abrir este archivo en Chrome.
+  </div>
+
+  <div id="btn-area">
+    <button id="btn-primary" disabled>Grabar en chip NFC</button>
+    <button id="btn-secondary" style="display:none" onclick="reset()">Escanear otro QR</button>
+  </div>
+
+</div>
+
+<div id="feedback">
+  <div class="icon" id="feedback-icon">✅</div>
+  <div class="msg" id="feedback-msg">¡Chip grabado!</div>
+  <div class="sub" id="feedback-sub"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsqr/1.4.0/jsQR.min.js"></script>
+<script>
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('canvas');
+  const btnPrimary = document.getElementById('btn-primary');
+  const btnSecondary = document.getElementById('btn-secondary');
+  const statusMain = document.getElementById('status-main');
+  const statusSub = document.getElementById('status-sub');
+  const statusLabel = document.getElementById('status-label');
+  const countNum = document.getElementById('count-num');
+  const feedback = document.getElementById('feedback');
+  const feedbackIcon = document.getElementById('feedback-icon');
+  const feedbackMsg = document.getElementById('feedback-msg');
+  const feedbackSub = document.getElementById('feedback-sub');
+  const scanLine = document.getElementById('scan-line');
+  const warningBox = document.getElementById('warning');
+  const stateWriting = document.getElementById('state-writing');
+  const cameraWrap = document.getElementById('camera-wrap');
+  const writingFolio = document.getElementById('writing-folio');
+
+  let currentUrl = null;
+  let currentFolio = null;
+  let scanning = true;
+  let count = 0;
+  let scanInterval = null;
+
+  const nfcSupported = 'NDEFReader' in window;
+  if (!nfcSupported) {
+    warningBox.style.display = 'block';
+  }
+
+  async function startCamera() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 1280 } }
+      });
+      video.srcObject = stream;
+    } catch (e) {
+      statusMain.textContent = 'Sin acceso a cámara';
+      statusSub.textContent = e.message;
+    }
+  }
+
+  function startScanning() {
+    if (scanInterval) clearInterval(scanInterval);
+    scanInterval = setInterval(() => {
+      if (!scanning) return;
+      if (!window.jsQR) return;
+      if (video.readyState < 2) return;
+
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0);
+
+      const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const code = window.jsQR(imgData.data, imgData.width, imgData.height, {
+        inversionAttempts: 'dontInvert'
+      });
+
+      if (code && code.data) {
+        const data = code.data;
+        const isRescueChip = data.includes('rescue-chip.com/profile/') || data.includes('rescue-chip.com/p/');
+        if (isRescueChip) {
+          const match = data.match(/\/(?:profile|p)\/([A-Z0-9-]+)/i);
+          if (match) {
+            const folio = match[1].toUpperCase();
+            onQRDetected(data, folio);
+          }
+        } else if (data.startsWith('http')) {
+          statusSub.textContent = 'QR detectado pero no es de RescueChip: ' + data.slice(0, 40) + '...';
+        }
+      }
+    }, 300);
+  }
+
+  function onQRDetected(url, folio) {
+    scanning = false;
+    clearInterval(scanInterval);
+    currentUrl = url;
+    currentFolio = folio;
+
+    scanLine.style.display = 'none';
+
+    statusLabel.textContent = 'QR detectado';
+    statusMain.textContent = folio;
+    statusMain.style.color = '#E11D48';
+    statusSub.textContent = url;
+
+    btnPrimary.disabled = false;
+    btnPrimary.textContent = nfcSupported ? '📶 Grabar en chip NFC' : '⚠️ NFC no disponible';
+    if (!nfcSupported) btnPrimary.disabled = true;
+    btnSecondary.style.display = 'block';
+
+    if (navigator.vibrate) navigator.vibrate(100);
+  }
+
+  btnPrimary.addEventListener('click', async () => {
+    if (!nfcSupported) return;
+
+    scanning = false;
+
+    cameraWrap.style.display = 'none';
+    stateWriting.style.display = 'flex';
+    writingFolio.textContent = currentFolio;
+    btnPrimary.style.display = 'none';
+    btnSecondary.style.display = 'none';
+    statusMain.textContent = 'Esperando chip...';
+    statusSub.textContent = '';
+
+    try {
+      const ndef = new NDEFReader();
+      await ndef.write({
+        records: [{ recordType: 'url', data: currentUrl }]
+      });
+
+      count++;
+      countNum.textContent = count;
+      if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+
+      feedbackIcon.textContent = '✅';
+      feedbackMsg.textContent = '¡Chip grabado!';
+      feedbackSub.textContent = currentFolio;
+      feedback.classList.add('show');
+
+      setTimeout(() => {
+        feedback.classList.remove('show');
+        reset();
+      }, 1800);
+
+    } catch (e) {
+      feedbackIcon.textContent = '❌';
+      feedbackMsg.textContent = 'Error al grabar';
+      feedbackSub.textContent = e.message || 'Intenta de nuevo';
+      feedback.classList.add('show');
+
+      setTimeout(() => {
+        feedback.classList.remove('show');
+        cameraWrap.style.display = 'block';
+        stateWriting.style.display = 'none';
+        btnPrimary.style.display = 'block';
+        btnPrimary.disabled = false;
+        btnSecondary.style.display = 'block';
+        statusMain.textContent = 'Error — intenta de nuevo';
+        statusSub.textContent = e.message || '';
+      }, 2500);
+    }
+  });
+
+  function reset() {
+    scanning = true;
+    currentUrl = null;
+    currentFolio = null;
+
+    cameraWrap.style.display = 'block';
+    stateWriting.style.display = 'none';
+    scanLine.style.display = 'block';
+
+    statusLabel.textContent = 'Estado';
+    statusMain.textContent = 'Apunta al QR del sticker';
+    statusMain.style.color = '#fff';
+    statusSub.textContent = '';
+
+    btnPrimary.disabled = true;
+    btnPrimary.textContent = 'Grabar en chip NFC';
+    btnPrimary.style.display = 'block';
+    btnSecondary.style.display = 'none';
+
+    startScanning();
+  }
+
+  startCamera();
+  video.addEventListener('loadeddata', startScanning);
+</script>
+</body>
+</html>
