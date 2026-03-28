@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function LoginPage() {
+function LoginForm() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -26,7 +27,9 @@ export default function LoginPage() {
             if (!res.ok) {
                 setError(data.error || 'Error al iniciar sesión');
             } else {
-                router.push('/dashboard');
+                const redirectTo = searchParams.get('redirect');
+                const safeRedirect = redirectTo && redirectTo.startsWith('/') ? redirectTo : '/dashboard';
+                router.push(safeRedirect);
             }
         } catch {
             setError('Error de conexión. Intenta de nuevo.');
@@ -235,5 +238,13 @@ export default function LoginPage() {
                 ← Volver al inicio
             </Link>
         </div>
+    );
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={null}>
+            <LoginForm />
+        </Suspense>
     );
 }
