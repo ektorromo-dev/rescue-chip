@@ -86,15 +86,15 @@ export async function POST(req: NextRequest) {
             // Obtener el ID de usuario del dueño de este chip
             const { data: chipData } = await supabase
                 .from("chips")
-                .select("id")
+                .select("id, owner_profile_id")
                 .ilike("folio", chip_folio)
                 .single();
 
-            if (chipData) {
+            if (chipData && chipData.owner_profile_id) {
                 const { data: profileData } = await supabase
                     .from("profiles")
                     .select("id, user_id, full_name, emergency_contacts")
-                    .eq("chip_id", chipData.id)
+                    .eq("id", chipData.owner_profile_id)
                     .single();
 
                 if (profileData) {
