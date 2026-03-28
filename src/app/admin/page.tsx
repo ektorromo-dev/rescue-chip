@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import { Plus, Siren, Store, Building2, CreditCard, Settings, Search, CheckCircle2, XCircle, AlertTriangle, TrendingUp, Users, Package, Clock, Zap, Activity, Target } from 'lucide-react'
+import { Plus, Siren, Store, Building2, CreditCard, Settings, Search, CheckCircle2, XCircle, AlertTriangle, TrendingUp, Users, Package, Clock, Zap, Activity, Target, Calculator } from 'lucide-react'
 
 // ✨ PALETTE & CONFIG ✨
 const PIE_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#14b8a6']
@@ -14,6 +14,34 @@ const CANALES = ['Tienda web', 'Rodada', 'Taller consignación', 'Venta directa'
 const SEVERIDADES = ['leve', 'moderado', 'grave', 'critico']
 const STAGE_LABELS: Record<string, string> = { prospecto: 'Prospecto', contactado: 'Contactado', reunion_agendada: 'Reunión', demo_realizada: 'Demo', propuesta_enviada: 'Propuesta', negociacion: 'Negociación', cerrado_ganado: 'Ganado', cerrado_perdido: 'Perdido', pausado: 'Pausado' }
 const WS_STATUS_LABELS: Record<string, string> = { prospecto: 'Prospecto', contactado: 'Contactado', activo: 'Activo', inactivo: 'Inactivo', pausado: 'Pausado' }
+
+const PRECIO_B2C = 347
+const PRECIOS_B2B = [
+  { label: 'B2C (1–49 u)', min: 1, max: 49, precio: 347 },
+  { label: 'Starter (50–99 u)', min: 50, max: 99, precio: 179 },
+  { label: 'Growth (100–299 u)', min: 100, max: 299, precio: 149 },
+  { label: 'Premium (300+ u)', min: 300, max: Infinity, precio: 119 },
+]
+
+function calcPrecio(qty: number) {
+  return PRECIOS_B2B.find(p => qty >= p.min && qty <= p.max) || PRECIOS_B2B[0]
+}
+
+function calcFechaEntrega(qty: number, envio: boolean) {
+  const hoy = new Date()
+  const produccion = 5 // días hábiles
+  const armado = Math.ceil((qty * 2) / 60 / 8) // minutos → días laborales
+  const paqueteria = envio ? 5 : 0
+  const totalDias = produccion + armado + paqueteria
+  let diasHabiles = 0
+  let fecha = new Date(hoy)
+  while (diasHabiles < totalDias) {
+    fecha.setDate(fecha.getDate() + 1)
+    const dia = fecha.getDay()
+    if (dia !== 0 && dia !== 6) diasHabiles++
+  }
+  return fecha.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+}
 
 // 🧮 HELPERS
 const fmt = (n: number) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', minimumFractionDigits: 0 }).format(n)
@@ -91,6 +119,15 @@ export default function AdminDashboard() {
   const [saleForm, setSaleForm] = useState({ sale_date: new Date().toISOString().split('T')[0], plan: PLANES[0], qty: 1, channel: 'Tienda web', source: '', customer_name: '', customer_phone: '', customer_email: '', notes: '' })
   const [wsForm, setWsForm] = useState({ name: '', owner_name: '', phone: '', email: '', address: '', municipio: '', estado: 'CDMX', status: 'prospecto', chips_consigned: 0, price_per_chip: 299, first_consignment_date: '', notes: '' })
   const [b2bForm, setB2bForm] = useState({ company_name: '', company_type: '', contact_name: '', contact_role: '', contact_phone: '', contact_email: '', stage: 'prospecto', estimated_chips: '', estimated_value: '', probability: 10, first_contact_date: new Date().toISOString().split('T')[0], next_action_date: '', next_action: '', notes: '' })
+  const [cotForm, setCotForm] = useState({
+    cliente: '',
+    empresa: '',
+    email: '',
+    whatsapp: '',
+    qty: 1,
+    envio: true,
+    notas: '',
+  })
 
   const loadData = useCallback(async () => {
     setLoading(true)
@@ -175,6 +212,7 @@ export default function AdminDashboard() {
     { id: 'workshops', label: 'Talleres', count: workshops.length, icon: Store },
     { id: 'b2b', label: 'B2B', count: pipeline.length, icon: Building2 },
     { id: 'analytics', label: 'Analytics', icon: Activity },
+    { id: 'cotizador', label: 'Cotizador', icon: Calculator },
   ]
 
   if (loading) return (
@@ -394,6 +432,128 @@ export default function AdminDashboard() {
             </div>
           </div>
         )}
+
+        {/* 6️⃣ COTIZADOR */}
+        {tab === 'cotizador' && (() => {
+          const tier = calcPrecio(cotForm.qty)
+          const subtotal = tier.precio * cotForm.qty
+          const iva = Math.round(subtotal * 0.16)
+          const total = subtotal + iva
+          const fechaEntrega = calcFechaEntrega(cotForm.qty, cotForm.envio)
+          const requiereContrato = cotForm.qty >= 50 || subtotal >= 15000
+          const folioCot = `COT-${Date.now().toString().slice(-6)}`
+          const isPremium = cotForm.qty >= 300
+
+          const textoWA = `Hola, te comparto la cotización ${folioCot} de RescueChip:\n\n👤 Cliente: ${cotForm.cliente}${cotForm.empresa ? ` (${cotForm.empresa})` : ''}\n📦 Cantidad: ${cotForm.qty} chips\n💰 Plan: ${tier.label} — $${tier.precio}/u\n💵 Total con IVA: $${total.toLocaleString('es-MX')} MXN\n📅 Entrega estimada: ${fechaEntrega}\n${cotForm.notas ? `📝 Notas: ${cotForm.notas}\n` : ''}\nPago 100% anticipado. Vigencia cotización: 15 días.\n\nrescue-chip.com`
+
+          return (
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 grid gap-4 max-w-2xl">
+              <div className="bg-[#161b22] border border-[#2d3139] rounded-xl p-5">
+                <h3 className="text-[#f0f6fc] font-semibold mb-4">Datos del Cliente</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[#8b949e] text-[10px] uppercase font-mono tracking-wider mb-2">Nombre</label>
+                    <input value={cotForm.cliente} onChange={e => setCotForm({...cotForm, cliente: e.target.value})} placeholder="Juan García" className={inputClass} />
+                  </div>
+                  <div>
+                    <label className="block text-[#8b949e] text-[10px] uppercase font-mono tracking-wider mb-2">Empresa (opcional)</label>
+                    <input value={cotForm.empresa} onChange={e => setCotForm({...cotForm, empresa: e.target.value})} placeholder="Taller Sur" className={inputClass} />
+                  </div>
+                  <div>
+                    <label className="block text-[#8b949e] text-[10px] uppercase font-mono tracking-wider mb-2">Email</label>
+                    <input type="email" value={cotForm.email} onChange={e => setCotForm({...cotForm, email: e.target.value})} placeholder="juan@email.com" className={inputClass} />
+                  </div>
+                  <div>
+                    <label className="block text-[#8b949e] text-[10px] uppercase font-mono tracking-wider mb-2">WhatsApp</label>
+                    <input type="tel" value={cotForm.whatsapp} onChange={e => setCotForm({...cotForm, whatsapp: e.target.value})} placeholder="5512345678" className={inputClass} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-[#161b22] border border-[#2d3139] rounded-xl p-5">
+                <h3 className="text-[#f0f6fc] font-semibold mb-4">Pedido</h3>
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div>
+                    <label className="block text-[#8b949e] text-[10px] uppercase font-mono tracking-wider mb-2">Cantidad de chips</label>
+                    <input type="number" min={1} value={cotForm.qty} onChange={e => setCotForm({...cotForm, qty: Math.max(1, parseInt(e.target.value) || 1)})} className={inputClass} />
+                  </div>
+                  <div className="flex items-end pb-1">
+                    <label className="flex items-center gap-2 cursor-pointer text-sm text-[#8b949e]">
+                      <input type="checkbox" checked={cotForm.envio} onChange={e => setCotForm({...cotForm, envio: e.target.checked})} className="accent-red-500 w-4 h-4" />
+                      Incluir envío
+                    </label>
+                  </div>
+                </div>
+
+                {/* Tabla de precios */}
+                <div className="grid grid-cols-4 gap-1 mb-4">
+                  {PRECIOS_B2B.map(p => (
+                    <div key={p.label} className={`rounded-lg p-2 text-center border transition-all ${tier.label === p.label ? 'border-red-500 bg-red-500/10' : 'border-[#2d3139] bg-[#0f1117]'}`}>
+                      <div className={`text-xs font-mono font-bold ${tier.label === p.label ? 'text-red-400' : 'text-[#8b949e]'}`}>${p.precio}</div>
+                      <div className="text-[9px] text-[#8b949e] mt-0.5">{p.min === 300 ? '300+' : `${p.min}–${p.max}`} u</div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="bg-[#0f1117] border border-[#2d3139] rounded-xl p-4 space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-[#8b949e]">Plan activo</span>
+                    <span className="text-white font-medium">{tier.label}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-[#8b949e]">Subtotal</span>
+                    <span className="text-white font-mono">{fmt(subtotal)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-[#8b949e]">IVA 16%</span>
+                    <span className="text-white font-mono">{fmt(iva)}</span>
+                  </div>
+                  <div className="flex justify-between text-base font-bold border-t border-[#2d3139] pt-2 mt-2">
+                    <span className="text-white">Total</span>
+                    <span className="text-emerald-400 font-mono">{fmt(total)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm pt-1">
+                    <span className="text-[#8b949e]">Entrega estimada</span>
+                    <span className="text-amber-400 text-xs text-right max-w-[55%]">{fechaEntrega}</span>
+                  </div>
+                  {requiereContrato && (
+                    <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 rounded-lg p-2 mt-2">
+                      <AlertTriangle size={14} className="text-amber-400 shrink-0" />
+                      <span className="text-amber-400 text-xs">Este pedido requiere contrato de compraventa</span>
+                    </div>
+                  )}
+                  {isPremium && (
+                    <div className="text-[10px] text-[#8b949e] text-center">* Precio Premium es base negociable</div>
+                  )}
+                </div>
+
+                <div className="mt-3">
+                  <label className="block text-[#8b949e] text-[10px] uppercase font-mono tracking-wider mb-2">Notas (opcional)</label>
+                  <textarea value={cotForm.notas} onChange={e => setCotForm({...cotForm, notas: e.target.value})} placeholder="Condiciones especiales, fecha requerida..." className={`${inputClass} min-h-[60px]`} />
+                </div>
+              </div>
+
+              {/* Botones de acción */}
+              <div className="grid grid-cols-2 gap-3">
+                <a
+                  href={`https://wa.me/52${cotForm.whatsapp.replace(/\D/g,'')}?text=${encodeURIComponent(textoWA)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold border transition-all ${cotForm.whatsapp ? 'bg-[#25D366]/10 border-[#25D366]/30 text-[#25D366] hover:bg-[#25D366]/20' : 'bg-[#161b22] border-[#2d3139] text-[#8b949e] pointer-events-none opacity-50'}`}
+                >
+                  WhatsApp
+                </a>
+                <a
+                  href={`mailto:${cotForm.email}?subject=Cotización RescueChip ${folioCot}&body=${encodeURIComponent(textoWA)}`}
+                  className={`flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold border transition-all ${cotForm.email ? 'bg-blue-500/10 border-blue-500/30 text-blue-400 hover:bg-blue-500/20' : 'bg-[#161b22] border-[#2d3139] text-[#8b949e] pointer-events-none opacity-50'}`}
+                >
+                  Email
+                </a>
+              </div>
+              <p className="text-[#8b949e] text-[10px] text-center font-mono">Folio: {folioCot} · Vigencia 15 días · Pago 100% anticipado</p>
+            </div>
+          )
+        })()}
 
       </div>
 
