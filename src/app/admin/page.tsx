@@ -216,10 +216,27 @@ export default function AdminDashboard() {
   ]
 
   if (loading) return (
-    <div className="min-h-screen bg-[#0f1117] flex items-center justify-center">
-      <div className="text-[#8b949e] font-mono animate-pulse flex items-center gap-3">
-        <Zap className="text-red-500 animate-bounce" size={20} /> Loading rescue_admin...
+    <div className="min-h-screen bg-[#0f1117] flex flex-col items-center justify-center gap-6">
+      <div className="flex flex-col items-center gap-1">
+        <span style={{ fontSize: '32px', fontWeight: 900, letterSpacing: '-1px', lineHeight: 1 }}>
+          <span style={{ color: '#F4F0EB' }}>RESCUE</span>
+          <span style={{ color: '#E8231A' }}>CHIP</span>
+        </span>
+        <span style={{ color: '#8b949e', fontSize: '11px', fontFamily: 'monospace', letterSpacing: '3px' }}>ADMIN</span>
       </div>
+      <div style={{ width: '48px', height: '3px', borderRadius: '2px', background: '#2d3139', overflow: 'hidden' }}>
+        <div style={{
+          width: '40%', height: '100%', background: '#E8231A', borderRadius: '2px',
+          animation: 'slide 1.2s ease-in-out infinite',
+        }} />
+      </div>
+      <style>{`
+        @keyframes slide {
+          0% { transform: translateX(-100%) }
+          50% { transform: translateX(250%) }
+          100% { transform: translateX(-100%) }
+        }
+      `}</style>
     </div>
   )
 
@@ -227,21 +244,35 @@ export default function AdminDashboard() {
     <div className="bg-[#0f1117] text-[#f0f6fc] font-sans selection:bg-red-500/30" style={{ minHeight: 'auto', paddingBottom: '32px' }}>
 
       {/* 🧭 HEADER & MOBILE TABS */}
-      <div className="sticky top-0 bg-[#0f1117]/90 backdrop-blur-md border-b border-[#2d3139] z-40">
-        <div className="px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.5)]" />
-            <h1 className="font-mono font-bold tracking-widest text-sm">RESCUECHIP<span className="text-[#8b949e] ml-1">/admin</span></h1>
+      <div className="sticky top-0 z-40" style={{ background: '#0f1117', borderBottom: '1px solid #2d3139' }}>
+        <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#E8231A', boxShadow: '0 0 8px rgba(232,35,26,0.6)', animation: 'pulse 2s infinite' }} />
+            <span style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: '14px', letterSpacing: '2px' }}>
+              <span style={{ color: '#F4F0EB' }}>RESCUE</span>
+              <span style={{ color: '#E8231A' }}>CHIP</span>
+              <span style={{ color: '#8b949e', marginLeft: '4px' }}>/admin</span>
+            </span>
           </div>
         </div>
-
-        {/* Scrollable Tabs */}
-        <div className="flex overflow-x-auto no-scrollbar border-t border-[#2d3139]/50 px-2 lg:px-4">
+        <div style={{ display: 'flex', overflowX: 'auto', borderTop: '1px solid rgba(45,49,57,0.5)', padding: '0 8px', scrollbarWidth: 'none' }}>
           {TABS.map(t => (
-            <button key={t.id} onClick={() => setTab(t.id)} className={`flex items-center gap-2 whitespace-nowrap px-4 py-3 text-sm font-medium transition-colors border-b-2 ${tab === t.id ? 'border-white text-white' : 'border-transparent text-[#8b949e] hover:text-white/80'}`}>
-              <t.icon size={16} />
+            <button key={t.id} onClick={() => setTab(t.id)} style={{
+              display: 'flex', alignItems: 'center', gap: '6px',
+              whiteSpace: 'nowrap', padding: '10px 12px',
+              fontSize: '13px', fontWeight: tab === t.id ? 600 : 400,
+              color: tab === t.id ? '#F4F0EB' : '#8b949e',
+              background: 'none', border: 'none', cursor: 'pointer',
+              borderBottom: `2px solid ${tab === t.id ? '#E8231A' : 'transparent'}`,
+              transition: 'all 0.15s',
+            }}>
+              <t.icon size={14} />
               {t.label}
-              {t.count !== undefined && <span className="ml-1.5 bg-[#2d3139] text-white text-[10px] font-mono px-1.5 py-0.5 rounded-full">{t.count}</span>}
+              {t.count !== undefined && (
+                <span style={{ marginLeft: '4px', background: tab === t.id ? '#E8231A' : '#2d3139', color: 'white', fontSize: '10px', fontFamily: 'monospace', padding: '1px 6px', borderRadius: '999px' }}>
+                  {t.count}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -252,11 +283,22 @@ export default function AdminDashboard() {
         {/* 1️⃣ OVERVIEW */}
         {tab === 'overview' && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 mb-6">
-              <StatCard label="Ingresos" value={fmt(totalRevenue)} color="text-emerald-400" icon={CreditCard} sub={`${totalUnits} unids`} />
-              <StatCard label="Usuarios" value={profiles.total} icon={Users} color="text-amber-400" sub={`${profiles.withPhone} actv`} />
-              <StatCard label="Emergencias" value={accidents} icon={Siren} color="text-red-500" sub={scanRate > 0 ? `${scanRate}% escaneo` : 'Sin datos'} />
-              <StatCard label="Pipeline" value={fmt(b2bValue)} icon={Building2} color="text-purple-400" sub={`${pipeline.length} opps`} />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', marginBottom: '20px' }}>
+              {[
+                { label: 'Ingresos', value: fmt(totalRevenue), sub: `${totalUnits} unidades`, color: '#34d399', icon: CreditCard },
+                { label: 'Usuarios', value: profiles.total, sub: `${profiles.withPhone} con tel`, color: '#fbbf24', icon: Users },
+                { label: 'Emergencias', value: accidents, sub: scanRate > 0 ? `${scanRate}% escaneado` : 'Sin datos', color: '#f87171', icon: Siren },
+                { label: 'Pipeline B2B', value: fmt(b2bValue), sub: `${pipeline.length} oportunidades`, color: '#c084fc', icon: Building2 },
+              ].map(card => (
+                <div key={card.label} style={{ background: '#161b22', border: '1px solid #2d3139', borderRadius: '12px', padding: '16px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                    <span style={{ color: '#8b949e', fontSize: '10px', fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '1px' }}>{card.label}</span>
+                    <card.icon size={14} color="#8b949e" />
+                  </div>
+                  <div style={{ fontSize: '22px', fontWeight: 700, fontFamily: 'monospace', color: card.color, marginBottom: '4px' }}>{card.value}</div>
+                  <div style={{ fontSize: '11px', color: '#8b949e' }}>{card.sub}</div>
+                </div>
+              ))}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -565,9 +607,24 @@ export default function AdminDashboard() {
           else if (tab === 'emergencies') setModal('accident')
           else if (tab === 'workshops') setModal('workshop')
           else if (tab === 'b2b') setModal('b2b')
+          else if (tab === 'cotizador') { /* no modal en cotizador */ return }
           else setModal('sale')
-        }} className="bg-red-600 text-white w-14 h-14 rounded-full shadow-lg shadow-red-900/50 flex items-center justify-center border border-red-500 active:scale-95 transition-transform">
-          <Plus size={24} />
+        }} style={{
+          background: '#E8231A',
+          color: 'white',
+          border: 'none',
+          borderRadius: '999px',
+          padding: '14px 20px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          fontSize: '14px',
+          fontWeight: 700,
+          boxShadow: '0 4px 20px rgba(232,35,26,0.4)',
+          cursor: 'pointer',
+        }}>
+          <Plus size={20} />
+          Agregar
         </button>
       </div>
 

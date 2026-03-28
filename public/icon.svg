@@ -1,5 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <rect width="512" height="512" rx="80" fill="#0f1117"/>
-  <rect x="60" y="60" width="392" height="392" rx="60" fill="#E8231A"/>
-  <text x="256" y="340" font-family="monospace" font-weight="900" font-size="220" fill="white" text-anchor="middle">R</text>
+  <rect x="24" y="24" width="464" height="464" rx="64" fill="#161b22"/>
+  <text x="256" y="210" font-family="'Arial Black', Arial, sans-serif" font-weight="900" font-size="148" fill="#F4F0EB" text-anchor="middle" letter-spacing="-4">RE</text>
+  <text x="256" y="360" font-family="'Arial Black', Arial, sans-serif" font-weight="900" font-size="148" fill="#E8231A" text-anchor="middle" letter-spacing="-4">CUE</text>
+  <rect x="80" y="378" width="352" height="6" rx="3" fill="#E8231A" opacity="0.4"/>
+  <text x="256" y="460" font-family="'Arial Black', Arial, sans-serif" font-weight="900" font-size="72" fill="#F4F0EB" text-anchor="middle" letter-spacing="8" opacity="0.6">CHIP</text>
 </svg>
