@@ -283,6 +283,11 @@
       </div>
       <div class="scan-line" id="scan-line"></div>
     </div>
+    <div id="btn-start-wrap" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.7);border-radius:16px;z-index:10;">
+      <button id="btn-start" style="background:#E11D48;color:#fff;border:none;padding:18px 32px;border-radius:14px;font-size:17px;font-weight:600;">
+        Activar cámara
+      </button>
+    </div>
   </div>
 
   <div id="state-writing">
@@ -491,8 +496,18 @@
     startScanning();
   }
 
-  startCamera();
   video.addEventListener('loadeddata', startScanning);
+
+  const btnStart = document.getElementById('btn-start');
+  if (btnStart) {
+    btnStart.addEventListener('click', () => {
+      const btnWrap = document.getElementById('btn-start-wrap');
+      if(btnWrap) btnWrap.style.display = 'none';
+      startCamera();
+    });
+  } else {
+    startCamera();
+  }
 </script>
 </body>
 </html>
