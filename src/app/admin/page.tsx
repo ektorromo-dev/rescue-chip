@@ -480,9 +480,9 @@ export default function AdminDashboard() {
         {tab === 'cotizador' && (() => {
           const tier = calcPrecio(cotForm.qty)
           const precioUnitario = precioLibre ? precioCustom : tier.precio
-          const subtotal = precioUnitario * cotForm.qty
-          const iva = Math.round(subtotal * 0.16)
-          const total = subtotal + iva
+          const total = precioUnitario * cotForm.qty
+          const subtotal = Math.round(total / 1.16)
+          const iva = total - subtotal
           const fechaEntrega = calcFechaEntrega(cotForm.qty, cotForm.envio)
           const requiereContrato = cotForm.qty >= 50 || subtotal >= 15000
           const folioCot = `COT-${Date.now().toString().slice(-6)}`
@@ -573,11 +573,11 @@ export default function AdminDashboard() {
                     <span className="text-white font-medium">{precioLibre ? 'Personalizado' : tier.label}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-[#8b949e]">Subtotal</span>
+                    <span className="text-[#8b949e]">Subtotal (sin IVA)</span>
                     <span className="text-white font-mono">{fmt(subtotal)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-[#8b949e]">IVA 16%</span>
+                    <span className="text-[#8b949e]">IVA incluido (16%)</span>
                     <span className="text-white font-mono">{fmt(iva)}</span>
                   </div>
                   <div className="flex justify-between text-base font-bold border-t border-[#2d3139] pt-2 mt-2">
