@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
             if (chipData && chipData.owner_profile_id) {
                 const { data: profileData } = await supabase
                     .from("profiles")
-                    .select("id, user_id, full_name, emergency_contacts")
+                    .select("id, user_id, full_name, emergency_contacts, phone")
                     .eq("id", chipData.owner_profile_id)
                     .single();
 
@@ -246,6 +246,11 @@ export async function POST(req: NextRequest) {
                         if (userData && userData.user && userData.user.phone) {
                             ownerPhones.push(userData.user.phone);
                         }
+                    }
+
+                    // Fallback: usar phone de profiles si auth.users no tiene
+                    if (ownerPhones.length === 0 && profileData.phone) {
+                        ownerPhones.push(profileData.phone);
                     }
 
                     const allPhonesToNotify = Array.from(new Set([...ownerPhones, ...contactPhones]));
