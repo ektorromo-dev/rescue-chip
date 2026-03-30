@@ -118,6 +118,7 @@ export async function POST(req: NextRequest) {
           new Set([...(ownerEmail ? [ownerEmail] : []), ...contactEmails])
         );
 
+        console.log(`[En camino DEBUG] ownerEmail: ${ownerEmail}, contactEmails: ${JSON.stringify(contactEmails)}, allEmails: ${JSON.stringify(allEmails)}, profilePhone: ${profileData.phone}, contacts: ${JSON.stringify(contacts)}`);
         if (allEmails.length > 0) {
           const emailHtml = `
             <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 2px solid #166534; border-radius: 10px;">
@@ -162,6 +163,7 @@ export async function POST(req: NextRequest) {
 
         const smsBody = `✅ RescueChip: Un familiar de ${userName} confirmó que ya va en camino al lugar del incidente.`;
 
+        console.log(`[En camino DEBUG] ownerPhone: ${ownerPhone}, contactPhones: ${JSON.stringify(contactPhones)}, allPhones: ${JSON.stringify(allPhones)}`);
         const smsPromises = allPhones.map(async (rawPhone) => {
           const formatted = formatMexicanPhone(rawPhone);
           try {
