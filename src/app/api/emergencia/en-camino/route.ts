@@ -109,18 +109,24 @@ export async function POST(req: NextRequest) {
           ownerPhone = profileData.phone;
         }
 
-        // ── EMAILS ────────────────────────────────
+        // ── NOTIFICACIONES EN PARALELO (email + SMS) ────────────
         const contactEmails = contacts
           .filter((c) => c.email && c.email.trim() !== '')
           .map((c) => c.email!.trim());
-
         const allEmails = Array.from(
           new Set([...(ownerEmail ? [ownerEmail] : []), ...contactEmails])
         );
 
-        console.log(`[En camino DEBUG] ownerEmail: ${ownerEmail}, contactEmails: ${JSON.stringify(contactEmails)}, allEmails: ${JSON.stringify(allEmails)}, profilePhone: ${profileData.phone}, contacts: ${JSON.stringify(contacts)}`);
-        if (allEmails.length > 0) {
-          const emailHtml = `
+        const contactPhones = contacts
+          .filter((c) => c.phone && c.phone.trim() !== '')
+          .map((c) => c.phone!.trim());
+        const allPhones = Array.from(
+          new Set([...(ownerPhone ? [ownerPhone] : []), ...contactPhones])
+        );
+
+        console.log(`[En camino] Emails: ${JSON.stringify(allEmails)}, Phones: ${JSON.stringify(allPhones)}, ownerPhone: ${ownerPhone}, profilePhone: ${profileData.phone}`);
+
+        const emailHtml = `
             <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 2px solid #166534; border-radius: 10px;">
               <h2 style="color: #166534; margin-top: 0; text-align: center;">✅ Un familiar va en camino</h2>
               <p style="font-size: 16px; text-align: center;">
@@ -138,47 +144,46 @@ export async function POST(req: NextRequest) {
             </div>
           `;
 
-          try {
-            await transporter.sendMail({
+        const smsBody = `✅ RescueChip: Un familiar de ${userName} confirmó que ya va en camino al lugar del incidente.`;
+
+        // Construir TODAS las promesas
+        const allNotificationPromises: Promise<void>[] = [];
+
+        // Email promise
+        if (allEmails.length > 0) {
+          allNotificationPromises.push(
+            transporter.sendMail({
               from: 'RescueChip <contacto@rescue-chip.com>',
               replyTo: 'contacto@rescue-chip.com',
               to: allEmails.join(', '),
               subject: '✅ Un familiar va en camino — RescueChip',
               html: emailHtml,
-            });
-            console.log(`[En camino] Email enviado a: ${allEmails.join(', ')}`);
-          } catch (mailError) {
-            console.error('[En camino] Error enviando email:', mailError);
-          }
+            }).then(() => {
+              console.log(`[En camino] Email enviado a: ${allEmails.join(', ')}`);
+            }).catch((mailError: any) => {
+              console.error('[En camino] Error enviando email:', mailError.message);
+            })
+          );
         }
 
-        // ── SMS ───────────────────────────────────
-        const contactPhones = contacts
-          .filter((c) => c.phone && c.phone.trim() !== '')
-          .map((c) => c.phone!.trim());
-
-        const allPhones = Array.from(
-          new Set([...(ownerPhone ? [ownerPhone] : []), ...contactPhones])
-        );
-
-        const smsBody = `✅ RescueChip: Un familiar de ${userName} confirmó que ya va en camino al lugar del incidente.`;
-
-        console.log(`[En camino DEBUG] ownerPhone: ${ownerPhone}, contactPhones: ${JSON.stringify(contactPhones)}, allPhones: ${JSON.stringify(allPhones)}`);
-        const smsPromises = allPhones.map(async (rawPhone) => {
+        // SMS promises
+        for (const rawPhone of allPhones) {
           const formatted = formatMexicanPhone(rawPhone);
-          try {
-            await twilioClient.messages.create({
+          allNotificationPromises.push(
+            twilioClient.messages.create({
               body: smsBody,
               from: process.env.TWILIO_PHONE_NUMBER,
               to: formatted,
-            });
-            console.log(`[En camino SMS] Enviado a ${formatted}`);
-          } catch (smsError: any) {
-            console.error(`[En camino SMS Error] ${formatted}:`, smsError.message);
-          }
-        });
+            }).then(() => {
+              console.log(`[En camino SMS] Enviado a ${formatted}`);
+            }).catch((smsError: any) => {
+              console.error(`[En camino SMS Error] ${formatted}: ${smsError.message}`);
+            })
+          );
+        }
 
-        await Promise.all(smsPromises);
+        // Ejecutar TODO en paralelo
+        await Promise.all(allNotificationPromises);
       }
     }
 
