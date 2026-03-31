@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import ProfileViewer from "@/components/ProfileViewer";
 
+export const dynamic = 'force-dynamic';
+
 interface ProfileProps {
     params: Promise<{ id: string }>;
     searchParams?: Promise<{ preview?: string }>;
@@ -108,10 +110,6 @@ export default async function ProfilePage({ params, searchParams }: ProfileProps
                 </div>
             </div>
         );
-    }
-
-    if (chip && !chip.activated) {
-        redirect(`/activate?folio=${cleanId}`);
     }
 
     // 2. Fetch the profile for this chip if not mocked
