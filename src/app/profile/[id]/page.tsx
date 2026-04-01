@@ -97,19 +97,7 @@ export default async function ProfilePage({ params, searchParams }: ProfileProps
 
     // Si el folio EXISTE pero NO está activado (ej. disponible o vendido)
     if (!isChipFullyActivated) {
-        return (
-            <div style={{ minHeight: '100vh', backgroundColor: '#0A0A08', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '16px', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}>
-                <div style={{ backgroundColor: '#131311', padding: '40px', borderRadius: '24px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)', maxWidth: '448px', width: '100%', textAlign: 'center', border: '1px solid rgba(255,255,255,0.08)' }}>
-                    <HeartPulse size={48} style={{ margin: '0 auto', color: 'rgba(232,35,26,0.5)', marginBottom: '24px' }} />
-                    <h1 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '16px', color: '#F4F0EB' }}>Redirigiendo...</h1>
-                    <p style={{ color: '#9E9A95', marginBottom: '32px' }}>Este dispositivo está pendiente de registro.</p>
-                    <meta httpEquiv="refresh" content={`0; url=/activate?folio=${encodeURIComponent(chip.folio)}`} />
-                    <Link href={`/activate?folio=${encodeURIComponent(chip.folio)}`} style={{ color: '#E8231A', textDecoration: 'underline', fontWeight: 700, marginTop: '16px', display: 'inline-block' }}>
-                        Haz clic aquí si no te redirige automáticamente.
-                    </Link>
-                </div>
-            </div>
-        );
+        redirect(`/activate?folio=${encodeURIComponent(chip.folio)}`);
     }
 
     // 2. Fetch the profile for this chip if not mocked
