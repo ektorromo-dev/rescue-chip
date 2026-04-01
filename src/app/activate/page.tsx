@@ -73,6 +73,10 @@ function ActivationFormContent() {
                             }, 1000);
                             return;
                         }
+                        if (data.alreadyActivated && data.folio) {
+                            window.location.href = `/profile/${encodeURIComponent(data.folio)}`;
+                            return;
+                        }
                         setPreValidationError(data.error || 'Este folio no es válido o ya fue activado.');
                     }
                 } catch (e) {

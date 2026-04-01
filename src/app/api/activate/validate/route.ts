@@ -33,7 +33,11 @@ export async function GET(request: NextRequest) {
     const isActivatedBool = chip.activated === true || String(chip.activated).toLowerCase() === 'true';
 
     if ((isActivatedStr && isActivatedBool) || (chip.status !== 'disponible' && chip.status !== 'vendido')) {
-        return NextResponse.json({ error: "Este folio no es válido o ya fue activado." }, { status: 400 });
+        return NextResponse.json({ 
+            error: "Este folio no es válido o ya fue activado.",
+            alreadyActivated: chip.activated === true,
+            folio: chip.folio
+        }, { status: 400 });
     }
 
     return NextResponse.json({ success: true, chip });
