@@ -436,6 +436,24 @@ function ActivationFormContent() {
             }
 
             // 4. Redirect to the dashboard to let them edit their new profile instead of returning directly to public profile
+            // Pre-registrar dispositivo como verificado para evitar pantalla de verificación
+            try {
+                let currentDeviceId = document.cookie.split('; ').find(row => row.startsWith('rescuechip_device_id='))?.split('=')[1];
+                if (!currentDeviceId) {
+                    currentDeviceId = crypto.randomUUID();
+                    document.cookie = `rescuechip_device_id=${currentDeviceId}; max-age=${30 * 24 * 60 * 60}; path=/; SameSite=Lax`;
+                }
+                await supabase.from('user_sessions').upsert({
+                    user_id: userId,
+                    device_id: currentDeviceId,
+                    device_info: navigator.userAgent || 'Unknown Device',
+                    status: 'verified',
+                    last_seen: new Date().toISOString()
+                }, { onConflict: 'user_id,device_id' });
+            } catch (deviceErr) {
+                console.error("Error pre-registrando dispositivo (ignorado):", deviceErr);
+            }
+
             router.push(`/dashboard`);
 
         } catch (err: any) {
