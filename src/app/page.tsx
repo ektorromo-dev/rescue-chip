@@ -696,11 +696,22 @@ export default function Home() {
       {/* AWARENESS SPLIT */}
       <section className="awareness">
         <div className="aw-video-wrap">
-          <video className="aw-video" autoPlay muted loop playsInline preload="auto"
-            onCanPlay={(e) => { const v = e.currentTarget; v.muted = true; v.play().catch(() => { }); }}
-          >
-            <source src={`${SB}5052599-hd_1920_1080_30fps.mp4`} type="video/mp4" />
-          </video>
+          <iframe
+            src="https://www.youtube.com/embed/bLTGSE9KFIQ?autoplay=1&mute=1&loop=1&playlist=bLTGSE9KFIQ&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1"
+            allow="autoplay; fullscreen"
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              width: '100vw',
+              height: '56.25vw',
+              minHeight: '100vh',
+              minWidth: '177.78vh',
+              transform: 'translate(-50%, -50%)',
+              border: 'none',
+              pointerEvents: 'none',
+            }}
+          />
           <div className="aw-overlay" />
           <span className="aw-tag">/ Cada rodada</span>
         </div>
@@ -946,12 +957,23 @@ export default function Home() {
 
       {/* CTA FINAL */}
       <section className="cta-final">
-        <video className="cta-video" autoPlay muted loop playsInline preload="auto"
-          onCanPlay={(e) => { const v = e.currentTarget; v.muted = true; v.playbackRate = 1.6; v.play().catch(() => { }); }}
-        >
-          <source src={`${SB}13457171_1920_1080_30fps.mp4`} type="video/mp4" />
-          <source src={`${SB}5052676-hd_1920_1080_30fps.mp4`} type="video/mp4" />
-        </video>
+        <iframe
+          className="cta-video"
+          src="https://www.youtube.com/embed/JIGHjUEMUSw?autoplay=1&mute=1&loop=1&playlist=JIGHjUEMUSw&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1"
+          allow="autoplay; fullscreen"
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            width: '100vw',
+            height: '56.25vw',
+            minHeight: '100vh',
+            minWidth: '177.78vh',
+            transform: 'translate(-50%, -50%)',
+            border: 'none',
+            pointerEvents: 'none',
+          }}
+        />
         <div className="cta-overlay" />
         <div className="cta-content">
           <div className="section-label">¿Listo para rodar protegido?</div>
