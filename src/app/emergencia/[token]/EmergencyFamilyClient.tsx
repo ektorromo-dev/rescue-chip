@@ -27,9 +27,10 @@ interface ProfileData {
 interface Props {
   incidente: IncidenteData;
   profile: ProfileData | null;
+  isDemo?: boolean;
 }
 
-export default function EmergencyFamilyClient({ incidente, profile }: Props) {
+export default function EmergencyFamilyClient({ incidente, profile, isDemo = false }: Props) {
   const [enCamino, setEnCamino] = useState(incidente.familiarEnCamino);
   const [sending, setSending] = useState(false);
   const [checkedItems, setCheckedItems] = useState<Record<number, boolean>>({});
@@ -55,6 +56,10 @@ export default function EmergencyFamilyClient({ incidente, profile }: Props) {
     : null;
 
   const handleEnCamino = async () => {
+    if (isDemo) {
+      setEnCamino(true);
+      return;
+    }
     setSending(true);
     try {
       await fetch('/api/emergencia/en-camino', {

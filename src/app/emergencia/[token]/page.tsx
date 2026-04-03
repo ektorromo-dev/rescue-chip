@@ -20,6 +20,40 @@ interface PageProps {
 
 export default async function EmergenciaPage({ params }: PageProps) {
   const { token } = await params;
+
+  // ── DEMO MODE ──
+  if (token.toLowerCase() === 'demo') {
+    const demoIncidente = {
+      token: 'demo',
+      chipFolio: 'RSC-DEMO',
+      latitud: 19.4326,
+      longitud: -99.1332,
+      locationShared: true,
+      createdAt: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+      familiarEnCamino: false,
+    };
+
+    const demoProfile = {
+      fullName: 'Carlos Martínez',
+      bloodType: 'O+',
+      medicalConditions: 'Asma leve controlada',
+      importantMedications: 'Salbutamol inhalador',
+      allergies: 'Penicilina, látex',
+      sexo: 'masculino',
+      age: '32',
+      city: 'Monterrey, NL',
+    };
+
+    return (
+      <EmergencyFamilyClient
+        incidente={demoIncidente}
+        profile={demoProfile}
+        isDemo={true}
+      />
+    );
+  }
+
   const supabase = await createClient();
 
   // 1. Buscar incidente por token
@@ -113,6 +147,7 @@ export default async function EmergenciaPage({ params }: PageProps) {
         age: profileData.age || null,
         city: profileData.city || null,
       } : null}
+      isDemo={false}
     />
   );
 }
