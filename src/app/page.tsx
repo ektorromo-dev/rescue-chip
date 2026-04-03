@@ -496,7 +496,6 @@ const LANDING_CSS = `
     .trust-badges{ grid-template-columns:1fr; }
   }
 `
-const SB = "https://kaihkhyqjmattriozick.supabase.co/storage/v1/object/public/Media%20Landing%20Page/";
 
 export default function Home() {
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
@@ -733,23 +732,23 @@ export default function Home() {
         </div>
         <div className="pgrid">
           <div className="pgrid-cell tall">
-            <img src={`${SB}Synthetic_Studio_motorcycle_accident_on_mexican_highway_at_dawn_cffea1ee-eea7-4958-b2ee-662faae91fc2.png`} alt="Accidente autopista mexicana" loading="lazy" />
+            <img src="/images/IAmototirada.png" alt="Accidente autopista mexicana" loading="lazy" />
             <div className="pgrid-cap"><span>La autopista mexicana</span></div>
           </div>
           <div className="pgrid-cell">
-            <img src={`${SB}Synthetic_Studio_first_person_point_of_view_motorcycle_crash_mo_06bf3283-17c9-4bbd-b7f7-33880fac7082.png`} alt="POV accidente" loading="lazy" />
+            <img src="/images/IAaccidente1.png" alt="POV accidente" loading="lazy" />
             <div className="pgrid-cap"><span>Punto de vista del rider</span></div>
           </div>
           <div className="pgrid-cell">
-            <img src={`${SB}Synthetic_Studio_first_person_point_of_view_motorcycle_crash_mo_be3c9235-5c34-4dc2-9137-78b2d4622ecb.png`} alt="POV crash" loading="lazy" />
+            <img src="/images/IAaccidente2.png" alt="POV crash" loading="lazy" />
             <div className="pgrid-cap"><span>La curva que no viste</span></div>
           </div>
           <div className="pgrid-cell">
-            <img src={`${SB}Synthetic_Studio_first_person_point_of_view_motorcycle_crash_mo_df484981-7c5d-4818-b8d5-0d67add7fa86.png`} alt="El impacto" loading="lazy" />
+            <img src="/images/IAaccidente3.png" alt="El impacto" loading="lazy" />
             <div className="pgrid-cap"><span>El impacto</span></div>
           </div>
           <div className="pgrid-cell">
-            <img src={`${SB}Synthetic_Studio_close_up_of_paramedic_hands_holding_smartpho_a08d2929-4ac2-40e4-878a-02b67e3bd64b_2.png`} alt="Paramédico escaneando chip" loading="lazy" />
+            <img src="/images/IAmotociclistaescanea.png" alt="Paramédico escaneando chip" loading="lazy" />
             <div className="pgrid-cap"><span>El escaneo que salva vidas</span></div>
           </div>
         </div>
@@ -784,7 +783,7 @@ export default function Home() {
       {/* PRODUCT */}
       <section className="product">
         <div className="product-media">
-          <img src={`${SB}WhatsApp%20Image%202026-03-08%20at%205.43.29%20PM%20(3).jpeg`} alt="Casco con chip RescueChip" loading="lazy" />
+          <img src="/images/nuevosticker.jpeg" alt="Casco con chip RescueChip" loading="lazy" />
           <div className="product-media-overlay" />
         </div>
         <div className="product-content">
@@ -803,7 +802,7 @@ export default function Home() {
 
       {/* PARAMÉDICO */}
       <section className="paramedic">
-        <img className="paramedic-img" src={`${SB}Synthetic_Studio_mexican_paramedic_kneeling_on_road_at_night_ph_440094be-c6db-45ef-83a2-983a58519393.png`} alt="Paramédico escaneando RescueChip" loading="lazy" />
+        <img className="paramedic-img" src="/images/IAparamedicoescaneando.png" alt="Paramédico escaneando RescueChip" loading="lazy" />
         <div className="paramedic-overlay" />
         <div className="paramedic-content">
           <div className="section-label">En una emergencia real</div>
@@ -820,10 +819,10 @@ export default function Home() {
           <h2 className="section-title">Tu chip. Tu casco. Tu red de seguridad.</h2>
           <p>Así luce el chip RescueChip en un casco real.</p>
           <div className="helmet-grid">
-            <div className="helmet-cell"><img src={`${SB}WhatsApp%20Image%202026-03-08%20at%205.43.29%20PM.jpeg`} alt="Chip RescueChip en casco" loading="lazy" /></div>
-            <div className="helmet-cell"><img src={`${SB}WhatsApp%20Image%202026-03-08%20at%205.43.29%20PM%20(1).jpeg`} alt="Casco Honda con chip NFC" loading="lazy" /></div>
-            <div className="helmet-cell"><img src={`${SB}WhatsApp%20Image%202026-03-08%20at%205.43.29%20PM%20(2).jpeg`} alt="Casco Nexx RescueChip" loading="lazy" /></div>
-            <div className="helmet-cell"><img src={`${SB}WhatsApp%20Image%202026-03-08%20at%205.43.30%20PM.jpeg`} alt="Close-up chip emergencia" loading="lazy" /></div>
+            <div className="helmet-cell"><img src="/images/nuevosticker2.jpeg" alt="Chip RescueChip en casco" loading="lazy" /></div>
+            <div className="helmet-cell"><img src="/images/nuevosticker3.jpeg" alt="Casco Honda con chip NFC" loading="lazy" /></div>
+            <div className="helmet-cell"><img src="/images/nuevosticker4.jpeg" alt="Casco Nexx RescueChip" loading="lazy" /></div>
+            <div className="helmet-cell"><img src="/images/nuevosticker5.jpeg" alt="Close-up chip emergencia" loading="lazy" /></div>
           </div>
         </div>
       </section>
