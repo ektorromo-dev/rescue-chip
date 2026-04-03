@@ -136,7 +136,7 @@ const LANDING_CSS = `
   /* PRODUCT */
   .product { display:grid; grid-template-columns:1fr 1fr; min-height:80vh; }
   .product-media { position:relative; overflow:hidden; }
-  .product-media img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; filter:brightness(.8) contrast(1.05); transition:transform 8s ease; }
+  .product-media img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center 40%; filter:brightness(.8) contrast(1.05); transition:transform 8s ease; }
   .product-media:hover img { transform:scale(1.04); }
   .product-media-overlay { position:absolute; inset:0; background:linear-gradient(to left,rgba(10,10,8,.3) 0%,transparent 60%); }
   .product-content { background:var(--dark-card); padding:80px 60px; display:flex; flex-direction:column; justify-content:center; }
