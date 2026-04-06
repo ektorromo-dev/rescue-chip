@@ -80,51 +80,6 @@ ${orderDetails.ciudad}, ${orderDetails.estado}, C.P. ${orderDetails.codigo_posta
 Referencia: ${orderDetails.referencia}`.trim()
             : "No especificada (Orden no encontrada en DB)";
 
-        // Determinar cantidad de folios y plan
-        let cantidadChips = 1;
-        let assignedPlan = 'individual';
-        const paqueteLower = paquete.toLowerCase();
-
-        if (paqueteLower.includes('pareja')) {
-            cantidadChips = 2;
-            assignedPlan = 'pareja';
-        } else if (paqueteLower.includes('familiar')) {
-            cantidadChips = 4;
-            assignedPlan = 'familiar';
-        }
-
-        // Asignar chips de la base de datos
-        let foliosAsignados: string[] = [];
-        const { data: chipsDisponibles, error: chipsError } = await supabase
-            .from('chips')
-            .select('*')
-            .eq('status', 'disponible')
-            .limit(cantidadChips);
-
-        if (chipsError) {
-            console.error("Error al buscar chips disponibles:", chipsError);
-        } else if (chipsDisponibles && chipsDisponibles.length === cantidadChips) {
-            // Marcar como vendidos
-            const idsChips = chipsDisponibles.map(c => c.id);
-            foliosAsignados = chipsDisponibles.map(c => c.folio);
-
-            const { error: updateChipsError } = await supabase
-                .from('chips')
-                .update({
-                    status: 'vendido',
-                    assigned_plan: assignedPlan
-                })
-                .in('id', idsChips);
-
-            if (updateChipsError) {
-                console.error("Error al actualizar estado de chips:", updateChipsError);
-            } else {
-                console.log(`✅ ${cantidadChips} chips asignados exitosamente:`, foliosAsignados.join(', '));
-            }
-        } else {
-            console.error(`❌ No hay suficientes chips disponibles en inventario. Se solicitaron ${cantidadChips}, se encontraron ${chipsDisponibles?.length || 0}`);
-        }
-
         const monto = (session.amount_total || 0) / 100;
 
         const emailHtml = `
@@ -137,7 +92,6 @@ Referencia: ${orderDetails.referencia}`.trim()
                 <tr><td><strong>Paquete:</strong></td><td>${paquete}</td></tr>
                 <tr><td><strong>Monto Pagado:</strong></td><td>$${monto.toFixed(2)} MXN</td></tr>
                 <tr><td><strong>¿Solicitó Factura?:</strong></td><td>${pidioFactura ? '✅ Sí (revisa el otro correo con los datos fiscales)' : '❌ No'}</td></tr>
-                <tr><td><strong>Folios Asignados:</strong></td><td>${foliosAsignados.length > 0 ? foliosAsignados.join(', ') : '⚠️ No se pudieron asignar folios automáticamente'}</td></tr>
                 <tr><td><strong>Dirección de Envío:</strong></td><td><pre style="font-family: inherit; margin: 0;">${direccion}</pre></td></tr>
             </table>
             <p>Por favor, comience a preparar el envío en los próximos 3-7 días hábiles.</p>
@@ -159,15 +113,7 @@ Referencia: ${orderDetails.referencia}`.trim()
 
         // --- ENVIAR CORREO DE CONFIRMACIÓN AL CLIENTE ---
         if (email && email !== "No especificado") {
-            const foliosHtml = foliosAsignados.length > 0
-                ? `<div style="background-color: #f0fdf4; padding: 15px; border-radius: 8px; border-left: 4px solid #16a34a; margin: 20px 0;">
-                    <h3 style="margin-top: 0; color: #166534; font-size: 16px;">Folios Asignados:</h3>
-                    <p style="color: #15803d; margin-bottom: 5px; font-size: 15px;">Estos son los folios únicos de tus chips:</p>
-                    <ul style="color: #15803d; margin-top: 5px; font-size: 16px; font-weight: bold;">
-                        ${foliosAsignados.map(f => `<li>${f}</li>`).join('')}
-                    </ul>
-                   </div>`
-                : '';
+            const foliosHtml = '';
 
             const customerEmailHtml = `
                 <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
