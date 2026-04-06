@@ -163,24 +163,22 @@ export default function DashboardPage() {
                 }
 
                 // 3. A este punto, SÍ hay otros dispositivos verificados, y este NO lo está.
-                // Por lo tanto, enviamos correo y esperamos confirmación.
-                setDeviceVerificationStatus("pending");
-                try {
-                    await fetch('/api/request-device-verification', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`
-                        },
-                        body: JSON.stringify({
-                            deviceId: localDeviceId,
-                            deviceInfo: navigator.userAgent || 'Unknown Device'
-                        })
+                // Registramos automáticamente, ya que el usuario se autenticó válidamente.
+                if (currentSession) {
+                    await supabase.from('user_sessions').update({
+                        status: 'verified',
+                        last_seen: new Date().toISOString()
+                    }).eq('id', currentSession.id);
+                } else {
+                    await supabase.from('user_sessions').insert({
+                        user_id: userSessionData.user.id,
+                        device_id: localDeviceId,
+                        device_info: navigator.userAgent || 'Unknown Device',
+                        status: 'verified'
                     });
-                } catch (e) {
-                    console.error("Error pidiendo verif por correo", e);
                 }
-                return false;
+                setDeviceVerificationStatus("verified");
+                return true;
             };
 
             // --- MANEJO DE NUEVO DISPOSITIVO POR EMAIL CON COOKIES ---
