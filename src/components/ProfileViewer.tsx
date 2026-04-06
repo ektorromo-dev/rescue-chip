@@ -74,7 +74,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, isPreview
         });
     };
 
-    const handleConsent = async (type: 'emergencia' | 'prueba') => {
+    const handleConsent = async (type: 'emergencia' | 'prueba' | 'consulta') => {
         setGeoError(false);
         setIsLoadingConsent(true);
 
@@ -234,6 +234,16 @@ export default function ProfileViewer({ chip, profile, isDemo = false, isPreview
                                 {isLoadingConsent ? "PROCESANDO..." : <><AlertTriangle size={20} /> ES UNA EMERGENCIA REAL</>}
                             </span>
                             {!isLoadingConsent && <span style={{ fontSize: '10px', fontWeight: 400, opacity: 0.8, letterSpacing: '0.05em' }}>(Notificará contactos de emergencia)</span>}
+                        </button>
+                        <button
+                            onClick={() => { handleConsent('consulta'); logScan('consulta'); }}
+                            disabled={isLoadingConsent}
+                            style={{ width: '100%', backgroundColor: '#1A1A18', color: '#9E9A95', padding: '14px 24px', borderRadius: '12px', fontWeight: 900, fontSize: '14px', border: '1px solid rgba(255,255,255,0.12)', cursor: isLoadingConsent ? 'not-allowed' : 'pointer', textTransform: 'uppercase', opacity: isLoadingConsent ? 0.5 : 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px' }}
+                        >
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                {isLoadingConsent ? "PROCESANDO..." : <>SOLO CONSULTAR DATOS MÉDICOS</>}
+                            </span>
+                            {!isLoadingConsent && <span style={{ fontSize: '10px', fontWeight: 400, opacity: 0.8, letterSpacing: '0.05em' }}>(No notificará a nadie)</span>}
                         </button>
                     </div>
                 </div>
@@ -507,7 +517,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, isPreview
                         )}
 
                         {/* INSURANCE DETAILS */}
-                        {(profile.medical_system || profile.aseguradora || profile.numero_poliza) && profile.medical_system !== "Sin seguro médico" && (
+                        {isEmergency && (profile.medical_system || profile.aseguradora || profile.numero_poliza) && profile.medical_system !== "Sin seguro médico" && (
                             <div style={{ backgroundColor: C.bgCard, borderRadius: '16px', padding: '24px', border: '1px solid rgba(255,255,255,0.08)', position: 'relative', overflow: 'hidden' }}>
                                 <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', fontWeight: 900, color: C.textMain, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '16px', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '12px' }}>
                                     <Info size={16} style={{ color: C.textMuted }} /> Información de Seguro
@@ -595,7 +605,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, isPreview
                         )}
 
                         {/* 6. CONTACTOS DE EMERGENCIA */}
-                        {emergencyContactsArray.length > 0 && (
+                        {isEmergency && emergencyContactsArray.length > 0 && (
                             <div style={{ backgroundColor: C.bgCard, border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', overflow: 'hidden' }}>
                                 <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', fontWeight: 900, color: C.textMain, textTransform: 'uppercase', letterSpacing: '0.05em', padding: '20px 24px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                                     <PhoneCall size={16} /> Contactos de Emergencia
