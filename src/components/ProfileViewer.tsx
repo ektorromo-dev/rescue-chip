@@ -404,9 +404,11 @@ export default function ProfileViewer({ chip, profile, isDemo = false, isPreview
                     {!isDemo && (
                         <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 16px', backgroundColor: '#09090b', color: '#d4d4d8', fontSize: '10px', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em', position: 'relative', zIndex: 50 }}>
                             <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Lock size={12} /> Seguro</span>
-                            <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#f87171' }}>
-                                Sesión expira en: {formatTime(timeLeft)}
-                            </span>
+                            {!isEmergency && (
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#f87171' }}>
+                                    Sesión expira en: {formatTime(timeLeft)}
+                                </span>
+                            )}
                         </div>
                     )}
 
