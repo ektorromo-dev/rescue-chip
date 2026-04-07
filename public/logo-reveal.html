@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RescueChip - Logo Reveal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0D0D0C;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            color: #FFFFFF;
+        }
+
+        .animation-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+            animation: fadeToBlack 0.5s 2.5s linear forwards;
+        }
+
+        @keyframes fadeToBlack {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* The SVG EKG Line */
+        .ekg-container {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 300px;
+            transform: translateY(-50%);
+            z-index: 10;
+        }
+
+        .ekg-path {
+            fill: none;
+            stroke: #E8231A;
+            stroke-width: 4;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-dasharray: 1300;
+            stroke-dashoffset: 1300;
+            animation: drawLine 1s 0s linear forwards, fadeOutLine 0.6s 0.8s forwards;
+        }
+
+        @keyframes drawLine {
+            0% { stroke-dashoffset: 1300; }
+            100% { stroke-dashoffset: 0; }
+        }
+        @keyframes fadeOutLine {
+            to { opacity: 0; }
+        }
+
+        /* Text Elements */
+        .text-content {
+            position: relative;
+            z-index: 20;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0;
+            animation: popIn 0.3s 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .wordmark {
+            font-weight: 900;
+            font-size: 4rem; /* Will scale with media queries */
+            letter-spacing: -2px;
+            margin: 0;
+            color: #FFFFFF;
+            position: relative;
+            animation: pulseGlow 0.8s 1.5s ease-out forwards;
+        }
+
+        @keyframes pulseGlow {
+            0% { text-shadow: 0 0 0 rgba(232, 35, 26, 0); }
+            30% { text-shadow: 0 0 40px rgba(232, 35, 26, 0.9), 0 0 15px rgba(232, 35, 26, 0.6); }
+            100% { text-shadow: 0 0 0 rgba(232, 35, 26, 0); }
+        }
+
+        .tagline {
+            font-weight: 300;
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 10px;
+            opacity: 0;
+            animation: fadeInText 0.4s 0.7s forwards;
+            letter-spacing: 0px;
+        }
+
+        .url {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #E8231A;
+            margin-top: 16px;
+            opacity: 0;
+            animation: fadeInText 0.4s 0.9s forwards;
+            letter-spacing: 1px;
+        }
+
+        @keyframes fadeInText {
+            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateY(10px); }
+        }
+
+        /* Responsive scaling for 9:16 vs 16:9 coverage */
+        @media (max-width: 768px) {
+            .wordmark { font-size: 3.5rem; letter-spacing: -1.5px; }
+            .tagline { font-size: 1rem; max-width: 80%; line-height: 1.4; }
+            .url { font-size: 0.95rem; }
+            .ekg-path { stroke-width: 6; } /* Thicker line on mobile */
+        }
+        @media (max-width: 480px) {
+            .wordmark { font-size: 2.8rem; letter-spacing: -1px; }
+            .tagline { font-size: 0.9rem; }
+            .ekg-container { height: 200px; }
+        }
+
+        /* Start Button overlay for audio context and to hold the first frame */
+        #start-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #0D0D0C;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        
+        #start-overlay button {
+            background: #E8231A;
+            color: #FFF;
+            border: none;
+            padding: 16px 32px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 10px 25px rgba(232, 35, 26, 0.3);
+            transition: transform 0.2s;
+        }
+        #start-overlay button:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="start-overlay">
+        <button id="start-btn">Reproducir Animación 🎬</button>
+    </div>
+
+    <div class="animation-container" id="anim-container" style="display: none;">
+        <!-- SVGs scale nicely with preserveAspectRatio="none" -->
+        <svg class="ekg-container" viewBox="0 0 1000 200" preserveAspectRatio="none">
+            <!-- Center is at 500, flatline is at Y=100. Spike height/depth controls realism -->
+            <path class="ekg-path" d="M 0 100 L 400 100 L 450 100 L 465 110 L 485 50 L 500 180 L 515 20 L 530 110 L 550 100 L 600 100 L 1000 100" />
+        </svg>
+
+        <div class="text-content">
+            <h1 class="wordmark">Rescue<span style="color: #E8231A;">Chip</span></h1>
+            <div class="tagline">Para que no estés solo si algo pasa.</div>
+            <div class="url">www.rescue-chip.com</div>
+        </div>
+    </div>
+
+    <script>
+        const overlay = document.getElementById('start-overlay');
+        const container = document.getElementById('anim-container');
+        const startBtn = document.getElementById('start-btn');
+
+        // Web Audio API for EKG beep
+        let audioCtx;
+
+        function playBeep() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if(audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            // Premium, soft hospital beep
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(850, audioCtx.currentTime); 
+            
+            gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.02);
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime + 0.1);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+
+        startBtn.addEventListener('click', () => {
+            // Optional: init audio context on click
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                container.style.display = 'flex';
+                
+                // Trigger beep at exactly 500ms (when spike hits 50% width)
+                setTimeout(() => {
+                    playBeep();
+                }, 500);
+            }, 200); // give overlay fade out time
+        });
+
+        // Allow starting with spacebar
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && overlay.style.display !== 'none') {
+                startBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -13,9 +13,11 @@ interface ProfileViewerProps {
     signedPolizaUrl: string | null;
     emergencyContactsArray: any[];
     allergiesArray: string[];
+    scanToken?: string;
+    tokenExpiresAt?: string;
 }
 
-export default function ProfileViewer({ chip, profile, isDemo = false, isPreview = false, signedPolizaUrl, emergencyContactsArray, allergiesArray }: ProfileViewerProps) {
+export default function ProfileViewer({ chip, profile, isDemo = false, isPreview = false, signedPolizaUrl, emergencyContactsArray, allergiesArray, scanToken, tokenExpiresAt }: ProfileViewerProps) {
 
     const getAutoTheme = () => {
         const h = new Date().getHours();
@@ -65,6 +67,29 @@ export default function ProfileViewer({ chip, profile, isDemo = false, isPreview
     const [geoError, setGeoError] = useState<boolean>(false);
     const [isLoadingConsent, setIsLoadingConsent] = useState<boolean>(false);
     const [photoOpen, setPhotoOpen] = useState(false);
+
+    const [isExpired, setIsExpired] = useState(false);
+    const [tokenTimeLeft, setTokenTimeLeft] = useState<number | null>(null);
+    const [currentExpiresAt, setCurrentExpiresAt] = useState(tokenExpiresAt || null);
+
+    // Token expiration countdown
+    useEffect(() => {
+        if (!currentExpiresAt || isDemo || isPreview) return;
+        
+        const checkExpiry = () => {
+            const now = Date.now();
+            const expiry = new Date(currentExpiresAt).getTime();
+            const remaining = Math.max(0, Math.floor((expiry - now) / 1000));
+            setTokenTimeLeft(remaining);
+            if (remaining <= 0) {
+                setIsExpired(true);
+            }
+        };
+        
+        checkExpiry();
+        const interval = setInterval(checkExpiry, 1000);
+        return () => clearInterval(interval);
+    }, [currentExpiresAt, isDemo, isPreview]);
 
     // Generate UUID function
     const generateUUID = () => {
@@ -118,6 +143,25 @@ export default function ProfileViewer({ chip, profile, isDemo = false, isPreview
         }).catch(e => console.error("Error logging access", e));
 
         setHasConsented(true);
+
+        // Extend token based on mode
+        if (scanToken) {
+            try {
+                const res = await fetch('/api/scan-token', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ folio: chip.folio, token: scanToken, mode: type })
+                });
+                const data = await res.json();
+                if (data.expires_at) {
+                    setCurrentExpiresAt(data.expires_at);
+                    setIsExpired(false);
+                }
+            } catch (e) {
+                console.error('Error extending token:', e);
+            }
+        }
+
         setIsLoadingConsent(false);
     };
 
@@ -212,6 +256,18 @@ export default function ProfileViewer({ chip, profile, isDemo = false, isPreview
             console.error('logScan error:', e);
         }
     };
+
+    if (isExpired && !isDemo && !isPreview) {
+        return (
+            <div style={{ minHeight: '100vh', backgroundColor: '#0A0A08', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '16px', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}>
+                <div style={{ backgroundColor: '#131311', padding: '40px', borderRadius: '24px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)', maxWidth: '448px', width: '100%', textAlign: 'center', border: '1px solid rgba(255,255,255,0.08)' }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#E8231A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 24px', display: 'block' }}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <h1 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '16px', color: '#F4F0EB' }}>Sesión expirada</h1>
+                    <p style={{ color: '#9E9A95', marginBottom: '32px' }}>Tu acceso ha expirado por seguridad. Escanea el chip NFC o el código QR nuevamente para acceder al perfil.</p>
+                </div>
+            </div>
+        );
+    }
 
     if (!hasConsented && !sessionExpired) {
         return (
@@ -428,6 +484,12 @@ export default function ProfileViewer({ chip, profile, isDemo = false, isPreview
                             }}>
                                 {[isDemo ? '32 años' : (profile.age && `${profile.age} años`), isDemo ? 'Monterrey, NL' : profile.city].filter(Boolean).join(' • ')}
                             </p>
+                    {tokenTimeLeft !== null && !isDemo && !isPreview && (
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '6px 12px', borderRadius: '8px', backgroundColor: tokenTimeLeft <= 30 ? 'rgba(232,35,26,0.15)' : 'rgba(255,255,255,0.05)', fontSize: '12px', color: tokenTimeLeft <= 30 ? '#E8231A' : '#9E9A95', fontWeight: 600, marginTop: '8px' }}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            Acceso expira en {Math.floor(tokenTimeLeft / 60)}:{(tokenTimeLeft % 60).toString().padStart(2, '0')}
+                        </div>
+                    )}
                         </div>
                     </div>     {/* Aviso "NO RETIRAR EL CASCO" */}
                     {profile.is_motorcyclist && (
