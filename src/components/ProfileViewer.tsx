@@ -581,7 +581,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, isPreview
                         )}
 
                         {/* INSURANCE DETAILS */}
-                        {isEmergency && (profile.medical_system || profile.aseguradora || profile.numero_poliza) && profile.medical_system !== "Sin seguro médico" && (
+                        {(profile.medical_system || profile.aseguradora || profile.numero_poliza) && profile.medical_system !== "Sin seguro médico" && (
                             <div style={{ backgroundColor: C.bgCard, borderRadius: '16px', padding: '24px', border: '1px solid rgba(255,255,255,0.08)', position: 'relative', overflow: 'hidden' }}>
                                 <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', fontWeight: 900, color: C.textMain, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '16px', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '12px' }}>
                                     <Info size={16} style={{ color: C.textMuted }} /> Información de Seguro
@@ -594,7 +594,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, isPreview
                                             {profile.aseguradora && (
                                                 <div>
                                                     <h4 style={{ fontSize: '11px', fontWeight: 900, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>🏦 Aseguradora</h4>
-                                                    <p style={{ fontWeight: 900, fontSize: '16px', color: C.textMain }}>{profile.aseguradora}</p>
+                                                    <p style={{ fontWeight: 900, fontSize: '16px', color: C.textMain }}>{isEmergency ? profile.aseguradora : (profile.aseguradora ? profile.aseguradora.substring(0, 3) + '***' : '')}</p>
                                                 </div>
                                             )}
                                             {profile.numero_poliza && (
@@ -606,7 +606,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, isPreview
                                             {profile.nombre_asegurado && (
                                                 <div style={{ gridColumn: '1 / -1' }}>
                                                     <h4 style={{ fontSize: '11px', fontWeight: 900, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>Titular</h4>
-                                                    <p style={{ fontWeight: 700, fontSize: '16px', color: C.textMain }}>{profile.nombre_asegurado}</p>
+                                                    <p style={{ fontWeight: 700, fontSize: '16px', color: C.textMain }}>{isEmergency ? profile.nombre_asegurado : (profile.nombre_asegurado ? profile.nombre_asegurado.split(' ')[0] + ' ***' : '')}</p>
                                                 </div>
                                             )}
                                         </>
@@ -617,7 +617,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, isPreview
                                         <>
                                             <div>
                                                 <h4 style={{ fontSize: '11px', fontWeight: 900, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>🏥 Institución</h4>
-                                                <p style={{ fontWeight: 900, fontSize: '16px', color: C.textMain }}>{profile.medical_system}</p>
+                                                <p style={{ fontWeight: 900, fontSize: '16px', color: C.textMain }}>{isEmergency ? profile.medical_system : (profile.medical_system ? profile.medical_system.substring(0, 3) + '***' : '')}</p>
                                             </div>
                                             {profile.nss && (
                                                 <div>
@@ -648,6 +648,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, isPreview
 
                                         if (phone) {
                                             const cleanPhone = phone.replace(/\D/g, '');
+                                            if (!isEmergency) return null;
                                             return (
                                                 <a href={`tel:${cleanPhone}`} style={{ width: '100%', backgroundColor: C.bgSection, color: C.textMain, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px', borderRadius: '12px', fontWeight: 700, fontSize: '14px', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.12)' }}>
                                                     <PhoneCall size={18} /> {label}
@@ -657,7 +658,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, isPreview
                                         return null;
                                     })()}
 
-                                    {signedPolizaUrl && (
+                                    {isEmergency && signedPolizaUrl && (
                                         <div style={{ width: '100%', paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
                                             <a href={signedPolizaUrl} target="_blank" rel="noopener noreferrer" style={{ width: '100%', display: 'flex', backgroundColor: 'transparent', border: '1px solid rgba(255,255,255,0.12)', color: C.textMain, alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '16px', borderRadius: '12px', fontWeight: 700, fontSize: '14px', textDecoration: 'none' }}>
                                                 <FileText size={20} /> Ver Póliza Completa
@@ -669,7 +670,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, isPreview
                         )}
 
                         {/* 6. CONTACTOS DE EMERGENCIA */}
-                        {isEmergency && emergencyContactsArray.length > 0 && (
+                        {emergencyContactsArray.length > 0 && (
                             <div style={{ backgroundColor: C.bgCard, border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', overflow: 'hidden' }}>
                                 <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', fontWeight: 900, color: C.textMain, textTransform: 'uppercase', letterSpacing: '0.05em', padding: '20px 24px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                                     <PhoneCall size={16} /> Contactos de Emergencia
@@ -680,16 +681,18 @@ export default function ProfileViewer({ chip, profile, isDemo = false, isPreview
                                         const cleanPhone = contact.phone ? contact.phone.replace(/\D/g, '') : "";
                                         const maskedPhone = maskNumber(contact.phone);
                                         const nameParts = contact.name ? contact.name.trim().split(' ') : [];
-                                        const maskedName = nameParts.length > 0 ? nameParts[0] : "Contacto";
+                                        const maskedName = !isEmergency 
+                                            ? (nameParts.length > 0 ? nameParts[0] : "Contacto")
+                                            : (nameParts.length > 0 ? nameParts[0] : "Contacto");
 
                                         return (
                                             <div key={idx} style={{ padding: '16px 20px', borderBottom: idx < emergencyContactsArray.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
                                                     <div style={{ flex: 1 }}>
                                                         <p style={{ fontSize: '15px', fontWeight: 700, color: C.textMain, marginBottom: '2px' }}>{maskedName}</p>
-                                                        <p style={{ fontSize: '13px', color: C.textMuted }}>Familiar / Contacto {idx + 1}</p>
+                                                        <p style={{ fontSize: '13px', color: C.textMuted }}>{isEmergency ? `Familiar / Contacto ${idx + 1}` : `Contacto ${idx + 1}`}</p>
                                                     </div>
-                                                    {contact.phone && (
+                                                    {isEmergency && contact.phone && (
                                                         <a href={`tel:${cleanPhone}`} style={{ backgroundColor: 'rgba(232,35,26,0.1)', border: '1px solid rgba(232,35,26,0.3)', color: C.red, borderRadius: '8px', padding: '6px 14px', fontSize: '12px', fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
                                                             <PhoneCall size={14} /> Llamar
                                                         </a>
@@ -720,18 +723,24 @@ export default function ProfileViewer({ chip, profile, isDemo = false, isPreview
 
                                             {profile.hospital_name && (
                                                 <p style={{ fontSize: '15px', fontWeight: 700, color: C.textMain, marginBottom: '8px', textAlign: 'center' }}>
-                                                    🏥 {profile.hospital_name}
+                                                    🏥 {isEmergency ? profile.hospital_name : (profile.hospital_name ? profile.hospital_name.substring(0, 4) + '***' : '')}
                                                 </p>
                                             )}
                                             {profile.google_maps_link.startsWith('http') ? (
-                                                <a
-                                                    href={profile.google_maps_link}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    style={{ width: '100%', backgroundColor: C.blue, color: C.textMain, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '16px', borderRadius: '12px', fontWeight: 700, fontSize: '14px', textDecoration: 'none', border: '1px solid #2563EB' }}
-                                                >
-                                                    📍 Abrir en Maps
-                                                </a>
+                                                isEmergency ? (
+                                                    <a
+                                                        href={profile.google_maps_link}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        style={{ width: '100%', backgroundColor: C.blue, color: C.textMain, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '16px', borderRadius: '12px', fontWeight: 700, fontSize: '14px', textDecoration: 'none', border: '1px solid #2563EB' }}
+                                                    >
+                                                        📍 Abrir en Maps
+                                                    </a>
+                                                ) : (
+                                                    <div style={{ width: '100%', backgroundColor: 'rgba(255,255,255,0.05)', color: '#9E9A95', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '16px', borderRadius: '12px', fontWeight: 700, fontSize: '14px', border: '1px solid rgba(255,255,255,0.08)', cursor: 'not-allowed', opacity: 0.5 }}>
+                                                        📍 Abrir en Maps
+                                                    </div>
+                                                )
                                             ) : (
                                                 <p style={{ fontSize: '14px', fontWeight: 700, backgroundColor: C.bgCard, padding: '12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', color: C.textMain, wordBreak: 'break-word' }}>{profile.google_maps_link}</p>
                                             )}
