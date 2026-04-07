@@ -486,12 +486,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, isPreview
                             }}>
                                 {[isDemo ? '32 años' : (profile.age && `${profile.age} años`), isDemo ? 'Monterrey, NL' : profile.city].filter(Boolean).join(' • ')}
                             </p>
-                    {tokenTimeLeft !== null && !isDemo && !isPreview && !isEmergency && (
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '6px 12px', borderRadius: '8px', backgroundColor: tokenTimeLeft <= 30 ? 'rgba(232,35,26,0.15)' : 'rgba(255,255,255,0.05)', fontSize: '12px', color: tokenTimeLeft <= 30 ? '#E8231A' : '#9E9A95', fontWeight: 600, marginTop: '8px' }}>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                            Acceso expira en {Math.floor(tokenTimeLeft / 60)}:{(tokenTimeLeft % 60).toString().padStart(2, '0')}
-                        </div>
-                    )}
+
                         </div>
                     </div>     {/* Aviso "NO RETIRAR EL CASCO" */}
                     {profile.is_motorcyclist && (
