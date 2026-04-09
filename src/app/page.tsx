@@ -808,7 +808,7 @@ export default function Home() {
           <div className="section-label">En una emergencia real</div>
           <h2 className="section-title">El paramédico escanea.<br /><em>Tú ya estás<br />protegido.</em></h2>
           <p>Sin app, sin contraseña, sin internet. El chip NFC, el QR de respaldo y tu tarjeta médica garantizan que tus datos vitales sean accesibles en cualquier escenario de emergencia.</p>
-          <a href="#precios" className="btn-primary">Activar mi protección — $347</a>
+          <a href="#precios" className="btn-primary">Activar mi protección — $349</a>
         </div>
       </section>
 
@@ -839,7 +839,7 @@ export default function Home() {
             <div className="price-card">
               <div className="price-name">Individual</div>
               <div className="price-desc">Para el rider que va solo y sabe que la carretera no perdona.</div>
-              <div className="price-amount"><span className="price-currency">$</span><span className="price-value">347</span></div>
+              <div className="price-amount"><span className="price-currency">$</span><span className="price-value">349</span></div>
               <div className="price-period">MXN · Pago único</div>
               <div className="price-divider" />
               <ul className="price-features">
