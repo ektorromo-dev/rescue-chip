@@ -11,6 +11,34 @@ export async function middleware(request: NextRequest) {
         },
     });
 
+    // CORS — solo para rutas /api/
+    if (request.nextUrl.pathname.startsWith('/api/')) {
+        const origin = request.headers.get('origin');
+        const allowedOrigins = [
+            'https://rescue-chip.com',
+            'https://www.rescue-chip.com',
+        ];
+
+        // Preflight OPTIONS
+        if (request.method === 'OPTIONS') {
+            return new NextResponse(null, {
+                status: 204,
+                headers: {
+                    'Access-Control-Allow-Origin': allowedOrigins.includes(origin || '') ? origin! : '',
+                    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+                    'Access-Control-Max-Age': '86400',
+                },
+            });
+        }
+
+        // Para requests normales, agregar header CORS a la response
+        if (allowedOrigins.includes(origin || '')) {
+            res.headers.set('Access-Control-Allow-Origin', origin!);
+        }
+        // Si el origin no está en la lista, NO se agrega el header — el browser bloquea
+    }
+
     // Extraer IP de forma agnóstica a Vercel/Localhost
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
         || request.headers.get('x-real-ip')
