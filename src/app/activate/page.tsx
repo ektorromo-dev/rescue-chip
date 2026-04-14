@@ -362,18 +362,26 @@ function ActivationFormContent() {
 
             console.log("Activación - Intentando insertar en perfiles sanitize:", sanitizedProfile);
 
-            const { data: insertedProfileData, error: profileError } = await supabase
-                .from('profiles')
-                .insert(sanitizedProfile)
-                .select()
-                .single();
+            const response = await fetch('/api/activate/complete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    folio: chip.folio,
+                    userId: userId,
+                    consentIp: userIp,
+                    profileData: sanitizedProfile
+                })
+            });
 
-            if (profileError) {
-                // Verificar si es un error de clave única violada (el usuario ya tiene un perfil)
-                if (profileError.code === '23505') {
-                    console.log("Activación - Perfil ya existente detectado vía constraint única. Preparando modal multi-chip.");
-                    // Obtenemos el ID de ese perfil existente para poder vincularlo
-                    const { data: existingProfile } = await supabase.from('profiles').select('id, user_id').eq('user_id', userId).single();
+            const result = await response.json();
+
+            if (!result.success) {
+                if (result.errorCode === '23505') {
+                    const { data: existingProfile } = await supabase
+                        .from('profiles')
+                        .select('id, user_id')
+                        .eq('user_id', userId)
+                        .single();
 
                     if (existingProfile) {
                         setPendingAuthData({ userId, email });
@@ -381,39 +389,10 @@ function ActivationFormContent() {
                         setExistingProfileToLink(existingProfile);
                         setShowLinkPrompt(true);
                         setLoading(false);
-                        return; // Detener flujo, esperar interacción del usuario
+                        return;
                     }
                 }
-
-                console.error("Error devuelto por Supabase al insertar perfil:", JSON.stringify(profileError, null, 2), profileError);
-                throw new Error(`Error BD (${profileError.code || 'Desconocido'}): ${profileError.message || 'Fallo al guardar el perfil'}`);
-            }
-
-            // 3. Update chip as activated (using inserted profile ID and with rollback capability)
-            try {
-                const { error: activateError } = await supabase
-                    .from('chips')
-                    .update({
-                        status: 'activado',
-                        activated: true,
-                        activated_by: userId,
-                        owner_profile_id: insertedProfileData.id, // ID real del `profiles` insertado
-                        activated_at: new Date().toISOString()
-                    })
-                    .eq('id', chip.id);
-
-                if (activateError) {
-                    console.error("Error devuelto por Supabase al actualizar chip:", JSON.stringify(activateError, null, 2), activateError);
-                    throw activateError;
-                }
-            } catch (chipUpdateError: any) {
-                console.error("Fallo crítico al actualizar el chip. Iniciando ROLLBACK del perfil...", chipUpdateError);
-                // Rollback: eliminar el perfil recién creado para no dejarlo huérfano
-                const { error: rollbackError } = await supabase.from('profiles').delete().eq('id', insertedProfileData.id);
-                if (rollbackError) {
-                    console.error("Error crítico durante el rollback (perfil huérfano):", JSON.stringify(rollbackError, null, 2));
-                }
-                throw new Error(`Fallo al vincular el chip (${chipUpdateError.code || 'Desconocido'}). Se deshizo la creación del perfil.`);
+                throw new Error(result.error || "Fallo crítico al completar la activación del chip.");
             }
 
             // --- N8N WEBHOOK CALL (New Profile) ---
@@ -1200,37 +1179,37 @@ function ActivationFormContent() {
 
                 {/* CONSENTIMIENTO INFORMADO — Bloque legal v1.0 */}
                 <div style={{
-                  background: 'rgba(232,35,26,0.05)',
-                  border: '1px solid rgba(232,35,26,0.2)',
-                  borderRadius: '8px',
-                  padding: '20px',
-                  marginBottom: '20px',
+                    background: 'rgba(232,35,26,0.05)',
+                    border: '1px solid rgba(232,35,26,0.2)',
+                    borderRadius: '8px',
+                    padding: '20px',
+                    marginBottom: '20px',
                 }}>
-                  <p style={{ fontSize: '14px', fontWeight: '600', color: '#F4F0EB', marginBottom: '12px' }}>
-                    CONSENTIMIENTO INFORMADO
-                  </p>
-                  <p style={{ fontSize: '12px', color: '#9E9A95', lineHeight: '1.6', marginBottom: '8px' }}>
-                    Al activar mi chip RESCUECHIP, declaro bajo protesta de decir verdad que:
-                  </p>
-                  <ol style={{ fontSize: '12px', color: '#9E9A95', lineHeight: '1.6', paddingLeft: '20px', marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <li>Entiendo que RESCUECHIP es un sistema de identificación médica, NO un servicio médico ni de emergencia. No garantiza resultados médicos favorables.</li>
-                    <li>Acepto que mi perfil médico será accesible de forma pública al escanear el chip NFC o código QR, sin autenticación previa. Esta es una condición esencial del servicio para funcionar en emergencias donde puedo estar inconsciente.</li>
-                    <li>Me comprometo a proporcionar información médica veraz y mantenerla actualizada. La exactitud de mis datos es mi responsabilidad exclusiva.</li>
-                    <li>Entiendo que la efectividad del sistema depende de terceros (paramédicos, testigos, red celular, estado del chip), y que RESCUECHIP no controla ni garantiza estos factores.</li>
-                    <li>Puedo eliminar mis datos en cualquier momento desde mi dashboard en rescue-chip.com. La eliminación es permanente e irreversible.</li>
-                    <li>He leído y acepto los <a href="/terminos" target="_blank" rel="noopener noreferrer" style={{ color: '#E8231A' }}>Términos y Condiciones</a> y el <a href="/privacidad" target="_blank" rel="noopener noreferrer" style={{ color: '#E8231A' }}>Aviso de Privacidad</a>.</li>
-                  </ol>
-                  <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer' }}>
-                    <input
-                      type="checkbox"
-                      checked={consentimientoPublico}
-                      onChange={(e) => setConsentimientoPublico(e.target.checked)}
-                      style={{ marginTop: '2px', flexShrink: 0, accentColor: '#E8231A' }}
-                    />
-                    <span style={{ fontSize: '13px', color: '#C8C0B4', lineHeight: '1.5', fontWeight: '500' }}>
-                      Acepto el consentimiento informado y las condiciones del servicio RESCUECHIP.
-                    </span>
-                  </label>
+                    <p style={{ fontSize: '14px', fontWeight: '600', color: '#F4F0EB', marginBottom: '12px' }}>
+                        CONSENTIMIENTO INFORMADO
+                    </p>
+                    <p style={{ fontSize: '12px', color: '#9E9A95', lineHeight: '1.6', marginBottom: '8px' }}>
+                        Al activar mi chip RESCUECHIP, declaro bajo protesta de decir verdad que:
+                    </p>
+                    <ol style={{ fontSize: '12px', color: '#9E9A95', lineHeight: '1.6', paddingLeft: '20px', marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <li>Entiendo que RESCUECHIP es un sistema de identificación médica, NO un servicio médico ni de emergencia. No garantiza resultados médicos favorables.</li>
+                        <li>Acepto que mi perfil médico será accesible de forma pública al escanear el chip NFC o código QR, sin autenticación previa. Esta es una condición esencial del servicio para funcionar en emergencias donde puedo estar inconsciente.</li>
+                        <li>Me comprometo a proporcionar información médica veraz y mantenerla actualizada. La exactitud de mis datos es mi responsabilidad exclusiva.</li>
+                        <li>Entiendo que la efectividad del sistema depende de terceros (paramédicos, testigos, red celular, estado del chip), y que RESCUECHIP no controla ni garantiza estos factores.</li>
+                        <li>Puedo eliminar mis datos en cualquier momento desde mi dashboard en rescue-chip.com. La eliminación es permanente e irreversible.</li>
+                        <li>He leído y acepto los <a href="/terminos" target="_blank" rel="noopener noreferrer" style={{ color: '#E8231A' }}>Términos y Condiciones</a> y el <a href="/privacidad" target="_blank" rel="noopener noreferrer" style={{ color: '#E8231A' }}>Aviso de Privacidad</a>.</li>
+                    </ol>
+                    <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer' }}>
+                        <input
+                            type="checkbox"
+                            checked={consentimientoPublico}
+                            onChange={(e) => setConsentimientoPublico(e.target.checked)}
+                            style={{ marginTop: '2px', flexShrink: 0, accentColor: '#E8231A' }}
+                        />
+                        <span style={{ fontSize: '13px', color: '#C8C0B4', lineHeight: '1.5', fontWeight: '500' }}>
+                            Acepto el consentimiento informado y las condiciones del servicio RESCUECHIP.
+                        </span>
+                    </label>
                 </div>
 
                 <button type="submit" disabled={loading || !consentimientoPublico || !sexo} style={{ marginTop: '16px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', backgroundColor: '#E8231A', color: '#fff', height: '64px', borderRadius: '16px', fontSize: '20px', fontWeight: 900, border: 'none', cursor: (!consentimientoPublico || loading || !sexo) ? 'not-allowed' : 'pointer', opacity: (!consentimientoPublico || !sexo) ? 0.4 : 1, transition: 'all 0.2s' }}>
