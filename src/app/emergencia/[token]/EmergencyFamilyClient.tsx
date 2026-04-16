@@ -231,7 +231,7 @@ export default function EmergencyFamilyClient({ incidente, profile, isDemo = fal
       </div>
 
       {/* ── DATOS MÉDICOS ── */}
-      {profile && (
+      {!isDemo && profile && (
         <div style={sectionStyle}>
           <h2 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '4px', marginTop: 0 }}>
             🏥 Datos médicos de {firstName}
