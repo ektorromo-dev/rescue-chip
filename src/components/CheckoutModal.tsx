@@ -147,6 +147,15 @@ export default function CheckoutModal({ plan, onClose }: CheckoutModalProps) {
             }
         }
 
+        // Track InitiateCheckout
+        if (typeof window !== 'undefined' && (window as any).fbq) {
+            (window as any).fbq('track', 'InitiateCheckout', {
+                value: packagePrices[plan],
+                currency: 'MXN',
+            });
+            console.log('Meta Pixel: InitiateCheckout tracked -', packagePrices[plan], 'MXN');
+        }
+
         try {
             const res = await fetch("/api/checkout", {
                 method: "POST",

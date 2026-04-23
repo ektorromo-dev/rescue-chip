@@ -433,6 +433,12 @@ function ActivationFormContent() {
                 console.error("Error pre-registrando dispositivo (ignorado):", deviceErr);
             }
 
+            // Track CompleteRegistration
+            if (typeof window !== 'undefined' && (window as any).fbq) {
+                (window as any).fbq('track', 'CompleteRegistration');
+                console.log('Meta Pixel: CompleteRegistration tracked');
+            }
+
             router.push(`/dashboard`);
 
         } catch (err: any) {
@@ -483,6 +489,12 @@ function ActivationFormContent() {
                 console.log("N8N Webhook disparado exitosamente (Perfil Existente).");
             } catch (n8nError) {
                 console.error("Fallo al disparar webhook de N8N (ignorado):", n8nError);
+            }
+
+            // Track CompleteRegistration
+            if (typeof window !== 'undefined' && (window as any).fbq) {
+                (window as any).fbq('track', 'CompleteRegistration');
+                console.log('Meta Pixel: CompleteRegistration tracked');
             }
 
             router.push(`/dashboard`);
