@@ -19,7 +19,7 @@ const nextConfig: NextConfig = {
           { key: 'X-XSS-Protection', value: '1; mode=block' },
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://*.stripe.com https://*.google.com https://*.googleapis.com https://*.supabase.co https://img.youtube.com https://i.ytimg.com; media-src 'self' https://*.supabase.co blob:; frame-src https://js.stripe.com https://hooks.stripe.com https://www.youtube.com https://youtube.com; connect-src 'self' https://*.supabase.co https://api.stripe.com https://*.sentry.io https://*.google.com https://*.googleapis.com; object-src 'none'; base-uri 'self'"
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://cdnjs.cloudflare.com https://connect.facebook.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://*.stripe.com https://*.google.com https://*.googleapis.com https://*.supabase.co https://img.youtube.com https://i.ytimg.com https://www.facebook.com; media-src 'self' https://*.supabase.co blob:; frame-src https://js.stripe.com https://hooks.stripe.com https://www.youtube.com https://youtube.com; connect-src 'self' https://*.supabase.co https://api.stripe.com https://*.sentry.io https://*.google.com https://*.googleapis.com https://connect.facebook.net; object-src 'none'; base-uri 'self'"
           }
         ],
       },
