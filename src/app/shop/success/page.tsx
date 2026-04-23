@@ -1,11 +1,14 @@
 import Link from "next/link";
 import { CheckCircle2, Home, ArrowRight, FileText } from "lucide-react";
+import MetaPixelPurchase from "@/components/MetaPixelPurchase";
 
 export default async function SuccessPage({ searchParams }: { searchParams: Promise<{ factura?: string }> }) {
     const params = await searchParams;
     const isFactura = params.factura === 'true';
 
     return (
+        <>
+            <MetaPixelPurchase />
         <div style={{
             minHeight: '100vh',
             backgroundColor: '#0A0A08',
@@ -135,5 +138,6 @@ export default async function SuccessPage({ searchParams }: { searchParams: Prom
                 rescue-chip.com
             </p>
         </div>
+        </>
     );
 }

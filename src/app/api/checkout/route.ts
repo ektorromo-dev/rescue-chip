@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
             //     allowed_countries: ["MX"],
             // },
             // URLS
-            success_url: `${req.headers.get("origin")}/shop/success?session_id={CHECKOUT_SESSION_ID}${factura_id ? '&factura=true' : ''}`,
+            success_url: `${req.headers.get("origin")}/shop/success?session_id={CHECKOUT_SESSION_ID}&amount=${priceData.unit_amount / 100}${factura_id ? '&factura=true' : ''}`,
             cancel_url: `${req.headers.get("origin")}/shop`,
             metadata: {
                 paquete,
