@@ -156,6 +156,12 @@ export default function CheckoutModal({ plan, onClose }: CheckoutModalProps) {
             console.log('Meta Pixel: InitiateCheckout tracked -', packagePrices[plan], 'MXN');
         }
 
+        // Capturar parámetros UTM de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const utm_source = urlParams.get('utm_source') || 'direct';
+        const utm_medium = urlParams.get('utm_medium') || 'none';
+        const utm_campaign = urlParams.get('utm_campaign') || 'none';
+
         try {
             const res = await fetch("/api/checkout", {
                 method: "POST",
@@ -165,6 +171,9 @@ export default function CheckoutModal({ plan, onClose }: CheckoutModalProps) {
                     shippingData,
                     factura_id: currentFacturaId,
                     monto: packagePrices[plan],
+                    utm_source,
+                    utm_medium,
+                    utm_campaign,
                 }),
             });
             const data = await res.json();

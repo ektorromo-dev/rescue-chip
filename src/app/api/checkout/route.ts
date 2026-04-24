@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
             apiVersion: "2023-10-16" as any,
         });
 
-        const { paquete, shippingData, factura_id, monto } = await req.json();
+        const { paquete, shippingData, factura_id, monto, utm_source, utm_medium, utm_campaign } = await req.json();
 
         // 1. Crear Orden
         const { data: oData, error: oError } = await supabase
@@ -97,7 +97,10 @@ export async function POST(req: NextRequest) {
                 order_id: order_id,
                 phone: shippingData?.phone || "Desconocido",
                 name: shippingData?.fullName || "Desconocido",
-                plan: paquete
+                plan: paquete,
+                utm_source: utm_source || 'direct',
+                utm_medium: utm_medium || 'none',
+                utm_campaign: utm_campaign || 'none'
             }
         });
 
