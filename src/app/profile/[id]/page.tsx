@@ -80,52 +80,35 @@ export default async function ProfilePage({ params, searchParams }: ProfileProps
             redirect(`/activate?folio=${encodeURIComponent(chip.folio)}`);
         }
 
-        // If preview mode, skip token generation
-        if (isPreview) {
-            // Load profile directly for preview
-            let profile: any = null;
-            let pQuery = supabase.from('profiles').select('*');
-            if (chip.owner_profile_id) {
-                pQuery = pQuery.eq('id', chip.owner_profile_id);
-            } else {
-                pQuery = pQuery.eq('chip_id', chip.id);
-            }
-            const { data: dbProfile } = await pQuery.single();
-            profile = dbProfile;
-            if (!profile) return <div>Error al cargar el perfil médico.</div>;
-
-            let signedPolizaUrl = null;
-            if (profile.poliza_url) {
-                const { data: urlData } = await supabase.storage.from('polizas').createSignedUrl(profile.poliza_url, 3600);
-                if (urlData) signedPolizaUrl = urlData.signedUrl;
-            }
-            let emergencyContactsArray: any[] = [];
-            if (profile.emergency_contacts) {
-                try {
-                    emergencyContactsArray = Array.isArray(profile.emergency_contacts) ? profile.emergency_contacts : [profile.emergency_contacts];
-                } catch (e) { console.error(e); }
-            }
-            const allergiesArray = profile.allergies ? profile.allergies.split(',').map((a: string) => a.trim()) : [];
-            return (
-                <ProfileViewer chip={chip} profile={profile} isDemo={false}
-                    signedPolizaUrl={signedPolizaUrl} emergencyContactsArray={emergencyContactsArray}
-                    allergiesArray={allergiesArray} isPreview={true} />
-            );
+        // Load profile directly without token generation to prevent 307 caching loops on Safari
+        let profile: any = null;
+        let pQuery = supabase.from('profiles').select('*');
+        if (chip.owner_profile_id) {
+            pQuery = pQuery.eq('id', chip.owner_profile_id);
+        } else {
+            pQuery = pQuery.eq('chip_id', chip.id);
         }
+        const { data: dbProfile } = await pQuery.single();
+        profile = dbProfile;
+        if (!profile) return <div>Error al cargar el perfil médico.</div>;
 
-        // Generate token and redirect
-        const { data: tokenData, error: tokenError } = await supabase
-            .from('scan_tokens')
-            .insert({ chip_folio: chip.folio.toUpperCase() })
-            .select('token')
-            .single();
-
-        if (tokenError || !tokenData) {
-            console.error('Error generating scan token:', tokenError);
-            return <div>Error al generar token de acceso.</div>;
+        let signedPolizaUrl = null;
+        if (profile.poliza_url) {
+            const { data: urlData } = await supabase.storage.from('polizas').createSignedUrl(profile.poliza_url, 3600);
+            if (urlData) signedPolizaUrl = urlData.signedUrl;
         }
-
-        redirect(`/profile/${tokenData.token}`);
+        let emergencyContactsArray: any[] = [];
+        if (profile.emergency_contacts) {
+            try {
+                emergencyContactsArray = Array.isArray(profile.emergency_contacts) ? profile.emergency_contacts : [profile.emergency_contacts];
+            } catch (e) { console.error(e); }
+        }
+        const allergiesArray = profile.allergies ? profile.allergies.split(',').map((a: string) => a.trim()) : [];
+        return (
+            <ProfileViewer chip={chip} profile={profile} isDemo={false}
+                signedPolizaUrl={signedPolizaUrl} emergencyContactsArray={emergencyContactsArray}
+                allergiesArray={allergiesArray} isPreview={isPreview} />
+        );
     }
 
     // --- TOKEN: validate and show profile ---
