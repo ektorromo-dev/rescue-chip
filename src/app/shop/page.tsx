@@ -129,9 +129,7 @@ export default function ShopPage() {
                         {/* Starter */}
                         <div style={{ backgroundColor: "#1A1A18", borderRadius: "16px", padding: "24px", border: "1px solid rgba(255,255,255,0.08)", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                             <div>
-                                <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#F4F0EB", marginBottom: "4px" }}>Starter</h3>
-                                <p style={{ fontSize: "13px", color: "#9E9A95", marginBottom: "16px" }}>50 chips a $179 c/u</p>
-                                <div style={{ fontSize: "28px", fontWeight: 900, color: "#F4F0EB", marginBottom: "20px" }}>$8,950 MXN</div>
+                                <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#F4F0EB", marginBottom: "0px" }}>Starter</h3>
                             </div>
                             <a href="https://wa.me/525551433904?text=Hola%2C%20me%20interesa%20el%20plan%20Starter%20de%20RescueChip%20(50%20chips%20a%20%24179%20c%2Fu).%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener noreferrer" style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", height: "44px", borderRadius: "12px", fontWeight: 700, fontSize: "14px", backgroundColor: "transparent", color: "#F4F0EB", border: "1px solid rgba(255,255,255,0.15)" }}>
                                 SOLICITAR
@@ -144,9 +142,7 @@ export default function ShopPage() {
                                 RECOMENDADO
                             </div>
                             <div>
-                                <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#F4F0EB", marginBottom: "4px" }}>Growth</h3>
-                                <p style={{ fontSize: "13px", color: "#9E9A95", marginBottom: "16px" }}>100 chips a $149 c/u</p>
-                                <div style={{ fontSize: "28px", fontWeight: 900, color: "#E8231A", marginBottom: "20px" }}>$14,900 MXN</div>
+                                <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#F4F0EB", marginBottom: "0px" }}>Growth</h3>
                             </div>
                             <a href="https://wa.me/525551433904?text=Hola%2C%20me%20interesa%20el%20plan%20Growth%20de%20RescueChip%20(100%20chips%20a%20%24149%20c%2Fu).%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener noreferrer" style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", height: "44px", borderRadius: "12px", fontWeight: 900, fontSize: "14px", backgroundColor: "#E8231A", color: "#FFF", border: "none" }}>
                                 SOLICITAR
@@ -156,9 +152,7 @@ export default function ShopPage() {
                         {/* Premium */}
                         <div style={{ backgroundColor: "#1A1A18", borderRadius: "16px", padding: "24px", border: "1px solid rgba(255,255,255,0.08)", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                             <div>
-                                <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#F4F0EB", marginBottom: "4px" }}>Premium</h3>
-                                <p style={{ fontSize: "13px", color: "#9E9A95", marginBottom: "16px" }}>300+ chips a $119 c/u</p>
-                                <div style={{ fontSize: "22px", fontWeight: 900, color: "#F4F0EB", marginBottom: "20px" }}>Precio negociable</div>
+                                <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#F4F0EB", marginBottom: "0px" }}>Premium</h3>
                             </div>
                             <a href="https://wa.me/525551433904?text=Hola%2C%20me%20interesa%20el%20plan%20Premium%20de%20RescueChip%20(300%2B%20chips).%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener noreferrer" style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", height: "44px", borderRadius: "12px", fontWeight: 700, fontSize: "14px", backgroundColor: "transparent", color: "#F4F0EB", border: "1px solid rgba(255,255,255,0.15)" }}>
                                 CONTÁCTANOS
