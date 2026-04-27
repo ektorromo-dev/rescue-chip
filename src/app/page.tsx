@@ -892,7 +892,7 @@ export default function Home() {
                 <li>Chips NFC programados con folios únicos RSC</li><li>Activación directa por el usuario final</li>
                 <li>Perfil médico completo por chip</li><li>Alertas automáticas SMS + email al escanear</li><li>Soporte por WhatsApp durante la implementación</li><li>Factura electrónica CFDI 4.0</li>
               </ul>
-              <a href="https://wa.me/525551433904?text=Hola%2C%20me%20interesa%20el%20plan%20Starter%20de%20RescueChip%20(50%20chips%20a%20%24179%20c%2Fu).%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener noreferrer" className="btn-agency-outline">Solicitar</a>
+              <a href="https://wa.me/525551433904?text=Hola%2C%20me%20interesa%20el%20plan%20Starter%20de%20RescueChip%20para%20agencias.%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener noreferrer" className="btn-agency-outline">Solicitar</a>
             </div>
             <div className="agency-card featured">
               <span className="agency-badge">Recomendado</span>
@@ -902,7 +902,7 @@ export default function Home() {
                 <li>Chips NFC programados con folios únicos RSC</li><li>Todo lo del plan Starter</li>
                 <li>Manual de ventas RescueChip para tu equipo (PDF)</li><li>Capacitación virtual para tu equipo de ventas</li><li>Soporte prioritario por WhatsApp</li><li>Factura electrónica CFDI 4.0</li>
               </ul>
-              <a href="https://wa.me/525551433904?text=Hola%2C%20me%20interesa%20el%20plan%20Growth%20de%20RescueChip%20(100%20chips%20a%20%24149%20c%2Fu).%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener noreferrer" className="btn-agency-solid">Solicitar</a>
+              <a href="https://wa.me/525551433904?text=Hola%2C%20me%20interesa%20el%20plan%20Growth%20de%20RescueChip%20para%20agencias.%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener noreferrer" className="btn-agency-solid">Solicitar</a>
             </div>
             <div className="agency-card dark-card-agency">
               <div className="agency-tier">Premium</div>
@@ -911,7 +911,7 @@ export default function Home() {
                 <li>Chips NFC programados con folios únicos RSC</li><li>Todo lo del plan Growth</li>
                 <li>Sesión de onboarding presencial o virtual</li><li>Material físico de punto de venta incluido</li><li>Gerente de cuenta dedicado</li><li>Factura electrónica CFDI 4.0</li>
               </ul>
-              <a href="https://wa.me/525551433904?text=Hola%2C%20me%20interesa%20el%20plan%20Premium%20de%20RescueChip%20(300%2B%20chips).%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener noreferrer" className="btn-agency-outline">Contáctanos</a>
+              <a href="https://wa.me/525551433904?text=Hola%2C%20me%20interesa%20el%20plan%20Premium%20de%20RescueChip%20para%20vol%C3%BAmenes%20corporativos.%20%C2%BFPodr%C3%ADan%20darme%20m%C3%A1s%20informaci%C3%B3n%3F" target="_blank" rel="noopener noreferrer" className="btn-agency-outline">Contáctanos</a>
             </div>
           </div>
         </div>
