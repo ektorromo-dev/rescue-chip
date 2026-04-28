@@ -30,7 +30,9 @@ export async function POST(req: NextRequest) {
         const { data: oData, error: oError } = await supabase
             .from("orders")
             .insert([{
-                ...shippingData,
+                nombre_receptor: shippingData?.nombre_receptor || 'No especificado',
+                telefono_receptor: shippingData?.telefono_receptor || 'No especificado',
+                email_cliente: shippingData?.email_cliente || '',
                 paquete,
                 monto,
                 requiere_factura: factura_id ? true : false,
@@ -83,10 +85,10 @@ export async function POST(req: NextRequest) {
             // Pedir nombre y telefono
             customer_creation: "always",
             phone_number_collection: { enabled: true },
-            // Ya no pedimos envio porque lo hacemos por nuestra cuenta:
-            // shipping_address_collection: {
-            //     allowed_countries: ["MX"],
-            // },
+            // Stripe maneja el envio desde la pasarela:
+            shipping_address_collection: {
+                allowed_countries: ["MX"],
+            },
             // URLS
             success_url: `${req.headers.get("origin")}/shop/success?session_id={CHECKOUT_SESSION_ID}&amount=${priceData.unit_amount / 100}${factura_id ? '&factura=true' : ''}`,
             cancel_url: `${req.headers.get("origin")}/shop`,
@@ -95,8 +97,8 @@ export async function POST(req: NextRequest) {
                 factura: factura_id ? "true" : "false",
                 factura_id: factura_id || "none",
                 order_id: order_id,
-                phone: shippingData?.phone || "Desconocido",
-                name: shippingData?.fullName || "Desconocido",
+                phone: shippingData?.telefono_receptor || "Desconocido",
+                name: shippingData?.nombre_receptor || "Desconocido",
                 plan: paquete,
                 utm_source: utm_source || 'direct',
                 utm_medium: utm_medium || 'none',

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ShoppingCart, Loader2, FileText, X, MapPin } from "lucide-react";
+import { ShoppingCart, Loader2, FileText, X, User } from "lucide-react";
 
 interface CheckoutModalProps {
     plan: string | null;
@@ -17,8 +17,6 @@ const packagePrices: Record<string, number> = {
 export default function CheckoutModal({ plan, onClose }: CheckoutModalProps) {
     const [loadingPackage, setLoadingPackage] = useState<string | null>(null);
     const [requiresInvoice, setRequiresInvoice] = useState(false);
-    const [coloniasOpt, setColoniasOpt] = useState<string[]>([]);
-    const [loadingZip, setLoadingZip] = useState(false);
 
     const [invoiceData, setInvoiceData] = useState({
         rfc: "",
@@ -33,13 +31,6 @@ export default function CheckoutModal({ plan, onClose }: CheckoutModalProps) {
     const [shippingData, setShippingData] = useState({
         nombre_receptor: "",
         telefono_receptor: "",
-        codigo_postal: "",
-        estado: "",
-        ciudad: "",
-        colonia: "",
-        calle_numero: "",
-        numero_interior: "",
-        referencia: "",
         email_cliente: "",
     });
 
@@ -57,64 +48,6 @@ export default function CheckoutModal({ plan, onClose }: CheckoutModalProps) {
     ) => {
         const { name, value } = e.target;
         setInvoiceData((prev) => ({ ...prev, [name]: value }));
-    };
-
-    const handleZipCodeChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const cp = e.target.value.replace(/\D/g, "");
-        setShippingData((prev) => ({ ...prev, codigo_postal: cp }));
-
-        if (cp.length === 5) {
-            setLoadingZip(true);
-            try {
-                const res = await fetch(
-                    `https://sepomex.icalialabs.com/api/v1/zip_codes?zip_code=${cp}`
-                );
-                const data = await res.json();
-
-                if (data?.zip_codes?.length > 0) {
-                    const first = data.zip_codes[0];
-                    setShippingData((prev) => ({
-                        ...prev,
-                        estado: first.d_estado,
-                        ciudad: first.d_mnpio,
-                        colonia: data.zip_codes.length === 1 ? first.d_asenta : "",
-                    }));
-                    if (data.zip_codes.length > 1) {
-                        setColoniasOpt(
-                            Array.from(new Set(data.zip_codes.map((z: { d_asenta: string }) => z.d_asenta)))
-                        );
-                    } else {
-                        setColoniasOpt([]);
-                    }
-                } else {
-                    const res2 = await fetch(
-                        `https://api.copomex.com/query/info_cp/${cp}?token=pruebas`
-                    );
-                    const data2 = await res2.json();
-                    if (!data2.error) {
-                        setShippingData((prev) => ({
-                            ...prev,
-                            estado: data2[0].response.estado,
-                            ciudad: data2[0].response.municipio,
-                            colonia: data2.length === 1 ? data2[0].response.asentamiento : "",
-                        }));
-                        if (data2.length > 1) {
-                            setColoniasOpt(
-                                Array.from(
-                                    new Set(data2.map((d: { response: { asentamiento: string } }) => d.response.asentamiento))
-                                )
-                            );
-                        } else {
-                            setColoniasOpt([]);
-                        }
-                    }
-                }
-            } catch (error) {
-                console.error("Error fetching zip code info:", error);
-            } finally {
-                setLoadingZip(false);
-            }
-        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -315,8 +248,8 @@ export default function CheckoutModal({ plan, onClose }: CheckoutModalProps) {
                                     borderBottom: "1px solid rgba(255,255,255,0.08)",
                                 }}
                             >
-                                <MapPin size={18} style={{ color: "#E8231A" }} />
-                                Dirección de Envío y Contacto
+                                <User size={18} style={{ color: "#E8231A" }} />
+                                Datos de contacto
                             </h4>
 
                             {/* Nombre */}
@@ -370,162 +303,6 @@ export default function CheckoutModal({ plan, onClose }: CheckoutModalProps) {
                                         style={inputStyle}
                                     />
                                 </div>
-                            </div>
-
-                            {/* CP + Estado */}
-                            <div
-                                style={{
-                                    display: "grid",
-                                    gridTemplateColumns: "1fr 1fr",
-                                    gap: "12px",
-                                }}
-                            >
-                                <div style={{ ...fieldStyle, position: "relative" }}>
-                                    <label style={labelStyle}>Código Postal *</label>
-                                    <input
-                                        type="text"
-                                        name="codigo_postal"
-                                        value={shippingData.codigo_postal}
-                                        onChange={handleZipCodeChange}
-                                        required
-                                        placeholder="Ej. 11000"
-                                        minLength={5}
-                                        maxLength={5}
-                                        disabled={loadingPackage !== null}
-                                        style={inputStyle}
-                                    />
-                                    {loadingZip && (
-                                        <Loader2
-                                            size={14}
-                                            style={{
-                                                position: "absolute",
-                                                bottom: "14px",
-                                                right: "12px",
-                                                color: "#9E9A95",
-                                                animation: "spin 1s linear infinite",
-                                            }}
-                                        />
-                                    )}
-                                </div>
-                                <div style={fieldStyle}>
-                                    <label style={labelStyle}>Estado *</label>
-                                    <input
-                                        type="text"
-                                        name="estado"
-                                        value={shippingData.estado}
-                                        onChange={handleShippingChange}
-                                        required
-                                        disabled={loadingPackage !== null}
-                                        style={inputStyle}
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Ciudad + Colonia */}
-                            <div
-                                style={{
-                                    display: "grid",
-                                    gridTemplateColumns: "1fr 1fr",
-                                    gap: "12px",
-                                }}
-                            >
-                                <div style={fieldStyle}>
-                                    <label style={labelStyle}>Ciudad / Municipio *</label>
-                                    <input
-                                        type="text"
-                                        name="ciudad"
-                                        value={shippingData.ciudad}
-                                        onChange={handleShippingChange}
-                                        required
-                                        disabled={loadingPackage !== null}
-                                        style={inputStyle}
-                                    />
-                                </div>
-                                <div style={fieldStyle}>
-                                    <label style={labelStyle}>Colonia *</label>
-                                    {coloniasOpt.length > 0 ? (
-                                        <select
-                                            name="colonia"
-                                            value={shippingData.colonia}
-                                            onChange={handleShippingChange}
-                                            required
-                                            disabled={loadingPackage !== null}
-                                            style={{ ...inputStyle, height: "44px" }}
-                                        >
-                                            <option value="">Selecciona</option>
-                                            {coloniasOpt.map((c) => (
-                                                <option key={c} value={c}>
-                                                    {c}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    ) : (
-                                        <input
-                                            type="text"
-                                            name="colonia"
-                                            value={shippingData.colonia}
-                                            onChange={handleShippingChange}
-                                            required
-                                            disabled={loadingPackage !== null}
-                                            style={inputStyle}
-                                        />
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Calle + Interior */}
-                            <div
-                                style={{
-                                    display: "grid",
-                                    gridTemplateColumns: "1fr 1fr",
-                                    gap: "12px",
-                                }}
-                            >
-                                <div style={fieldStyle}>
-                                    <label style={labelStyle}>Calle y # Exterior *</label>
-                                    <input
-                                        type="text"
-                                        name="calle_numero"
-                                        value={shippingData.calle_numero}
-                                        onChange={handleShippingChange}
-                                        required
-                                        placeholder="Ej. Insurgentes Sur 123"
-                                        disabled={loadingPackage !== null}
-                                        style={inputStyle}
-                                    />
-                                </div>
-                                <div style={fieldStyle}>
-                                    <label style={labelStyle}>Número Interior</label>
-                                    <input
-                                        type="text"
-                                        name="numero_interior"
-                                        value={shippingData.numero_interior}
-                                        onChange={handleShippingChange}
-                                        placeholder="Ej. Depto 4"
-                                        disabled={loadingPackage !== null}
-                                        style={inputStyle}
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Referencia */}
-                            <div style={fieldStyle}>
-                                <label style={labelStyle}>Referencia de entrega *</label>
-                                <textarea
-                                    name="referencia"
-                                    value={shippingData.referencia}
-                                    onChange={handleShippingChange}
-                                    required
-                                    rows={2}
-                                    placeholder="Ej: Casa azul con portón negro, entre calle Hidalgo y Morelos"
-                                    disabled={loadingPackage !== null}
-                                    style={{
-                                        ...inputStyle,
-                                        height: "auto",
-                                        padding: "12px",
-                                        resize: "vertical",
-                                    }}
-                                />
                             </div>
                         </div>
 

@@ -66,6 +66,22 @@ export async function POST(req: NextRequest) {
             } else {
                 console.error("Error updating order in webhook:", error);
             }
+
+            // Guardar dirección de Stripe en la orden
+            const shippingDetailsState = (session as any).shipping_details;
+            if (shippingDetailsState?.address) {
+                await supabase
+                    .from("orders")
+                    .update({
+                        calle_numero: `${shippingDetailsState.address.line1 || ''} ${shippingDetailsState.address.line2 || ''}`.trim(),
+                        ciudad: shippingDetailsState.address.city || null,
+                        estado: shippingDetailsState.address.state || null,
+                        codigo_postal: shippingDetailsState.address.postal_code || null,
+                        colonia: '',
+                        referencia: ''
+                    })
+                    .eq("id", order_id);
+            }
         }
 
         // Extraer detalles del cliente
@@ -73,12 +89,20 @@ export async function POST(req: NextRequest) {
         const email = orderDetails?.email_cliente || session.customer_details?.email || "No especificado";
         const telefono = orderDetails?.telefono_receptor || session.customer_details?.phone || "No especificado";
 
-        // Dirección de envío
-        const direccion = orderDetails
-            ? `${orderDetails.calle_numero} ${orderDetails.numero_interior ? `Int. ${orderDetails.numero_interior}` : ""}, Col. ${orderDetails.colonia}
-${orderDetails.ciudad}, ${orderDetails.estado}, C.P. ${orderDetails.codigo_postal}
-Referencia: ${orderDetails.referencia}`.trim()
-            : "No especificada (Orden no encontrada en DB)";
+        // Dirección de envío desde Stripe (shipping_address_collection)
+        const shippingDetails = (session as any).shipping_details;
+        let direccion = "No especificada";
+        if (shippingDetails?.address) {
+            const addr = shippingDetails.address;
+            direccion = [
+                shippingDetails.name || '',
+                addr.line1 || '',
+                addr.line2 || '',
+                `${addr.city || ''}, ${addr.state || ''}`,
+                `C.P. ${addr.postal_code || ''}`,
+                addr.country || ''
+            ].filter(line => line.trim()).join('\n');
+        }
 
         const monto = (session.amount_total || 0) / 100;
 
