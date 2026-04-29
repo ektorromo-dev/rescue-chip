@@ -37,12 +37,7 @@ const LANDING_CSS = `
   .nav-login:hover { border-color:rgba(244,240,235,0.5) !important; color:var(--white) !important; }
 
   /* HERO */
-  .hero { position:relative; min-height:100vh; display:flex; flex-direction:column; justify-content:flex-end; padding:0 60px 80px; overflow:hidden; background-color: #0A0A08; }
-  .hero-video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; filter:grayscale(20%) brightness(.5) contrast(1.1); transform:scale(1.03); animation:slow-zoom 14s ease-in-out infinite alternate; }
-  @keyframes slow-zoom { from{transform:scale(1.03)} to{transform:scale(1.0)} }
-  .hero-overlay { position:absolute; inset:0; background:linear-gradient(to top,rgba(10,10,8,.97) 0%,rgba(10,10,8,.45) 45%,rgba(10,10,8,.15) 75%,rgba(10,10,8,.4) 100%),linear-gradient(to right,rgba(10,10,8,.4) 0%,transparent 60%); }
-  .hero-grain { position:absolute; inset:0; pointer-events:none; opacity:.5; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E"); }
-  .hero-accent { position:absolute; top:0; right:120px; width:2px; height:100%; background:linear-gradient(to bottom,transparent 0%,var(--red) 30%,var(--red-dim) 70%,transparent 100%); opacity:.4; }
+  .hero { position:relative; min-height:auto; display:flex; flex-direction:column; justify-content:center; padding:120px 60px 60px; overflow:hidden; background-color: #0A0A08; }
   .hero-content { position:relative; z-index:2; max-width:720px; animation:hero-in 1s ease both; }
   @keyframes hero-in { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
   .hero-badge { display:inline-flex; align-items:center; gap:8px; background:rgba(232,35,26,.12); border:1px solid rgba(232,35,26,.3); border-radius:2px; padding:6px 14px; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:#ff6b63; margin-bottom:28px; font-weight:500; }
