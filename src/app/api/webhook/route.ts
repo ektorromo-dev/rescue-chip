@@ -174,6 +174,13 @@ export async function POST(req: NextRequest) {
                     <p style="color: #555; font-size: 16px;">Recibirás tu pedido en 3-7 días hábiles en la dirección que proporcionaste.</p>
                     <p style="color: #555; font-size: 16px;">Una vez que recibas tus chips, ingresa a <a href="https://rescue-chip.com/activate" style="color: #e11d48; font-weight: bold;">rescue-chip.com/activate</a> para crear tu perfil médico de emergencia.</p>
                     
+                    <div style="text-align: center; margin: 24px 0;">
+                        <a href="https://rescue-chip.com/shop/success?session_id=${session.id}" 
+                           style="display: inline-block; background-color: #e11d48; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 10px; font-weight: 700; font-size: 14px;">
+                            ¿Requieres factura? Solicítala aquí
+                        </a>
+                    </div>
+                    
                     ${pidioFactura ? `<p style="color: #555; font-size: 16px; background-color: #fdf2f8; padding: 10px; border-left: 4px solid #db2777; margin: 20px 0;">Solicitaste factura. Recibirás tu CFDI y XML en un máximo de 72 horas hábiles.</p>` : ''}
                     
                     <div style="margin-top: 30px; font-size: 15px; color: #666;">

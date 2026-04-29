@@ -39,7 +39,6 @@ export async function POST(req: NextRequest) {
     const { data: factura, error: facturaError } = await supabase
       .from("factura_requests")
       .insert([{
-        order_id: order.id,
         session_id,
         rfc,
         nombre_fiscal,
