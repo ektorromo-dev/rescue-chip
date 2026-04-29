@@ -37,7 +37,7 @@ const LANDING_CSS = `
   .nav-login:hover { border-color:rgba(244,240,235,0.5) !important; color:var(--white) !important; }
 
   /* HERO */
-  .hero { position:relative; min-height:100vh; display:flex; flex-direction:column; justify-content:flex-end; padding:0 60px 80px; overflow:hidden; }
+  .hero { position:relative; min-height:100vh; display:flex; flex-direction:column; justify-content:flex-end; padding:0 60px 80px; overflow:hidden; background-color: #0A0A08; }
   .hero-video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; filter:grayscale(20%) brightness(.5) contrast(1.1); transform:scale(1.03); animation:slow-zoom 14s ease-in-out infinite alternate; }
   @keyframes slow-zoom { from{transform:scale(1.03)} to{transform:scale(1.0)} }
   .hero-overlay { position:absolute; inset:0; background:linear-gradient(to top,rgba(10,10,8,.97) 0%,rgba(10,10,8,.45) 45%,rgba(10,10,8,.15) 75%,rgba(10,10,8,.4) 100%),linear-gradient(to right,rgba(10,10,8,.4) 0%,transparent 60%); }
@@ -416,27 +416,6 @@ export default function Home() {
         fader.observe(el);
       });
 
-    // Force play on videos
-    const forcePlay = (v: HTMLVideoElement) => {
-      v.muted = true;
-      v.load();
-      const attempt = () => v.play().catch(() => { });
-      attempt();
-      v.addEventListener("canplay", attempt, { once: true });
-      v.addEventListener("loadeddata", attempt, { once: true });
-    };
-    const playAllVideos = () => {
-      document.querySelectorAll<HTMLVideoElement>("video").forEach(forcePlay);
-    };
-    playAllVideos();
-    [300, 800, 1500, 3000].forEach(ms => setTimeout(playAllVideos, ms));
-
-    // CTA video speed
-    document.querySelectorAll<HTMLVideoElement>(".cta-video").forEach((v) => {
-      v.addEventListener("loadedmetadata", () => { v.playbackRate = 1.6; });
-      if (v.readyState >= 1) v.playbackRate = 1.6;
-    });
-
     return () => {
       subscription.unsubscribe();
       window.removeEventListener("scroll", onScroll);
@@ -490,25 +469,6 @@ export default function Home() {
 
       {/* HERO */}
       <section className="hero">
-        <iframe
-          src="https://www.youtube.com/embed/Fxe5OhX0Ra0?autoplay=1&mute=1&loop=1&playlist=Fxe5OhX0Ra0&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1"
-          allow="autoplay; fullscreen"
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            width: '100vw',
-            height: '56.25vw',
-            minHeight: '100vh',
-            minWidth: '177.78vh',
-            transform: 'translate(-50%, -50%)',
-            border: 'none',
-            pointerEvents: 'none',
-          }}
-        />
-        <div className="hero-overlay" />
-        <div className="hero-grain" />
-        <div className="hero-accent" />
         <div className="hero-content">
           <div className="hero-badge">Alineado con NOM-034-SSA3-2013 · Identificación Médica</div>
           <h1>Mantén informada a tu familia si algo te pasa.</h1>
