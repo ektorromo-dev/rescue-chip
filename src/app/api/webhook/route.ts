@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
             }
 
             // Guardar dirección de Stripe en la orden
-            const shippingDetails = (session as any).shipping_details;
+            const shippingDetails = (fullSession as any).shipping_details;
             if (shippingDetails?.address) {
                 await supabase
                     .from("orders")
