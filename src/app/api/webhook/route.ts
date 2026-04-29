@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
         }
 
         // Dirección de envío desde Stripe (shipping_address_collection)
-        const globalShippingDetails = fullSession.shipping_details;
+        const globalShippingDetails = (fullSession as any).shipping_details;
 
         // Extraer detalles del cliente
         const nombre = fullSession.customer_details?.name || globalShippingDetails?.name || "No especificado";
