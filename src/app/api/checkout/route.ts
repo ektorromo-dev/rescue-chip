@@ -24,19 +24,21 @@ export async function POST(req: NextRequest) {
             apiVersion: "2023-10-16" as any,
         });
 
-        const { paquete, shippingData, factura_id, monto, utm_source, utm_medium, utm_campaign } = await req.json();
+        const { paquete, utm_source, utm_medium, utm_campaign } = await req.json();
 
         // 1. Crear Orden
+        const prices: Record<string, number> = { individual: 349, pareja: 549, familiar: 949 };
+        const monto = prices[paquete] || 0;
+
         const { data: oData, error: oError } = await supabase
             .from("orders")
             .insert([{
-                nombre_receptor: shippingData?.nombre_receptor || 'No especificado',
-                telefono_receptor: shippingData?.telefono_receptor || 'No especificado',
-                email_cliente: shippingData?.email_cliente || '',
+                nombre_receptor: 'Pendiente (Stripe)',
+                telefono_receptor: 'Pendiente (Stripe)',
+                email_cliente: '',
                 paquete,
                 monto,
-                requiere_factura: factura_id ? true : false,
-                factura_id
+                requiere_factura: false,
             }])
             .select("id")
             .single();
@@ -90,28 +92,17 @@ export async function POST(req: NextRequest) {
                 allowed_countries: ["MX"],
             },
             // URLS
-            success_url: `${req.headers.get("origin")}/shop/success?session_id={CHECKOUT_SESSION_ID}&amount=${priceData.unit_amount / 100}${factura_id ? '&factura=true' : ''}`,
+            success_url: `${req.headers.get("origin")}/shop/success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${req.headers.get("origin")}/#precios`,
             metadata: {
                 paquete,
-                factura: factura_id ? "true" : "false",
-                factura_id: factura_id || "none",
                 order_id: order_id,
-                phone: shippingData?.telefono_receptor || "Desconocido",
-                name: shippingData?.nombre_receptor || "Desconocido",
                 plan: paquete,
                 utm_source: utm_source || 'direct',
                 utm_medium: utm_medium || 'none',
                 utm_campaign: utm_campaign || 'none'
             }
         });
-
-        if (factura_id) {
-            await supabase
-                .from("factura_requests")
-                .update({ session_id: session.id })
-                .eq("id", factura_id);
-        }
 
         // 4. Actualizar orden con Stripe Session ID
         await supabase

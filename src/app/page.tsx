@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import CheckoutModal from "@/components/CheckoutModal";
 import { createClient } from "@/lib/supabase/client";
 import { Menu, X } from "lucide-react";
 
@@ -343,10 +342,48 @@ const LANDING_CSS = `
 `;
 
 export default function Home() {
-  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [session, setSession] = useState<{ user?: { email?: string } } | null>(null);
   const [navScrolled, setNavScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleBuyNow = async (paquete: string) => {
+    if (loadingPlan) return;
+    setLoadingPlan(paquete);
+    
+    // Track InitiateCheckout
+    if (typeof window !== 'undefined' && (window as any).fbq) {
+      const prices: Record<string, number> = { individual: 349, pareja: 549, familiar: 949 };
+      (window as any).fbq('track', 'InitiateCheckout', {
+        value: prices[paquete] || 349,
+        currency: 'MXN',
+      });
+    }
+
+    // Capturar UTM
+    const urlParams = new URLSearchParams(window.location.search);
+    const utm_source = urlParams.get('utm_source') || 'direct';
+    const utm_medium = urlParams.get('utm_medium') || 'none';
+    const utm_campaign = urlParams.get('utm_campaign') || 'none';
+
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ paquete, utm_source, utm_medium, utm_campaign }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error(data.error || "Error al procesar");
+      }
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : "Error desconocido";
+      alert("Error: " + msg);
+      setLoadingPlan(null);
+    }
+  };
 
   useEffect(() => {
     const supabase = createClient();
@@ -409,7 +446,6 @@ export default function Home() {
 
   return (
     <div className="landing-root">
-      <CheckoutModal plan={selectedPlan} onClose={() => setSelectedPlan(null)} />
       <style dangerouslySetInnerHTML={{ __html: LANDING_CSS }} />
 
       {/* NAV */}
@@ -506,7 +542,9 @@ export default function Home() {
               <div className="price-amount"><span className="price-currency">$</span><span className="price-value">349</span></div>
               <div className="price-period">MXN · Pago único</div>
               <div className="price-sub">&nbsp;</div>
-              <button onClick={() => setSelectedPlan("individual")} className="btn-price btn-price-outline">PROTECCIÓN INDIVIDUAL</button>
+              <button onClick={() => handleBuyNow("individual")} className="btn-price btn-price-outline">
+                {loadingPlan === "individual" ? "Procesando..." : "PROTECCIÓN INDIVIDUAL"}
+              </button>
             </div>
             <div className="price-card featured">
               <div className="price-name">PAREJA</div>
@@ -514,7 +552,9 @@ export default function Home() {
               <div className="price-amount"><span className="price-currency">$</span><span className="price-value">549</span></div>
               <div className="price-period">MXN · Pago único</div>
               <div className="price-sub">$274 por persona</div>
-              <button onClick={() => setSelectedPlan("pareja")} className="btn-price btn-price-solid">PROTEGER A MI PAREJA TAMBIÉN</button>
+              <button onClick={() => handleBuyNow("pareja")} className="btn-price btn-price-solid">
+                {loadingPlan === "pareja" ? "Procesando..." : "PROTEGER A MI PAREJA TAMBIÉN"}
+              </button>
             </div>
             <div className="price-card">
               <div className="price-name">FAMILIAR</div>
@@ -522,7 +562,9 @@ export default function Home() {
               <div className="price-amount"><span className="price-currency">$</span><span className="price-value">949</span></div>
               <div className="price-period">MXN · Pago único</div>
               <div className="price-sub">Desde $237 por persona</div>
-              <button onClick={() => setSelectedPlan("familiar")} className="btn-price btn-price-outline">PROTEGER A MI FAMILIA</button>
+              <button onClick={() => handleBuyNow("familiar")} className="btn-price btn-price-outline">
+                {loadingPlan === "familiar" ? "Procesando..." : "PROTEGER A MI FAMILIA"}
+              </button>
             </div>
           </div>
           <div className="scroll-dots">
@@ -696,9 +738,9 @@ export default function Home() {
       
       {/* STICKY CTA MOBILE */}
       <div className="sticky-cta-mobile">
-        <a href="#precios" className="sticky-cta-btn">
-          Quiero estar protegido — $349
-        </a>
+        <button onClick={() => handleBuyNow("individual")} className="sticky-cta-btn">
+          {loadingPlan === "individual" ? "Procesando..." : "Quiero estar protegido — $349"}
+        </button>
       </div>
     </div>
   );

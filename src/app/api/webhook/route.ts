@@ -82,20 +82,34 @@ export async function POST(req: NextRequest) {
                     })
                     .eq("id", order_id);
             }
+
+            // Actualizar datos de contacto desde Stripe
+            const customerName = shippingDetails?.name || session.customer_details?.name || 'No especificado';
+            const customerEmail = session.customer_details?.email || '';
+            const customerPhone = session.customer_details?.phone || '';
+
+            await supabase
+                .from("orders")
+                .update({
+                    nombre_receptor: customerName,
+                    email_cliente: customerEmail,
+                    telefono_receptor: customerPhone,
+                })
+                .eq("id", order_id);
         }
 
-        // Extraer detalles del cliente
-        const nombre = orderDetails?.nombre_receptor || session.customer_details?.name || "No especificado";
-        const email = orderDetails?.email_cliente || session.customer_details?.email || "No especificado";
-        const telefono = orderDetails?.telefono_receptor || session.customer_details?.phone || "No especificado";
-
         // Dirección de envío desde Stripe (shipping_address_collection)
-        const shippingDetails = (session as any).shipping_details;
+        const globalShippingDetails = (session as any).shipping_details;
+
+        // Extraer detalles del cliente
+        const nombre = session.customer_details?.name || globalShippingDetails?.name || "No especificado";
+        const email = session.customer_details?.email || "No especificado";
+        const telefono = session.customer_details?.phone || "No especificado";
         let direccion = "No especificada";
-        if (shippingDetails?.address) {
-            const addr = shippingDetails.address;
+        if (globalShippingDetails?.address) {
+            const addr = globalShippingDetails.address;
             direccion = [
-                shippingDetails.name || '',
+                globalShippingDetails.name || '',
                 addr.line1 || '',
                 addr.line2 || '',
                 `${addr.city || ''}, ${addr.state || ''}`,
