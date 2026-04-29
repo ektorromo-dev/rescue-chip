@@ -91,7 +91,7 @@ export async function POST(req: NextRequest) {
             },
             // URLS
             success_url: `${req.headers.get("origin")}/shop/success?session_id={CHECKOUT_SESSION_ID}&amount=${priceData.unit_amount / 100}${factura_id ? '&factura=true' : ''}`,
-            cancel_url: `${req.headers.get("origin")}/shop`,
+            cancel_url: `${req.headers.get("origin")}/#precios`,
             metadata: {
                 paquete,
                 factura: factura_id ? "true" : "false",
