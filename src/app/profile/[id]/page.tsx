@@ -2,6 +2,7 @@ import { AlertTriangle, Clock } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import ProfileViewer from "@/components/ProfileViewer";
 
 export const dynamic = 'force-dynamic';
@@ -16,7 +17,9 @@ export default async function ProfilePage({ params, searchParams }: ProfileProps
     const id = decodeURIComponent(rawId);
     const resolvedSearchParams = searchParams ? await searchParams : undefined;
     const isPreview = resolvedSearchParams?.preview === 'true';
-    const supabase = await createClient();
+    // Lecturas de chips/profiles/scan_tokens requieren service_role tras el cierre de RLS.
+    // El storage 'polizas' sigue usando signed URLs (admin las firma igual).
+    const supabase = createAdminClient();
     const cleanId = id.trim();
 
     // --- DEMO / RSC-DEMO handling (unchanged) ---

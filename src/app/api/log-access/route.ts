@@ -12,9 +12,12 @@ const twilioClient = twilio(
     process.env.TWILIO_AUTH_TOKEN
 );
 
+if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    throw new Error('SUPABASE_SERVICE_ROLE_KEY requerido en /api/log-access');
+}
 const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
 const transporter = nodemailer.createTransport({
@@ -37,6 +40,36 @@ export async function POST(req: NextRequest) {
         if (!chip_folio || !tipo || !session_token) {
             return NextResponse.json({ error: "Faltan datos requeridos." }, { status: 400 });
         }
+
+        // ── VALIDAR session_token CONTRA scan_tokens (F-05) ──
+        // Sin esta validación, cualquiera podía enviar un session_token inventado
+        // y disparar SMS+WhatsApp+Email a las víctimas sin haber escaneado nada.
+        const { data: tokenRecord, error: tokenError } = await supabase
+            .from('scan_tokens')
+            .select('chip_folio, expires_at, mode')
+            .eq('token', session_token)
+            .maybeSingle();
+
+        if (tokenError || !tokenRecord) {
+            console.warn(`[log-access] Token inválido o no encontrado: ${session_token}`);
+            return NextResponse.json({ error: "Token inválido." }, { status: 401 });
+        }
+
+        if (tokenRecord.chip_folio.toUpperCase() !== chip_folio.toUpperCase()) {
+            console.warn(`[log-access] Token no corresponde al folio enviado.`);
+            return NextResponse.json({ error: "Token no autorizado para este folio." }, { status: 403 });
+        }
+
+        if (new Date(tokenRecord.expires_at) < new Date()) {
+            return NextResponse.json({ error: "Token expirado." }, { status: 410 });
+        }
+
+        // Si el token no fue creado en modo emergencia, no permitir disparar emergencia
+        if (tipo === 'emergencia' && tokenRecord.mode !== 'emergencia') {
+            console.warn(`[log-access] Intento de emergencia con token modo=${tokenRecord.mode}`);
+            return NextResponse.json({ error: "Token no permite modo emergencia." }, { status: 403 });
+        }
+        // ── FIN VALIDACIÓN ──
 
         const ip_raw = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
             || req.headers.get('x-real-ip')

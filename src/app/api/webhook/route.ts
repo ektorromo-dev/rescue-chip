@@ -3,9 +3,12 @@ import Stripe from "stripe";
 import nodemailer from "nodemailer";
 import { createClient } from "@supabase/supabase-js";
 
+if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    throw new Error('SUPABASE_SERVICE_ROLE_KEY requerido en /api/webhook');
+}
 const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
 export async function POST(req: NextRequest) {

@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import EmergencyFamilyClient from './EmergencyFamilyClient';
@@ -54,7 +54,8 @@ export default async function EmergenciaPage({ params }: PageProps) {
     );
   }
 
-  const supabase = await createClient();
+  // Lecturas/escrituras de incidentes requieren service_role tras el cierre de RLS.
+  const supabase = createAdminClient();
 
   // 1. Buscar incidente por token
   const { data: incidente, error } = await supabase
