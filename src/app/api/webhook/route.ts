@@ -68,17 +68,17 @@ export async function POST(req: NextRequest) {
             }
 
             // Guardar dirección de Stripe en la orden
-            const shippingDetailsState = (session as any).shipping_details;
-            if (shippingDetailsState?.address) {
+            const shippingDetails = (session as any).shipping_details;
+            if (shippingDetails?.address) {
                 await supabase
                     .from("orders")
                     .update({
-                        calle_numero: `${shippingDetailsState.address.line1 || ''} ${shippingDetailsState.address.line2 || ''}`.trim(),
-                        ciudad: shippingDetailsState.address.city || null,
-                        estado: shippingDetailsState.address.state || null,
-                        codigo_postal: shippingDetailsState.address.postal_code || null,
-                        colonia: '',
-                        referencia: ''
+                        calle_numero: `${shippingDetails.address.line1 || ''} ${shippingDetails.address.line2 || ''}`.trim(),
+                        ciudad: shippingDetails.address.city || null,
+                        estado: shippingDetails.address.state || null,
+                        codigo_postal: shippingDetails.address.postal_code || null,
+                        colonia: shippingDetails.address.line2 || '',
+                        referencia: shippingDetails.name || ''
                     })
                     .eq("id", order_id);
             }
