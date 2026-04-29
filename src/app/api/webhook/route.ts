@@ -46,17 +46,27 @@ export async function POST(req: NextRequest) {
     if (event.type === "checkout.session.completed") {
         const session = event.data.object as Stripe.Checkout.Session;
 
+        // Recuperar sesión completa de Stripe (el evento webhook no siempre incluye shipping_details)
+        let fullSession = session;
+        try {
+            fullSession = await stripe.checkout.sessions.retrieve(session.id, {
+                expand: ['shipping_details', 'customer_details'],
+            });
+        } catch (retrieveError) {
+            console.error("Error retrieving full session from Stripe:", retrieveError);
+        }
+
         // Extraer metadatos
-        const paquete = session.metadata?.paquete || "Desconocido";
-        const pidioFactura = session.metadata?.factura === "true";
-        const order_id = session.metadata?.order_id;
+        const paquete = fullSession.metadata?.paquete || "Desconocido";
+        const pidioFactura = fullSession.metadata?.factura === "true";
+        const order_id = fullSession.metadata?.order_id;
 
         let orderDetails = null;
         if (order_id) {
             // Actualizar orden
             const { data, error } = await supabase
                 .from("orders")
-                .update({ status: 'pagado', session_id: session.id })
+                .update({ status: 'pagado', session_id: fullSession.id })
                 .eq("id", order_id)
                 .select()
                 .single();
@@ -84,9 +94,10 @@ export async function POST(req: NextRequest) {
             }
 
             // Actualizar datos de contacto desde Stripe
-            const customerName = shippingDetails?.name || session.customer_details?.name || 'No especificado';
-            const customerEmail = session.customer_details?.email || '';
-            const customerPhone = session.customer_details?.phone || '';
+            const customerName = shippingDetails?.name || fullSession.customer_details?.name || 'No especificado';
+            const customerEmail = fullSession.customer_details?.email || '';
+            const rawPhone = fullSession.customer_details?.phone || '';
+            const customerPhone = rawPhone.replace(/^\+52/, '').replace(/^\+/, '').replace(/\D/g, '');
 
             await supabase
                 .from("orders")
@@ -99,12 +110,12 @@ export async function POST(req: NextRequest) {
         }
 
         // Dirección de envío desde Stripe (shipping_address_collection)
-        const globalShippingDetails = (session as any).shipping_details;
+        const globalShippingDetails = fullSession.shipping_details;
 
         // Extraer detalles del cliente
-        const nombre = session.customer_details?.name || globalShippingDetails?.name || "No especificado";
-        const email = session.customer_details?.email || "No especificado";
-        const telefono = session.customer_details?.phone || "No especificado";
+        const nombre = fullSession.customer_details?.name || globalShippingDetails?.name || "No especificado";
+        const email = fullSession.customer_details?.email || "No especificado";
+        const telefono = fullSession.customer_details?.phone || "No especificado";
         let direccion = "No especificada";
         if (globalShippingDetails?.address) {
             const addr = globalShippingDetails.address;
@@ -118,7 +129,7 @@ export async function POST(req: NextRequest) {
             ].filter(line => line.trim()).join('\n');
         }
 
-        const monto = (session.amount_total || 0) / 100;
+        const monto = (fullSession.amount_total || 0) / 100;
 
         const emailHtml = `
             <h2>Nueva Venta Generada - RescueChip 🎉</h2>
@@ -175,7 +186,7 @@ export async function POST(req: NextRequest) {
                     <p style="color: #555; font-size: 16px;">Una vez que recibas tus chips, ingresa a <a href="https://rescue-chip.com/activate" style="color: #e11d48; font-weight: bold;">rescue-chip.com/activate</a> para crear tu perfil médico de emergencia.</p>
                     
                     <div style="text-align: center; margin: 24px 0;">
-                        <a href="https://rescue-chip.com/shop/success?session_id=${session.id}" 
+                        <a href="https://rescue-chip.com/shop/success?session_id=${fullSession.id}" 
                            style="display: inline-block; background-color: #e11d48; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 10px; font-weight: 700; font-size: 14px;">
                             ¿Requieres factura? Solicítala aquí
                         </a>
