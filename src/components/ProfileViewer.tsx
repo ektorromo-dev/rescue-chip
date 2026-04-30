@@ -91,12 +91,26 @@ export default function ProfileViewer({ chip, profile, isDemo = false, isPreview
         return () => clearInterval(interval);
     }, [currentExpiresAt, isDemo, isPreview]);
 
-    // Generate UUID function
-    const generateUUID = () => {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-            const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
-            return v.toString(16);
-        });
+    // Token de sesión: si viene scanToken como prop, usarlo. Si no, pedir uno al servidor.
+    const getOrCreateScanToken = async (): Promise<string | null> => {
+        if (scanToken) return scanToken;
+        try {
+            const res = await fetch('/api/scan-token', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ folio: chip.folio })
+            });
+            const data = await res.json();
+            if (data.token) {
+                setCurrentExpiresAt(data.expires_at);
+                return data.token;
+            }
+            console.error('Error creating scan token:', data);
+            return null;
+        } catch (e) {
+            console.error('Error fetching scan token:', e);
+            return null;
+        }
     };
 
     const handleConsent = async (type: 'emergencia' | 'prueba' | 'consulta') => {
@@ -122,14 +136,36 @@ export default function ProfileViewer({ chip, profile, isDemo = false, isPreview
             setGeoError(true);
         }
 
-        const token = generateUUID();
-        setSessionToken(token);
-        sessionStorage.setItem(`rescuechip_session_${chip.folio}`, token);
+        // 1. Obtener o crear el scan_token REAL en la base de datos
+        const realToken = await getOrCreateScanToken();
+        if (!realToken) {
+            console.error('No se pudo obtener token de sesión');
+            setIsLoadingConsent(false);
+            return;
+        }
+        setSessionToken(realToken);
+        sessionStorage.setItem(`rescuechip_session_${chip.folio}`, realToken);
 
         const isEmerg = type === 'emergencia';
         setIsEmergency(isEmerg);
 
-        // Send Log
+        // 2. Extender el token al modo correcto (emergencia=7min, consulta=1min)
+        try {
+            const res = await fetch('/api/scan-token', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ folio: chip.folio, token: realToken, mode: type })
+            });
+            const data = await res.json();
+            if (data.expires_at) {
+                setCurrentExpiresAt(data.expires_at);
+                setIsExpired(false);
+            }
+        } catch (e) {
+            console.error('Error extending token:', e);
+        }
+
+        // 3. Loggear acceso con el token real validable
         fetch('/api/log-access', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -138,30 +174,11 @@ export default function ProfileViewer({ chip, profile, isDemo = false, isPreview
                 tipo: type,
                 latitud: lat,
                 longitud: lng,
-                session_token: token
+                session_token: realToken
             })
         }).catch(e => console.error("Error logging access", e));
 
         setHasConsented(true);
-
-        // Extend token based on mode
-        if (scanToken) {
-            try {
-                const res = await fetch('/api/scan-token', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ folio: chip.folio, token: scanToken, mode: type })
-                });
-                const data = await res.json();
-                if (data.expires_at) {
-                    setCurrentExpiresAt(data.expires_at);
-                    setIsExpired(false);
-                }
-            } catch (e) {
-                console.error('Error extending token:', e);
-            }
-        }
-
         setIsLoadingConsent(false);
     };
 
