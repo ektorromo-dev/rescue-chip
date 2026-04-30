@@ -113,7 +113,7 @@ export default async function EmergenciaPage({ params }: PageProps) {
   if (incidente.profile_id) {
     const { data } = await supabase
       .from('profiles')
-      .select('full_name, blood_type, medical_conditions, important_medications, allergies, emergency_contacts, sexo, age, city')
+      .select('full_name, blood_type, medical_conditions, important_medications, allergies, emergency_contacts, sexo, age, location')
       .eq('id', incidente.profile_id)
       .single();
     profileData = data;
@@ -146,7 +146,7 @@ export default async function EmergenciaPage({ params }: PageProps) {
         allergies: profileData.allergies || null,
         sexo: profileData.sexo || null,
         age: profileData.age || null,
-        city: profileData.city || null,
+        city: profileData.location || null,
       } : null}
       isDemo={false}
     />
