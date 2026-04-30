@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { rateLimitActivate } from "@/lib/ratelimit";
 
 export async function GET(request: NextRequest) {
@@ -16,7 +16,8 @@ export async function GET(request: NextRequest) {
     }
 
     // 2. DESPUÉS validar si el folio existe en la base de datos
-    const supabase = await createClient();
+    // Usa service role porque la policy "Allow public read access to chips" fue eliminada por seguridad.
+    const supabase = createAdminClient();
     const cleanFolio = folio.trim();
 
     const { data: chip, error: chipError } = await supabase
