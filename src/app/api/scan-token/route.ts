@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest } from 'next/server';
 
 export async function POST(request: NextRequest) {
@@ -9,7 +9,8 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: 'Folio requerido' }, { status: 400 });
   }
 
-  const supabase = await createClient();
+  // Usa service role porque las policies públicas de scan_tokens fueron eliminadas por seguridad.
+  const supabase = createAdminClient();
 
   // Si viene mode, es para extender un token existente
   if (mode === 'emergencia' || mode === 'consulta') {
