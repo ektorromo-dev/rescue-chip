@@ -4,6 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import nodemailer from "nodemailer";
 import twilio from "twilio";
 import { rateLimitSendEmergency } from "@/lib/ratelimit";
+import { formatStoredPhone } from '@/lib/phone-utils';
 import { logAuditEvent } from '@/lib/audit';
 
 // Twilio Setup
@@ -236,18 +237,7 @@ export async function POST(req: NextRequest) {
                     }
 
                     // --- TWILIO SMS & WHATSAPP INTEGRATION ---
-                    // Helper function to format Mexican phone numbers robustly
-                    const formatMexicanPhone = (phoneRaw: string): string => {
-                        let phone = phoneRaw.replace(/\D/g, ""); // strip non-numeric
-                        if (phone.length === 12 && phone.startsWith("52")) {
-                            return `+${phone}`;
-                        } else if (phone.length === 10) {
-                            return `+52${phone}`; // Force country string
-                        } else if (!phone.startsWith("+52")) {
-                            return `+52${phone}`; // best effort fallback
-                        }
-                        return `+${phone}`;
-                    };
+
 
                     const plainLocation = latitud && longitud
                         ? `https://maps.google.com/?q=${latitud},${longitud}`
@@ -290,7 +280,7 @@ export async function POST(req: NextRequest) {
 
                     // Trigger notifications concurrently
                     const notificationPromises = allPhonesToNotify.map(async (rawPhone) => {
-                        const formattedPhone = formatMexicanPhone(rawPhone);
+                        const formattedPhone = formatStoredPhone(rawPhone);
 
                         console.log(`[Twilio Pre-Send Check] Procesando SMS para destino: ${formattedPhone}`);
 

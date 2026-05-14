@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import nodemailer from 'nodemailer';
 import twilio from 'twilio';
+import { formatStoredPhone } from '@/lib/phone-utils';
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -23,17 +24,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const formatMexicanPhone = (phoneRaw: string): string => {
-  let phone = phoneRaw.replace(/\D/g, '');
-  if (phone.length === 12 && phone.startsWith('52')) {
-    return `+${phone}`;
-  } else if (phone.length === 10) {
-    return `+52${phone}`;
-  } else if (!phone.startsWith('+52')) {
-    return `+52${phone}`;
-  }
-  return `+${phone}`;
-};
+
 
 export async function POST(req: NextRequest) {
   try {
@@ -168,7 +159,7 @@ export async function POST(req: NextRequest) {
 
         // SMS promises
         for (const rawPhone of allPhones) {
-          const formatted = formatMexicanPhone(rawPhone);
+          const formatted = formatStoredPhone(rawPhone);
           allNotificationPromises.push(
             twilioClient.messages.create({
               body: smsBody,

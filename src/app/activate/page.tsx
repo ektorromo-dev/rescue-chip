@@ -8,6 +8,8 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useState, Suspense, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { sanitizeProfileInput } from "@/app/actions/sanitize";
+import { validateAndFormatPhone, SUPPORTED_COUNTRIES } from '@/lib/phone-utils';
+import type { CountryCode } from 'libphonenumber-js';
 
 function ActivationFormContent() {
     const searchParams = useSearchParams();
@@ -23,6 +25,7 @@ function ActivationFormContent() {
     const [photoFile, setPhotoFile] = useState<File | null>(null);
     const [showPassword, setShowPassword] = useState(false);
     const [phone, setPhone] = useState("");
+    const [selectedCountry, setSelectedCountry] = useState<CountryCode>('MX');
     const [whatsappOptedIn, setWhatsappOptedIn] = useState(true);
     const [consentimientoPublico, setConsentimientoPublico] = useState(false);
     const [sexo, setSexo] = useState<string>('');
@@ -96,8 +99,9 @@ function ActivationFormContent() {
 
         const formData = new FormData(e.currentTarget);
 
-        if (phone.length < 10) {
-            setErrorMsg("El número de celular debe tener 10 dígitos.");
+        const phoneValidation = validateAndFormatPhone(phone, selectedCountry);
+        if (!phoneValidation.isValid) {
+            setErrorMsg(phoneValidation.error || "Número de teléfono inválido para el país seleccionado.");
             setLoading(false);
             return;
         }
@@ -328,7 +332,7 @@ function ActivationFormContent() {
                 plan: chipAssignedPlan,
                 photo_url: photoUrl,
                 full_name: formData.get("fullName") as string,
-                phone: `+52${phone}`,
+                phone: phoneValidation.formatted,
                 whatsapp_opted_in: whatsappOptedIn,
                 age: age,
                 sexo: sexo,
@@ -404,7 +408,7 @@ function ActivationFormContent() {
                         'x-rescuechip-secret': 'rescuechip2026'
                     },
                     body: JSON.stringify({
-                        phone: `+52${phone}`,
+                        phone: phoneValidation.formatted,
                         name: formData.get("fullName") as string,
                         folio: chip.folio
                     })
@@ -744,17 +748,46 @@ function ActivationFormContent() {
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                             <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Número de Celular *</label>
-                            <div style={{ display: "flex" }}>
-                                <span style={{ display: "inline-flex", alignItems: "center", padding: "0 16px", border: "1px solid rgba(255,255,255,0.08)", backgroundColor: "#1A1A18", color: "#9E9A95", fontSize: "14px", fontWeight: 500 }}>
-                                    🇲🇽 +52
-                                </span>
+                            <div style={{ display: "flex", gap: "8px" }}>
+                                <select
+                                    value={selectedCountry}
+                                    onChange={(e) => {
+                                        setSelectedCountry(e.target.value as CountryCode);
+                                        setPhone('');
+                                    }}
+                                    style={{
+                                        border: "1px solid rgba(255,255,255,0.08)",
+                                        backgroundColor: "#1A1A18",
+                                        color: "#F4F0EB",
+                                        padding: "8px 12px",
+                                        fontSize: "14px",
+                                        borderRadius: "4px",
+                                        cursor: "pointer",
+                                        minWidth: "160px"
+                                    }}
+                                    required
+                                >
+                                    {SUPPORTED_COUNTRIES.map(country => (
+                                        <option key={country.code} value={country.code}>
+                                            {country.flag} {country.name}
+                                        </option>
+                                    ))}
+                                </select>
                                 <input
                                     type="tel"
                                     inputMode="numeric"
-                                    placeholder="55 1234 5678"
+                                    placeholder={SUPPORTED_COUNTRIES.find(c => c.code === selectedCountry)?.placeholder || ''}
                                     value={phone}
-                                    onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                                    style={{ border: "1px solid rgba(255,255,255,0.08)", backgroundColor: "#1E1E1C", padding: "8px 16px", fontSize: "14px", transition: "all 0.2s ease-in-out" }}
+                                    onChange={(e) => setPhone(e.target.value.replace(/[^\d\s]/g, ''))}
+                                    style={{
+                                        flex: 1,
+                                        border: "1px solid rgba(255,255,255,0.08)",
+                                        backgroundColor: "#1E1E1C",
+                                        padding: "8px 16px",
+                                        fontSize: "14px",
+                                        color: "#F4F0EB",
+                                        borderRadius: "4px"
+                                    }}
                                     required
                                 />
                             </div>
