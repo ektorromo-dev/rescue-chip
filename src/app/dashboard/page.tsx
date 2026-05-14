@@ -715,7 +715,7 @@ export default function DashboardPage() {
                                         </div>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                                             <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Número de Celular</label>
-                                            <div style={{ display: "flex", gap: "8px" }}>
+                                            <div style={{ display: "flex", gap: "8px", width: "100%", overflow: "hidden" }}>
                                                 <select
                                                     value={userPhoneCountry}
                                                     onChange={(e) => {
@@ -749,7 +749,7 @@ export default function DashboardPage() {
                                                             setUserPhoneError(result.isValid ? '' : (result.error || 'Número inválido'));
                                                         }
                                                     }}
-                                                    style={{ flex: 1, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", backgroundColor: '#1A1A18', border: userPhoneError ? '1px solid #E8231A' : '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box' }}
+                                                    style={{ flex: 1, minWidth: 0, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", backgroundColor: '#1A1A18', border: userPhoneError ? '1px solid #E8231A' : '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box' }}
                                                 />
                                             </div>
                                             {userPhoneError && (
