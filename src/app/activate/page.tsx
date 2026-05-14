@@ -27,6 +27,9 @@ function ActivationFormContent() {
     const [phone, setPhone] = useState("");
     const [selectedCountry, setSelectedCountry] = useState<CountryCode>('MX');
     const [phoneError, setPhoneError] = useState<string>('');
+    const [contactPhones, setContactPhones] = useState<string[]>(['', '', '']);
+    const [contactCountries, setContactCountries] = useState<CountryCode[]>(['MX', 'MX', 'MX']);
+    const [contactPhoneErrors, setContactPhoneErrors] = useState<string[]>(['', '', '']);
     const [whatsappOptedIn, setWhatsappOptedIn] = useState(true);
     const [consentimientoPublico, setConsentimientoPublico] = useState(false);
     const [sexo, setSexo] = useState<string>('');
@@ -753,9 +756,13 @@ function ActivationFormContent() {
                                 <select
                                     value={selectedCountry}
                                     onChange={(e) => {
-                                        setSelectedCountry(e.target.value as CountryCode);
+                                        const newCountry = e.target.value as CountryCode;
+                                        setSelectedCountry(newCountry);
                                         setPhone('');
                                         setPhoneError('');
+                                        setContactCountries([newCountry, newCountry, newCountry]);
+                                        setContactPhones(['', '', '']);
+                                        setContactPhoneErrors(['', '', '']);
                                     }}
                                     style={{
                                         border: "1px solid rgba(255,255,255,0.08)",
@@ -862,10 +869,59 @@ function ActivationFormContent() {
                                     onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Ej. María López (Esposa)" required />
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                <label htmlFor="contact1Phone" style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Teléfono</label>
-                                <input type="tel" id="contact1Phone" name="contact1Phone" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                    onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="+52 55 1234 5678" required />
+                                <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Teléfono</label>
+                                <div style={{ display: "flex", gap: "8px" }}>
+                                    <select
+                                        value={contactCountries[0]}
+                                        onChange={(e) => {
+                                            const updated = [...contactCountries];
+                                            updated[0] = e.target.value as CountryCode;
+                                            setContactCountries(updated);
+                                            const updatedPhones = [...contactPhones];
+                                            updatedPhones[0] = '';
+                                            setContactPhones(updatedPhones);
+                                        }}
+                                        style={{ border: "1px solid rgba(255,255,255,0.1)", backgroundColor: "#1A1A18", color: "#F4F0EB", padding: "8px 10px", fontSize: "13px", borderRadius: "10px", cursor: "pointer", minWidth: "130px" }}
+                                    >
+                                        {SUPPORTED_COUNTRIES.map(c => (
+                                            <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
+                                        ))}
+                                    </select>
+                                    <input
+                                        type="tel"
+                                        id="contact1Phone"
+                                        name="contact1Phone"
+                                        inputMode="numeric"
+                                        placeholder={SUPPORTED_COUNTRIES.find(c => c.code === contactCountries[0])?.placeholder || ''}
+                                        value={contactPhones[0]}
+                                        maxLength={(SUPPORTED_COUNTRIES.find(c => c.code === contactCountries[0])?.maxDigits || 15) + 4}
+                                        onChange={(e) => {
+                                            const digits = e.target.value.replace(/\D/g, '');
+                                            const max = SUPPORTED_COUNTRIES.find(c => c.code === contactCountries[0])?.maxDigits || 15;
+                                            if (digits.length <= max) {
+                                                const updated = [...contactPhones];
+                                                updated[0] = formatPhoneAsYouType(digits, contactCountries[0]);
+                                                setContactPhones(updated);
+                                            }
+                                            const updatedErrors = [...contactPhoneErrors];
+                                            updatedErrors[0] = '';
+                                            setContactPhoneErrors(updatedErrors);
+                                        }}
+                                        onBlur={() => {
+                                            if (contactPhones[0].trim()) {
+                                                const result = validateAndFormatPhone(contactPhones[0], contactCountries[0]);
+                                                const updatedErrors = [...contactPhoneErrors];
+                                                updatedErrors[0] = result.isValid ? '' : (result.error || 'Número inválido');
+                                                setContactPhoneErrors(updatedErrors);
+                                            }
+                                        }}
+                                        style={{ flex: 1, backgroundColor: '#1A1A18', border: contactPhoneErrors[0] ? '1px solid #E8231A' : '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box' }}
+                                        required
+                                    />
+                                </div>
+                                {contactPhoneErrors[0] && (
+                                    <p style={{ fontSize: '12px', color: '#E8231A', margin: '4px 0 0 0', fontWeight: 500 }}>{contactPhoneErrors[0]}</p>
+                                )}
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                                 <label htmlFor="contact1Email" style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Email (Opcional, para recibir alertas)</label>
@@ -886,10 +942,58 @@ function ActivationFormContent() {
                                     onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Nombre completo o parentesco" />
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                <label htmlFor="contact2Phone" style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Teléfono</label>
-                                <input type="tel" id="contact2Phone" name="contact2Phone" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                    onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="+52 55 0000 0000" />
+                                <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Teléfono</label>
+                                <div style={{ display: "flex", gap: "8px" }}>
+                                    <select
+                                        value={contactCountries[1]}
+                                        onChange={(e) => {
+                                            const updated = [...contactCountries];
+                                            updated[1] = e.target.value as CountryCode;
+                                            setContactCountries(updated);
+                                            const updatedPhones = [...contactPhones];
+                                            updatedPhones[1] = '';
+                                            setContactPhones(updatedPhones);
+                                        }}
+                                        style={{ border: "1px solid rgba(255,255,255,0.1)", backgroundColor: "#1A1A18", color: "#F4F0EB", padding: "8px 10px", fontSize: "13px", borderRadius: "10px", cursor: "pointer", minWidth: "130px" }}
+                                    >
+                                        {SUPPORTED_COUNTRIES.map(c => (
+                                            <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
+                                        ))}
+                                    </select>
+                                    <input
+                                        type="tel"
+                                        id="contact2Phone"
+                                        name="contact2Phone"
+                                        inputMode="numeric"
+                                        placeholder={SUPPORTED_COUNTRIES.find(c => c.code === contactCountries[1])?.placeholder || ''}
+                                        value={contactPhones[1]}
+                                        maxLength={(SUPPORTED_COUNTRIES.find(c => c.code === contactCountries[1])?.maxDigits || 15) + 4}
+                                        onChange={(e) => {
+                                            const digits = e.target.value.replace(/\D/g, '');
+                                            const max = SUPPORTED_COUNTRIES.find(c => c.code === contactCountries[1])?.maxDigits || 15;
+                                            if (digits.length <= max) {
+                                                const updated = [...contactPhones];
+                                                updated[1] = formatPhoneAsYouType(digits, contactCountries[1]);
+                                                setContactPhones(updated);
+                                            }
+                                            const updatedErrors = [...contactPhoneErrors];
+                                            updatedErrors[1] = '';
+                                            setContactPhoneErrors(updatedErrors);
+                                        }}
+                                        onBlur={() => {
+                                            if (contactPhones[1].trim()) {
+                                                const result = validateAndFormatPhone(contactPhones[1], contactCountries[1]);
+                                                const updatedErrors = [...contactPhoneErrors];
+                                                updatedErrors[1] = result.isValid ? '' : (result.error || 'Número inválido');
+                                                setContactPhoneErrors(updatedErrors);
+                                            }
+                                        }}
+                                        style={{ flex: 1, backgroundColor: '#1A1A18', border: contactPhoneErrors[1] ? '1px solid #E8231A' : '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box' }}
+                                    />
+                                </div>
+                                {contactPhoneErrors[1] && (
+                                    <p style={{ fontSize: '12px', color: '#E8231A', margin: '4px 0 0 0', fontWeight: 500 }}>{contactPhoneErrors[1]}</p>
+                                )}
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                                 <label htmlFor="contact2Email" style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Email (Opcional, para recibir alertas)</label>
@@ -910,10 +1014,58 @@ function ActivationFormContent() {
                                     onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Nombre completo o parentesco" />
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                <label htmlFor="contact3Phone" style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Teléfono</label>
-                                <input type="tel" id="contact3Phone" name="contact3Phone" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                    onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="+52 55 0000 0000" />
+                                <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Teléfono</label>
+                                <div style={{ display: "flex", gap: "8px" }}>
+                                    <select
+                                        value={contactCountries[2]}
+                                        onChange={(e) => {
+                                            const updated = [...contactCountries];
+                                            updated[2] = e.target.value as CountryCode;
+                                            setContactCountries(updated);
+                                            const updatedPhones = [...contactPhones];
+                                            updatedPhones[2] = '';
+                                            setContactPhones(updatedPhones);
+                                        }}
+                                        style={{ border: "1px solid rgba(255,255,255,0.1)", backgroundColor: "#1A1A18", color: "#F4F0EB", padding: "8px 10px", fontSize: "13px", borderRadius: "10px", cursor: "pointer", minWidth: "130px" }}
+                                    >
+                                        {SUPPORTED_COUNTRIES.map(c => (
+                                            <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
+                                        ))}
+                                    </select>
+                                    <input
+                                        type="tel"
+                                        id="contact3Phone"
+                                        name="contact3Phone"
+                                        inputMode="numeric"
+                                        placeholder={SUPPORTED_COUNTRIES.find(c => c.code === contactCountries[2])?.placeholder || ''}
+                                        value={contactPhones[2]}
+                                        maxLength={(SUPPORTED_COUNTRIES.find(c => c.code === contactCountries[2])?.maxDigits || 15) + 4}
+                                        onChange={(e) => {
+                                            const digits = e.target.value.replace(/\D/g, '');
+                                            const max = SUPPORTED_COUNTRIES.find(c => c.code === contactCountries[2])?.maxDigits || 15;
+                                            if (digits.length <= max) {
+                                                const updated = [...contactPhones];
+                                                updated[2] = formatPhoneAsYouType(digits, contactCountries[2]);
+                                                setContactPhones(updated);
+                                            }
+                                            const updatedErrors = [...contactPhoneErrors];
+                                            updatedErrors[2] = '';
+                                            setContactPhoneErrors(updatedErrors);
+                                        }}
+                                        onBlur={() => {
+                                            if (contactPhones[2].trim()) {
+                                                const result = validateAndFormatPhone(contactPhones[2], contactCountries[2]);
+                                                const updatedErrors = [...contactPhoneErrors];
+                                                updatedErrors[2] = result.isValid ? '' : (result.error || 'Número inválido');
+                                                setContactPhoneErrors(updatedErrors);
+                                            }
+                                        }}
+                                        style={{ flex: 1, backgroundColor: '#1A1A18', border: contactPhoneErrors[2] ? '1px solid #E8231A' : '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box' }}
+                                    />
+                                </div>
+                                {contactPhoneErrors[2] && (
+                                    <p style={{ fontSize: '12px', color: '#E8231A', margin: '4px 0 0 0', fontWeight: 500 }}>{contactPhoneErrors[2]}</p>
+                                )}
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                                 <label htmlFor="contact3Email" style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Email (Opcional, para recibir alertas)</label>
