@@ -769,7 +769,7 @@ export default function DashboardPage() {
                                         Contactos de Emergencia
                                     </h3>
 
-                                    <div style={{ padding: "8px 0", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", display: "flex", flexDirection: "column", gap: "16px" }}>
+                                    <div style={{ padding: "8px 16px", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", display: "flex", flexDirection: "column", gap: "16px" }}>
                                         <h4 style={{ fontSize: "14px", fontWeight: 700, color: "#E8231A" }}>Contacto 1 (Requerido)</h4>
                                         <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -793,7 +793,7 @@ export default function DashboardPage() {
                                         </div>
                                     </div>
 
-                                    <div style={{ padding: "8px 0", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", display: "flex", flexDirection: "column", gap: "16px" }}>
+                                    <div style={{ padding: "8px 16px", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", display: "flex", flexDirection: "column", gap: "16px" }}>
                                         <h4 style={{ fontSize: "14px", fontWeight: 700 }}>Contacto 2 (Opcional)</h4>
                                         <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -817,7 +817,7 @@ export default function DashboardPage() {
                                         </div>
                                     </div>
 
-                                    <div style={{ padding: "8px 0", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", display: "flex", flexDirection: "column", gap: "16px" }}>
+                                    <div style={{ padding: "8px 16px", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", display: "flex", flexDirection: "column", gap: "16px" }}>
                                         <h4 style={{ fontSize: "14px", fontWeight: 700 }}>Contacto 3 (Opcional)</h4>
                                         <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
