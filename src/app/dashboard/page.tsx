@@ -723,7 +723,7 @@ export default function DashboardPage() {
                                                         setUserPhone('');
                                                         setUserPhoneError('');
                                                     }}
-                                                    style={{ border: "1px solid rgba(255,255,255,0.1)", backgroundColor: "#1A1A18", color: "#F4F0EB", padding: "8px 10px", fontSize: "13px", borderRadius: "10px", cursor: "pointer", width: "130px", flexShrink: 0, overflow: "hidden" }}
+                                                    style={{ border: "1px solid rgba(255,255,255,0.1)", backgroundColor: "#1A1A18", color: "#F4F0EB", padding: "12px 10px", fontSize: "13px", borderRadius: "10px", cursor: "pointer", width: "130px", flexShrink: 0, overflow: "hidden" }}
                                                 >
                                                     {SUPPORTED_COUNTRIES.map(c => (
                                                         <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
