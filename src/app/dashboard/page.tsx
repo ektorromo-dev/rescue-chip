@@ -6,6 +6,9 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { updateProfileSafe } from "@/app/actions/sanitize";
+import { validateAndFormatPhone, SUPPORTED_COUNTRIES, formatPhoneAsYouType } from '@/lib/phone-utils';
+import { parsePhoneNumber } from 'libphonenumber-js';
+import type { CountryCode } from 'libphonenumber-js';
 
 export default function DashboardPage() {
     const router = useRouter();
@@ -65,6 +68,9 @@ export default function DashboardPage() {
 
     // Contacts
     const [contact1Name, setContact1Name] = useState("");
+    const [userPhone, setUserPhone] = useState("");
+    const [userPhoneCountry, setUserPhoneCountry] = useState<CountryCode>('MX');
+    const [userPhoneError, setUserPhoneError] = useState("");
     const [contact1Phone, setContact1Phone] = useState("");
     const [contact1Email, setContact1Email] = useState("");
     const [contact2Name, setContact2Name] = useState("");
@@ -262,6 +268,18 @@ export default function DashboardPage() {
                 setCurrentPhotoUrl(profile.photo_url || null);
 
                 setFullName(profile.full_name || "");
+                if (profile.phone) {
+                    try {
+                        const parsed = parsePhoneNumber(profile.phone);
+                        if (parsed?.country) {
+                            setUserPhoneCountry(parsed.country as CountryCode);
+                        }
+                        const formatted = formatPhoneAsYouType(parsed?.nationalNumber || '', parsed?.country as CountryCode || 'MX');
+                        setUserPhone(formatted);
+                    } catch {
+                        setUserPhone(profile.phone);
+                    }
+                }
                 setAge(profile.age ? profile.age.toString() : "");
                 setLocation(profile.location || "");
                 setBloodType(profile.blood_type || "");
@@ -466,6 +484,7 @@ export default function DashboardPage() {
                 numero_afiliacion: numeroAfiliacion || null,
                 clinica_asignada: clinicaAsignada || null,
                 curp_seguro: curpSeguro || null,
+                phone: userPhone.trim() ? (validateAndFormatPhone(userPhone, userPhoneCountry).formatted || userPhone) : null,
                 updated_at: new Date().toISOString()
             };
 
@@ -693,6 +712,52 @@ export default function DashboardPage() {
                                             <input type="text" id="location" value={location} onChange={(e) => setLocation(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                                 onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                 onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} required />
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
+                                            <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Número de Celular</label>
+                                            <div style={{ display: "flex", gap: "8px" }}>
+                                                <select
+                                                    value={userPhoneCountry}
+                                                    onChange={(e) => {
+                                                        setUserPhoneCountry(e.target.value as CountryCode);
+                                                        setUserPhone('');
+                                                        setUserPhoneError('');
+                                                    }}
+                                                    style={{ border: "1px solid rgba(255,255,255,0.1)", backgroundColor: "#1A1A18", color: "#F4F0EB", padding: "8px 10px", fontSize: "13px", borderRadius: "10px", cursor: "pointer", minWidth: "140px" }}
+                                                >
+                                                    {SUPPORTED_COUNTRIES.map(c => (
+                                                        <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
+                                                    ))}
+                                                </select>
+                                                <input
+                                                    type="tel"
+                                                    inputMode="numeric"
+                                                    placeholder={SUPPORTED_COUNTRIES.find(c => c.code === userPhoneCountry)?.placeholder || ''}
+                                                    value={userPhone}
+                                                    maxLength={(SUPPORTED_COUNTRIES.find(c => c.code === userPhoneCountry)?.maxDigits || 15) + 4}
+                                                    onChange={(e) => {
+                                                        const digits = e.target.value.replace(/\D/g, '');
+                                                        const max = SUPPORTED_COUNTRIES.find(c => c.code === userPhoneCountry)?.maxDigits || 15;
+                                                        if (digits.length <= max) {
+                                                            setUserPhone(formatPhoneAsYouType(digits, userPhoneCountry));
+                                                        }
+                                                        setUserPhoneError('');
+                                                    }}
+                                                    onBlur={() => {
+                                                        if (userPhone.trim()) {
+                                                            const result = validateAndFormatPhone(userPhone, userPhoneCountry);
+                                                            setUserPhoneError(result.isValid ? '' : (result.error || 'Número inválido'));
+                                                        }
+                                                    }}
+                                                    style={{ flex: 1, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", backgroundColor: '#1A1A18', border: userPhoneError ? '1px solid #E8231A' : '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box' }}
+                                                />
+                                            </div>
+                                            {userPhoneError && (
+                                                <p style={{ fontSize: '12px', color: '#E8231A', margin: '4px 0 0 0', fontWeight: 500 }}>{userPhoneError}</p>
+                                            )}
+                                            <p style={{ fontSize: '12px', color: '#9E9A95', margin: '4px 0 0 0' }}>
+                                                Este número recibe alertas SMS cuando tu chip es escaneado en una emergencia.
+                                            </p>
                                         </div>
                                     </div>
                                 </section>
