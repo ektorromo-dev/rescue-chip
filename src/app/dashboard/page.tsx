@@ -661,10 +661,10 @@ export default function DashboardPage() {
                                         <span style={{ backgroundColor: "rgba(232,35,26,0.12)", color: "#E8231A", width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", flexShrink: 0, fontWeight: 600 }}>1</span>
                                         Identificación
                                     </h3>
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px', minWidth: 0, width: '100%' }}>
                                         <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "16px" }}>
                                             <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Foto de Perfil</label>
-                                            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "16px" }}>
+                                            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "16px", width: "100%", minWidth: 0 }}>
                                                 {photoFile ? (
                                                     <div style={{ width: "120px", height: "120px", minWidth: "120px", minHeight: "120px", borderRadius: "50%", overflow: "hidden", backgroundColor: "#1A1A18", border: "4px solid #131311", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.3)", flexShrink: 0 }}>
                                                         {/* eslint-disable-next-line @next/next/no-img-element */}
