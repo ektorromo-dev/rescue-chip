@@ -228,7 +228,7 @@ function ActivationFormContent() {
             }
 
             // Si no tiene perfil o no tiene chips, procedemos a crear un perfil nuevo/único.
-            await proceedWithRegistration(userId, chip, formData, email);
+            await proceedWithRegistration(userId, chip, formData, email, phoneValidation.formatted as string);
 
         } catch (err: any) {
             console.error("Error detallado en handleSubmit:", err);
@@ -237,7 +237,7 @@ function ActivationFormContent() {
         }
     };
 
-    const proceedWithRegistration = async (userId: string, chip: any, formData: FormData, email: string) => {
+    const proceedWithRegistration = async (userId: string, chip: any, formData: FormData, email: string, formattedPhone: string) => {
         try {
             // ================= CONTINUAR FLUJO NORMAL DE REGISTRO =================
             // Build emergency contacts array dynamically
@@ -332,7 +332,7 @@ function ActivationFormContent() {
                 plan: chipAssignedPlan,
                 photo_url: photoUrl,
                 full_name: formData.get("fullName") as string,
-                phone: phoneValidation.formatted,
+                phone: formattedPhone,
                 whatsapp_opted_in: whatsappOptedIn,
                 age: age,
                 sexo: sexo,
@@ -408,7 +408,7 @@ function ActivationFormContent() {
                         'x-rescuechip-secret': 'rescuechip2026'
                     },
                     body: JSON.stringify({
-                        phone: phoneValidation.formatted,
+                        phone: formattedPhone,
                         name: formData.get("fullName") as string,
                         folio: chip.folio
                     })
