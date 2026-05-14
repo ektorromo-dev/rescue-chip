@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
             const customerName = shippingDetails?.name || fullSession.customer_details?.name || 'No especificado';
             const customerEmail = fullSession.customer_details?.email || '';
             const rawPhone = fullSession.customer_details?.phone || '';
-            const customerPhone = rawPhone.replace(/^\+52/, '').replace(/^\+/, '').replace(/\D/g, '');
+            const customerPhone = rawPhone;
 
             await supabase
                 .from("orders")
