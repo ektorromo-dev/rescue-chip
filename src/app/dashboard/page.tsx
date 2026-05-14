@@ -582,7 +582,7 @@ export default function DashboardPage() {
     }
 
     return (
-        <div style={{ minHeight: "100vh", backgroundColor: "#0A0A08", display: "flex", flexDirection: "column", alignItems: "stretch", padding: "0" }}>
+        <div style={{ minHeight: "100vh", backgroundColor: "#0A0A08", display: "flex", flexDirection: "column", alignItems: "stretch", padding: "0", overflowX: "hidden" }}>
             <div style={{ colorScheme: 'dark', maxWidth: '768px', width: '100%', margin: '0 auto', padding: '16px', overflow: 'hidden' }}>
                 {/* Header */}
                 <div style={{ position: "relative", overflow: "hidden" }}>
@@ -680,7 +680,7 @@ export default function DashboardPage() {
                                                         📷
                                                     </div>
                                                 )}
-                                                <div style={{ overflow: "hidden", maxWidth: "100%" }}>
+                                                <div style={{ overflow: "hidden", maxWidth: "100%", width: "100%" }}>
                                                     <input
                                                         type="file"
                                                         accept="image/*"
