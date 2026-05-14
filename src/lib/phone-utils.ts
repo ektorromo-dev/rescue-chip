@@ -43,14 +43,24 @@ export function validateAndFormatPhone(
 export function formatStoredPhone(phoneRaw: string): string {
   try {
     const cleaned = phoneRaw.replace(/\s/g, '');
-    const withPlus = cleaned.startsWith('+') ? cleaned : `+${cleaned}`;
-    const parsed = parsePhoneNumber(withPlus);
-    if (parsed && parsed.isValid()) {
-      return parsed.format('E.164');
+    // Si ya tiene código de país, parsear directo
+    if (cleaned.startsWith('+')) {
+      const parsed = parsePhoneNumber(cleaned);
+      if (parsed && parsed.isValid()) {
+        return parsed.format('E.164');
+      }
     }
-    return withPlus;
+    // Sin código de país: intentar primero como México (legado)
+    const digits = cleaned.replace(/\D/g, '');
+    const parsedMX = parsePhoneNumber(digits, 'MX');
+    if (parsedMX && parsedMX.isValid()) {
+      return parsedMX.format('E.164');
+    }
+    // Fallback: agregar + y devolver como está
+    return cleaned.startsWith('+') ? cleaned : `+${cleaned}`;
   } catch {
-    return phoneRaw.startsWith('+') ? phoneRaw : `+${phoneRaw}`;
+    const cleaned = phoneRaw.replace(/\s/g, '');
+    return cleaned.startsWith('+') ? cleaned : `+${cleaned}`;
   }
 }
 
