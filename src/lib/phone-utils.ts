@@ -13,7 +13,8 @@ export function validateAndFormatPhone(
   countryCode: CountryCode
 ): PhoneValidationResult {
   try {
-    const phoneNumber = parsePhoneNumber(phoneInput, countryCode);
+    const cleanInput = phoneInput.replace(/[-\s().]/g, '');
+    const phoneNumber = parsePhoneNumber(cleanInput, countryCode);
 
     if (!phoneNumber || !phoneNumber.isValid()) {
       return {
