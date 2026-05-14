@@ -689,7 +689,7 @@ export default function DashboardPage() {
                                                                 setPhotoFile(e.target.files[0]);
                                                             }
                                                         }}
-                                                        style={{ width: "100%", display: "flex", height: "56px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", backgroundColor: "#1E1E1C", padding: "8px 16px", fontSize: "14px", transition: "all 0.2s ease-in-out", boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)" }}
+                                                        style={{ width: "100%", maxWidth: "100%", boxSizing: "border-box", height: "56px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", backgroundColor: "#1E1E1C", padding: "8px 16px", fontSize: "14px", transition: "all 0.2s ease-in-out" }}
                                                     />
                                                     <p style={{ fontSize: "12px", color: "#9E9A95", fontWeight: 500 }}>Sube una nueva foto si deseas cambiar la actual.</p>
                                                 </div>

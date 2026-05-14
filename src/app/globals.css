@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html, body {
+  overflow-x: hidden;
+}
+
 :root {
   --background: 60 3% 4%;
   --foreground: 40 14% 95%;
