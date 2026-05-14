@@ -1,4 +1,4 @@
-import { parsePhoneNumber, isValidPhoneNumber } from 'libphonenumber-js';
+import { parsePhoneNumber, isValidPhoneNumber, AsYouType } from 'libphonenumber-js';
 import type { CountryCode } from 'libphonenumber-js';
 
 export interface PhoneValidationResult {
@@ -59,11 +59,19 @@ export const SUPPORTED_COUNTRIES: {
   flag: string;
   dialCode: string;
   placeholder: string;
+  maxDigits: number;
 }[] = [
-  { code: 'MX', name: 'México', flag: '🇲🇽', dialCode: '+52', placeholder: '55 1234 5678' },
-  { code: 'CR', name: 'Costa Rica', flag: '🇨🇷', dialCode: '+506', placeholder: '8888 8888' },
-  { code: 'DO', name: 'Rep. Dominicana', flag: '🇩🇴', dialCode: '+1', placeholder: '809 555 1234' },
-  { code: 'CL', name: 'Chile', flag: '🇨🇱', dialCode: '+56', placeholder: '9 8765 4321' },
-  { code: 'AR', name: 'Argentina', flag: '🇦🇷', dialCode: '+54', placeholder: '11 5555 5555' },
-  { code: 'CO', name: 'Colombia', flag: '🇨🇴', dialCode: '+57', placeholder: '310 123 4567' },
+  { code: 'MX', name: 'México', flag: '🇲🇽', dialCode: '+52', placeholder: '55 1234 5678', maxDigits: 10 },
+  { code: 'US', name: 'Estados Unidos', flag: '🇺🇸', dialCode: '+1', placeholder: '555 123 4567', maxDigits: 10 },
+  { code: 'CA', name: 'Canadá', flag: '🇨🇦', dialCode: '+1', placeholder: '555 123 4567', maxDigits: 10 },
+  { code: 'CR', name: 'Costa Rica', flag: '🇨🇷', dialCode: '+506', placeholder: '8888 8888', maxDigits: 8 },
+  { code: 'DO', name: 'Rep. Dominicana', flag: '🇩🇴', dialCode: '+1', placeholder: '809 555 1234', maxDigits: 10 },
+  { code: 'CL', name: 'Chile', flag: '🇨🇱', dialCode: '+56', placeholder: '9 8765 4321', maxDigits: 9 },
+  { code: 'CO', name: 'Colombia', flag: '🇨🇴', dialCode: '+57', placeholder: '310 123 4567', maxDigits: 10 },
 ];
+
+export function formatPhoneAsYouType(input: string, countryCode: CountryCode): string {
+  const digits = input.replace(/\D/g, '');
+  const formatter = new AsYouType(countryCode);
+  return formatter.input(digits);
+}

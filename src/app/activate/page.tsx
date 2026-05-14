@@ -8,7 +8,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useState, Suspense, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { sanitizeProfileInput } from "@/app/actions/sanitize";
-import { validateAndFormatPhone, SUPPORTED_COUNTRIES } from '@/lib/phone-utils';
+import { validateAndFormatPhone, SUPPORTED_COUNTRIES, formatPhoneAsYouType } from '@/lib/phone-utils';
 import type { CountryCode } from 'libphonenumber-js';
 
 function ActivationFormContent() {
@@ -26,6 +26,7 @@ function ActivationFormContent() {
     const [showPassword, setShowPassword] = useState(false);
     const [phone, setPhone] = useState("");
     const [selectedCountry, setSelectedCountry] = useState<CountryCode>('MX');
+    const [phoneError, setPhoneError] = useState<string>('');
     const [whatsappOptedIn, setWhatsappOptedIn] = useState(true);
     const [consentimientoPublico, setConsentimientoPublico] = useState(false);
     const [sexo, setSexo] = useState<string>('');
@@ -754,6 +755,7 @@ function ActivationFormContent() {
                                     onChange={(e) => {
                                         setSelectedCountry(e.target.value as CountryCode);
                                         setPhone('');
+                                        setPhoneError('');
                                     }}
                                     style={{
                                         border: "1px solid rgba(255,255,255,0.08)",
@@ -778,10 +780,29 @@ function ActivationFormContent() {
                                     inputMode="numeric"
                                     placeholder={SUPPORTED_COUNTRIES.find(c => c.code === selectedCountry)?.placeholder || ''}
                                     value={phone}
-                                    onChange={(e) => setPhone(e.target.value.replace(/[^\d\s]/g, ''))}
+                                    maxLength={(SUPPORTED_COUNTRIES.find(c => c.code === selectedCountry)?.maxDigits || 15) + 4}
+                                    onChange={(e) => {
+                                        const digits = e.target.value.replace(/\D/g, '');
+                                        const maxDigits = SUPPORTED_COUNTRIES.find(c => c.code === selectedCountry)?.maxDigits || 15;
+                                        if (digits.length <= maxDigits) {
+                                            const formatted = formatPhoneAsYouType(digits, selectedCountry);
+                                            setPhone(formatted);
+                                        }
+                                        setPhoneError('');
+                                    }}
+                                    onBlur={() => {
+                                        if (phone.trim()) {
+                                            const result = validateAndFormatPhone(phone, selectedCountry);
+                                            if (!result.isValid) {
+                                                setPhoneError(result.error || 'Número inválido para el país seleccionado');
+                                            } else {
+                                                setPhoneError('');
+                                            }
+                                        }
+                                    }}
                                     style={{
                                         flex: 1,
-                                        border: "1px solid rgba(255,255,255,0.08)",
+                                        border: phoneError ? "1px solid #E8231A" : "1px solid rgba(255,255,255,0.08)",
                                         backgroundColor: "#1E1E1C",
                                         padding: "8px 16px",
                                         fontSize: "14px",
@@ -791,6 +812,11 @@ function ActivationFormContent() {
                                     required
                                 />
                             </div>
+                            {phoneError && (
+                                <p style={{ fontSize: '12px', color: '#E8231A', margin: '4px 0 0 0', fontWeight: 500 }}>
+                                    {phoneError}
+                                </p>
+                            )}
                             <label style={{ display: "flex", alignItems: "flex-start", gap: "12px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)" }}>
                                 <input
                                     type="checkbox"
