@@ -583,7 +583,7 @@ export default function DashboardPage() {
 
     return (
         <div style={{ minHeight: "100vh", backgroundColor: "#0A0A08", display: "flex", flexDirection: "column", alignItems: "stretch", padding: "0" }}>
-            <div style={{ colorScheme: 'dark', maxWidth: '768px', width: '100%', margin: '0 auto', padding: '16px' }}>
+            <div style={{ colorScheme: 'dark', maxWidth: '768px', width: '100%', margin: '0 auto', padding: '16px', overflow: 'hidden' }}>
                 {/* Header */}
                 <div style={{ position: "relative", overflow: "hidden" }}>
                     <div style={{ position: "absolute", top: 0, right: 0, width: "320px", height: "320px", borderRadius: "9999px" }} />
