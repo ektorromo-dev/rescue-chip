@@ -1,12 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
-import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { PuntoDeVenta } from '@/components/MapaPuntosDeVenta';
-
-const MapaCliente = dynamic(() => import('@/components/MapaPuntosDeVenta'), { 
-  ssr: false,
-  loading: () => <div style={{ height: '100%', width: '100%', backgroundColor: '#1A1A18', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9E9A95' }}>Cargando mapa...</div>
-});
+import MapaWrapper from '@/components/MapaWrapper';
 
 export const metadata = {
   title: 'Puntos de Venta | RescueChip',
@@ -38,7 +33,7 @@ export default async function PuntosDeVentaPage() {
 
       {/* Mapa (Ancho 100%, Alto responsive) */}
       <section style={{ width: '100%', height: '50vh', minHeight: '300px', maxHeight: '500px', position: 'relative', zIndex: 1 }}>
-        <MapaCliente puntos={puntos} />
+        <MapaWrapper puntos={puntos} />
       </section>
 
       {/* Grid de Tiendas */}
