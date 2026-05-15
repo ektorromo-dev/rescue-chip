@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Menu, X } from "lucide-react";
+import DondeComprarSection from "@/components/DondeComprarSection";
 
 const LANDING_CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Barlow+Condensed:wght@400;600;700&display=swap');
@@ -403,7 +404,7 @@ export default function Home() {
     }, { threshold: 0.07 });
 
     document
-      .querySelectorAll(".price-card, .trust-badge, .hiw-step, .benefit-item, .agency-card")
+      .querySelectorAll(".price-card, .hiw-step, .benefit-item, .agency-card")
       .forEach((el) => {
         (el as HTMLElement).style.opacity = "0";
         (el as HTMLElement).style.transform = "translateY(16px)";
@@ -428,7 +429,7 @@ export default function Home() {
         <ul className="nav-links">
           <li><a href="#como-funciona">Cómo funciona</a></li>
           <li><a href="#precios">Precios</a></li>
-          <li><a href="#comunidad">Comunidad</a></li>
+          <li><a href="#donde-comprar">Dónde comprar</a></li>
           <li><a href="#agencias">Agencias</a></li>
           {session ? (
             <li><Link href="/dashboard" className="nav-cta">Mi perfil médico</Link></li>
@@ -449,7 +450,7 @@ export default function Home() {
         <ul className="mobile-menu-links">
           <li><a href="#como-funciona" onClick={() => setMobileMenuOpen(false)}>Cómo funciona</a></li>
           <li><a href="#precios" onClick={() => setMobileMenuOpen(false)}>Precios</a></li>
-          <li><a href="#comunidad" onClick={() => setMobileMenuOpen(false)}>Comunidad</a></li>
+          <li><a href="#donde-comprar" onClick={() => setMobileMenuOpen(false)}>Dónde comprar</a></li>
           <li><a href="#agencias" onClick={() => setMobileMenuOpen(false)}>Agencias</a></li>
           {session ? (
             <li><Link href="/dashboard" className="nav-cta" onClick={() => setMobileMenuOpen(false)}>Mi perfil médico</Link></li>
@@ -530,22 +531,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SOCIAL PROOF */}
-      <section className="trust" id="comunidad">
-        <div className="trust-inner">
-          <div className="section-label">Comunidad RescueChip</div>
-          <h2 className="section-title">Riders que ya eligieron protegerse</h2>
-          <div className="trust-badges">
-            <div className="trust-badge">🏥 Alineado con NOM-034-SSA3-2013</div>
-            <div className="trust-badge">🔒 Datos cifrados</div>
-            <div className="trust-badge">🇲🇽 Hecho en México</div>
-            <div className="trust-badge">⚡ Sin suscripción</div>
-          </div>
-          <div className="trust-cta">
-            <a href="#precios" className="btn-primary" style={{ display: 'block' }}>TRANQUILIDAD PARA MI FAMILIA — $349</a>
-          </div>
-        </div>
-      </section>
+      {/* DÓNDE COMPRAR */}
+      <DondeComprarSection />
 
       {/* CÓMO FUNCIONA */}
       <section className="how-it-works" id="como-funciona">
