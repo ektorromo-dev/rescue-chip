@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, AttributionControl } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-gesture-handling/dist/leaflet-gesture-handling.css';
@@ -30,6 +30,17 @@ L.Icon.Default.mergeOptions({
 
 L.Map.addInitHook('addHandler', 'gestureHandling', GestureHandling);
 
+L.Map.mergeOptions({
+  gestureHandlingOptions: {
+    text: {
+      touch: "Usa dos dedos para mover el mapa",
+      scroll: "Usa Ctrl + scroll para hacer zoom",
+      scrollMac: "Usa ⌘ + scroll para hacer zoom"
+    },
+    duration: 1000
+  }
+});
+
 const customMarkerIcon = L.divIcon({
   html: '<div style="background:#E8231A;width:14px;height:14px;border-radius:50%;border:2px solid white;box-shadow:0 0 4px rgba(0,0,0,0.5);"></div>',
   className: 'custom-marker',
@@ -54,11 +65,13 @@ export default function MapaPuntosDeVenta({ puntos }: { puntos: PuntoDeVenta[] }
       style={{ height: '100%', width: '100%', zIndex: 1 }}
       gestureHandling={true}
       scrollWheelZoom={false}
+      attributionControl={false}
     >
       <TileLayer
-        url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
       />
+      <AttributionControl prefix={false} position="bottomright" />
       
       {puntos.map((punto) => (
         <Marker key={punto.id} position={[punto.lat, punto.lng]} icon={customMarkerIcon}>
@@ -89,6 +102,17 @@ export default function MapaPuntosDeVenta({ puntos }: { puntos: PuntoDeVenta[] }
           </Popup>
         </Marker>
       ))}
+      <style>{`
+        .leaflet-control-attribution {
+          font-size: 9px !important;
+          opacity: 0.4 !important;
+          background: transparent !important;
+          box-shadow: none !important;
+        }
+        .leaflet-control-attribution a {
+          color: inherit !important;
+        }
+      `}</style>
     </MapContainer>
   );
 }
