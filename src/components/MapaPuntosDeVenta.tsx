@@ -4,6 +4,8 @@ import { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import 'leaflet-gesture-handling/dist/leaflet-gesture-handling.css';
+import { GestureHandling } from 'leaflet-gesture-handling';
 
 export interface PuntoDeVenta {
   id: string;
@@ -25,6 +27,8 @@ L.Icon.Default.mergeOptions({
   iconUrl: '',
   shadowUrl: '',
 });
+
+L.Map.addInitHook('addHandler', 'gestureHandling', GestureHandling);
 
 const customMarkerIcon = L.divIcon({
   html: '<div style="background:#E8231A;width:14px;height:14px;border-radius:50%;border:2px solid white;box-shadow:0 0 4px rgba(0,0,0,0.5);"></div>',
@@ -48,6 +52,8 @@ export default function MapaPuntosDeVenta({ puntos }: { puntos: PuntoDeVenta[] }
       center={[19.35, -99.13]} 
       zoom={11} 
       style={{ height: '100%', width: '100%', zIndex: 1 }}
+      gestureHandling={true}
+      scrollWheelZoom={false}
     >
       <TileLayer
         url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
