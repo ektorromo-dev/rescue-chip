@@ -652,7 +652,8 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
     try { localStorage.setItem(LS_KEY, estilo.id) } catch {}
     mapRef.current?.setStyle(estilo.url)
     mapRef.current?.once('style.load', () => {
-      mapRef.current?.setPitch(estilo.pitch ?? 0)
+      const PITCH_MAP: Record<string, number> = { 'standard': 45 }
+      mapRef.current?.setPitch(PITCH_MAP[estilo.id] ?? 0)
       if (estilo.id === 'standard') {
         try { mapRef.current?.setConfigProperty('basemap', 'lightPreset', lightPreset) } catch {}
         try { mapRef.current?.setConfigProperty('basemap', 'show3dObjects', true) } catch {}
