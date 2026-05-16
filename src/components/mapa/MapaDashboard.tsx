@@ -176,7 +176,7 @@ export default function MapaDashboard() {
             letterSpacing: '3px', fontSize: '15px',
             pointerEvents: 'none',
           }}>
-            RESCUE<span style={{ color: '#E8231A' }}>CHIP</span>
+            RESCUE<span style={{ color: '#E8231A' }}>MAPS</span>
           </span>
           <button
             onClick={() => { setFullscreen(false); setReportOpen(false) }}
@@ -200,7 +200,7 @@ export default function MapaDashboard() {
           <button
             onClick={() => setReportOpen(true)}
             style={{
-              position: 'fixed', bottom: '32px', right: '16px', zIndex: 10001,
+              position: 'fixed', bottom: 'max(32px, env(safe-area-inset-bottom, 32px))', right: '16px', zIndex: 10001,
               background: '#E8231A', color: '#fff', border: 'none',
               borderRadius: '28px', padding: '13px 22px',
               fontSize: '14px', fontWeight: 700, cursor: 'pointer',
