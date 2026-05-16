@@ -13,12 +13,17 @@ const COLORES: Record<string, string> = {
 }
 
 const ESTILOS = [
-  { id: 'dark-v11',             label: '🌑 Oscuro',   url: 'mapbox://styles/mapbox/dark-v11' },
-  { id: 'light-v11',            label: '☀️ Claro',    url: 'mapbox://styles/mapbox/light-v11' },
-  { id: 'streets-v12',          label: '🗺️ Calles',   url: 'mapbox://styles/mapbox/streets-v12' },
-  { id: 'outdoors-v12',         label: '🏔️ Exterior', url: 'mapbox://styles/mapbox/outdoors-v12' },
-  { id: 'satellite-streets-v12',label: '🛰️ Satélite', url: 'mapbox://styles/mapbox/satellite-streets-v12' },
+  { id: 'dark-v11',              label: '🌑 Oscuro',   url: 'mapbox://styles/mapbox/dark-v11' },
+  { id: 'light-v11',             label: '☀️ Claro',    url: 'mapbox://styles/mapbox/light-v11' },
+  { id: 'streets-v12',           label: '🗺️ Calles',   url: 'mapbox://styles/mapbox/streets-v12' },
+  { id: 'outdoors-v12',          label: '🏔️ Exterior', url: 'mapbox://styles/mapbox/outdoors-v12' },
+  { id: 'satellite-streets-v12', label: '🛰️ Satélite', url: 'mapbox://styles/mapbox/satellite-streets-v12' },
 ]
+
+const LS_KEY = 'rc_mapa_estilo'
+const getEstiloGuardado = (): string => localStorage.getItem(LS_KEY) ?? 'dark-v11'
+const getEstiloUrl = (id: string): string =>
+  ESTILOS.find(e => e.id === id)?.url ?? ESTILOS[0].url
 
 interface Punto {
   id: string
@@ -48,30 +53,58 @@ function loadMapboxScript(): Promise<void> {
   })
 }
 
-export default function MapaRescueChip({ puntos = [], interactive = true, height = '500px' }: Props) {
+export default function MapaRescueChip({
+  puntos = [],
+  interactive = true,
+  height = '500px',
+}: Props) {
   const mapContainer = useRef<HTMLDivElement>(null)
-  const mapRef = useRef<any>(null)
-  const markersRef = useRef<any[]>([])
-  const [estiloActual, setEstiloActual] = useState('dark-v11')
+  const mapRef      = useRef<any>(null)
+  const markersRef  = useRef<any[]>([])
+  const puntosRef   = useRef<Punto[]>(puntos)
+  const [estiloActual, setEstiloActual] = useState<string>(getEstiloGuardado)
 
-  const updateMarkers = useCallback(() => {
+  // Mantener puntosRef actualizado sin recrear callbacks
+  useEffect(() => {
+    puntosRef.current = puntos
+  }, [puntos])
+
+  // addMarkers es estable (sin deps que cambien) — lee de puntosRef
+  const addMarkers = useCallback(() => {
     const mapboxgl = (window as any).mapboxgl
     if (!mapRef.current || !mapboxgl) return
     markersRef.current.forEach(m => m.remove())
     markersRef.current = []
-    puntos.forEach(punto => {
+    puntosRef.current.forEach(punto => {
       const el = document.createElement('div')
-      el.style.cssText = `width:14px;height:14px;border-radius:50%;background:${COLORES[punto.tipo] ?? COLORES.accidente};border:2px solid white;box-shadow:0 0 8px ${COLORES[punto.tipo] ?? COLORES.accidente};cursor:pointer;`
+      el.style.cssText = `
+        width:14px;height:14px;border-radius:50%;
+        background:${COLORES[punto.tipo] ?? COLORES.accidente};
+        border:2px solid white;
+        box-shadow:0 0 8px ${COLORES[punto.tipo] ?? COLORES.accidente};
+        cursor:pointer;
+      `
       const popup = new mapboxgl.Popup({ offset: 12, closeButton: false })
-        .setHTML(`<div style="font-family:sans-serif;font-size:13px;color:#111;padding:4px 2px"><strong style="text-transform:capitalize">${punto.tipo.replace('_', ' ')}</strong>${punto.descripcion ? `<p style="margin:4px 0 0;color:#555">${punto.descripcion}</p>` : ''}<p style="margin:4px 0 0;font-size:11px;color:#999">${punto.fuente === 'emergencia' ? '🚨 Emergencia real' : '⚠️ Reporte de rider'}</p></div>`)
+        .setHTML(`
+          <div style="font-family:sans-serif;font-size:13px;color:#111;padding:4px 2px">
+            <strong style="text-transform:capitalize">${punto.tipo.replace('_', ' ')}</strong>
+            ${punto.descripcion
+              ? `<p style="margin:4px 0 0;color:#555">${punto.descripcion}</p>`
+              : ''}
+            <p style="margin:4px 0 0;font-size:11px;color:#999">
+              ${punto.fuente === 'emergencia' ? '🚨 Emergencia real' : '⚠️ Reporte de rider'}
+            </p>
+          </div>
+        `)
       const marker = new mapboxgl.Marker({ element: el })
         .setLngLat([punto.longitud, punto.latitud])
         .setPopup(popup)
         .addTo(mapRef.current)
       markersRef.current.push(marker)
     })
-  }, [puntos])
+  }, []) // [] = función estable, nunca se recrea
 
+  // Inicializar mapa una sola vez (solo si cambia `interactive`)
   useEffect(() => {
     let cancelled = false
     const init = async () => {
@@ -81,7 +114,7 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
       mapboxgl.accessToken = MAPBOX_TOKEN
       mapRef.current = new mapboxgl.Map({
         container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/dark-v11',
+        style: getEstiloUrl(getEstiloGuardado()),
         center: [-99.1332, 19.4326],
         zoom: 5,
         interactive,
@@ -89,9 +122,17 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
       })
       if (interactive) {
         mapRef.current.addControl(new mapboxgl.NavigationControl(), 'top-right')
-        mapRef.current.addControl(new mapboxgl.GeolocateControl({ positionOptions: { enableHighAccuracy: true }, trackUserLocation: true }), 'top-right')
+        mapRef.current.addControl(
+          new mapboxgl.GeolocateControl({
+            positionOptions: { enableHighAccuracy: true },
+            trackUserLocation: true,
+          }),
+          'top-right'
+        )
       }
-      mapRef.current.on('load', updateMarkers)
+      // 'load' = primera carga | 'style.load' = después de setStyle()
+      mapRef.current.on('load',       addMarkers)
+      mapRef.current.on('style.load', addMarkers)
     }
     init()
     return () => {
@@ -100,15 +141,17 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
       mapRef.current?.remove()
       mapRef.current = null
     }
-  }, [interactive, updateMarkers])
+  }, [interactive, addMarkers]) // addMarkers es estable → solo se reinit si cambia interactive
 
+  // Actualizar markers cuando llegan nuevos puntos
   useEffect(() => {
-    if (mapRef.current?.isStyleLoaded()) updateMarkers()
-  }, [puntos, updateMarkers])
+    if (mapRef.current?.isStyleLoaded()) addMarkers()
+  }, [puntos, addMarkers])
 
   return (
     <div style={{ position: 'relative', width: '100%', height }}>
       <div ref={mapContainer} style={{ width: '100%', height: '100%' }} />
+
       {interactive && (
         <div style={{
           position: 'absolute',
@@ -125,6 +168,7 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
               key={estilo.id}
               onClick={() => {
                 setEstiloActual(estilo.id)
+                localStorage.setItem(LS_KEY, estilo.id)
                 mapRef.current?.setStyle(estilo.url)
               }}
               style={{
