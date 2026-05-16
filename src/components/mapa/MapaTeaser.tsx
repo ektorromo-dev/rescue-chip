@@ -82,7 +82,7 @@ export default function MapaTeaser() {
         </p>
         
         <a
-          href="/shop"
+          href="/#precios"
           style={{
             display: 'inline-block',
             background: '#E8231A',

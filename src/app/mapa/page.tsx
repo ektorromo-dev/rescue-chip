@@ -168,7 +168,7 @@ export default function MapaPage() {
                 </p>
               </div>
               <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' as const }}>
-                <Link href="/login" style={{
+                <Link href="/login?redirect=/mapa" style={{
                   padding: '10px 20px',
                   border: '1px solid rgba(244,240,235,0.2)',
                   borderRadius: '4px',
@@ -179,7 +179,7 @@ export default function MapaPage() {
                 }}>
                   Iniciar sesión
                 </Link>
-                <Link href="/shop" style={{
+                <Link href="/#precios" style={{
                   padding: '10px 20px',
                   background: '#E8231A',
                   borderRadius: '4px',
