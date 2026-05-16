@@ -60,6 +60,7 @@ export default function MapaDashboard() {
   const [navError,    setNavError]    = useState('')
   const [navRoute,    setNavRoute]    = useState<NavRoute | null>(null)
   const [navOpen,     setNavOpen]     = useState(false)
+  const [navStarted,  setNavStarted]  = useState(false)
 
   // Fullscreen — use document.documentElement so Chrome hides the URL bar
   const enterFullscreen = useCallback(async () => {
@@ -233,179 +234,261 @@ export default function MapaDashboard() {
 
   // ── FULLSCREEN ─────────────────────────────────────────────────────────────
   if (fullscreen) {
-    const isNavigating = navRoute !== null // usa el prop de MapaRescueChip para saber si navega
     return (
-      <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: '#0A0A08' }}>
-        {/* Mapa — ocupa toda la pantalla */}
+      <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: '#000' }}>
+
+        {/* ── MAPA PANTALLA COMPLETA ── */}
         <MapaRescueChip
           puntos={puntos} interactive height="100dvh" fullscreen
-          navRoute={navRoute} onAlternativeSelect={handleAlternativeSelect}
+          navRoute={navRoute}
+          onAlternativeSelect={handleAlternativeSelect}
           onMapClickDest={handleMapClickDest}
+          navStarted={navStarted}
+          onNavStopped={() => setNavStarted(false)}
         />
 
-        {/* ── OVERLAY TOP: gradiente + header + controles ── */}
+        {/* ── BARRA SUPERIOR (tipo Google Maps) ── */}
         <div style={{
-          position: 'fixed', top: 0, left: 0, right: 0, zIndex: 10001,
-          background: 'linear-gradient(to bottom, rgba(10,10,8,0.88) 0%, rgba(10,10,8,0.6) 60%, transparent 100%)',
+          position: 'fixed',
+          top: 'max(12px, env(safe-area-inset-top, 12px))',
+          left: '12px', right: '12px', zIndex: 10001,
           pointerEvents: 'none',
         }}>
-          {/* Header */}
-          <div style={{ display: 'flex', alignItems: 'center', padding: '10px 12px 4px', gap: '8px', pointerEvents: 'all' }}>
-            <button onClick={exitFullscreen} style={{
-              background: 'rgba(244,240,235,0.12)', border: 'none',
-              borderRadius: '50%', width: '32px', height: '32px', color: '#F4F0EB',
-              fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              flexShrink: 0,
-            }}>✕</button>
-
-            <span style={{ color: '#F4F0EB', fontWeight: 900, letterSpacing: '2px', fontSize: '14px', flex: 1, textAlign: 'center' }}>
-              RESCUE<span style={{ color: '#E8231A' }}>MAPS</span>
-            </span>
-            <div style={{ width: '32px' }} />{/* spacer para centrar logo */}
-          </div>
-
-          {/* Controles strip */}
           <div style={{
-            display: 'flex', gap: '5px', padding: '4px 10px 10px',
-            overflowX: 'auto', pointerEvents: 'all',
-            scrollbarWidth: 'none' as const, msOverflowStyle: 'none' as const,
+            display: 'flex', alignItems: 'center', gap: '8px',
+            background: 'rgba(16,16,14,0.96)',
+            borderRadius: navRoute ? '16px' : '30px',
+            padding: navRoute ? '10px 14px' : '12px 18px',
+            backdropFilter: 'blur(24px)',
+            boxShadow: '0 4px 28px rgba(0,0,0,0.55)',
+            border: '1px solid rgba(244,240,235,0.06)',
+            pointerEvents: 'all',
           }}>
-            {/* Los botones de Gasolineras, Hospitales, Lluvia, Viento y Vista 
-                están dentro de MapaRescueChip como overlay del mapa.
-                Aquí solo ponemos el botón de Ir a... si no está navegando */}
-            {!navRoute && (
-              <button onClick={() => setNavOpen(true)} style={{
-                padding: '7px 14px', borderRadius: '20px', border: 'none',
-                background: 'rgba(244,240,235,0.15)', color: '#F4F0EB',
-                fontSize: '13px', fontWeight: 600, cursor: 'pointer',
-                backdropFilter: 'blur(10px)', whiteSpace: 'nowrap', flexShrink: 0,
-              }}>
-                🔍 ¿A dónde vas?
-              </button>
+            {/* Botón atrás / cerrar */}
+            <button
+              onClick={navRoute ? () => { setNavRoute(null); setNavStarted(false) } : exitFullscreen}
+              style={{
+                background: 'transparent', border: 'none',
+                color: '#F4F0EB', fontSize: '22px',
+                cursor: 'pointer', lineHeight: 1, padding: '0 2px', flexShrink: 0,
+              }}
+            >
+              ←
+            </button>
+
+            {navRoute ? (
+              /* Ruta activa: muestra origen → destino */
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: '11px', color: '#666', lineHeight: 1.2 }}>
+                  {navRoute.origen.label.split(',').slice(0, 2).join(',')}
+                </div>
+                <div style={{
+                  fontSize: '14px', color: '#F4F0EB', fontWeight: 600,
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                }}>
+                  → {navRoute.destino.label.split(',').slice(0, 2).join(',')}
+                </div>
+              </div>
+            ) : (
+              /* Sin ruta: campo de búsqueda */
+              <input
+                placeholder="Busca un lugar o toca el mapa…"
+                value={destinoText}
+                onChange={e => setDestinoText(e.target.value)}
+                onFocus={() => setNavOpen(true)}
+                style={{
+                  flex: 1, background: 'transparent', border: 'none',
+                  color: '#F4F0EB', fontSize: '15px', outline: 'none',
+                  minWidth: 0, caretColor: '#E8231A',
+                }}
+              />
             )}
+
+            {/* Botón buscar / cerrar ruta */}
+            {!navRoute && destinoText ? (
+              <button
+                onClick={() => { calcRoute(); setNavOpen(false) }}
+                style={{
+                  background: '#E8231A', border: 'none', borderRadius: '50%',
+                  width: '32px', height: '32px', color: '#fff', fontSize: '14px',
+                  cursor: 'pointer', flexShrink: 0,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}
+              >
+                ↗
+              </button>
+            ) : navRoute ? (
+              <button
+                onClick={exitFullscreen}
+                style={{ background: 'transparent', border: 'none', color: '#555', fontSize: '20px', cursor: 'pointer', flexShrink: 0 }}
+              >
+                ✕
+              </button>
+            ) : null}
           </div>
+
+          {/* Mensaje de error de nav */}
+          {navError && (
+            <div style={{
+              marginTop: '6px', background: 'rgba(232,35,26,0.9)', color: '#fff',
+              borderRadius: '10px', padding: '8px 14px', fontSize: '13px',
+              pointerEvents: 'all',
+            }}>
+              {navError}
+            </div>
+          )}
         </div>
 
-        {/* ── BOTTOM SHEET ── */}
-        <div style={{
-          position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 10001,
-        }}>
-          {/* Drag handle visual */}
-          {navRoute && (
-            <div style={{
-              background: '#161614', borderRadius: '18px 18px 0 0',
-              padding: '10px 18px max(24px, env(safe-area-inset-bottom, 24px))',
-              boxShadow: '0 -8px 32px rgba(0,0,0,0.6)',
-              borderTop: '1px solid rgba(244,240,235,0.08)',
-            }}>
-              <div style={{ width: '36px', height: '4px', background: 'rgba(244,240,235,0.2)', borderRadius: '2px', margin: '0 auto 12px' }} />
+        {/* ── BOTTOM SHEET: Ruta activa ── */}
+        {navRoute && !navStarted && (
+          <div style={{
+            position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 10001,
+            background: 'rgba(16,16,14,0.97)',
+            borderRadius: '22px 22px 0 0',
+            backdropFilter: 'blur(24px)',
+            padding: '14px 20px max(24px, env(safe-area-inset-bottom, 24px))',
+            boxShadow: '0 -10px 50px rgba(0,0,0,0.65)',
+          }}>
+            <div style={{ width: '36px', height: '4px', background: 'rgba(244,240,235,0.15)', borderRadius: '2px', margin: '0 auto 16px' }} />
 
-              {/* Route summary */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px' }}>
-                    <span style={{ fontSize: '22px', fontWeight: 800, color: '#F4F0EB' }}>
-                      {fmtDist(navRoute.result.distanceM)}
-                    </span>
-                    <span style={{ fontSize: '15px', color: '#aaa' }}>
-                      {fmtTime(navRoute.result.durationS)}
-                    </span>
-                  </div>
-                  <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
-                    → {navRoute.destino.label.split(',')[0]}
-                  </div>
-                  {navRoute.destinoWeather && (() => {
-                    const dw = navRoute.destinoWeather!
-                    const WMO_EMOJI: Record<number, string> = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',61:'🌧️',63:'🌧️',65:'🌧️',80:'🌧️',95:'⛈️'}
-                    const emoji = WMO_EMOJI[dw.code] ?? '🌡️'
-                    return <div style={{ fontSize: '12px', color: '#888', marginTop: '2px' }}>{emoji} Destino {dw.temp}°C · 💨 {dw.wind} km/h</div>
-                  })()}
+            {/* Tiempo y distancia */}
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', marginBottom: '6px' }}>
+              <span style={{ fontSize: '32px', fontWeight: 900, color: '#F4F0EB' }}>
+                {fmtTime(navRoute.result.durationS)}
+              </span>
+              <span style={{ fontSize: '18px', color: '#888' }}>
+                {fmtDist(navRoute.result.distanceM)}
+              </span>
+            </div>
+
+            {/* Destino + clima */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+              <div style={{ fontSize: '13px', color: '#666' }}>
+                Via ruta más rápida · {navRoute.destino.label.split(',')[0]}
+              </div>
+              {navRoute.destinoWeather && (
+                <div style={{ fontSize: '13px', color: '#888' }}>
+                  {navRoute.destinoWeather.temp}°C
+                  {navRoute.destinoWeather.wind >= 50 && <span style={{ color: '#E8231A', marginLeft: '6px' }}>💨{navRoute.destinoWeather.wind}km/h</span>}
                 </div>
-
-                <button onClick={() => setNavRoute(null)} style={{
-                  background: 'transparent', border: 'none', color: '#555',
-                  fontSize: '20px', cursor: 'pointer', lineHeight: 1, padding: '0 4px',
-                }}>✕</button>
-              </div>
-
-              {/* Leyenda tráfico compacta */}
-              <div style={{ display: 'flex', gap: '8px', marginBottom: '10px', flexWrap: 'wrap' }}>
-                {[['#4285F4','Libre'],['#FF9800','Lento'],['#F44336','Pesado'],['#B71C1C','Detenido']].map(([c,l]) => (
-                  <div key={l} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '10px', color: '#666' }}>
-                    <div style={{ width: '16px', height: '3px', background: c, borderRadius: '2px' }} />{l}
-                  </div>
-                ))}
-              </div>
-
-              {/* Botón Navegar */}
-              <button onClick={() => {
-                // El botón navegar dispara startNavigation en MapaRescueChip
-                // via el panel de navegación activa que ya existe dentro del mapa
-                const event = new CustomEvent('rescuemaps-start-nav')
-                window.dispatchEvent(event)
-              }} style={{
-                width: '100%', background: '#22c55e', color: '#fff',
-                border: 'none', borderRadius: '10px', padding: '14px',
-                fontSize: '16px', fontWeight: 800, cursor: 'pointer',
-                letterSpacing: '0.5px',
-              }}>
-                ▶ Iniciar navegación
-              </button>
-
-              {/* Rutas alternativas en el mapa — nota */}
-              {navRoute.result.alternatives.length > 0 && (
-                <p style={{ fontSize: '11px', color: '#555', textAlign: 'center', margin: '8px 0 0' }}>
-                  {navRoute.result.alternatives.length} ruta(s) alternativa(s) disponible(s) — tócalas en el mapa
-                </p>
               )}
             </div>
-          )}
 
-          {/* FABs cuando no hay bottom sheet de ruta */}
-          {!navRoute && !reportOpen && !navOpen && (
-            <div style={{
-              display: 'flex', justifyContent: 'flex-end', gap: '10px',
-              padding: '0 14px max(20px, env(safe-area-inset-bottom, 20px)) 14px',
-            }}>
-              <button onClick={() => setReportOpen(true)} style={{
-                background: '#E8231A', color: '#fff', border: 'none',
-                borderRadius: '22px', padding: '12px 20px',
-                fontSize: '13px', fontWeight: 700, cursor: 'pointer',
-                boxShadow: '0 4px 16px rgba(232,35,26,0.45)',
-              }}>⚠️ Reportar</button>
+            {/* Leyenda tráfico */}
+            <div style={{ display: 'flex', gap: '10px', marginBottom: '14px' }}>
+              {[['#4285F4','Libre'],['#FF9800','Lento'],['#F44336','Pesado'],['#B71C1C','Detenido']].map(([c,l]) => (
+                <div key={l} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '10px', color: '#666' }}>
+                  <div style={{ width: '16px', height: '3px', background: c, borderRadius: '2px' }} />{l}
+                </div>
+              ))}
             </div>
-          )}
-        </div>
 
-        {/* ── BOTTOM SHEET NAV INPUT ── */}
-        {navOpen && (
+            {/* Botón Navegar */}
+            <button
+              onClick={() => setNavStarted(true)}
+              disabled={navLoading}
+              style={{
+                width: '100%', background: '#4285F4', color: '#fff',
+                border: 'none', borderRadius: '14px', padding: '17px',
+                fontSize: '17px', fontWeight: 900, cursor: 'pointer',
+                letterSpacing: '0.5px', boxShadow: '0 4px 20px rgba(66,133,244,0.4)',
+              }}
+            >
+              ▶ Iniciar navegación
+            </button>
+
+            {navRoute.result.alternatives.length > 0 && (
+              <p style={{ fontSize: '11px', color: '#555', textAlign: 'center', margin: '10px 0 0' }}>
+                {navRoute.result.alternatives.length} ruta(s) alternativa(s) en gris — tócalas en el mapa para comparar
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* ── BOTTOM SHEET: Navegando en vivo ── */}
+        {navRoute && navStarted && (
+          <div style={{
+            position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 10001,
+            background: 'rgba(16,16,14,0.97)',
+            borderRadius: '22px 22px 0 0',
+            backdropFilter: 'blur(24px)',
+            padding: '14px 20px max(24px, env(safe-area-inset-bottom, 24px))',
+            boxShadow: '0 -10px 50px rgba(0,0,0,0.65)',
+          }}>
+            <div style={{ width: '36px', height: '4px', background: 'rgba(244,240,235,0.15)', borderRadius: '2px', margin: '0 auto 12px' }} />
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <div style={{ fontSize: '14px', color: '#888' }}>
+                  {navRoute.destino.label.split(',')[0]}
+                </div>
+                <div style={{ fontSize: '22px', fontWeight: 800, color: '#F4F0EB', marginTop: '2px' }}>
+                  {fmtTime(navRoute.result.durationS)} · {fmtDist(navRoute.result.distanceM)}
+                </div>
+              </div>
+              <button
+                onClick={() => { setNavStarted(false); setNavRoute(null) }}
+                style={{
+                  background: '#E8231A', color: '#fff', border: 'none',
+                  borderRadius: '10px', padding: '12px 18px',
+                  fontSize: '13px', fontWeight: 700, cursor: 'pointer',
+                }}
+              >
+                ⏹ Detener
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ── FAB Reportar (solo cuando no hay ruta activa) ── */}
+        {!navRoute && !reportOpen && !navOpen && (
+          <button
+            onClick={() => setReportOpen(true)}
+            style={{
+              position: 'fixed',
+              bottom: 'max(24px, env(safe-area-inset-bottom, 24px))',
+              right: '14px', zIndex: 10001,
+              background: 'rgba(16,16,14,0.92)', color: '#F4F0EB',
+              border: '1px solid rgba(244,240,235,0.1)', borderRadius: '24px',
+              padding: '12px 20px', fontSize: '13px', fontWeight: 600,
+              cursor: 'pointer', backdropFilter: 'blur(14px)',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+            }}
+          >
+            ⚠️ Reportar
+          </button>
+        )}
+
+        {/* ── SHEET: Input de destino / opciones nav ── */}
+        {navOpen && !navRoute && (
           <div style={{
             position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 10002,
-            background: '#161614', borderRadius: '18px 18px 0 0',
+            background: 'rgba(16,16,14,0.98)', borderRadius: '22px 22px 0 0',
+            backdropFilter: 'blur(24px)',
             padding: '20px 18px max(28px, env(safe-area-inset-bottom, 28px))',
-            boxShadow: '0 -8px 40px rgba(0,0,0,0.7)',
+            boxShadow: '0 -12px 60px rgba(0,0,0,0.75)',
           }}>
-            <div style={{ width: '36px', height: '4px', background: 'rgba(244,240,235,0.2)', borderRadius: '2px', margin: '0 auto 16px' }} />
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-              <span style={{ color: '#F4F0EB', fontWeight: 700, fontSize: '15px' }}>¿A dónde vas?</span>
-              <button onClick={() => setNavOpen(false)} style={{ background: 'transparent', border: 'none', color: '#888', fontSize: '20px', cursor: 'pointer' }}>✕</button>
+            <div style={{ width: '36px', height: '4px', background: 'rgba(244,240,235,0.15)', borderRadius: '2px', margin: '0 auto 16px' }} />
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <span style={{ color: '#F4F0EB', fontWeight: 700, fontSize: '16px' }}>¿A dónde vas?</span>
+              <button onClick={() => setNavOpen(false)} style={{ background: 'transparent', border: 'none', color: '#666', fontSize: '22px', cursor: 'pointer' }}>✕</button>
             </div>
             {navPanel}
           </div>
         )}
 
-        {/* ── BOTTOM SHEET REPORTE ── */}
+        {/* ── SHEET: Reporte ── */}
         {reportOpen && !navOpen && (
           <div style={{
             position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 10002,
-            background: '#161614', borderRadius: '18px 18px 0 0',
+            background: 'rgba(16,16,14,0.98)', borderRadius: '22px 22px 0 0',
+            backdropFilter: 'blur(24px)',
             padding: '20px 18px max(28px, env(safe-area-inset-bottom, 28px))',
-            boxShadow: '0 -8px 40px rgba(0,0,0,0.7)',
+            boxShadow: '0 -12px 60px rgba(0,0,0,0.75)',
           }}>
-            <div style={{ width: '36px', height: '4px', background: 'rgba(244,240,235,0.2)', borderRadius: '2px', margin: '0 auto 16px' }} />
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-              <span style={{ color: '#F4F0EB', fontWeight: 700, fontSize: '15px' }}>Reportar incidente</span>
-              <button onClick={() => setReportOpen(false)} style={{ background: 'transparent', border: 'none', color: '#888', fontSize: '20px', cursor: 'pointer' }}>✕</button>
+            <div style={{ width: '36px', height: '4px', background: 'rgba(244,240,235,0.15)', borderRadius: '2px', margin: '0 auto 16px' }} />
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <span style={{ color: '#F4F0EB', fontWeight: 700, fontSize: '16px' }}>Reportar incidente</span>
+              <button onClick={() => setReportOpen(false)} style={{ background: 'transparent', border: 'none', color: '#666', fontSize: '22px', cursor: 'pointer' }}>✕</button>
             </div>
             {reportPanel}
           </div>

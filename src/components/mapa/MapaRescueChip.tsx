@@ -100,7 +100,10 @@ export async function fetchRoute(sLng: number, sLat: number, eLng: number, eLat:
       `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/` +
       `${sLng.toFixed(6)},${sLat.toFixed(6)};${eLng.toFixed(6)},${eLat.toFixed(6)}` +
       `?geometries=geojson&steps=true&language=es&alternatives=true` +
-      `&annotations=congestion&overview=full&access_token=${MAPBOX_TOKEN}`
+      `&annotations=congestion&overview=full` +
+      `&exclude=ferry,motorail` +
+      `&approaches=curb%3Bcurb` +
+      `&access_token=${MAPBOX_TOKEN}`
     const r = await fetch(url)
     const d = await r.json()
     const main = d.routes?.[0]
@@ -290,10 +293,12 @@ interface Props {
   onMapReady?: (map: any) => void
   onEnterFullscreen?: () => void
   onMapClickDest?: (coords: { lng: number; lat: number }) => void
+  navStarted?: boolean
+  onNavStopped?: () => void
 }
 
 // ─── COMPONENT ───────────────────────────────────────────────────────────────
-export default function MapaRescueChip({ puntos = [], interactive = true, height = '500px', fullscreen = false, navRoute = null, onAlternativeSelect, onMapReady, onEnterFullscreen, onMapClickDest }: Props) {
+export default function MapaRescueChip({ puntos = [], interactive = true, height = '500px', fullscreen = false, navRoute = null, onAlternativeSelect, onMapReady, onEnterFullscreen, onMapClickDest, navStarted = false, onNavStopped }: Props) {
   const mapContainer  = useRef<HTMLDivElement>(null)
   const mapRef        = useRef<any>(null)
   const mboxRef       = useRef<any>(null)
@@ -328,6 +333,15 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
   useEffect(() => { showGasRef.current  = showGas  }, [showGas])
   useEffect(() => { showHospRef.current = showHosp }, [showHosp])
   useEffect(() => { navRouteRef.current = navRoute }, [navRoute])
+
+  // Arrancar/detener navegación desde el padre
+  useEffect(() => {
+    if (navStarted && !navigating) startNavigation()
+    if (!navStarted && navigating) {
+      stopNavigation()
+      onNavStopped?.()
+    }
+  }, [navStarted]) // eslint-disable-line
 
   // OWM layer sync
   useEffect(() => {
