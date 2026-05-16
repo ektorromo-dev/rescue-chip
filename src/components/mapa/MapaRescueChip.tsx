@@ -23,9 +23,11 @@ const OWM_LAYERS = [
   { id: 'wind_new',          label: '💨 Viento' },
 ]
 
-const LS_KEY         = 'rc_mapa_estilo'
-const getEstiloGuardado = (): string => localStorage.getItem(LS_KEY) ?? 'dark-v11'
-const getEstiloUrl   = (id: string): string =>
+const LS_KEY = 'rc_mapa_estilo'
+const getEstiloGuardado = (): string => {
+  try { return localStorage.getItem(LS_KEY) ?? 'dark-v11' } catch { return 'dark-v11' }
+}
+const getEstiloUrl = (id: string): string =>
   ESTILOS.find(e => e.id === id)?.url ?? ESTILOS[0].url
 
 // ─── WEATHER ─────────────────────────────────────────────────────────────────
@@ -35,7 +37,7 @@ const WMO: Record<number, WMOEntry> = {
   1:  { label: 'Casi despejado',   emoji: '🌤️', alerta: null },
   2:  { label: 'Parcial. nublado', emoji: '⛅',  alerta: null },
   3:  { label: 'Nublado',          emoji: '☁️',  alerta: null },
-  45: { label: 'Neblina',          emoji: '🌫️',  alerta: '⚠️ Neblina — visibilidad muy reducida' },
+  45: { label: 'Neblina',          emoji: '🌫️',  alerta: '⚠️ Neblina — visibilidad reducida' },
   48: { label: 'Niebla densa',     emoji: '🌫️',  alerta: '⚠️ Niebla — peligro extremo' },
   51: { label: 'Llovizna',         emoji: '🌦️',  alerta: '⚠️ Lluvia — piso mojado' },
   53: { label: 'Llovizna mod.',    emoji: '🌦️',  alerta: '⚠️ Lluvia — piso mojado' },
@@ -82,33 +84,57 @@ async function fetchWeather(lat: number, lng: number): Promise<WeatherData | nul
 }
 
 // ─── ROUTING ─────────────────────────────────────────────────────────────────
-async function fetchRoute(sLng: number, sLat: number, eLng: number, eLat: number) {
+export interface RouteResult {
+  geometry: any
+  distanceM: number
+  durationS: number
+  steps: Array<{ instruction: string; distanceM: number }>
+}
+
+export async function fetchRoute(
+  sLng: number, sLat: number, eLng: number, eLat: number
+): Promise<RouteResult | null> {
   try {
-    const url = `https://api.mapbox.com/directions/v5/mapbox/driving/` +
-      `${sLng.toFixed(5)},${sLat.toFixed(5)};${eLng.toFixed(5)},${eLat.toFixed(5)}` +
-      `?geometries=geojson&access_token=${MAPBOX_TOKEN}&language=es`
+    const url =
+      `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/` +
+      `${sLng.toFixed(6)},${sLat.toFixed(6)};${eLng.toFixed(6)},${eLat.toFixed(6)}` +
+      `?geometries=geojson&steps=true&language=es&access_token=${MAPBOX_TOKEN}`
     const r = await fetch(url)
     const d = await r.json()
-    return d.routes?.[0] ?? null
+    const route = d.routes?.[0]
+    if (!route) return null
+    const steps = (route.legs?.[0]?.steps ?? []).map((s: any) => ({
+      instruction: s.maneuver?.instruction ?? '',
+      distanceM: Math.round(s.distance),
+    }))
+    return {
+      geometry: route.geometry,
+      distanceM: Math.round(route.distance),
+      durationS: Math.round(route.duration),
+      steps,
+    }
   } catch { return null }
 }
 
-function drawRoute(map: any, geometry: any) {
+function drawRouteOnMap(map: any, geometry: any) {
   if (!map) return
-  if (map.getLayer('rc-route')) map.removeLayer('rc-route')
+  if (map.getLayer('rc-route-line')) map.removeLayer('rc-route-line')
+  if (map.getLayer('rc-route-casing')) map.removeLayer('rc-route-casing')
   if (map.getSource('rc-route')) map.removeSource('rc-route')
   map.addSource('rc-route', { type: 'geojson', data: { type: 'Feature', properties: {}, geometry } })
-  map.addLayer({
-    id: 'rc-route', type: 'line', source: 'rc-route',
+  map.addLayer({ id: 'rc-route-casing', type: 'line', source: 'rc-route',
     layout: { 'line-join': 'round', 'line-cap': 'round' },
-    paint: { 'line-color': '#E8231A', 'line-width': 4, 'line-opacity': 0.85 },
-  })
+    paint: { 'line-color': '#fff', 'line-width': 7, 'line-opacity': 0.6 } })
+  map.addLayer({ id: 'rc-route-line', type: 'line', source: 'rc-route',
+    layout: { 'line-join': 'round', 'line-cap': 'round' },
+    paint: { 'line-color': '#E8231A', 'line-width': 4, 'line-opacity': 0.95 } })
 }
 
-function clearRoute(map: any) {
+function clearRouteFromMap(map: any) {
   if (!map) return
-  if (map.getLayer('rc-route')) map.removeLayer('rc-route')
-  if (map.getSource('rc-route')) map.removeSource('rc-route')
+  if (map.getLayer('rc-route-line'))   map.removeLayer('rc-route-line')
+  if (map.getLayer('rc-route-casing')) map.removeLayer('rc-route-casing')
+  if (map.getSource('rc-route'))       map.removeSource('rc-route')
 }
 
 // ─── OWM OVERLAY ─────────────────────────────────────────────────────────────
@@ -123,10 +149,13 @@ function applyOWMLayer(map: any, layer: string | null) {
     tileSize: 256,
     attribution: '© OpenWeatherMap',
   })
-  map.addLayer({ id: 'owm-layer', type: 'raster', source: 'owm-source', paint: { 'raster-opacity': 0.5 } })
+  map.addLayer({
+    id: 'owm-layer', type: 'raster', source: 'owm-source',
+    paint: { 'raster-opacity': 0.55 },
+  })
 }
 
-// ─── POIs ─────────────────────────────────────────────────────────────────────
+// ─── POIs via Overpass ───────────────────────────────────────────────────────
 interface BBox { south: number; west: number; north: number; east: number }
 
 async function fetchPOIsOverpass(tipo: 'fuel' | 'hospital', bbox: BBox): Promise<any[]> {
@@ -146,55 +175,42 @@ const PUBLIC_OPS = ['IMSS', 'ISSSTE', 'SSA', 'SECTOR SALUD', 'PEMEX', 'SEDENA', 
                     'BIENESTAR', 'INSABI', 'ISSEMYM', 'ISEM', 'IMSS-BIENESTAR', 'GOBIERNO']
 
 function getGasInfo(tags: any) {
-  const brand = (tags.brand || '').trim()
-  const op    = (tags.operator || '').trim()
-  const name  = (tags.name || '').trim()
-  const title = brand || op || name || 'Gasolinera'
-  const subtitle = name && name.toUpperCase() !== title.toUpperCase() ? name : ''
+  const brand    = (tags.brand || tags['brand:es'] || '').trim()
+  const operator = (tags.operator || '').trim()
+  const name     = (tags.name || '').trim()
+  const title    = brand || operator || name || 'Gasolinera'
+  const subtitle = (name && name.toUpperCase() !== title.toUpperCase()) ? name : (operator && operator.toUpperCase() !== title.toUpperCase() ? operator : '')
   return { title, subtitle }
 }
 
 function getHospInfo(tags: any) {
-  const name    = (tags.name || tags['name:es'] || '').trim()
-  const op      = (tags.operator || '').trim()
-  const opType  = (tags['operator:type'] || '').toLowerCase()
-  const title   = name || op || 'Hospital'
-  const isPublic = PUBLIC_OPS.some(p => op.toUpperCase().includes(p))
+  const name   = (tags.name || tags['name:es'] || '').trim()
+  const op     = (tags.operator || '').trim()
+  const opType = (tags['operator:type'] || '').toLowerCase()
+  const title  = name || op || 'Hospital'
+  const isPublic  = PUBLIC_OPS.some(p => op.toUpperCase().includes(p)) || opType === 'public' || opType === 'government'
   const isPrivate = opType === 'private' || (!isPublic && op.length > 0)
   let subtitle = ''
   if (op)           subtitle = isPublic ? `Público · ${op}` : isPrivate ? `Privado · ${op}` : op
-  else if (opType === 'public')   subtitle = 'Público'
-  else if (opType === 'private')  subtitle = 'Privado'
-  else subtitle = tags.amenity === 'hospital' ? 'Hospital' : 'Clínica'
+  else if (opType === 'public')  subtitle = 'Público'
+  else if (opType === 'private') subtitle = 'Privado'
+  else                           subtitle = tags.amenity === 'hospital' ? 'Hospital' : 'Clínica'
   return { title, subtitle }
 }
 
-function buildPopupHTML(
-  title: string, subtitle: string,
-  route: { distKm: string; timeMin: number; navUrl: string } | 'loading' | null
-) {
-  const routeHtml = route === 'loading'
-    ? `<p style="margin:6px 0 0;color:#999;font-size:11px">📍 Calculando ruta...</p>`
-    : route
-    ? `<div style="margin:7px 0 0;padding:6px 0 0;border-top:1px solid #eee">
-         <span style="font-size:12px;color:#333;font-weight:600">📍 ${route.distKm} km · ~${route.timeMin} min</span><br/>
-         <a href="${route.navUrl}" target="_blank" rel="noopener"
-            style="display:inline-block;margin-top:6px;padding:5px 12px;background:#4285F4;color:#fff;border-radius:4px;font-size:11px;text-decoration:none;font-weight:600">
-           Abrir en Maps →
-         </a>
-       </div>`
-    : ''
-  return `<div style="font-family:sans-serif;font-size:13px;color:#111;padding:2px;min-width:150px;max-width:230px">
-    <strong style="font-size:14px">${title}</strong>
-    ${subtitle ? `<p style="margin:3px 0 4px;color:#555;font-size:12px">${subtitle}</p>` : ''}
-    ${routeHtml}
-  </div>`
-}
-
-// ─── MAP UTILS ────────────────────────────────────────────────────────────────
+// ─── UTILS ───────────────────────────────────────────────────────────────────
 function clearMarkers(ref: React.MutableRefObject<any[]>) {
   ref.current.forEach(m => m.remove()); ref.current = []
 }
+
+function fmtDist(m: number): string {
+  return m < 1000 ? `${m} m` : `${(m / 1000).toFixed(1)} km`
+}
+function fmtTime(s: number): string {
+  const min = Math.round(s / 60)
+  return min < 60 ? `${min} min` : `${Math.floor(min / 60)}h ${min % 60}min`
+}
+
 function loadMapboxScript(): Promise<void> {
   return new Promise((resolve) => {
     if ((window as any).mapboxgl) { resolve(); return }
@@ -206,23 +222,44 @@ function loadMapboxScript(): Promise<void> {
   })
 }
 
-// ─── TYPES ────────────────────────────────────────────────────────────────────
-interface Punto { id: string; tipo: string; latitud: number; longitud: number; fuente: 'reporte' | 'emergencia'; descripcion?: string }
-interface Props  { puntos?: Punto[]; interactive?: boolean; height?: string; fullscreen?: boolean }
+// ─── TYPES ───────────────────────────────────────────────────────────────────
+interface Punto {
+  id: string; tipo: string; latitud: number; longitud: number
+  fuente: 'reporte' | 'emergencia'; descripcion?: string
+}
 
-// ─── COMPONENT ────────────────────────────────────────────────────────────────
-export default function MapaRescueChip({ puntos = [], interactive = true, height = '500px', fullscreen = false }: Props) {
+export interface NavRoute {
+  origen: { lng: number; lat: number; label: string }
+  destino: { lng: number; lat: number; label: string }
+  result: RouteResult
+  destinoWeather?: WeatherData | null
+}
+
+interface Props {
+  puntos?: Punto[]
+  interactive?: boolean
+  height?: string
+  fullscreen?: boolean
+  navRoute?: NavRoute | null
+  onMapReady?: (map: any) => void
+}
+
+// ─── COMPONENT ───────────────────────────────────────────────────────────────
+export default function MapaRescueChip({
+  puntos = [], interactive = true, height = '500px',
+  fullscreen = false, navRoute = null, onMapReady,
+}: Props) {
   const mapContainer = useRef<HTMLDivElement>(null)
   const mapRef       = useRef<any>(null)
   const mboxRef      = useRef<any>(null)
   const markersRef   = useRef<any[]>([])
   const gasMkrs      = useRef<any[]>([])
   const hospMkrs     = useRef<any[]>([])
+  const navMkrs      = useRef<any[]>([])   // origen/destino markers
   const puntosRef    = useRef<Punto[]>(puntos)
   const showGasRef   = useRef(false)
   const showHospRef  = useRef(false)
   const owmLayerRef  = useRef<string | null>(null)
-  const prevViewRef  = useRef<{ center: [number, number]; zoom: number } | null>(null)
 
   const [estiloActual,    setEstiloActual]    = useState<string>(getEstiloGuardado)
   const [showGas,         setShowGas]         = useState(false)
@@ -232,28 +269,67 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
   const [weather,         setWeather]         = useState<WeatherData | null>(null)
   const [showForecast,    setShowForecast]    = useState(false)
   const [poiMsg,          setPoiMsg]          = useState('')
+  const [showSteps,       setShowSteps]       = useState(false)
 
-  useEffect(() => { puntosRef.current  = puntos  }, [puntos])
+  useEffect(() => { puntosRef.current   = puntos  }, [puntos])
   useEffect(() => { showGasRef.current  = showGas  }, [showGas])
   useEffect(() => { showHospRef.current = showHosp }, [showHosp])
 
-  // Apply OWM when state changes
+  // Sync OWM layer state → map
   useEffect(() => {
     owmLayerRef.current = owmLayer
-    if (mapRef.current?.isStyleLoaded()) applyOWMLayer(mapRef.current, owmLayer)
+    if (!mapRef.current) return
+    const apply = () => applyOWMLayer(mapRef.current, owmLayer)
+    if (mapRef.current.isStyleLoaded()) apply()
+    else mapRef.current.once('style.load', apply)
   }, [owmLayer])
+
+  // Draw nav route when it changes
+  useEffect(() => {
+    if (!mapRef.current) return
+    clearMarkers(navMkrs)
+    clearRouteFromMap(mapRef.current)
+    if (!navRoute) return
+    const mapboxgl = mboxRef.current
+    if (!mapboxgl) return
+
+    // Draw route
+    if (mapRef.current.isStyleLoaded()) {
+      drawRouteOnMap(mapRef.current, navRoute.result.geometry)
+    } else {
+      mapRef.current.once('style.load', () => drawRouteOnMap(mapRef.current, navRoute.result.geometry))
+    }
+
+    // Origen marker (green)
+    const elO = document.createElement('div')
+    elO.style.cssText = 'width:14px;height:14px;border-radius:50%;background:#22c55e;border:3px solid white;box-shadow:0 0 10px #22c55e;'
+    navMkrs.current.push(new mapboxgl.Marker({ element: elO }).setLngLat([navRoute.origen.lng, navRoute.origen.lat]).addTo(mapRef.current))
+
+    // Destino marker (red)
+    const elD = document.createElement('div')
+    elD.style.cssText = 'width:14px;height:14px;border-radius:50%;background:#E8231A;border:3px solid white;box-shadow:0 0 10px #E8231A;'
+    navMkrs.current.push(new mapboxgl.Marker({ element: elD }).setLngLat([navRoute.destino.lng, navRoute.destino.lat]).addTo(mapRef.current))
+
+    // Fit bounds
+    const coords = navRoute.result.geometry.coordinates
+    const lngs = coords.map((c: number[]) => c[0])
+    const lats = coords.map((c: number[]) => c[1])
+    mapRef.current.fitBounds(
+      [[Math.min(...lngs), Math.min(...lats)], [Math.max(...lngs), Math.max(...lats)]],
+      { padding: 60, duration: 1000 }
+    )
+  }, [navRoute])
 
   // Auto-center on location when entering fullscreen
   useEffect(() => {
     if (!fullscreen || !mapRef.current) return
     navigator.geolocation?.getCurrentPosition(
-      ({ coords }) => mapRef.current?.flyTo({ center: [coords.longitude, coords.latitude], zoom: 14, duration: 1500 }),
-      undefined,
-      { timeout: 5000 }
+      ({ coords }) => mapRef.current?.flyTo({ center: [coords.longitude, coords.latitude], zoom: 14, duration: 1200 }),
+      undefined, { timeout: 5000 }
     )
   }, [fullscreen])
 
-  // ── Stable: incident markers ──────────────────────────────────────────────
+  // ── Stable: incident markers ─────────────────────────────────────────────
   const addMarkers = useCallback(() => {
     const mapboxgl = mboxRef.current
     if (!mapRef.current || !mapboxgl) return
@@ -267,12 +343,12 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
           ${punto.descripcion ? `<p style="margin:4px 0 0;color:#555">${punto.descripcion}</p>` : ''}
           <p style="margin:4px 0 0;font-size:11px;color:#999">${punto.fuente === 'emergencia' ? '🚨 Emergencia real' : '⚠️ Reporte de rider'}</p>
         </div>`)
-      const marker = new mapboxgl.Marker({ element: el }).setLngLat([punto.longitud, punto.latitud]).setPopup(popup).addTo(mapRef.current)
-      markersRef.current.push(marker)
+      new mapboxgl.Marker({ element: el }).setLngLat([punto.longitud, punto.latitud]).setPopup(popup).addTo(mapRef.current)
+      markersRef.current.push({ remove: () => { el.remove() } })
     })
   }, [])
 
-  // ── Stable: POI markers with route ───────────────────────────────────────
+  // ── Stable: POI markers with on-click routing ────────────────────────────
   const addPOIMarkers = useCallback((
     elements: any[], tipo: 'gasolinera' | 'hospital', ref: React.MutableRefObject<any[]>
   ) => {
@@ -289,40 +365,64 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
       const color = tipo === 'gasolinera' ? '#FFD700' : '#3B82F6'
 
       const div = document.createElement('div')
-      div.style.cssText = `width:30px;height:30px;border-radius:50%;background:${color};border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;`
+      div.style.cssText = `width:28px;height:28px;border-radius:50%;background:${color};border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;flex-shrink:0;`
       div.textContent = emoji
 
-      const popup = new mapboxgl.Popup({ offset: 14, closeButton: true, maxWidth: '240px' })
-        .setHTML(buildPopupHTML(title, subtitle, null))
+      const popup = new mapboxgl.Popup({ offset: 14, closeButton: true, maxWidth: '250px' })
 
-      popup.on('close', () => clearRoute(mapRef.current))
+      const showPopup = () => {
+        const loadingHtml = `<div style="font-family:sans-serif;font-size:13px;color:#111;padding:4px;min-width:160px">
+          <strong style="font-size:14px">${title}</strong>
+          ${subtitle ? `<p style="margin:3px 0;color:#555;font-size:12px">${subtitle}</p>` : ''}
+          <p style="margin:6px 0 0;color:#999;font-size:11px">📍 Calculando ruta...</p>
+        </div>`
+        popup.setHTML(loadingHtml)
+        if (!popup.isOpen()) popup.addTo(mapRef.current)
 
-      div.addEventListener('click', () => {
-        popup.setHTML(buildPopupHTML(title, subtitle, 'loading'))
         navigator.geolocation.getCurrentPosition(
           async ({ coords }) => {
             const route = await fetchRoute(coords.longitude, coords.latitude, lng, lat)
-            if (route && mapRef.current) {
-              drawRoute(mapRef.current, route.geometry)
-              const distKm = (route.distance / 1000).toFixed(1)
-              const timeMin = Math.round(route.duration / 60)
-              const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`
-              if (popup.isOpen()) popup.setHTML(buildPopupHTML(title, subtitle, { distKm, timeMin, navUrl }))
-            } else {
-              if (popup.isOpen()) popup.setHTML(buildPopupHTML(title, subtitle, null))
-            }
+            if (!popup.isOpen()) return
+            const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`
+            const routeHtml = route
+              ? `<div style="margin:7px 0 0;padding:6px 0 0;border-top:1px solid #eee">
+                   <span style="font-size:12px;color:#333;font-weight:600">
+                     📍 ${fmtDist(route.distanceM)} · ${fmtTime(route.durationS)}
+                   </span><br/>
+                   <a href="${navUrl}" target="_blank" rel="noopener"
+                      style="display:inline-block;margin-top:6px;padding:5px 14px;background:#4285F4;color:#fff;border-radius:4px;font-size:11px;text-decoration:none;font-weight:600">
+                     Abrir en Maps →
+                   </a>
+                 </div>`
+              : ''
+            if (route) drawRouteOnMap(mapRef.current, route.geometry)
+            popup.setHTML(`<div style="font-family:sans-serif;font-size:13px;color:#111;padding:4px;min-width:160px;max-width:240px">
+              <strong style="font-size:14px">${title}</strong>
+              ${subtitle ? `<p style="margin:3px 0;color:#555;font-size:12px">${subtitle}</p>` : ''}
+              ${routeHtml}
+            </div>`)
           },
-          () => { if (popup.isOpen()) popup.setHTML(buildPopupHTML(title, subtitle, null)) },
-          { timeout: 5000 }
+          () => {
+            if (!popup.isOpen()) return
+            popup.setHTML(`<div style="font-family:sans-serif;font-size:13px;color:#111;padding:4px">
+              <strong>${title}</strong>
+              ${subtitle ? `<p style="margin:3px 0;color:#555;font-size:12px">${subtitle}</p>` : ''}
+              <p style="margin:6px 0 0;color:#888;font-size:11px">Activa la ubicación para ver la ruta</p>
+            </div>`)
+          },
+          { timeout: 6000, enableHighAccuracy: true }
         )
-      })
+      }
+
+      popup.on('close', () => clearRouteFromMap(mapRef.current))
+      div.addEventListener('click', (e) => { e.stopPropagation(); showPopup() })
 
       const marker = new mapboxgl.Marker({ element: div }).setLngLat([lng, lat]).setPopup(popup).addTo(mapRef.current)
       ref.current.push(marker)
     })
   }, [])
 
-  // ── Map init — deps include fullscreen to fix cooperativeGestures ─────────
+  // ── Map init ─────────────────────────────────────────────────────────────
   useEffect(() => {
     let cancelled = false
     let moveTimer: ReturnType<typeof setTimeout> | null = null
@@ -334,15 +434,13 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
       mboxRef.current = mapboxgl
       mapboxgl.accessToken = MAPBOX_TOKEN
 
-      const saved = prevViewRef.current; prevViewRef.current = null
-
       mapRef.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: getEstiloUrl(getEstiloGuardado()),
-        center: saved?.center ?? [-99.1332, 19.4326],
-        zoom: saved?.zoom ?? 5,
+        center: [-99.1332, 19.4326],
+        zoom: 5,
         interactive,
-        cooperativeGestures: interactive && !fullscreen, // ← KEY: two-finger only in non-fullscreen
+        cooperativeGestures: interactive && !fullscreen,
         language: 'es',
         locale: {
           'TouchPanBlocker.Message': 'Usa dos dedos para mover el mapa',
@@ -352,19 +450,31 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
       })
 
       if (interactive) {
-        if (!fullscreen) mapRef.current.addControl(new mapboxgl.NavigationControl(), 'top-right')
+        if (!fullscreen) {
+          mapRef.current.addControl(new mapboxgl.NavigationControl(), 'top-right')
+        }
         mapRef.current.addControl(
-          new mapboxgl.GeolocateControl({ positionOptions: { enableHighAccuracy: true }, trackUserLocation: true }),
-          fullscreen ? 'bottom-right' : 'top-right'
+          new mapboxgl.GeolocateControl({
+            positionOptions: { enableHighAccuracy: true },
+            trackUserLocation: true,
+          }),
+          'top-right'
         )
 
-        // Initial weather
+        // Clima inicial
         navigator.geolocation?.getCurrentPosition(
-          async ({ coords }) => { const w = await fetchWeather(coords.latitude, coords.longitude); if (!cancelled) setWeather(w) },
-          async () => { const c = mapRef.current?.getCenter(); if (c) { const w = await fetchWeather(c.lat, c.lng); if (!cancelled) setWeather(w) } },
+          async ({ coords }) => {
+            const w = await fetchWeather(coords.latitude, coords.longitude)
+            if (!cancelled) setWeather(w)
+          },
+          async () => {
+            const c = mapRef.current?.getCenter()
+            if (c) { const w = await fetchWeather(c.lat, c.lng); if (!cancelled) setWeather(w) }
+          },
           { timeout: 5000 }
         )
 
+        // Refresca clima + POIs al dejar de mover
         mapRef.current.on('moveend', () => {
           if (moveTimer) clearTimeout(moveTimer)
           moveTimer = setTimeout(async () => {
@@ -375,48 +485,53 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
             const bounds = mapRef.current?.getBounds()
             if (!bounds) return
             const bbox: BBox = { south: bounds.getSouth(), west: bounds.getWest(), north: bounds.getNorth(), east: bounds.getEast() }
-            if (showGasRef.current) { const els = await fetchPOIsOverpass('fuel', bbox); if (!cancelled) addPOIMarkers(els, 'gasolinera', gasMkrs) }
-            if (showHospRef.current) { const els = await fetchPOIsOverpass('hospital', bbox); if (!cancelled) addPOIMarkers(els, 'hospital', hospMkrs) }
-          }, 1200)
+            if (showGasRef.current) {
+              const els = await fetchPOIsOverpass('fuel', bbox)
+              if (!cancelled) addPOIMarkers(els, 'gasolinera', gasMkrs)
+            }
+            if (showHospRef.current) {
+              const els = await fetchPOIsOverpass('hospital', bbox)
+              if (!cancelled) addPOIMarkers(els, 'hospital', hospMkrs)
+            }
+          }, 1400)
         })
       }
 
       const onLoad = () => {
         addMarkers()
         if (owmLayerRef.current) applyOWMLayer(mapRef.current, owmLayerRef.current)
+        if (navRoute?.result) drawRouteOnMap(mapRef.current, navRoute.result.geometry)
       }
       mapRef.current.on('load', onLoad)
       mapRef.current.on('style.load', onLoad)
+
+      if (onMapReady) mapRef.current.on('load', () => onMapReady(mapRef.current))
     }
 
     init()
     return () => {
       cancelled = true
       if (moveTimer) clearTimeout(moveTimer)
-      if (mapRef.current) {
-        const c = mapRef.current.getCenter()
-        prevViewRef.current = { center: [c.lng, c.lat], zoom: mapRef.current.getZoom() }
-      }
-      clearMarkers(markersRef); clearMarkers(gasMkrs); clearMarkers(hospMkrs)
+      clearMarkers(markersRef); clearMarkers(gasMkrs); clearMarkers(hospMkrs); clearMarkers(navMkrs)
       mapRef.current?.remove(); mapRef.current = null; mboxRef.current = null
     }
-  }, [interactive, fullscreen, addMarkers, addPOIMarkers]) // fullscreen en deps
+  }, [interactive, fullscreen, addMarkers, addPOIMarkers, onMapReady]) // eslint-disable-line
 
   useEffect(() => { if (mapRef.current?.isStyleLoaded()) addMarkers() }, [puntos, addMarkers])
 
   // ── POI toggles ──────────────────────────────────────────────────────────
-  const checkZoom = useCallback((tipo: string): boolean => {
-    if ((mapRef.current?.getZoom() ?? 0) < 10) {
-      setPoiMsg(`Acércate más para ver ${tipo}`)
-      setTimeout(() => setPoiMsg(''), 3000)
-      return false
-    }
-    return true
-  }, [])
-
   const getBBox = useCallback((): BBox | null => {
     const b = mapRef.current?.getBounds()
     return b ? { south: b.getSouth(), west: b.getWest(), north: b.getNorth(), east: b.getEast() } : null
+  }, [])
+
+  const checkZoom = useCallback((tipo: string): boolean => {
+    if ((mapRef.current?.getZoom() ?? 0) < 10) {
+      setPoiMsg(`Acércate más al mapa para ver ${tipo}`)
+      setTimeout(() => setPoiMsg(''), 3500)
+      return false
+    }
+    return true
   }, [])
 
   const toggleGas = useCallback(async () => {
@@ -437,111 +552,184 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
     addPOIMarkers(await fetchPOIsOverpass('hospital', bbox), 'hospital', hospMkrs)
   }, [addPOIMarkers, checkZoom, getBBox])
 
-  const changeStyle = (id: string, url: string) => {
-    setEstiloActual(id); localStorage.setItem(LS_KEY, id)
-    mapRef.current?.setStyle(url); setShowStylePicker(false)
-  }
+  const changeStyle = useCallback((id: string, url: string) => {
+    setEstiloActual(id)
+    try { localStorage.setItem(LS_KEY, id) } catch {}
+    mapRef.current?.setStyle(url)
+    setShowStylePicker(false)
+  }, [])
 
   const wmo      = weather ? getWMO(weather.code) : null
-  const alertMsg = (weather?.wind ?? 0) >= 50 ? `⚠️ Viento fuerte — ${weather!.wind} km/h` : wmo?.alerta ?? null
+  const alertMsg = (weather?.wind ?? 0) >= 50 ? `⚠️ Viento fuerte — ${weather!.wind} km/h` : (wmo?.alerta ?? null)
 
-  const btn = (active: boolean, bg: string, tc = '#F4F0EB'): React.CSSProperties => ({
+  const btnStyle = (active: boolean, bg: string, tc = '#F4F0EB'): React.CSSProperties => ({
     padding: '6px 11px', borderRadius: '6px', border: 'none',
-    background: active ? bg : 'rgba(10,10,8,0.76)',
+    background: active ? bg : 'rgba(10,10,8,0.80)',
     color: active ? tc : '#F4F0EB', fontSize: '12px',
     cursor: 'pointer', fontWeight: active ? 700 : 400,
-    backdropFilter: 'blur(10px)', whiteSpace: 'nowrap' as const,
-    flexShrink: 0,
+    backdropFilter: 'blur(10px)', whiteSpace: 'nowrap',
+    flexShrink: 0, transition: 'background 0.15s',
   })
 
   return (
-    <div style={{ position: 'relative', width: '100%', height }}>
+    <div style={{ position: 'relative', width: '100%', height, overflow: 'hidden' }}>
       <div ref={mapContainer} style={{ width: '100%', height: '100%' }} />
 
-      {/* ── Weather card ──────────────────────────────────────────────── */}
+      {/* ── Weather card ─────────────────────────────────────────── */}
       {interactive && weather && wmo && (
-        <div onClick={() => setShowForecast(f => !f)} style={{
-          position: 'absolute',
-          top: fullscreen ? '108px' : '10px',
-          left: '10px', zIndex: 1,
-          background: 'rgba(10,10,8,0.86)',
-          border: `1px solid ${alertMsg ? 'rgba(232,35,26,0.6)' : 'rgba(244,240,235,0.12)'}`,
-          borderRadius: '8px', padding: '8px 12px',
-          color: '#F4F0EB', backdropFilter: 'blur(10px)',
-          minWidth: '150px', cursor: 'pointer',
-        }}>
-          <div style={{ fontSize: '14px', fontWeight: 600, marginBottom: '3px' }}>{wmo.emoji} {wmo.label}</div>
-          <div style={{ fontSize: '12px', color: '#bbb', display: 'flex', gap: '10px' }}>
-            <span>🌡️ {weather.temp}°C</span><span>💨 {weather.wind} km/h</span>
+        <div
+          onClick={() => setShowForecast(f => !f)}
+          style={{
+            position: 'absolute',
+            top: fullscreen ? '62px' : '10px',
+            left: '10px', zIndex: 2,
+            background: 'rgba(10,10,8,0.88)',
+            border: `1px solid ${alertMsg ? 'rgba(232,35,26,0.6)' : 'rgba(244,240,235,0.12)'}`,
+            borderRadius: '10px', padding: '8px 12px',
+            color: '#F4F0EB', backdropFilter: 'blur(12px)',
+            minWidth: '148px', cursor: 'pointer', userSelect: 'none',
+          }}
+        >
+          <div style={{ fontSize: '14px', fontWeight: 600, marginBottom: '3px' }}>
+            {wmo.emoji} {wmo.label}
           </div>
-          {alertMsg && <div style={{ marginTop: '5px', fontSize: '11px', color: '#E8231A', fontWeight: 700 }}>{alertMsg}</div>}
+          <div style={{ fontSize: '12px', color: '#bbb', display: 'flex', gap: '10px' }}>
+            <span>🌡️ {weather.temp}°C</span>
+            <span>💨 {weather.wind} km/h</span>
+          </div>
+          {alertMsg && (
+            <div style={{ marginTop: '5px', fontSize: '11px', color: '#E8231A', fontWeight: 700 }}>
+              {alertMsg}
+            </div>
+          )}
           {showForecast && weather.forecast.length > 0 && (
             <div style={{ marginTop: '8px', borderTop: '1px solid rgba(244,240,235,0.1)', paddingTop: '8px' }}>
-              <div style={{ fontSize: '10px', color: '#888', marginBottom: '5px', letterSpacing: '1px', textTransform: 'uppercase' as const }}>
-                Pronóstico 5 días
+              <div style={{ fontSize: '10px', color: '#888', marginBottom: '5px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                Próximos 5 días
               </div>
               {weather.forecast.map(day => {
-                const d = new Date(day.date + 'T12:00:00')
                 const wd = getWMO(day.code)
+                const d  = new Date(day.date + 'T12:00:00')
                 return (
                   <div key={day.date} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px', padding: '2px 0' }}>
                     <span style={{ color: '#aaa', minWidth: '30px' }}>{d.toLocaleDateString('es-MX', { weekday: 'short' })}</span>
                     <span>{wd.emoji}</span>
-                    <span style={{ color: '#F4F0EB' }}>{day.maxTemp}° <span style={{ color: '#666' }}>{day.minTemp}°</span></span>
+                    <span>{day.maxTemp}° <span style={{ color: '#666' }}>{day.minTemp}°</span></span>
                   </div>
                 )
               })}
             </div>
           )}
-          <div style={{ fontSize: '10px', color: '#555', marginTop: '4px' }}>{showForecast ? '▲ Ocultar' : '▼ Pronóstico 5 días'}</div>
+          <div style={{ fontSize: '10px', color: '#555', marginTop: '4px' }}>
+            {showForecast ? '▲ Ocultar' : '▼ Ver pronóstico 5 días'}
+          </div>
         </div>
       )}
 
-      {/* ── POI message ─────────────────────────────────────────────────── */}
+      {/* ── Nav route info ───────────────────────────────────────── */}
+      {navRoute && (
+        <div style={{
+          position: 'absolute', bottom: fullscreen ? '100px' : '140px', left: '10px', right: '10px',
+          zIndex: 2, background: 'rgba(10,10,8,0.92)', borderRadius: '10px',
+          padding: '12px 14px', backdropFilter: 'blur(12px)',
+          border: '1px solid rgba(244,240,235,0.12)', color: '#F4F0EB',
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+            <div>
+              <span style={{ fontSize: '18px', fontWeight: 800, color: '#E8231A' }}>
+                {fmtDist(navRoute.result.distanceM)}
+              </span>
+              <span style={{ fontSize: '14px', color: '#aaa', marginLeft: '10px' }}>
+                {fmtTime(navRoute.result.durationS)}
+              </span>
+            </div>
+            <button
+              onClick={() => setShowSteps(s => !s)}
+              style={{ background: 'rgba(244,240,235,0.1)', border: 'none', color: '#F4F0EB', borderRadius: '4px', padding: '4px 10px', fontSize: '12px', cursor: 'pointer' }}
+            >
+              {showSteps ? '▲ Ocultar pasos' : '▼ Ver pasos'}
+            </button>
+          </div>
+          <div style={{ fontSize: '12px', color: '#888' }}>
+            {navRoute.origen.label} → {navRoute.destino.label}
+          </div>
+          {navRoute.destinoWeather && (() => {
+            const dw = getWMO(navRoute.destinoWeather!.code)
+            return (
+              <div style={{ marginTop: '6px', fontSize: '12px', color: '#aaa' }}>
+                Clima en destino: {dw.emoji} {dw.label} · {navRoute.destinoWeather!.temp}°C
+                {navRoute.destinoWeather!.alerta && (
+                  <span style={{ color: '#E8231A', fontWeight: 700, marginLeft: '6px' }}>
+                    {navRoute.destinoWeather!.alerta}
+                  </span>
+                )}
+              </div>
+            )
+          })()}
+          {showSteps && navRoute.result.steps.length > 0 && (
+            <div style={{ marginTop: '8px', borderTop: '1px solid rgba(244,240,235,0.1)', paddingTop: '8px', maxHeight: '160px', overflowY: 'auto' }}>
+              {navRoute.result.steps.slice(0, 15).map((step, i) => (
+                <div key={i} style={{ fontSize: '11px', color: '#ccc', padding: '3px 0', borderBottom: '1px solid rgba(244,240,235,0.05)' }}>
+                  <span style={{ color: '#E8231A', marginRight: '6px', fontWeight: 700 }}>{i + 1}.</span>
+                  {step.instruction}
+                  <span style={{ color: '#666', marginLeft: '6px' }}>{fmtDist(step.distanceM)}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── POI message ──────────────────────────────────────────── */}
       {poiMsg && (
         <div style={{
-          position: 'absolute', top: fullscreen ? '164px' : 'auto', bottom: fullscreen ? 'auto' : '100px',
-          left: '10px', zIndex: 2,
-          background: 'rgba(10,10,8,0.9)', color: '#F4F0EB',
-          padding: '6px 12px', borderRadius: '6px', fontSize: '12px',
-          border: '1px solid rgba(244,240,235,0.15)',
+          position: 'absolute', top: fullscreen ? '110px' : 'auto',
+          bottom: fullscreen ? 'auto' : '200px',
+          left: '10px', zIndex: 3,
+          background: 'rgba(10,10,8,0.92)', color: '#F4F0EB',
+          padding: '7px 14px', borderRadius: '8px', fontSize: '12px',
+          border: '1px solid rgba(244,240,235,0.2)',
         }}>
           {poiMsg}
         </div>
       )}
 
-      {/* ── FULLSCREEN: top horizontal bar ───────────────────────────────── */}
+      {/* ── FULLSCREEN controls (top bar) ─────────────────────────── */}
       {interactive && fullscreen && (
         <>
           <div style={{
-            position: 'absolute', top: '60px', left: '8px', right: '55px', zIndex: 1,
-            display: 'flex', gap: '5px', overflowX: 'auto',
-            // Hide scrollbar
-            msOverflowStyle: 'none' as any,
-            scrollbarWidth: 'none' as any,
+            position: 'absolute', top: '10px', left: '8px', right: '55px',
+            zIndex: 2, display: 'flex', gap: '5px', overflowX: 'auto',
+            paddingBottom: '2px',
+            scrollbarWidth: 'none' as const,
+            msOverflowStyle: 'none' as const,
           }}>
-            <button onClick={toggleGas}  style={btn(showGas,  '#FFD700', '#111')}>⛽ Gasolineras</button>
-            <button onClick={toggleHosp} style={btn(showHosp, '#3B82F6')}       >🏥 Hospitales</button>
+            <button onClick={toggleGas}  style={btnStyle(showGas,  '#D97706', '#fff')}>⛽ Gasolineras</button>
+            <button onClick={toggleHosp} style={btnStyle(showHosp, '#3B82F6')}>🏥 Hospitales</button>
             {OWM_LAYERS.map(l => (
-              <button key={l.id} onClick={() => setOwmLayer(owmLayer === l.id ? null : l.id)} style={btn(owmLayer === l.id, '#0EA5E9')}>
+              <button key={l.id} onClick={() => setOwmLayer(owmLayer === l.id ? null : l.id)} style={btnStyle(owmLayer === l.id, '#0EA5E9')}>
                 {l.label}
               </button>
             ))}
-            <button onClick={() => setShowStylePicker(p => !p)} style={btn(showStylePicker, '#E8231A')}>⊞ Vista</button>
+            <button onClick={() => setShowStylePicker(p => !p)} style={btnStyle(showStylePicker, '#6B21A8')}>
+              ⊞ Vista
+            </button>
           </div>
 
           {showStylePicker && (
             <div style={{
-              position: 'absolute', top: '100px', right: '8px', zIndex: 3,
-              background: 'rgba(10,10,8,0.94)', borderRadius: '8px',
+              position: 'absolute', top: '48px', right: '8px', zIndex: 4,
+              background: 'rgba(10,10,8,0.95)', borderRadius: '10px',
               padding: '6px', display: 'flex', flexDirection: 'column', gap: '3px',
-              border: '1px solid rgba(244,240,235,0.15)', backdropFilter: 'blur(12px)',
+              border: '1px solid rgba(244,240,235,0.15)', backdropFilter: 'blur(14px)',
+              minWidth: '140px',
             }}>
               {ESTILOS.map(e => (
                 <button key={e.id} onClick={() => changeStyle(e.id, e.url)} style={{
-                  ...btn(estiloActual === e.id, '#E8231A'),
-                  textAlign: 'left' as const, padding: '7px 14px',
+                  ...btnStyle(estiloActual === e.id, '#E8231A'),
+                  textAlign: 'left', padding: '8px 12px',
                   background: estiloActual === e.id ? '#E8231A' : 'transparent',
+                  borderRadius: '6px',
                 }}>
                   {e.label}
                 </button>
@@ -551,25 +739,25 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
         </>
       )}
 
-      {/* ── NON-FULLSCREEN: bottom-left controls ──────────────────────────── */}
+      {/* ── NON-FULLSCREEN controls (bottom-left) ────────────────── */}
       {interactive && !fullscreen && (
         <div style={{
-          position: 'absolute', bottom: '28px', left: '10px', zIndex: 1,
+          position: 'absolute', bottom: '36px', left: '10px', zIndex: 2,
           display: 'flex', flexDirection: 'column', gap: '5px',
           maxWidth: 'calc(100% - 60px)',
         }}>
-          <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' as const }}>
-            <button onClick={toggleGas}  style={btn(showGas,  '#FFD700', '#111')}>⛽ Gasolineras</button>
-            <button onClick={toggleHosp} style={btn(showHosp, '#3B82F6')}       >🏥 Hospitales</button>
+          <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+            <button onClick={toggleGas}  style={btnStyle(showGas,  '#D97706', '#fff')}>⛽ Gasolineras</button>
+            <button onClick={toggleHosp} style={btnStyle(showHosp, '#3B82F6')}>🏥 Hospitales</button>
             {OWM_LAYERS.map(l => (
-              <button key={l.id} onClick={() => setOwmLayer(owmLayer === l.id ? null : l.id)} style={btn(owmLayer === l.id, '#0EA5E9')}>
+              <button key={l.id} onClick={() => setOwmLayer(owmLayer === l.id ? null : l.id)} style={btnStyle(owmLayer === l.id, '#0EA5E9')}>
                 {l.label}
               </button>
             ))}
           </div>
-          <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' as const }}>
+          <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
             {ESTILOS.map(e => (
-              <button key={e.id} onClick={() => changeStyle(e.id, e.url)} style={btn(estiloActual === e.id, '#E8231A')}>
+              <button key={e.id} onClick={() => changeStyle(e.id, e.url)} style={btnStyle(estiloActual === e.id, '#E8231A')}>
                 {e.label}
               </button>
             ))}
