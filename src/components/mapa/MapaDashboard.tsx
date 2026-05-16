@@ -3,6 +3,9 @@ import { useEffect, useState, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import { fetchRoute, type NavRoute, type WeatherData } from './MapaRescueChip'
 
+function fmtDist(m: number): string { return m < 1000 ? `${m} m` : `${(m / 1000).toFixed(1)} km` }
+function fmtTime(s: number): string { const min = Math.round(s / 60); return min < 60 ? `${min} min` : `${Math.floor(min / 60)}h ${min % 60}min` }
+
 const MapaRescueChip = dynamic(() => import('./MapaRescueChip'), {
   ssr: false,
   loading: () => <div style={{ width: '100%', height: '500px', background: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#555' }}>Cargando mapa...</div>,
@@ -159,6 +162,21 @@ export default function MapaDashboard() {
   }
 
   // ── Shared nav panel ─────────────────────────────────────────────────────
+  const handleMapClickDest = useCallback(async ({ lng, lat }: { lng: number; lat: number }) => {
+    try {
+      const r = await fetch(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng.toFixed(6)},${lat.toFixed(6)}.json` +
+        `?access_token=${process.env.NEXT_PUBLIC_MAPBOX_TOKEN}&language=es&limit=1`
+      )
+      const d = await r.json()
+      const name = d.features?.[0]?.place_name ?? `${lat.toFixed(5)}, ${lng.toFixed(5)}`
+      setDestinoText(name)
+    } catch {
+      setDestinoText(`${lat.toFixed(5)}, ${lng.toFixed(5)}`)
+    }
+    setNavOpen(true)
+  }, [])
+
   const navPanel = (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
       <input type="text" placeholder="🟢 Origen (vacío = mi ubicación)" value={origenText}
@@ -215,57 +233,159 @@ export default function MapaDashboard() {
 
   // ── FULLSCREEN ─────────────────────────────────────────────────────────────
   if (fullscreen) {
+    const isNavigating = navRoute !== null // usa el prop de MapaRescueChip para saber si navega
     return (
       <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: '#0A0A08' }}>
-        <MapaRescueChip puntos={puntos} interactive height="100dvh" fullscreen navRoute={navRoute} onAlternativeSelect={handleAlternativeSelect} />
+        {/* Mapa — ocupa toda la pantalla */}
+        <MapaRescueChip
+          puntos={puntos} interactive height="100dvh" fullscreen
+          navRoute={navRoute} onAlternativeSelect={handleAlternativeSelect}
+          onMapClickDest={handleMapClickDest}
+        />
 
-        {/* Header: X (izquierda) + RESCUEMAPS (derecha) para dejar top-right libre al GeolocateControl */}
+        {/* ── OVERLAY TOP: gradiente + header + controles ── */}
         <div style={{
           position: 'fixed', top: 0, left: 0, right: 0, zIndex: 10001,
-          padding: '10px 14px',
-          background: 'linear-gradient(to bottom, rgba(10,10,8,0.85) 0%, transparent 100%)',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          background: 'linear-gradient(to bottom, rgba(10,10,8,0.88) 0%, rgba(10,10,8,0.6) 60%, transparent 100%)',
           pointerEvents: 'none',
         }}>
-          {/* X button — top LEFT to avoid GeolocateControl at top-right */}
-          <button onClick={exitFullscreen} style={{
-            pointerEvents: 'all',
-            background: 'rgba(10,10,8,0.80)', border: '1px solid rgba(244,240,235,0.2)',
-            borderRadius: '50%', width: '34px', height: '34px', color: '#F4F0EB',
-            fontSize: '15px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            backdropFilter: 'blur(8px)',
-          }}>✕</button>
+          {/* Header */}
+          <div style={{ display: 'flex', alignItems: 'center', padding: '10px 12px 4px', gap: '8px', pointerEvents: 'all' }}>
+            <button onClick={exitFullscreen} style={{
+              background: 'rgba(244,240,235,0.12)', border: 'none',
+              borderRadius: '50%', width: '32px', height: '32px', color: '#F4F0EB',
+              fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0,
+            }}>✕</button>
 
-          {/* Logo — top RIGHT */}
-          <span style={{ color: '#F4F0EB', fontWeight: 900, letterSpacing: '3px', fontSize: '15px', pointerEvents: 'none' }}>
-            RESCUE<span style={{ color: '#E8231A' }}>MAPS</span>
-          </span>
+            <span style={{ color: '#F4F0EB', fontWeight: 900, letterSpacing: '2px', fontSize: '14px', flex: 1, textAlign: 'center' }}>
+              RESCUE<span style={{ color: '#E8231A' }}>MAPS</span>
+            </span>
+            <div style={{ width: '32px' }} />{/* spacer para centrar logo */}
+          </div>
+
+          {/* Controles strip */}
+          <div style={{
+            display: 'flex', gap: '5px', padding: '4px 10px 10px',
+            overflowX: 'auto', pointerEvents: 'all',
+            scrollbarWidth: 'none' as const, msOverflowStyle: 'none' as const,
+          }}>
+            {/* Los botones de Gasolineras, Hospitales, Lluvia, Viento y Vista 
+                están dentro de MapaRescueChip como overlay del mapa.
+                Aquí solo ponemos el botón de Ir a... si no está navegando */}
+            {!navRoute && (
+              <button onClick={() => setNavOpen(true)} style={{
+                padding: '7px 14px', borderRadius: '20px', border: 'none',
+                background: 'rgba(244,240,235,0.15)', color: '#F4F0EB',
+                fontSize: '13px', fontWeight: 600, cursor: 'pointer',
+                backdropFilter: 'blur(10px)', whiteSpace: 'nowrap', flexShrink: 0,
+              }}>
+                🔍 ¿A dónde vas?
+              </button>
+            )}
+          </div>
         </div>
 
-        {/* FABs — bottom right, above safe area */}
-        {!reportOpen && !navOpen && (
-          <div style={{
-            position: 'fixed', bottom: 'max(28px, env(safe-area-inset-bottom, 28px))',
-            right: '14px', zIndex: 10001,
-            display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'flex-end',
-          }}>
-            <button onClick={() => setNavOpen(true)} style={{
-              background: 'rgba(10,10,8,0.88)', color: '#F4F0EB',
-              border: '1px solid rgba(244,240,235,0.2)', borderRadius: '22px', padding: '11px 18px',
-              fontSize: '13px', fontWeight: 600, cursor: 'pointer', backdropFilter: 'blur(10px)',
-            }}>🗺️ Ir a…</button>
-            <button onClick={() => setReportOpen(true)} style={{
-              background: '#E8231A', color: '#fff', border: 'none',
-              borderRadius: '22px', padding: '13px 20px',
-              fontSize: '13px', fontWeight: 700, cursor: 'pointer',
-              boxShadow: '0 4px 18px rgba(232,35,26,0.5)',
-            }}>⚠️ Reportar</button>
-          </div>
-        )}
+        {/* ── BOTTOM SHEET ── */}
+        <div style={{
+          position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 10001,
+        }}>
+          {/* Drag handle visual */}
+          {navRoute && (
+            <div style={{
+              background: '#161614', borderRadius: '18px 18px 0 0',
+              padding: '10px 18px max(24px, env(safe-area-inset-bottom, 24px))',
+              boxShadow: '0 -8px 32px rgba(0,0,0,0.6)',
+              borderTop: '1px solid rgba(244,240,235,0.08)',
+            }}>
+              <div style={{ width: '36px', height: '4px', background: 'rgba(244,240,235,0.2)', borderRadius: '2px', margin: '0 auto 12px' }} />
 
-        {/* Bottom sheet — nav */}
+              {/* Route summary */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px' }}>
+                    <span style={{ fontSize: '22px', fontWeight: 800, color: '#F4F0EB' }}>
+                      {fmtDist(navRoute.result.distanceM)}
+                    </span>
+                    <span style={{ fontSize: '15px', color: '#aaa' }}>
+                      {fmtTime(navRoute.result.durationS)}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
+                    → {navRoute.destino.label.split(',')[0]}
+                  </div>
+                  {navRoute.destinoWeather && (() => {
+                    const dw = navRoute.destinoWeather!
+                    const WMO_EMOJI: Record<number, string> = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',61:'🌧️',63:'🌧️',65:'🌧️',80:'🌧️',95:'⛈️'}
+                    const emoji = WMO_EMOJI[dw.code] ?? '🌡️'
+                    return <div style={{ fontSize: '12px', color: '#888', marginTop: '2px' }}>{emoji} Destino {dw.temp}°C · 💨 {dw.wind} km/h</div>
+                  })()}
+                </div>
+
+                <button onClick={() => setNavRoute(null)} style={{
+                  background: 'transparent', border: 'none', color: '#555',
+                  fontSize: '20px', cursor: 'pointer', lineHeight: 1, padding: '0 4px',
+                }}>✕</button>
+              </div>
+
+              {/* Leyenda tráfico compacta */}
+              <div style={{ display: 'flex', gap: '8px', marginBottom: '10px', flexWrap: 'wrap' }}>
+                {[['#4285F4','Libre'],['#FF9800','Lento'],['#F44336','Pesado'],['#B71C1C','Detenido']].map(([c,l]) => (
+                  <div key={l} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '10px', color: '#666' }}>
+                    <div style={{ width: '16px', height: '3px', background: c, borderRadius: '2px' }} />{l}
+                  </div>
+                ))}
+              </div>
+
+              {/* Botón Navegar */}
+              <button onClick={() => {
+                // El botón navegar dispara startNavigation en MapaRescueChip
+                // via el panel de navegación activa que ya existe dentro del mapa
+                const event = new CustomEvent('rescuemaps-start-nav')
+                window.dispatchEvent(event)
+              }} style={{
+                width: '100%', background: '#22c55e', color: '#fff',
+                border: 'none', borderRadius: '10px', padding: '14px',
+                fontSize: '16px', fontWeight: 800, cursor: 'pointer',
+                letterSpacing: '0.5px',
+              }}>
+                ▶ Iniciar navegación
+              </button>
+
+              {/* Rutas alternativas en el mapa — nota */}
+              {navRoute.result.alternatives.length > 0 && (
+                <p style={{ fontSize: '11px', color: '#555', textAlign: 'center', margin: '8px 0 0' }}>
+                  {navRoute.result.alternatives.length} ruta(s) alternativa(s) disponible(s) — tócalas en el mapa
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* FABs cuando no hay bottom sheet de ruta */}
+          {!navRoute && !reportOpen && !navOpen && (
+            <div style={{
+              display: 'flex', justifyContent: 'flex-end', gap: '10px',
+              padding: '0 14px max(20px, env(safe-area-inset-bottom, 20px)) 14px',
+            }}>
+              <button onClick={() => setReportOpen(true)} style={{
+                background: '#E8231A', color: '#fff', border: 'none',
+                borderRadius: '22px', padding: '12px 20px',
+                fontSize: '13px', fontWeight: 700, cursor: 'pointer',
+                boxShadow: '0 4px 16px rgba(232,35,26,0.45)',
+              }}>⚠️ Reportar</button>
+            </div>
+          )}
+        </div>
+
+        {/* ── BOTTOM SHEET NAV INPUT ── */}
         {navOpen && (
-          <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 10002, background: '#161614', borderRadius: '18px 18px 0 0', padding: '20px 18px max(28px, env(safe-area-inset-bottom, 28px))', boxShadow: '0 -8px 40px rgba(0,0,0,0.7)' }}>
+          <div style={{
+            position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 10002,
+            background: '#161614', borderRadius: '18px 18px 0 0',
+            padding: '20px 18px max(28px, env(safe-area-inset-bottom, 28px))',
+            boxShadow: '0 -8px 40px rgba(0,0,0,0.7)',
+          }}>
+            <div style={{ width: '36px', height: '4px', background: 'rgba(244,240,235,0.2)', borderRadius: '2px', margin: '0 auto 16px' }} />
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
               <span style={{ color: '#F4F0EB', fontWeight: 700, fontSize: '15px' }}>¿A dónde vas?</span>
               <button onClick={() => setNavOpen(false)} style={{ background: 'transparent', border: 'none', color: '#888', fontSize: '20px', cursor: 'pointer' }}>✕</button>
@@ -274,9 +394,15 @@ export default function MapaDashboard() {
           </div>
         )}
 
-        {/* Bottom sheet — reporte */}
+        {/* ── BOTTOM SHEET REPORTE ── */}
         {reportOpen && !navOpen && (
-          <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 10002, background: '#161614', borderRadius: '18px 18px 0 0', padding: '20px 18px max(28px, env(safe-area-inset-bottom, 28px))', boxShadow: '0 -8px 40px rgba(0,0,0,0.7)' }}>
+          <div style={{
+            position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 10002,
+            background: '#161614', borderRadius: '18px 18px 0 0',
+            padding: '20px 18px max(28px, env(safe-area-inset-bottom, 28px))',
+            boxShadow: '0 -8px 40px rgba(0,0,0,0.7)',
+          }}>
+            <div style={{ width: '36px', height: '4px', background: 'rgba(244,240,235,0.2)', borderRadius: '2px', margin: '0 auto 16px' }} />
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
               <span style={{ color: '#F4F0EB', fontWeight: 700, fontSize: '15px' }}>Reportar incidente</span>
               <button onClick={() => setReportOpen(false)} style={{ background: 'transparent', border: 'none', color: '#888', fontSize: '20px', cursor: 'pointer' }}>✕</button>
@@ -307,7 +433,7 @@ export default function MapaDashboard() {
         <div style={{ height: '500px', background: '#111', borderRadius: '8px' }} />
       ) : (
         <div style={{ borderRadius: '8px', overflow: 'hidden' }}>
-          <MapaRescueChip puntos={puntos} interactive height="500px" navRoute={navRoute} onAlternativeSelect={handleAlternativeSelect} onEnterFullscreen={enterFullscreen} />
+          <MapaRescueChip puntos={puntos} interactive height="500px" navRoute={navRoute} onAlternativeSelect={handleAlternativeSelect} onEnterFullscreen={enterFullscreen} onMapClickDest={handleMapClickDest} />
         </div>
       )}
 

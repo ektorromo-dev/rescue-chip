@@ -88,7 +88,7 @@ export interface AlternativeRoute { geometry: any; distanceM: number; durationS:
 export interface RouteIncident { lng: number; lat: number; type: string; description?: string }
 export interface RouteResult {
   geometry: any; distanceM: number; durationS: number
-  steps: Array<{ instruction: string; distanceM: number }>
+  steps: Array<{ instruction: string; distanceM: number; location?: [number, number] }>
   congestion: string[]
   incidents: RouteIncident[]
   alternatives: AlternativeRoute[]
@@ -106,7 +106,9 @@ export async function fetchRoute(sLng: number, sLat: number, eLng: number, eLat:
     const main = d.routes?.[0]
     if (!main) return null
     const steps = (main.legs?.[0]?.steps ?? []).map((s: any) => ({
-      instruction: s.maneuver?.instruction ?? '', distanceM: Math.round(s.distance),
+      instruction: s.maneuver?.instruction ?? '',
+      distanceM: Math.round(s.distance),
+      location: s.maneuver?.location as [number, number] | undefined,
     }))
     const congestion: string[] = main.legs?.[0]?.annotation?.congestion ?? []
     const incidents: RouteIncident[] = (main.legs?.[0]?.incidents ?? []).map((inc: any) => {
@@ -264,6 +266,14 @@ function loadMapboxScript(): Promise<void> {
   })
 }
 
+function haversine(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371000
+  const φ1 = lat1 * Math.PI / 180, φ2 = lat2 * Math.PI / 180
+  const Δφ = (lat2 - lat1) * Math.PI / 180, Δλ = (lon2 - lon1) * Math.PI / 180
+  const a = Math.sin(Δφ/2)**2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2)**2
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+}
+
 // ─── TYPES ───────────────────────────────────────────────────────────────────
 interface Punto { id: string; tipo: string; latitud: number; longitud: number; fuente: 'reporte' | 'emergencia'; descripcion?: string }
 export interface NavRoute {
@@ -279,10 +289,11 @@ interface Props {
   onAlternativeSelect?: (idx: number) => void
   onMapReady?: (map: any) => void
   onEnterFullscreen?: () => void
+  onMapClickDest?: (coords: { lng: number; lat: number }) => void
 }
 
 // ─── COMPONENT ───────────────────────────────────────────────────────────────
-export default function MapaRescueChip({ puntos = [], interactive = true, height = '500px', fullscreen = false, navRoute = null, onAlternativeSelect, onMapReady, onEnterFullscreen }: Props) {
+export default function MapaRescueChip({ puntos = [], interactive = true, height = '500px', fullscreen = false, navRoute = null, onAlternativeSelect, onMapReady, onEnterFullscreen, onMapClickDest }: Props) {
   const mapContainer  = useRef<HTMLDivElement>(null)
   const mapRef        = useRef<any>(null)
   const mboxRef       = useRef<any>(null)
@@ -562,6 +573,15 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
           }, 1400)
         })
 
+        // Click en mapa para establecer destino
+        if (onMapClickDest) {
+          mapRef.current.on('click', (e: any) => {
+            // No interceptar clicks en markers/popups ni cuando hay POIs activos
+            if (e.originalEvent?.target !== mapRef.current?.getCanvas()) return
+            onMapClickDest({ lng: e.lngLat.lng, lat: e.lngLat.lat })
+          })
+        }
+
         // Click alternatives
         for (let i = 0; i < 2; i++) {
           mapRef.current.on('click', `rc-alt-${i}`, () => { onAlternativeSelect?.(i) })
@@ -622,27 +642,46 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
   }, [addPOIMarkers, checkZoom, getBBox])
   const startNavigation = useCallback(() => {
     if (!navRouteRef.current) return
-    setNavigating(true); setNavStep(0)
+    setNavigating(true)
+    setNavStep(0)
+    let currentStepLocal = 0
+
     watchIdRef.current = navigator.geolocation.watchPosition(
       ({ coords }) => {
-        userPosRef.current = [coords.longitude, coords.latitude]
+        const { longitude: userLng, latitude: userLat } = coords
+        userPosRef.current = [userLng, userLat]
         if (!mapRef.current || !navRouteRef.current) return
-        // Centrar mapa en posición actual
-        mapRef.current.easeTo({ center: [coords.longitude, coords.latitude], zoom: 15, duration: 500 })
-        // Encontrar paso más cercano
+
+        // Centrar mapa en posición del usuario con orientación
+        mapRef.current.easeTo({
+          center: [userLng, userLat],
+          bearing: coords.heading ?? mapRef.current.getBearing(),
+          zoom: 16,
+          duration: 400,
+        })
+
         const steps = navRouteRef.current.result.steps
-        if (!steps.length) return
-        // Calcular distancia al próximo paso (simplificado)
-        const curStep = navStep
-        if (curStep < steps.length) {
-          const remaining = steps.slice(curStep).reduce((a, s) => a + s.distanceM, 0)
-          setNavDist(remaining)
+
+        // Auto-advance: si estamos a <50m del inicio del siguiente paso → avanzar
+        if (currentStepLocal < steps.length - 1) {
+          const nextLoc = steps[currentStepLocal + 1].location
+          if (nextLoc) {
+            const dist = haversine(userLat, userLng, nextLoc[1], nextLoc[0])
+            if (dist < 50) {
+              currentStepLocal++
+              setNavStep(currentStepLocal)
+            }
+          }
         }
+
+        // Distancia restante acumulada desde el paso actual
+        const remaining = steps.slice(currentStepLocal).reduce((a, s) => a + s.distanceM, 0)
+        setNavDist(remaining)
       },
-      () => {},
-      { enableHighAccuracy: true, maximumAge: 2000, timeout: 10000 }
+      (err) => console.warn('GPS:', err.message),
+      { enableHighAccuracy: true, maximumAge: 1000, timeout: 15000 }
     )
-  }, [navStep])
+  }, [])
 
   const stopNavigation = useCallback(() => {
     setNavigating(false); setNavStep(0); setNavDist(null)
@@ -662,12 +701,25 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
       const PITCH_MAP: Record<string, number> = { 'standard': 45 }
       mapRef.current?.setPitch(PITCH_MAP[estilo.id] ?? 0)
       if (estilo.id === 'standard') {
-        try { mapRef.current?.setConfigProperty('basemap', 'lightPreset', lightPreset) } catch {}
-        try { mapRef.current?.setConfigProperty('basemap', 'show3dObjects', true) } catch {}
+        // Standard style v3: lighting preset + 3D objects
+        try { (mapRef.current as any)?.setConfigProperty('basemap', 'lightPreset', lightPreset) } catch {}
+        try { (mapRef.current as any)?.setConfigProperty('basemap', 'show3dObjects', true) } catch {}
+        // Terrain 3D
+        try {
+          if (!mapRef.current?.getSource('mapbox-dem')) {
+            mapRef.current?.addSource('mapbox-dem', { type: 'raster-dem', url: 'mapbox://mapbox.mapbox-terrain-dem-v1', tileSize: 512, maxzoom: 14 })
+          }
+          mapRef.current?.setTerrain({ source: 'mapbox-dem', exaggeration: 1.5 })
+        } catch {}
+      } else {
+        try { mapRef.current?.setTerrain(null as any) } catch {}
       }
+      // Re-draw OWM and route after style change
+      if (owmLayerRef.current) applyOWMLayer(mapRef.current, owmLayerRef.current)
+      if (navRouteRef.current) drawNavRoute()
     })
     setShowStylePicker(false)
-  }, [lightPreset])
+  }, [lightPreset, drawNavRoute])
 
   const changeLightPreset = useCallback((preset: string) => {
     setLightPreset(preset)
@@ -913,7 +965,7 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
           onClick={onEnterFullscreen}
           title="Pantalla completa"
           style={{
-            position: 'absolute', top: '10px', right: '10px', zIndex: 2,
+            position: 'absolute', top: '86px', right: '10px', zIndex: 2,
             background: 'rgba(10,10,8,0.75)', border: '1px solid rgba(244,240,235,0.2)',
             borderRadius: '6px', padding: '6px 8px', color: '#F4F0EB',
             fontSize: '14px', cursor: 'pointer', backdropFilter: 'blur(8px)',
