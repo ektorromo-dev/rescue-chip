@@ -116,8 +116,15 @@ export async function fetchRoute(sLng: number, sLat: number, eLng: number, eLat:
 
 // ─── ROUTE DRAWING ────────────────────────────────────────────────────────────
 // Returns the first symbol layer ID so route layers render BELOW map labels
-function getFirstLabelLayerId(map: any): string | undefined {
-  return map.getStyle()?.layers?.find((l: any) => l.type === 'symbol')?.id
+function getRouteBeforeId(map: any): string | undefined {
+  const layers: any[] = map.getStyle()?.layers ?? []
+  // Busca capas de etiquetas de carreteras en orden de prioridad
+  const priorities = ['road-label', 'road-number-shield', 'road-intersection', 'road-primary-label', 'motorway-label']
+  for (const id of priorities) {
+    if (layers.some(l => l.id === id)) return id
+  }
+  // Fallback: primera capa de tipo symbol
+  return layers.find(l => l.type === 'symbol')?.id
 }
 
 function clearRouteFromMap(map: any) {
@@ -131,7 +138,7 @@ function clearRouteFromMap(map: any) {
 function drawRouteOnMap(map: any, result: RouteResult, selectedAlt = -1) {
   if (!map) return
   clearRouteFromMap(map)
-  const beforeId = getFirstLabelLayerId(map)
+  const beforeId = getRouteBeforeId(map)
 
   // 1. Alternatives FIRST (below main route, above basemap)
   result.alternatives.forEach((alt, i) => {
@@ -140,17 +147,16 @@ function drawRouteOnMap(map: any, result: RouteResult, selectedAlt = -1) {
     map.addLayer({ id: `rc-alt-casing-${i}`, type: 'line', source: `rc-alt-src-${i}`,
       layout: { 'line-join': 'round', 'line-cap': 'round' },
       paint: { 'line-color': '#fff', 'line-width': 8, 'line-opacity': isSelected ? 0.35 : 0.2 }
-    }, beforeId)
+    }, beforeId ?? undefined)
     map.addLayer({ id: `rc-alt-${i}`, type: 'line', source: `rc-alt-src-${i}`,
       layout: { 'line-join': 'round', 'line-cap': 'round' },
       paint: {
-        'line-color': isSelected ? '#4285F4' : '#9E9E9E',
-        'line-width': isSelected ? 5 : 4,
-        'line-opacity': isSelected ? 0.9 : 0.5,
-        // dashed only if NOT selected
-        ...(!isSelected ? { 'line-dasharray': [2, 2] } : {}),
+        'line-color': '#9E9E9E',
+        'line-width': 4,
+        'line-opacity': 0.55,
+        'line-dasharray': [2, 2],
       }
-    }, beforeId)
+    }, beforeId ?? undefined)
   })
 
   // 2. Main route source — segmented by congestion if available
@@ -173,7 +179,7 @@ function drawRouteOnMap(map: any, result: RouteResult, selectedAlt = -1) {
   map.addLayer({ id: 'rc-route-casing', type: 'line', source: 'rc-route-src',
     layout: { 'line-join': 'round', 'line-cap': 'round' },
     paint: { 'line-color': '#fff', 'line-width': 9, 'line-opacity': 0.38 }
-  }, beforeId)
+  }, beforeId ?? undefined)
 
   // 4. Traffic-colored main line
   // Colors: low=blue(libre), moderate=orange(lento), heavy=red(muy lento), severe=dark-red(detenido)
@@ -191,7 +197,7 @@ function drawRouteOnMap(map: any, result: RouteResult, selectedAlt = -1) {
       'line-width': 5,
       'line-opacity': 0.95,
     }
-  }, beforeId)
+  }, beforeId ?? undefined)
 }
 
 // ─── OWM OVERLAY ─────────────────────────────────────────────────────────────
@@ -265,6 +271,7 @@ interface Props {
   navRoute?: NavRoute | null
   onAlternativeSelect?: (idx: number) => void
   onMapReady?: (map: any) => void
+  onEnterFullscreen?: () => void
 }
 
 // ─── COMPONENT ───────────────────────────────────────────────────────────────
@@ -293,6 +300,11 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
   const [showForecast,    setShowForecast]    = useState(false)
   const [poiMsg,          setPoiMsg]          = useState('')
   const [showSteps,       setShowSteps]       = useState(false)
+  const [navigating,   setNavigating]   = useState(false)
+  const [navStep,      setNavStep]      = useState(0)
+  const [navDist,      setNavDist]      = useState<number | null>(null)
+  const watchIdRef = useRef<number | null>(null)
+  const userPosRef = useRef<[number, number] | null>(null)
 
   useEffect(() => { puntosRef.current   = puntos  }, [puntos])
   useEffect(() => { showGasRef.current  = showGas  }, [showGas])
@@ -518,7 +530,7 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
         // In fullscreen: GeolocateControl at top-left (X button is top-right in header)
         mapRef.current.addControl(
           new mapboxgl.GeolocateControl({ positionOptions: { enableHighAccuracy: true }, trackUserLocation: true }),
-          fullscreen ? 'top-left' : 'top-right'
+          fullscreen ? 'bottom-left' : 'top-right'
         )
 
         // Initial weather
@@ -569,6 +581,7 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
     return () => {
       cancelled = true
       if (moveTimer) clearTimeout(moveTimer)
+      if (watchIdRef.current !== null) { navigator.geolocation.clearWatch(watchIdRef.current); watchIdRef.current = null }
       clearMarkers(markersRef); clearMarkers(gasMkrs); clearMarkers(hospMkrs)
       clearMarkers(navMkrs); clearMarkers(weatherMkrs); clearMarkers(incidentMkrs)
       mapRef.current?.remove(); mapRef.current = null; mboxRef.current = null
@@ -600,9 +613,57 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
     const bbox = getBBox(); if (!bbox) return
     addPOIMarkers(await fetchPOIsOverpass('hospital', bbox), 'hospital', hospMkrs)
   }, [addPOIMarkers, checkZoom, getBBox])
-  const changeStyle = useCallback((id: string, url: string) => {
-    setEstiloActual(id); try { localStorage.setItem(LS_KEY, id) } catch {}
-    mapRef.current?.setStyle(url); setShowStylePicker(false)
+  const startNavigation = useCallback(() => {
+    if (!navRouteRef.current) return
+    setNavigating(true); setNavStep(0)
+    watchIdRef.current = navigator.geolocation.watchPosition(
+      ({ coords }) => {
+        userPosRef.current = [coords.longitude, coords.latitude]
+        if (!mapRef.current || !navRouteRef.current) return
+        // Centrar mapa en posición actual
+        mapRef.current.easeTo({ center: [coords.longitude, coords.latitude], zoom: 15, duration: 500 })
+        // Encontrar paso más cercano
+        const steps = navRouteRef.current.result.steps
+        if (!steps.length) return
+        // Calcular distancia al próximo paso (simplificado)
+        const curStep = navStep
+        if (curStep < steps.length) {
+          const remaining = steps.slice(curStep).reduce((a, s) => a + s.distanceM, 0)
+          setNavDist(remaining)
+        }
+      },
+      () => {},
+      { enableHighAccuracy: true, maximumAge: 2000, timeout: 10000 }
+    )
+  }, [navStep])
+
+  const stopNavigation = useCallback(() => {
+    setNavigating(false); setNavStep(0); setNavDist(null)
+    if (watchIdRef.current !== null) {
+      navigator.geolocation.clearWatch(watchIdRef.current)
+      watchIdRef.current = null
+    }
+  }, [])
+
+  const [lightPreset, setLightPreset] = useState<string>('day')
+
+  const changeStyle = useCallback((estilo: typeof ESTILOS[0]) => {
+    setEstiloActual(estilo.id)
+    try { localStorage.setItem(LS_KEY, estilo.id) } catch {}
+    mapRef.current?.setStyle(estilo.url)
+    mapRef.current?.once('style.load', () => {
+      mapRef.current?.setPitch(estilo.pitch ?? 0)
+      if (estilo.id === 'standard') {
+        try { mapRef.current?.setConfigProperty('basemap', 'lightPreset', lightPreset) } catch {}
+        try { mapRef.current?.setConfigProperty('basemap', 'show3dObjects', true) } catch {}
+      }
+    })
+    setShowStylePicker(false)
+  }, [lightPreset])
+
+  const changeLightPreset = useCallback((preset: string) => {
+    setLightPreset(preset)
+    try { mapRef.current?.setConfigProperty('basemap', 'lightPreset', preset) } catch {}
   }, [])
 
   const wmo      = weather ? getWMO(weather.code) : null
@@ -623,8 +684,8 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
       {interactive && weather && wmo && (
         <div onClick={() => setShowForecast(f => !f)} style={{
           position: 'absolute',
-          top: fullscreen ? '62px' : '10px',
-          left: fullscreen ? '52px' : '10px', // offset for GeolocateControl in fullscreen (top-left)
+          top: fullscreen ? '96px' : '10px',
+          left: '10px',
           zIndex: 2,
           background: 'rgba(10,10,8,0.88)',
           border: `1px solid ${alertMsg ? 'rgba(232,35,26,0.6)' : 'rgba(244,240,235,0.12)'}`,
@@ -656,6 +717,41 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
         </div>
       )}
 
+      {/* ── Panel navegación activa ──────────────────────── */}
+      {navigating && navRoute && (
+        <div style={{
+          position: 'absolute', top: fullscreen ? '52px' : '10px',
+          right: '10px', zIndex: 5,
+          background: 'rgba(10,10,8,0.95)', borderRadius: '10px',
+          padding: '10px 14px', backdropFilter: 'blur(14px)',
+          border: '1px solid rgba(232,35,26,0.4)', color: '#F4F0EB',
+          minWidth: '200px', maxWidth: '260px',
+        }}>
+          <div style={{ fontSize: '11px', color: '#E8231A', fontWeight: 700, marginBottom: '4px', letterSpacing: '1px', textTransform: 'uppercase' }}>
+            🔴 Navegando
+          </div>
+          {navRoute.result.steps[navStep] && (
+            <div style={{ fontSize: '13px', color: '#F4F0EB', lineHeight: '1.4', marginBottom: '6px' }}>
+              {navRoute.result.steps[navStep].instruction}
+            </div>
+          )}
+          {navDist !== null && (
+            <div style={{ fontSize: '12px', color: '#aaa' }}>Distancia restante: {fmtDist(navDist)}</div>
+          )}
+          <div style={{ display: 'flex', gap: '6px', marginTop: '8px' }}>
+            {navStep > 0 && (
+              <button onClick={() => setNavStep(s => s - 1)} style={{ flex: 1, background: 'rgba(244,240,235,0.1)', border: 'none', color: '#F4F0EB', borderRadius: '4px', padding: '6px', fontSize: '12px', cursor: 'pointer' }}>◀ Anterior</button>
+            )}
+            {navStep < navRoute.result.steps.length - 1 && (
+              <button onClick={() => setNavStep(s => s + 1)} style={{ flex: 1, background: 'rgba(244,240,235,0.1)', border: 'none', color: '#F4F0EB', borderRadius: '4px', padding: '6px', fontSize: '12px', cursor: 'pointer' }}>Siguiente ▶</button>
+            )}
+          </div>
+          <button onClick={stopNavigation} style={{ width: '100%', marginTop: '6px', background: '#E8231A', border: 'none', color: '#fff', borderRadius: '4px', padding: '7px', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>
+            ⏹ Detener navegación
+          </button>
+        </div>
+      )}
+
       {/* ── Nav route summary ──────────────────────────────────── */}
       {navRoute && (
         <div style={{
@@ -669,16 +765,22 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
               <span style={{ fontSize: '18px', fontWeight: 800, color: '#E8231A' }}>{fmtDist(navRoute.result.distanceM)}</span>
               <span style={{ fontSize: '14px', color: '#aaa', marginLeft: '10px' }}>{fmtTime(navRoute.result.durationS)}</span>
             </div>
-            <button onClick={() => setShowSteps(s => !s)} style={{ background: 'rgba(244,240,235,0.1)', border: 'none', color: '#F4F0EB', borderRadius: '4px', padding: '4px 10px', fontSize: '12px', cursor: 'pointer' }}>
-              {showSteps ? '▲ Ocultar' : '▼ Pasos'}
-            </button>
           </div>
-          <div style={{ fontSize: '12px', color: '#888' }}>{navRoute.origen.label} → {navRoute.destino.label}</div>
-          {/* Leyenda de colores de tráfico */}
-          <div style={{ display: 'flex', gap: '8px', marginTop: '6px', flexWrap: 'wrap' }}>
-            {[['#4285F4','Libre'],['#FF9800','Lento'],['#F44336','Muy lento'],['#B71C1C','Detenido']].map(([color, label]) => (
-              <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '10px', color: '#aaa' }}>
-                <div style={{ width: '18px', height: '4px', background: color, borderRadius: '2px' }} />{label}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ fontSize: '12px', color: '#888', flex: 1 }}>{navRoute.origen.label} → {navRoute.destino.label}</div>
+            {!navigating && (
+              <button onClick={startNavigation} style={{
+                background: '#22c55e', color: '#fff', border: 'none',
+                borderRadius: '5px', padding: '5px 10px', fontSize: '11px',
+                fontWeight: 700, cursor: 'pointer', marginLeft: '8px', flexShrink: 0,
+              }}>▶ Navegar</button>
+            )}
+          </div>
+          {/* Leyenda tráfico compacta */}
+          <div style={{ display: 'flex', gap: '6px', marginTop: '4px', flexWrap: 'wrap' }}>
+            {[['#4285F4','Libre'],['#FF9800','Lento'],['#F44336','Pesado'],['#B71C1C','Detenido']].map(([color, label]) => (
+              <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '3px', fontSize: '10px', color: '#888' }}>
+                <div style={{ width: '14px', height: '3px', background: color, borderRadius: '2px' }} />{label}
               </div>
             ))}
           </div>
@@ -694,35 +796,44 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
               </div>
             )
           })()}
-          {/* Alternatives */}
-          {navRoute.result.alternatives.length > 0 && (
-            <div style={{ marginTop: '8px', borderTop: '1px solid rgba(244,240,235,0.1)', paddingTop: '6px' }}>
-              <div style={{ fontSize: '10px', color: '#666', marginBottom: '5px', textTransform: 'uppercase', letterSpacing: '1px' }}>Rutas alternativas (toca para seleccionar)</div>
-              {navRoute.result.alternatives.map((alt, i) => (
-                <button key={i} onClick={() => onAlternativeSelect?.(i)} style={{
-                  display: 'flex', justifyContent: 'space-between', width: '100%',
-                  background: navRoute.selectedAlt === i ? 'rgba(66,133,244,0.2)' : 'rgba(244,240,235,0.05)',
-                  border: `1px solid ${navRoute.selectedAlt === i ? '#4285F4' : 'rgba(244,240,235,0.1)'}`,
-                  borderRadius: '6px', padding: '6px 10px', marginBottom: '4px',
-                  color: '#F4F0EB', cursor: 'pointer', fontSize: '12px',
-                }}>
-                  <span>Ruta {i + 2}</span>
-                  <span style={{ color: '#aaa' }}>{fmtDist(alt.distanceM)} · {fmtTime(alt.durationS)}</span>
-                </button>
-              ))}
-            </div>
-          )}
-          {/* Steps */}
-          {showSteps && navRoute.result.steps.length > 0 && (
-            <div style={{ marginTop: '8px', borderTop: '1px solid rgba(244,240,235,0.1)', paddingTop: '8px', maxHeight: '150px', overflowY: 'auto' }}>
-              {navRoute.result.steps.slice(0, 15).map((step, i) => (
-                <div key={i} style={{ fontSize: '11px', color: '#ccc', padding: '3px 0', borderBottom: '1px solid rgba(244,240,235,0.05)' }}>
-                  <span style={{ color: '#E8231A', marginRight: '6px', fontWeight: 700 }}>{i + 1}.</span>
-                  {step.instruction} <span style={{ color: '#666' }}>{fmtDist(step.distanceM)}</span>
-                </div>
-              ))}
-            </div>
-          )}
+          {/* Precauciones del rider */}
+          {(() => {
+            const prec: string[] = []
+            const cong = navRoute.result.congestion
+            const total = Math.max(cong.length, 1)
+            const heavyPct = cong.filter(c => c === 'heavy' || c === 'severe').length / total
+            const modPct   = cong.filter(c => c === 'moderate').length / total
+            if (heavyPct > 0.2)       prec.push(`🔴 ${Math.round(heavyPct * 100)}% de la ruta con tráfico muy pesado — considera salir en otro horario`)
+            else if (heavyPct > 0.05) prec.push(`🟠 Tramos con tráfico pesado — mantén distancia de seguridad`)
+            else if (modPct > 0.3)    prec.push(`🟡 Varios tramos lentos — anticipa frenadas`)
+            else if (cong.length > 0) prec.push(`🟢 Tráfico fluido en la mayor parte de la ruta`)
+            const acc   = navRoute.result.incidents.filter(i => i.type === 'accident').length
+            const obras = navRoute.result.incidents.filter(i => i.type === 'construction').length
+            const cierre = navRoute.result.incidents.filter(i => i.type === 'road_closure').length
+            if (acc > 0)    prec.push(`🚨 ${acc} accidente(s) en ruta — reduce velocidad al pasar`)
+            if (obras > 0)  prec.push(`🚧 ${obras} zona(s) de obra — carril reducido, sé visible`)
+            if (cierre > 0) prec.push(`🚫 ${cierre} cierre(s) de carretera — verifica ruta alternativa`)
+            if (navRoute.destinoWeather) {
+              const dw = navRoute.destinoWeather
+              const dwmo = { 45:'🌫️ Neblina en destino', 48:'🌫️ Niebla densa en destino', 51:'🌧️ Llovizna en destino', 61:'🌧️ Lluvia en destino', 63:'🌧️ Lluvia moderada en destino', 65:'🌧️ Lluvia fuerte en destino', 80:'🌧️ Chubascos en destino', 95:'⛈️ Tormenta en destino — evalúa si salir' }
+              const dmsg = (dwmo as any)[dw.code]
+              if (dmsg) prec.push(dmsg)
+              if (dw.wind >= 50) prec.push(`💨 Viento fuerte en destino (${dw.wind} km/h) — mayor esfuerzo físico y menor estabilidad`)
+            }
+            const distKm = navRoute.result.distanceM / 1000
+            if (distKm > 300)      prec.push(`📏 Ruta larga (${Math.round(distKm)} km) — planea 2+ paradas de descanso`)
+            else if (distKm > 150) prec.push(`📏 Ruta media (${Math.round(distKm)} km) — considera 1 parada de descanso`)
+            prec.push(`🪖 Verifica casco, guantes y equipo completo antes de salir`)
+            if (navRoute.result.alternatives.length > 0) prec.push(`🛣️ Hay ${navRoute.result.alternatives.length} ruta(s) alternativa(s) — tócalas en el mapa para compararlas`)
+            return (
+              <div style={{ marginTop: '8px', borderTop: '1px solid rgba(244,240,235,0.1)', paddingTop: '8px' }}>
+                <div style={{ fontSize: '10px', color: '#666', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '1px' }}>Precauciones para el rider</div>
+                {prec.map((p, i) => (
+                  <div key={i} style={{ fontSize: '12px', color: '#ccc', padding: '4px 0', borderBottom: '1px solid rgba(244,240,235,0.05)', lineHeight: '1.4' }}>{p}</div>
+                ))}
+              </div>
+            )
+          })()}
         </div>
       )}
 
@@ -741,7 +852,7 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
       {interactive && fullscreen && (
         <>
           <div style={{
-            position: 'absolute', top: '52px', left: '8px', right: '55px',
+            position: 'absolute', top: '52px', left: '8px', right: '8px',
             zIndex: 2, display: 'flex', gap: '5px', overflowX: 'auto',
             scrollbarWidth: 'none' as const, msOverflowStyle: 'none' as const,
           }}>
@@ -762,7 +873,7 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
               border: '1px solid rgba(244,240,235,0.15)', backdropFilter: 'blur(14px)', minWidth: '140px',
             }}>
               {ESTILOS.map(e => (
-                <button key={e.id} onClick={() => changeStyle(e.id, e.url)} style={{
+                <button key={e.id} onClick={() => changeStyle(e)} style={{
                   ...btnS(estiloActual === e.id, '#E8231A'),
                   textAlign: 'left', padding: '8px 12px', borderRadius: '6px',
                   background: estiloActual === e.id ? '#E8231A' : 'transparent',
@@ -770,9 +881,39 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
                   {e.label}
                 </button>
               ))}
+            {estiloActual === 'standard' && (
+              <div style={{ marginTop: '4px', borderTop: '1px solid rgba(244,240,235,0.1)', paddingTop: '4px' }}>
+                {LIGHT_PRESETS.map(lp => (
+                  <button key={lp.id} onClick={() => changeLightPreset(lp.id)} style={{
+                    ...btnS(lightPreset === lp.id, '#6B21A8'),
+                    textAlign: 'left', padding: '7px 12px', borderRadius: '6px', width: '100%',
+                    background: lightPreset === lp.id ? '#6B21A8' : 'transparent',
+                  }}>
+                    {lp.label}
+                  </button>
+                ))}
+              </div>
+            )}
             </div>
           )}
         </>
+      )}
+
+      {/* ── Botón fullscreen discreto ────────────────────────────── */}
+      {interactive && !fullscreen && onEnterFullscreen && (
+        <button
+          onClick={onEnterFullscreen}
+          title="Pantalla completa"
+          style={{
+            position: 'absolute', top: '10px', right: '10px', zIndex: 2,
+            background: 'rgba(10,10,8,0.75)', border: '1px solid rgba(244,240,235,0.2)',
+            borderRadius: '6px', padding: '6px 8px', color: '#F4F0EB',
+            fontSize: '14px', cursor: 'pointer', backdropFilter: 'blur(8px)',
+            lineHeight: 1,
+          }}
+        >
+          ⛶
+        </button>
       )}
 
       {/* ── NON-FULLSCREEN: bottom-left controls ─────────────────── */}
@@ -789,7 +930,7 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
           </div>
           <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
             {ESTILOS.map(e => (
-              <button key={e.id} onClick={() => changeStyle(e.id, e.url)} style={btnS(estiloActual === e.id, '#E8231A')}>{e.label}</button>
+              <button key={e.id} onClick={() => changeStyle(e)} style={btnS(estiloActual === e.id, '#E8231A')}>{e.label}</button>
             ))}
           </div>
         </div>

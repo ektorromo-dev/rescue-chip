@@ -296,9 +296,6 @@ export default function MapaDashboard() {
           <h3 style={{ color: '#F4F0EB', fontSize: '16px', margin: 0 }}>Mapa de incidentes</h3>
           <p style={{ color: '#888', fontSize: '12px', margin: '2px 0 0' }}>{puntos.length} alerta{puntos.length !== 1 ? 's' : ''} activa{puntos.length !== 1 ? 's' : ''} · Actualiza cada 60s</p>
         </div>
-        <button onClick={enterFullscreen} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '7px 14px', background: 'rgba(244,240,235,0.06)', border: '1px solid rgba(244,240,235,0.12)', borderRadius: '5px', color: '#F4F0EB', fontSize: '12px', cursor: 'pointer' }}>
-          ⛶ Pantalla completa
-        </button>
       </div>
 
       <div style={{ background: '#161614', border: '1px solid rgba(244,240,235,0.08)', borderRadius: '8px', padding: '14px' }}>
@@ -310,7 +307,7 @@ export default function MapaDashboard() {
         <div style={{ height: '500px', background: '#111', borderRadius: '8px' }} />
       ) : (
         <div style={{ borderRadius: '8px', overflow: 'hidden' }}>
-          <MapaRescueChip puntos={puntos} interactive height="500px" navRoute={navRoute} onAlternativeSelect={handleAlternativeSelect} />
+          <MapaRescueChip puntos={puntos} interactive height="500px" navRoute={navRoute} onAlternativeSelect={handleAlternativeSelect} onEnterFullscreen={enterFullscreen} />
         </div>
       )}
 
