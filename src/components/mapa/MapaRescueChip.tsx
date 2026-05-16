@@ -282,7 +282,7 @@ interface Props {
 }
 
 // ─── COMPONENT ───────────────────────────────────────────────────────────────
-export default function MapaRescueChip({ puntos = [], interactive = true, height = '500px', fullscreen = false, navRoute = null, onAlternativeSelect, onMapReady }: Props) {
+export default function MapaRescueChip({ puntos = [], interactive = true, height = '500px', fullscreen = false, navRoute = null, onAlternativeSelect, onMapReady, onEnterFullscreen }: Props) {
   const mapContainer  = useRef<HTMLDivElement>(null)
   const mapRef        = useRef<any>(null)
   const mboxRef       = useRef<any>(null)
