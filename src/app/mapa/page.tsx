@@ -19,26 +19,23 @@ export default function MapaPage() {
   const [estado, setEstado] = useState<Estado>('cargando')
 
   useEffect(() => {
-    const verificar = async () => {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+    const supabase = createClient()
 
-      if (!user) {
+    const checkAuth = async (userId: string | undefined) => {
+      if (!userId) {
         setEstado('no_auth')
         return
       }
-
       const { data: profile } = await supabase
         .from('profiles')
         .select('id')
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .maybeSingle()
 
       if (!profile) {
         setEstado('no_auth')
         return
       }
-
       const { data: chip } = await supabase
         .from('chips')
         .select('folio')
@@ -49,7 +46,17 @@ export default function MapaPage() {
       setEstado(chip ? 'activo' : 'sin_chip')
     }
 
-    verificar()
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        checkAuth(session?.user?.id)
+      }
+    )
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      checkAuth(session?.user?.id)
+    })
+
+    return () => subscription.unsubscribe()
   }, [])
 
   return (
