@@ -5,7 +5,7 @@ import Map, {
   Popup,
   NavigationControl,
   GeolocateControl,
-} from 'react-map-gl/mapbox'
+} from 'react-map-gl'
 
 interface Punto {
   id: string
