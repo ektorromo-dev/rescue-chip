@@ -26,6 +26,7 @@ export default function MapaPage() {
         setEstado('no_auth')
         return
       }
+
       const { data: profile } = await supabase
         .from('profiles')
         .select('id')
@@ -33,9 +34,11 @@ export default function MapaPage() {
         .maybeSingle()
 
       if (!profile) {
-        setEstado('no_auth')
+        // Autenticado pero sin perfil = sin chip activo
+        setEstado('sin_chip')
         return
       }
+
       const { data: chip } = await supabase
         .from('chips')
         .select('folio')
