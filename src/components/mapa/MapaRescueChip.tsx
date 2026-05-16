@@ -1,8 +1,11 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
-import mapboxgl from 'mapbox-gl'
-
-mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!
+import { useState } from 'react'
+import Map, {
+  Marker,
+  Popup,
+  NavigationControl,
+  GeolocateControl,
+} from 'react-map-gl/mapbox'
 
 interface Punto {
   id: string
@@ -32,81 +35,83 @@ export default function MapaRescueChip({
   interactive = true,
   height = '500px',
 }: MapaRescueChipProps) {
-  const mapContainer = useRef<HTMLDivElement>(null)
-  const map = useRef<mapboxgl.Map | null>(null)
-  const markers = useRef<mapboxgl.Marker[]>([])
-
-  useEffect(() => {
-    if (map.current || !mapContainer.current) return
-
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/dark-v11',
-      center: [-99.1332, 19.4326],
-      zoom: 5,
-      interactive,
-    })
-
-    if (interactive) {
-      map.current.addControl(
-        new mapboxgl.NavigationControl(),
-        'top-right'
-      )
-      map.current.addControl(
-        new mapboxgl.GeolocateControl({
-          positionOptions: { enableHighAccuracy: true },
-          trackUserLocation: true,
-        }),
-        'top-right'
-      )
-    }
-
-    return () => {
-      map.current?.remove()
-      map.current = null
-    }
-  }, [interactive])
-
-  useEffect(() => {
-    if (!map.current) return
-
-    markers.current.forEach(m => m.remove())
-    markers.current = []
-
-    puntos.forEach(punto => {
-      const el = document.createElement('div')
-      el.style.cssText = `
-        width: 14px;
-        height: 14px;
-        border-radius: 50%;
-        background: ${COLORES[punto.tipo] ?? COLORES.accidente};
-        border: 2px solid white;
-        box-shadow: 0 0 8px ${COLORES[punto.tipo] ?? COLORES.accidente};
-        cursor: pointer;
-      `
-
-      const popup = new mapboxgl.Popup({ offset: 12, closeButton: false })
-        .setHTML(`
-          <div style="font-family:sans-serif; font-size:13px; color:#111; padding:4px 2px;">
-            <strong style="text-transform:capitalize;">${punto.tipo.replace('_', ' ')}</strong>
-            ${punto.descripcion ? `<p style="margin:4px 0 0; color:#555;">${punto.descripcion}</p>` : ''}
-            <p style="margin:4px 0 0; font-size:11px; color:#999;">${punto.fuente === 'emergencia' ? '🚨 Emergencia real' : '⚠️ Reporte de rider'}</p>
-          </div>
-        `)
-
-      const marker = new mapboxgl.Marker({ element: el })
-        .setLngLat([punto.longitud, punto.latitud])
-        .setPopup(popup)
-        .addTo(map.current!)
-
-      markers.current.push(marker)
-    })
-  }, [puntos])
+  const [popupInfo, setPopupInfo] = useState<Punto | null>(null)
 
   return (
-    <div
-      ref={mapContainer}
+    <Map
+      mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
+      initialViewState={{
+        longitude: -99.1332,
+        latitude: 19.4326,
+        zoom: 5,
+      }}
       style={{ width: '100%', height }}
-    />
+      mapStyle="mapbox://styles/mapbox/dark-v11"
+      interactive={interactive}
+    >
+      {interactive && (
+        <>
+          <NavigationControl position="top-right" />
+          <GeolocateControl
+            position="top-right"
+            positionOptions={{ enableHighAccuracy: true }}
+            trackUserLocation
+          />
+        </>
+      )}
+
+      {puntos.map(punto => (
+        <Marker
+          key={punto.id}
+          longitude={punto.longitud}
+          latitude={punto.latitud}
+          onClick={e => {
+            e.originalEvent.stopPropagation()
+            setPopupInfo(punto)
+          }}
+        >
+          <div style={{
+            width: '14px',
+            height: '14px',
+            borderRadius: '50%',
+            background: COLORES[punto.tipo] ?? COLORES.accidente,
+            border: '2px solid white',
+            boxShadow: `0 0 8px ${COLORES[punto.tipo] ?? COLORES.accidente}`,
+            cursor: 'pointer',
+          }} />
+        </Marker>
+      ))}
+
+      {popupInfo && (
+        <Popup
+          longitude={popupInfo.longitud}
+          latitude={popupInfo.latitud}
+          offset={12}
+          closeButton
+          onClose={() => setPopupInfo(null)}
+        >
+          <div style={{
+            fontFamily: 'sans-serif',
+            fontSize: '13px',
+            color: '#111',
+            padding: '4px 2px',
+          }}>
+            <strong style={{ textTransform: 'capitalize' }}>
+              {popupInfo.tipo.replace('_', ' ')}
+            </strong>
+            {popupInfo.descripcion && (
+              <p style={{ margin: '4px 0 0', color: '#555' }}>
+                {popupInfo.descripcion}
+              </p>
+            )}
+            <p style={{ margin: '4px 0 0', fontSize: '11px', color: '#999' }}>
+              {popupInfo.fuente === 'emergencia'
+                ? '🚨 Emergencia real'
+                : '⚠️ Reporte de rider'}
+            </p>
+          </div>
+        </Popup>
+      )}
+    </Map>
   )
 }

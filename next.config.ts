@@ -4,7 +4,12 @@ import type { NextConfig } from "next";
 
 
 const nextConfig: NextConfig = {
-  transpilePackages: ['mapbox-gl'],
+  transpilePackages: ['mapbox-gl', 'react-map-gl'],
+  turbopack: {
+    resolveAlias: {
+      'mapbox-gl': './node_modules/mapbox-gl/dist/mapbox-gl.js',
+    },
+  },
   poweredByHeader: false,
   async headers() {
     return [
