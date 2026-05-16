@@ -658,11 +658,6 @@ export default function MapaRescueChip({
             return (
               <div style={{ marginTop: '6px', fontSize: '12px', color: '#aaa' }}>
                 Clima en destino: {dw.emoji} {dw.label} · {navRoute.destinoWeather!.temp}°C
-                {navRoute.destinoWeather!.alerta && (
-                  <span style={{ color: '#E8231A', fontWeight: 700, marginLeft: '6px' }}>
-                    {navRoute.destinoWeather!.alerta}
-                  </span>
-                )}
               </div>
             )
           })()}
