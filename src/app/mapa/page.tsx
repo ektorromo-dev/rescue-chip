@@ -39,14 +39,14 @@ export default function MapaPage() {
         return
       }
 
-      const { data: chip } = await supabase
+      const { data: chips } = await supabase
         .from('chips')
         .select('folio')
         .eq('owner_profile_id', profile.id)
         .eq('activated', true)
-        .maybeSingle()
+        .limit(1)
 
-      setEstado(chip ? 'activo' : 'sin_chip')
+      setEstado(chips && chips.length > 0 ? 'activo' : 'sin_chip')
     }
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
