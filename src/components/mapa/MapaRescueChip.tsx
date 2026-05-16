@@ -85,6 +85,7 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
         center: [-99.1332, 19.4326],
         zoom: 5,
         interactive,
+        cooperativeGestures: interactive,
       })
       if (interactive) {
         mapRef.current.addControl(new mapboxgl.NavigationControl(), 'top-right')
