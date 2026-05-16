@@ -23,6 +23,13 @@ const OWM_LAYERS = [
   { id: 'wind_new',          label: '💨 Viento' },
 ]
 
+const LIGHT_PRESETS = [
+  { id: 'dawn',  label: '🌅 Alba'      },
+  { id: 'day',   label: '☀️ Día'       },
+  { id: 'dusk',  label: '🌆 Atardecer' },
+  { id: 'night', label: '🌙 Noche'     },
+]
+
 const LS_KEY = 'rc_mapa_estilo'
 const getEstiloGuardado = (): string => { try { return localStorage.getItem(LS_KEY) ?? 'dark-v11' } catch { return 'dark-v11' } }
 const getEstiloUrl = (id: string): string => ESTILOS.find(e => e.id === id)?.url ?? ESTILOS[0].url
