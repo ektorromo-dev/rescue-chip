@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback, useState } from 'react'
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!
 const MAPBOX_JS = 'https://api.mapbox.com/mapbox-gl-js/v3.23.1/mapbox-gl.js'
@@ -11,6 +11,14 @@ const COLORES: Record<string, string> = {
   desvio: '#00BFFF',
   emergencia: '#E8231A',
 }
+
+const ESTILOS = [
+  { id: 'dark-v11',             label: '🌑 Oscuro',   url: 'mapbox://styles/mapbox/dark-v11' },
+  { id: 'light-v11',            label: '☀️ Claro',    url: 'mapbox://styles/mapbox/light-v11' },
+  { id: 'streets-v12',          label: '🗺️ Calles',   url: 'mapbox://styles/mapbox/streets-v12' },
+  { id: 'outdoors-v12',         label: '🏔️ Exterior', url: 'mapbox://styles/mapbox/outdoors-v12' },
+  { id: 'satellite-streets-v12',label: '🛰️ Satélite', url: 'mapbox://styles/mapbox/satellite-streets-v12' },
+]
 
 interface Punto {
   id: string
@@ -44,6 +52,7 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
   const mapContainer = useRef<HTMLDivElement>(null)
   const mapRef = useRef<any>(null)
   const markersRef = useRef<any[]>([])
+  const [estiloActual, setEstiloActual] = useState('dark-v11')
 
   const updateMarkers = useCallback(() => {
     const mapboxgl = (window as any).mapboxgl
@@ -96,5 +105,47 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
     if (mapRef.current?.isStyleLoaded()) updateMarkers()
   }, [puntos, updateMarkers])
 
-  return <div ref={mapContainer} style={{ width: '100%', height }} />
+  return (
+    <div style={{ position: 'relative', width: '100%', height }}>
+      <div ref={mapContainer} style={{ width: '100%', height: '100%' }} />
+      {interactive && (
+        <div style={{
+          position: 'absolute',
+          bottom: '28px',
+          left: '10px',
+          display: 'flex',
+          gap: '4px',
+          flexWrap: 'wrap',
+          zIndex: 1,
+          maxWidth: 'calc(100% - 60px)',
+        }}>
+          {ESTILOS.map(estilo => (
+            <button
+              key={estilo.id}
+              onClick={() => {
+                setEstiloActual(estilo.id)
+                mapRef.current?.setStyle(estilo.url)
+              }}
+              style={{
+                padding: '5px 10px',
+                borderRadius: '4px',
+                border: 'none',
+                background: estiloActual === estilo.id
+                  ? '#E8231A'
+                  : 'rgba(10,10,8,0.82)',
+                color: '#F4F0EB',
+                fontSize: '11px',
+                cursor: 'pointer',
+                fontWeight: estiloActual === estilo.id ? 700 : 400,
+                backdropFilter: 'blur(4px)',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {estilo.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
 }
