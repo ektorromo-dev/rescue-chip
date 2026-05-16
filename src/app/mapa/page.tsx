@@ -229,18 +229,29 @@ export default function MapaPage() {
                   Activa tu chip para reportar incidentes y acceder al mapa completo
                 </p>
               </div>
-              <Link href="/activate" style={{
-                padding: '10px 24px',
-                background: '#E8231A',
-                borderRadius: '4px',
-                color: '#fff',
-                textDecoration: 'none',
-                fontSize: '13px',
-                fontWeight: 600,
-                whiteSpace: 'nowrap' as const,
-              }}>
-                Activar mi chip
-              </Link>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-end' }}>
+                <Link href="/#precios" style={{
+                  padding: '10px 24px',
+                  background: '#E8231A',
+                  borderRadius: '4px',
+                  color: '#fff',
+                  textDecoration: 'none',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  whiteSpace: 'nowrap' as const,
+                  textAlign: 'center' as const,
+                }}>
+                  Obtén tu RescueChip →
+                </Link>
+                <Link href="/activate" style={{
+                  fontSize: '12px',
+                  color: '#888',
+                  textDecoration: 'underline',
+                  textUnderlineOffset: '3px',
+                }}>
+                  ¿Ya compraste? Actívalo aquí
+                </Link>
+              </div>
             </div>
           </div>
         )}
