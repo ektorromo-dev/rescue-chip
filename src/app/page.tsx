@@ -431,6 +431,12 @@ export default function Home() {
           <li><a href="#precios">Precios</a></li>
           <li><a href="#donde-comprar">Dónde comprar</a></li>
           <li><a href="#agencias">Agencias</a></li>
+          <li><Link href="/mapa" className="nav-link-mapa" 
+            style={{color:'#F4F0EB', textDecoration:'none', 
+            fontSize:'13px', letterSpacing:'1.5px', 
+            textTransform:'uppercase', fontWeight:500}}>
+            Mapa
+          </Link></li>
           {session ? (
             <li><Link href="/dashboard" className="nav-cta">Mi perfil médico</Link></li>
           ) : (
@@ -452,6 +458,12 @@ export default function Home() {
           <li><a href="#precios" onClick={() => setMobileMenuOpen(false)}>Precios</a></li>
           <li><a href="#donde-comprar" onClick={() => setMobileMenuOpen(false)}>Dónde comprar</a></li>
           <li><a href="#agencias" onClick={() => setMobileMenuOpen(false)}>Agencias</a></li>
+          <li><Link href="/mapa" className="nav-link-mapa" onClick={() => setMobileMenuOpen(false)}
+            style={{color:'#F4F0EB', textDecoration:'none', 
+            fontSize:'13px', letterSpacing:'1.5px', 
+            textTransform:'uppercase', fontWeight:500}}>
+            Mapa
+          </Link></li>
           {session ? (
             <li><Link href="/dashboard" className="nav-cta" onClick={() => setMobileMenuOpen(false)}>Mi perfil médico</Link></li>
           ) : (
