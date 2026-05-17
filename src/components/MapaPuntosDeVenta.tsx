@@ -50,9 +50,15 @@ const customMarkerIcon = L.divIcon({
 
 export default function MapaPuntosDeVenta({ puntos }: { puntos: PuntoDeVenta[] }) {
   useEffect(() => {
-    // Necesario para forzar actualización de tamaño cuando el contenedor padre cambie (ej. rotación de pantalla)
     const handleResize = () => {
-      window.dispatchEvent(new Event('resize'));
+      // Invalidar el tamaño del mapa de Leaflet cuando el contenedor cambie
+      const mapContainer = document.querySelector('.leaflet-container');
+      if (mapContainer) {
+        const mapInstance = (mapContainer as any)._leaflet_map;
+        if (mapInstance) {
+          setTimeout(() => mapInstance.invalidateSize(), 100);
+        }
+      }
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
