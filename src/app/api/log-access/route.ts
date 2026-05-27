@@ -212,7 +212,7 @@ export async function POST(req: NextRequest) {
                         </div>
                     `;
 
-                    const allEmailsToNotify = [];
+                    const allEmailsToNotify = ['contacto@rescue-chip.com'];
                     if (ownerEmail) allEmailsToNotify.push(ownerEmail);
                     if (contactEmails.length > 0) allEmailsToNotify.push(...contactEmails);
 
