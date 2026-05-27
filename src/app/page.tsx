@@ -349,7 +349,9 @@ export default function Home() {
     const el = pricingScrollRef.current;
     if (!el) return;
     const handleScroll = () => {
-      const index = Math.round(el.scrollLeft / el.offsetWidth);
+      const maxScroll = el.scrollWidth - el.offsetWidth;
+      const scrollPercent = maxScroll > 0 ? el.scrollLeft / maxScroll : 0;
+      const index = Math.min(2, Math.round(scrollPercent * 2));
       setActiveDot(index);
     };
     el.addEventListener("scroll", handleScroll, { passive: true });
