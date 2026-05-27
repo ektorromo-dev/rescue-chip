@@ -522,7 +522,7 @@ export default function Home() {
             <div className="price-card">
               <div className="price-name">FAMILIAR</div>
               <div className="price-desc">Hasta 4 kits</div>
-              <div className="price-amount"><span className="price-currency">$</span><span className="price-value">1399</span></div>
+              <div className="price-amount"><span className="price-currency">$</span><span className="price-value">1,399</span></div>
               <div className="price-period">MXN · Pago único</div>
               <div className="price-sub">Desde $349 por persona</div>
               <button onClick={() => handleBuyNow("familiar")} className="btn-price btn-price-outline">
