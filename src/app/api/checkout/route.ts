@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
         const { paquete, utm_source, utm_medium, utm_campaign } = await req.json();
 
         // 1. Crear Orden
-        const prices: Record<string, number> = { individual: 349, pareja: 549, familiar: 949 };
+        const prices: Record<string, number> = { individual: 499, pareja: 749, familiar: 1399 };
         const monto = prices[paquete] || 0;
 
         const { data: oData, error: oError } = await supabase
@@ -57,17 +57,17 @@ export async function POST(req: NextRequest) {
             case "individual":
                 priceData.product_data.name = "Paquete Individual";
                 priceData.product_data.description = "1 chip NFC + sticker + activación + envío gratis";
-                priceData.unit_amount = 34900; // 349.00 MXN en centavos
+                priceData.unit_amount = 49900; // 499.00 MXN en centavos
                 break;
             case "pareja":
                 priceData.product_data.name = "Paquete Pareja";
                 priceData.product_data.description = "2 chips NFC + stickers + activación + envío gratis";
-                priceData.unit_amount = 54900; // 549.00 MXN
+                priceData.unit_amount = 74900; // 749.00 MXN
                 break;
             case "familiar":
                 priceData.product_data.name = "Paquete Familiar";
                 priceData.product_data.description = "4 chips NFC + stickers + activación + envío gratis";
-                priceData.unit_amount = 94900; // 949.00 MXN
+                priceData.unit_amount = 139900; // 1399.00 MXN
                 break;
             default:
                 return NextResponse.json({ error: "Paquete no válido" }, { status: 400 });

@@ -349,9 +349,9 @@ export default function Home() {
     
     // Track InitiateCheckout
     if (typeof window !== 'undefined' && (window as any).fbq) {
-      const prices: Record<string, number> = { individual: 349, pareja: 549, familiar: 949 };
+      const prices: Record<string, number> = { individual: 499, pareja: 749, familiar: 1399 };
       (window as any).fbq('track', 'InitiateCheckout', {
-        value: prices[paquete] || 349,
+        value: prices[paquete] || 499,
         currency: 'MXN',
       });
     }
@@ -477,7 +477,7 @@ export default function Home() {
           <h1>Mantén informada a tu familia si algo te pasa.</h1>
           <p className="hero-sub">Un chip NFC y un Código QR en tu casco que permite a los paramédicos o testigos acceder a tu perfil médico y alertar a tu familia con tu ubicación exacta. Sin app. Sin registro previo. En segundos. Además de una tarjeta médica para tu cartera.</p>
           <div className="hero-actions">
-            <a href="#precios" className="btn-primary">Protege tu rodada — $349</a>
+            <a href="#precios" className="btn-primary">Protege tu rodada — $499</a>
             <div className="hero-secondary-btns">
               <a href="/profile/RSC-DEMO" target="_blank" className="btn-secondary">
                 🩺 Lo que el paramédico ve
@@ -502,7 +502,7 @@ export default function Home() {
             <div className="price-card">
               <div className="price-name">INDIVIDUAL</div>
               <div className="price-desc">1 kit</div>
-              <div className="price-amount"><span className="price-currency">$</span><span className="price-value">349</span></div>
+              <div className="price-amount"><span className="price-currency">$</span><span className="price-value">499</span></div>
               <div className="price-period">MXN · Pago único</div>
               <div className="price-sub">&nbsp;</div>
               <button onClick={() => handleBuyNow("individual")} className="btn-price btn-price-outline">
@@ -512,9 +512,9 @@ export default function Home() {
             <div className="price-card featured">
               <div className="price-name">PAREJA</div>
               <div className="price-desc">2 kits</div>
-              <div className="price-amount"><span className="price-currency">$</span><span className="price-value">549</span></div>
+              <div className="price-amount"><span className="price-currency">$</span><span className="price-value">749</span></div>
               <div className="price-period">MXN · Pago único</div>
-              <div className="price-sub">$274 por persona</div>
+              <div className="price-sub">$374 por persona</div>
               <button onClick={() => handleBuyNow("pareja")} className="btn-price btn-price-solid">
                 {loadingPlan === "pareja" ? "Procesando..." : "PROTEGER A MI PAREJA TAMBIÉN"}
               </button>
@@ -522,9 +522,9 @@ export default function Home() {
             <div className="price-card">
               <div className="price-name">FAMILIAR</div>
               <div className="price-desc">Hasta 4 kits</div>
-              <div className="price-amount"><span className="price-currency">$</span><span className="price-value">949</span></div>
+              <div className="price-amount"><span className="price-currency">$</span><span className="price-value">1399</span></div>
               <div className="price-period">MXN · Pago único</div>
-              <div className="price-sub">Desde $237 por persona</div>
+              <div className="price-sub">Desde $349 por persona</div>
               <button onClick={() => handleBuyNow("familiar")} className="btn-price btn-price-outline">
                 {loadingPlan === "familiar" ? "Procesando..." : "PROTEGER A MI FAMILIA"}
               </button>
@@ -596,7 +596,7 @@ export default function Home() {
             </div>
             <div className="benefit-item">
               <h3>Un pago. Para siempre.</h3>
-              <p>$349 MXN con envío incluido. Sin mensualidades. Sin suscripciones. Sin letra chica. Tu perfil activo de por vida.</p>
+              <p>$499 MXN con envío incluido. Sin mensualidades. Sin suscripciones. Sin letra chica. Tu perfil activo de por vida.</p>
             </div>
           </div>
         </div>
@@ -668,7 +668,7 @@ export default function Home() {
           <h2 className="section-title">Tu chip llega en<br />5-7 días hábiles</h2>
           <p>Pago único. Sin suscripción. Envío incluido a todo México. Tu perfil activo desde el primer escaneo.</p>
           <div className="cta-actions">
-            <a href="#precios" className="btn-primary">Proteger mis rodadas — $349</a>
+            <a href="#precios" className="btn-primary">Proteger mis rodadas — $499</a>
           </div>
         </div>
       </section>
@@ -688,7 +688,7 @@ export default function Home() {
       {/* STICKY CTA MOBILE */}
       <div className="sticky-cta-mobile">
         <button onClick={() => handleBuyNow("individual")} className="sticky-cta-btn">
-          {loadingPlan === "individual" ? "Procesando..." : "Quiero estar protegido — $349"}
+          {loadingPlan === "individual" ? "Procesando..." : "Quiero estar protegido — $499"}
         </button>
       </div>
     </div>
