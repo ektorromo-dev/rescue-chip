@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Menu, X } from "lucide-react";
 import DondeComprarSection from "@/components/DondeComprarSection";
@@ -342,6 +342,19 @@ export default function Home() {
   const [session, setSession] = useState<{ user?: { email?: string } } | null>(null);
   const [navScrolled, setNavScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const pricingScrollRef = useRef<HTMLDivElement>(null);
+  const [activeDot, setActiveDot] = useState(0);
+
+  useEffect(() => {
+    const el = pricingScrollRef.current;
+    if (!el) return;
+    const handleScroll = () => {
+      const index = Math.round(el.scrollLeft / el.offsetWidth);
+      setActiveDot(index);
+    };
+    el.addEventListener("scroll", handleScroll, { passive: true });
+    return () => el.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleBuyNow = async (paquete: string) => {
     if (loadingPlan) return;
@@ -498,7 +511,7 @@ export default function Home() {
             <h2 className="section-title">Envío gratis a todo México</h2>
             <p>Un solo pago. Sin suscripción. Tu perfil activo de por vida.</p>
           </div>
-          <div className="pricing-scroll">
+          <div className="pricing-scroll" ref={pricingScrollRef}>
             <div className="price-card">
               <div className="price-name">INDIVIDUAL</div>
               <div className="price-desc">1 kit</div>
@@ -531,9 +544,9 @@ export default function Home() {
             </div>
           </div>
           <div className="scroll-dots">
-            <div className="scroll-dot active" />
-            <div className="scroll-dot" />
-            <div className="scroll-dot" />
+            <div className={`scroll-dot${activeDot === 0 ? " active" : ""}`} />
+            <div className={`scroll-dot${activeDot === 1 ? " active" : ""}`} />
+            <div className={`scroll-dot${activeDot === 2 ? " active" : ""}`} />
           </div>
         </div>
       </section>
