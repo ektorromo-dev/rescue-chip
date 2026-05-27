@@ -687,9 +687,9 @@ export default function Home() {
       
       {/* STICKY CTA MOBILE */}
       <div className="sticky-cta-mobile">
-        <button onClick={() => handleBuyNow("individual")} className="sticky-cta-btn">
-          {loadingPlan === "individual" ? "Procesando..." : "Quiero estar protegido — $499"}
-        </button>
+        <a href="#donde-comprar" className="sticky-cta-btn">
+          ¿Lo quieres hoy? $449 MXN en puntos de venta →
+        </a>
       </div>
     </div>
   );
