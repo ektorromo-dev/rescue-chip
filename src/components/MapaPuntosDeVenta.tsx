@@ -1,11 +1,5 @@
 "use client";
-
-import { useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, AttributionControl } from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import 'leaflet-gesture-handling/dist/leaflet-gesture-handling.css';
-import { GestureHandling } from 'leaflet-gesture-handling';
+import { useEffect, useRef } from 'react';
 
 export interface PuntoDeVenta {
   id: string;
@@ -20,105 +14,122 @@ export interface PuntoDeVenta {
   activo: boolean;
 }
 
-// Fix para los íconos por defecto de Leaflet en Next.js
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: '',
-  iconUrl: '',
-  shadowUrl: '',
-});
+const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
+const MAPBOX_JS  = 'https://api.mapbox.com/mapbox-gl-js/v3.23.1/mapbox-gl.js';
+const MAPBOX_CSS = 'https://api.mapbox.com/mapbox-gl-js/v3.23.1/mapbox-gl.css';
 
-L.Map.addInitHook('addHandler', 'gestureHandling', GestureHandling);
-
-L.Map.mergeOptions({
-  gestureHandlingOptions: {
-    text: {
-      touch: "Usa dos dedos para mover el mapa",
-      scroll: "Usa Ctrl + scroll para hacer zoom",
-      scrollMac: "Usa ⌘ + scroll para hacer zoom"
-    },
-    duration: 1000
-  }
-});
-
-const customMarkerIcon = L.divIcon({
-  html: '<div style="background:#E8231A;width:14px;height:14px;border-radius:50%;border:2px solid white;box-shadow:0 0 4px rgba(0,0,0,0.5);"></div>',
-  className: 'custom-marker',
-  iconSize: [18, 18],
-  iconAnchor: [9, 9],
-});
+function loadMapbox(): Promise<void> {
+  return new Promise((resolve) => {
+    if ((window as any).mapboxgl) { resolve(); return; }
+    if (!document.getElementById('mapbox-gl-css')) {
+      const link = document.createElement('link');
+      link.id = 'mapbox-gl-css'; link.rel = 'stylesheet'; link.href = MAPBOX_CSS;
+      document.head.appendChild(link);
+    }
+    const existing = document.getElementById('mapbox-gl-js');
+    if (existing) { existing.addEventListener('load', () => resolve()); return; }
+    const script = document.createElement('script');
+    script.id = 'mapbox-gl-js'; script.src = MAPBOX_JS;
+    script.onload = () => resolve();
+    document.head.appendChild(script);
+  });
+}
 
 export default function MapaPuntosDeVenta({ puntos }: { puntos: PuntoDeVenta[] }) {
-  useEffect(() => {
-    const handleResize = () => {
-      // Invalidar el tamaño del mapa de Leaflet cuando el contenedor cambie
-      const mapContainer = document.querySelector('.leaflet-container');
-      if (mapContainer) {
-        const mapInstance = (mapContainer as any)._leaflet_map;
-        if (mapInstance) {
-          setTimeout(() => mapInstance.invalidateSize(), 100);
-        }
-      }
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<any>(null);
 
-  return (
-    <MapContainer 
-      center={[19.35, -99.13]} 
-      zoom={11} 
-      style={{ height: '100%', width: '100%', zIndex: 1 }}
-      gestureHandling={true}
-      scrollWheelZoom={false}
-      attributionControl={false}
-    >
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-      />
-      <AttributionControl prefix={false} position="bottomright" />
-      
-      {puntos.map((punto) => (
-        <Marker key={punto.id} position={[punto.lat, punto.lng]} icon={customMarkerIcon}>
-          <Popup>
-            <div style={{ padding: '4px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <strong style={{ fontSize: '14px', color: '#131311', display: 'block', marginBottom: '2px' }}>{punto.nombre}</strong>
-              <span style={{ fontSize: '12px', color: '#666', display: 'block' }}>{punto.direccion}</span>
-              <a 
-                href={`https://maps.google.com/?q=${punto.lat},${punto.lng}`} 
-                target="_blank" 
-                rel="noreferrer"
-                style={{ 
-                  display: 'inline-block', 
-                  backgroundColor: '#E8231A', 
-                  color: 'white', 
-                  padding: '6px 12px', 
-                  borderRadius: '6px', 
-                  fontSize: '12px', 
-                  textDecoration: 'none', 
-                  fontWeight: 600,
-                  textAlign: 'center',
-                  marginTop: '4px'
-                }}
-              >
-                Ver en Google Maps
-              </a>
-            </div>
-          </Popup>
-        </Marker>
-      ))}
-      <style>{`
-        .leaflet-control-attribution {
-          font-size: 9px !important;
-          opacity: 0.4 !important;
-          background: transparent !important;
-          box-shadow: none !important;
+  useEffect(() => {
+    let cancelled = false;
+
+    const init = async () => {
+      await loadMapbox();
+      if (cancelled || !containerRef.current) return;
+
+      const mapboxgl = (window as any).mapboxgl;
+      mapboxgl.accessToken = MAPBOX_TOKEN;
+
+      const map = new mapboxgl.Map({
+        container: containerRef.current,
+        style: 'mapbox://styles/mapbox/standard',
+        center: [-99.13, 19.43],
+        zoom: 5,
+        pitch: 45,
+        bearing: -10,
+        interactive: true,
+        cooperativeGestures: true,
+        language: 'es',
+        locale: {
+          'TouchPanBlocker.Message': 'Usa dos dedos para mover el mapa',
+          'ScrollZoomBlocker.CtrlMessage': 'Mantén Ctrl y haz scroll para hacer zoom',
+          'ScrollZoomBlocker.CmdMessage': 'Mantén ⌘ y haz scroll para hacer zoom',
+        },
+      });
+
+      mapRef.current = map;
+
+      map.on('load', () => {
+        if (cancelled) return;
+        try { (map as any).setConfigProperty('basemap', 'lightPreset', 'day'); } catch {}
+        try { (map as any).setConfigProperty('basemap', 'show3dObjects', true); } catch {}
+
+        puntos.forEach((punto) => {
+          const el = document.createElement('div');
+          el.style.cssText = [
+            'width:38px', 'height:38px',
+            'background:#E8231A',
+            'border-radius:50% 50% 50% 0',
+            'transform:rotate(-45deg)',
+            'border:2.5px solid white',
+            'box-shadow:0 4px 14px rgba(232,35,26,0.55)',
+            'cursor:pointer',
+            'display:flex', 'align-items:center', 'justify-content:center',
+          ].join(';');
+          const inner = document.createElement('div');
+          inner.style.cssText = 'transform:rotate(45deg);color:white;font-size:10px;font-weight:900;font-family:sans-serif;letter-spacing:-0.5px;line-height:1;';
+          inner.textContent = 'RC';
+          el.appendChild(inner);
+
+          const popup = new mapboxgl.Popup({ offset: 28, closeButton: true, maxWidth: '260px' })
+            .setHTML(`
+              <div style="font-family:sans-serif;padding:6px;min-width:200px">
+                ${punto.foto_url ? `<img src="${punto.foto_url}" style="width:100%;height:110px;object-fit:cover;border-radius:8px;margin-bottom:10px" />` : ''}
+                <strong style="font-size:14px;color:#111;display:block;margin-bottom:4px">${punto.nombre}</strong>
+                <span style="font-size:12px;color:#666;display:block;margin-bottom:3px">📍 ${punto.direccion}, ${punto.ciudad}</span>
+                ${punto.horario ? `<span style="font-size:12px;color:#666;display:block;margin-bottom:3px">🕒 ${punto.horario}</span>` : ''}
+                ${punto.telefono ? `<span style="font-size:12px;color:#666;display:block;margin-bottom:8px">📞 ${punto.telefono}</span>` : ''}
+                <a href="https://maps.google.com/?q=${punto.lat},${punto.lng}" target="_blank" rel="noreferrer"
+                  style="display:block;background:#E8231A;color:white;padding:9px;border-radius:7px;font-size:12px;text-decoration:none;font-weight:700;text-align:center">
+                  Ver en Google Maps →
+                </a>
+              </div>
+            `);
+
+          new mapboxgl.Marker({ element: el, anchor: 'bottom-left' })
+            .setLngLat([punto.lng, punto.lat])
+            .setPopup(popup)
+            .addTo(map);
+        });
+
+        if (puntos.length > 0) {
+          const lngs = puntos.map(p => p.lng);
+          const lats = puntos.map(p => p.lat);
+          const pad = puntos.length === 1 ? 1.5 : 0.4;
+          map.fitBounds(
+            [[Math.min(...lngs) - pad, Math.min(...lats) - pad], [Math.max(...lngs) + pad, Math.max(...lats) + pad]],
+            { padding: 80, duration: 1400, pitch: 45 }
+          );
         }
-        .leaflet-control-attribution a {
-          color: inherit !important;
-        }
-      `}</style>
-    </MapContainer>
-  );
+      });
+    };
+
+    init();
+    return () => {
+      cancelled = true;
+      mapRef.current?.remove();
+      mapRef.current = null;
+    };
+  }, [puntos]);
+
+  return <div ref={containerRef} style={{ width: '100%', height: '100%' }} />;
 }

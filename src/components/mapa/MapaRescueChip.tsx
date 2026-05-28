@@ -11,6 +11,7 @@ const COLORES: Record<string, string> = {
 }
 
 const ESTILOS = [
+  { id: 'standard',              label: '✨ 3D Modern', url: 'mapbox://styles/mapbox/standard' },
   { id: 'dark-v11',              label: '🌑 Oscuro',   url: 'mapbox://styles/mapbox/dark-v11' },
   { id: 'light-v11',             label: '☀️ Claro',    url: 'mapbox://styles/mapbox/light-v11' },
   { id: 'streets-v12',           label: '🗺️ Calles',   url: 'mapbox://styles/mapbox/streets-v12' },
@@ -31,7 +32,7 @@ const LIGHT_PRESETS = [
 ]
 
 const LS_KEY = 'rc_mapa_estilo'
-const getEstiloGuardado = (): string => { try { return localStorage.getItem(LS_KEY) ?? 'dark-v11' } catch { return 'dark-v11' } }
+const getEstiloGuardado = (): string => { try { return localStorage.getItem(LS_KEY) ?? 'standard' } catch { return 'standard' } }
 const getEstiloUrl = (id: string): string => ESTILOS.find(e => e.id === id)?.url ?? ESTILOS[0].url
 
 // ─── WEATHER ─────────────────────────────────────────────────────────────────
@@ -605,6 +606,12 @@ export default function MapaRescueChip({ puntos = [], interactive = true, height
       }
 
       const onLoad = () => {
+        const currentStyle = getEstiloGuardado()
+        if (currentStyle === 'standard') {
+          try { mapRef.current?.setPitch(45) } catch {}
+          try { (mapRef.current as any)?.setConfigProperty('basemap', 'lightPreset', 'day') } catch {}
+          try { (mapRef.current as any)?.setConfigProperty('basemap', 'show3dObjects', true) } catch {}
+        }
         addMarkers()
         if (owmLayerRef.current) applyOWMLayer(mapRef.current, owmLayerRef.current)
         if (navRouteRef.current) drawNavRoute()
