@@ -3,6 +3,15 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
+import dynamic from "next/dynamic";
+const MapaPuntosDeVenta = dynamic(() => import("./MapaPuntosDeVenta"), {
+  ssr: false,
+  loading: () => (
+    <div style={{ width: "100%", height: "400px", background: "#1A1A18", display: "flex", alignItems: "center", justifyContent: "center", color: "#9E9A95", borderRadius: "12px" }}>
+      Cargando mapa...
+    </div>
+  ),
+});
 import { MapPin, Phone, Clock } from "lucide-react";
 
 interface PuntoDeVenta {
@@ -112,33 +121,9 @@ export default function DondeComprarSection() {
           </div>
         )}
 
-        <Link 
-          href="/puntos-de-venta" 
-          style={{ 
-            display: 'inline-block', 
-            padding: '14px 28px', 
-            border: '1px solid #E8231A', 
-            color: '#E8231A', 
-            fontFamily: '"Barlow Condensed", sans-serif', 
-            fontSize: '14px', 
-            fontWeight: 600, 
-            letterSpacing: '1px', 
-            textTransform: 'uppercase', 
-            textDecoration: 'none', 
-            borderRadius: '4px',
-            transition: 'all 0.2s'
-          }}
-          onMouseOver={(e) => {
-            e.currentTarget.style.backgroundColor = '#E8231A';
-            e.currentTarget.style.color = '#fff';
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.backgroundColor = 'transparent';
-            e.currentTarget.style.color = '#E8231A';
-          }}
-        >
-          Ver mapa completo →
-        </Link>
+        <div style={{ width: '100%', height: '420px', borderRadius: '12px', overflow: 'hidden', border: '1px solid rgba(244,240,235,0.08)' }}>
+          <MapaPuntosDeVenta puntos={puntos} />
+        </div>
       </div>
       <style>{`
         @media(max-width: 900px) {
