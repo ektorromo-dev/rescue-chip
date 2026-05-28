@@ -72,6 +72,8 @@ export default function MapaPuntosDeVenta({ puntos }: { puntos: PuntoDeVenta[] }
         if (cancelled) return;
         try { (map as any).setConfigProperty('basemap', 'lightPreset', 'day'); } catch {}
         try { (map as any).setConfigProperty('basemap', 'show3dObjects', true); } catch {}
+        map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
+        map.addControl(new mapboxgl.FullscreenControl(), 'top-right');
 
         puntos.forEach((punto) => {
           const el = document.createElement('div');
