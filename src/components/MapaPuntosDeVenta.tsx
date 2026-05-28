@@ -76,19 +76,18 @@ export default function MapaPuntosDeVenta({ puntos }: { puntos: PuntoDeVenta[] }
         puntos.forEach((punto) => {
           const el = document.createElement('div');
           el.style.cssText = [
-            'width:38px', 'height:38px',
-            'background:#E8231A',
-            'border-radius:50% 50% 50% 0',
-            'transform:rotate(-45deg)',
+            'width:44px', 'height:44px',
+            'border-radius:50%',
             'border:2.5px solid white',
             'box-shadow:0 4px 14px rgba(232,35,26,0.55)',
             'cursor:pointer',
-            'display:flex', 'align-items:center', 'justify-content:center',
+            'overflow:hidden',
+            'background:#E8231A',
           ].join(';');
-          const inner = document.createElement('div');
-          inner.style.cssText = 'transform:rotate(45deg);color:white;font-size:10px;font-weight:900;font-family:sans-serif;letter-spacing:-0.5px;line-height:1;';
-          inner.textContent = 'RC';
-          el.appendChild(inner);
+          const img = document.createElement('img');
+          img.src = '/tiendas/Logo-RSC.png';
+          img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
+          el.appendChild(img);
 
           const popup = new mapboxgl.Popup({ offset: 28, closeButton: true, maxWidth: '260px' })
             .setHTML(`
