@@ -521,34 +521,12 @@ export default function Home() {
               <div className="price-period">MXN · Pago único</div>
               <div className="price-sub">&nbsp;</div>
               <button onClick={() => handleBuyNow("individual")} className="btn-price btn-price-outline">
-                {loadingPlan === "individual" ? "Procesando..." : "PROTECCIÓN INDIVIDUAL"}
-              </button>
-            </div>
-            <div className="price-card featured">
-              <div className="price-name">PAREJA</div>
-              <div className="price-desc">2 kits</div>
-              <div className="price-amount"><span className="price-currency">$</span><span className="price-value">749</span></div>
-              <div className="price-period">MXN · Pago único</div>
-              <div className="price-sub">$374 por persona</div>
-              <button onClick={() => handleBuyNow("pareja")} className="btn-price btn-price-solid">
-                {loadingPlan === "pareja" ? "Procesando..." : "PROTEGER A MI PAREJA TAMBIÉN"}
-              </button>
-            </div>
-            <div className="price-card">
-              <div className="price-name">FAMILIAR</div>
-              <div className="price-desc">Hasta 4 kits</div>
-              <div className="price-amount"><span className="price-currency">$</span><span className="price-value">1,399</span></div>
-              <div className="price-period">MXN · Pago único</div>
-              <div className="price-sub">Desde $349 por persona</div>
-              <button onClick={() => handleBuyNow("familiar")} className="btn-price btn-price-outline">
-                {loadingPlan === "familiar" ? "Procesando..." : "PROTEGER A MI FAMILIA"}
+                {loadingPlan === "individual" ? "Procesando..." : "COMPRAR AHORA"}
               </button>
             </div>
           </div>
           <div className="scroll-dots">
             <div className={`scroll-dot${activeDot === 0 ? " active" : ""}`} />
-            <div className={`scroll-dot${activeDot === 1 ? " active" : ""}`} />
-            <div className={`scroll-dot${activeDot === 2 ? " active" : ""}`} />
           </div>
         </div>
       </section>
