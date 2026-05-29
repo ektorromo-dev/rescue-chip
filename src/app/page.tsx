@@ -119,6 +119,7 @@ const LANDING_CSS = `
     flex-direction: column;
     align-items: center;
     text-align: center;
+    margin: 0 auto;
     transition:background .2s;
   }
   .price-card:hover { background:#1a1a18; }
@@ -515,7 +516,7 @@ export default function Home() {
           </div>
           <div className="pricing-scroll" ref={pricingScrollRef}>
             <div className="price-card">
-              <div className="price-name">INDIVIDUAL</div>
+              <div className="price-name">TU KIT RESCUECHIP</div>
               <div className="price-desc">1 kit</div>
               <div className="price-amount"><span className="price-currency">$</span><span className="price-value">499</span></div>
               <div className="price-period">MXN · Pago único</div>
@@ -524,9 +525,6 @@ export default function Home() {
                 {loadingPlan === "individual" ? "Procesando..." : "COMPRAR AHORA"}
               </button>
             </div>
-          </div>
-          <div className="scroll-dots">
-            <div className={`scroll-dot${activeDot === 0 ? " active" : ""}`} />
           </div>
         </div>
       </section>
