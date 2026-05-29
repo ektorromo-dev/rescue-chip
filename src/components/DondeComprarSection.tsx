@@ -55,7 +55,7 @@ export default function DondeComprarSection() {
     <section className="donde-comprar" id="donde-comprar" style={{ padding: '80px 60px', backgroundColor: '#0D0D0C', borderTop: '1px solid rgba(244,240,235,0.08)' }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <h2 style={{ fontFamily: '"Bebas Neue", sans-serif', fontSize: 'clamp(36px,5vw,60px)', lineHeight: 1, letterSpacing: '1px', marginBottom: '16px', color: '#F4F0EB', textAlign: 'center' }}>
-          Ya disponible en los siguientes puntos de venta en CDMX
+          Ya disponible en los siguientes puntos de venta
         </h2>
         <p style={{ fontSize: '16px', color: '#9E9A95', marginBottom: '48px', textAlign: 'center' }}>
           Llévalo hoy mismo, sin esperar envío

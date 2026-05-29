@@ -137,7 +137,7 @@ const LANDING_CSS = `
   .btn-price { display:block; width: 100%; text-align:center; text-decoration:none; padding:13px; border-radius:4px; font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:600; letter-spacing:2px; text-transform:uppercase; transition:all .2s; margin-top: auto; cursor:pointer; }
   .btn-price-outline { border:1px solid var(--border); color:var(--off-white); background:transparent; }
   .btn-price-outline:hover { border-color:var(--red); color:var(--red); }
-  .btn-price-solid { background:var(--red); color:var(--white); border:1px solid var(--red); }
+  .btn-price-solid { background:#E11D48; color:white; border:1px solid #E11D48; }
   .btn-price-solid:hover { background:#c41c14; }
 
   .scroll-dots {
@@ -518,10 +518,10 @@ export default function Home() {
             <div className="price-card">
               <div className="price-name">TU KIT RESCUECHIP</div>
               <div className="price-desc">1 kit</div>
-              <div className="price-amount"><span className="price-currency">$</span><span className="price-value">499</span></div>
+              <div className="price-amount"><span className="price-currency" style={{ color: '#E11D48' }}>$</span><span className="price-value" style={{ color: '#E11D48' }}>499</span></div>
               <div className="price-period">MXN · Pago único</div>
               <div className="price-sub">&nbsp;</div>
-              <button onClick={() => handleBuyNow("individual")} className="btn-price btn-price-outline">
+              <button onClick={() => handleBuyNow("individual")} className="btn-price btn-price-solid">
                 {loadingPlan === "individual" ? "Procesando..." : "COMPRAR AHORA"}
               </button>
             </div>
