@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import { HeartPulse, Droplets, AlertTriangle, PhoneCall, CheckCircle2, FileText, UserSquare2, ArrowLeft, ShieldAlert, Navigation, Info, Lock, Clock, LocateFixed } from "lucide-react";
 import Link from "next/link";
 import FirstAidBanner from "@/components/FirstAidBanner";
+import { getMedicalConfig } from '@/lib/medical-systems';
+import { parsePhoneNumber } from 'libphonenumber-js';
 
 interface ProfileViewerProps {
     chip: any;
@@ -18,6 +20,7 @@ interface ProfileViewerProps {
 }
 
 export default function ProfileViewer({ chip, profile, isDemo = false, isPreview = false, signedPolizaUrl, emergencyContactsArray, allergiesArray, scanToken, tokenExpiresAt }: ProfileViewerProps) {
+    const medicalConfig = getMedicalConfig(profile?.country || 'MX');
 
     const getAutoTheme = () => {
         const h = new Date().getHours();
@@ -651,12 +654,9 @@ export default function ProfileViewer({ chip, profile, isDemo = false, isPreview
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                                     {(() => {
                                         const sys = profile.medical_system;
-                                        let phone = profile.telefono_aseguradora;
-                                        let label = `Llamar Institución`;
-
-                                        if (sys === "IMSS") { phone = "8002222668"; label = "Llamar a IMSS"; }
-                                        else if (sys === "ISSSTE") { phone = "8000190900"; label = "Llamar ISSSTE"; }
-                                        else if (sys === "PEMEX") { phone = "5519442500"; label = "Urgencias PEMEX"; }
+                                        const sysConfig = medicalConfig.publicSystems.find(s => s.value === sys);
+                                        let phone = profile.telefono_aseguradora || sysConfig?.emergencyPhone || null;
+                                        let label = sysConfig?.emergencyLabel || 'Llamar institución';
 
                                         if (phone) {
                                             const cleanPhone = phone.replace(/\D/g, '');
