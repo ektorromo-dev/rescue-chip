@@ -10,6 +10,8 @@ import { createClient } from "@/lib/supabase/client";
 import { sanitizeProfileInput } from "@/app/actions/sanitize";
 import { validateAndFormatPhone, SUPPORTED_COUNTRIES, formatPhoneAsYouType } from '@/lib/phone-utils';
 import type { CountryCode } from 'libphonenumber-js';
+import React from 'react';
+import { getMedicalConfig, PROFILE_COUNTRIES, getPhoneCountryFromProfileCountry } from '@/lib/medical-systems';
 
 function ActivationFormContent() {
     const searchParams = useSearchParams();
@@ -52,6 +54,9 @@ function ActivationFormContent() {
     // Rate Limit State
     const [isLockedOut, setIsLockedOut] = useState(false);
     const [lockCountdown, setLockCountdown] = useState(0);
+
+    const [profileCountry, setProfileCountry] = useState<string>('MX');
+    const medicalConfig = getMedicalConfig(profileCountry);
 
     useEffect(() => {
         if (folioFromUrl) {
@@ -330,6 +335,7 @@ function ActivationFormContent() {
             const profileToInsert = {
                 chip_id: chip.id,
                 user_id: userId,
+                country: profileCountry,
                 consent_timestamp: new Date().toISOString(),
                 consent_ip: userIp,
                 consent_version: 'v1.0',
@@ -693,6 +699,60 @@ function ActivationFormContent() {
                         Identificación
                     </h3>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
+                            <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>
+                                País de uso / residencia <span style={{ color: '#E8231A' }}>*</span>
+                            </label>
+                            <select
+                                value={profileCountry}
+                                onChange={(e) => {
+                                    const newCountry = e.target.value;
+                                    setProfileCountry(newCountry);
+                                    // Actualizar prefijo telefónico por defecto al del nuevo país
+                                    const phoneCountry = getPhoneCountryFromProfileCountry(newCountry);
+                                    setSelectedCountry(phoneCountry as any);
+                                    setPhone('');
+                                    setPhoneError('');
+                                    setContactCountries([phoneCountry as any, phoneCountry as any, phoneCountry as any]);
+                                    setContactPhones(['', '', '']);
+                                    setContactPhoneErrors(['', '', '']);
+                                    // Reset seguro médico al cambiar país
+                                    setMedicalSystem('');
+                                    setAseguradora('');
+                                }}
+                                style={{
+                                    width: '100%',
+                                    backgroundColor: '#1A1A18',
+                                    border: '1px solid rgba(255,255,255,0.1)',
+                                    borderRadius: '10px',
+                                    padding: '12px 16px',
+                                    fontSize: '15px',
+                                    color: '#F4F0EB',
+                                    outline: 'none',
+                                    boxSizing: 'border-box',
+                                }}
+                                required
+                            >
+                                <optgroup label="── Mercados activos ──">
+                                    {PROFILE_COUNTRIES.filter(c => c.group === 'activo').map(c => (
+                                        <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
+                                    ))}
+                                </optgroup>
+                                <optgroup label="── En expansión ──">
+                                    {PROFILE_COUNTRIES.filter(c => c.group === 'expansion').map(c => (
+                                        <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
+                                    ))}
+                                </optgroup>
+                                <optgroup label="── Otros países ──">
+                                    {PROFILE_COUNTRIES.filter(c => c.group === 'otro').map(c => (
+                                        <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
+                                    ))}
+                                </optgroup>
+                            </select>
+                            <p style={{ fontSize: '12px', color: '#9E9A95', margin: '4px 0 0 0' }}>
+                                Selecciona el país donde usarás tu RescueChip. Esto adapta los campos médicos y legales a tu región.
+                            </p>
+                        </div>
                         <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "16px" }}>
                             <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Foto de Perfil (Opcional pero Recomendado)</label>
                             <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "16px" }}>
@@ -1121,218 +1181,154 @@ function ActivationFormContent() {
 
                 {/* SEGURO MÉDICO (UNIFIED) */}
                 <section style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    <h3 style={{ fontSize: "18px", fontWeight: 700, display: "flex", alignItems: "center", gap: "10px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "12px", marginBottom: "16px", color: "#F4F0EB" }}>
-                        <span style={{ backgroundColor: "rgba(232,35,26,0.12)", color: "#E8231A", width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", flexShrink: 0, fontWeight: 600 }}>4</span>
-                        Mi Seguro Médico <span style={{ color: "#9E9A95", fontSize: "14px", marginLeft: "8px" }}>(Opcional)</span>
-                    </h3>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "16px", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.08)" }}>
-                        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                            <label htmlFor="medicalSystem" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Sistema médico</label>
-                            <select id="medicalSystem" name="medicalSystem" value={medicalSystem} onChange={(e) => setMedicalSystem(e.target.value)} style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}>
-                                <option value="">Selecciona un sistema</option>
-                                <option value="Seguro Privado (Gastos Médicos Mayores)">Seguro Privado (Gastos Médicos Mayores)</option>
-                                <option value="IMSS">IMSS</option>
-                                <option value="ISSSTE">ISSSTE</option>
-                                <option value="IMSS-BIENESTAR">IMSS-BIENESTAR</option>
-                                <option value="PEMEX">PEMEX</option>
-                                <option value="SEDENA / SEMAR">SEDENA / SEMAR</option>
-                                <option value="Sin seguro médico">Sin seguro médico</option>
-                            </select>
-                        </div>
-
-                        {/* CONDITIONAL RENDERINGS */}
-                        {medicalSystem === "Seguro Privado (Gastos Médicos Mayores)" && (
-                            <>
-                                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                                    <label htmlFor="aseguradora" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Aseguradora</label>
-                                    <select id="aseguradora" name="aseguradora" value={aseguradora} onChange={(e) => setAseguradora(e.target.value)} style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                        onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}>
-                                        <option value="">Selecciona una aseguradora</option>
-                                        <option value="AXA">AXA</option>
-                                        <option value="GNP">GNP</option>
-                                        <option value="Seguros Monterrey (SMNYL)">Seguros Monterrey (SMNYL)</option>
-                                        <option value="Allianz">Allianz</option>
-                                        <option value="MetLife">MetLife</option>
-                                        <option value="Zurich">Zurich</option>
-                                        <option value="BUPA">BUPA</option>
-                                        <option value="Mapfre">Mapfre</option>
-                                        <option value="Seguros Atlas">Seguros Atlas</option>
-                                        <option value="Otro">Otro</option>
-                                    </select>
-                                </div>
-                                {aseguradora === "Otro" && (
-                                    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                                        <label htmlFor="aseguradoraOtra" style={{ fontSize: "14px", fontWeight: 600, color: "#E8231A" }}>Especificar Aseguradora *</label>
-                                        <input type="text" id="aseguradoraOtra" name="aseguradoraOtra" required style={{ width: "100%", display: "flex", height: "48px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", backgroundColor: "#1E1E1C", padding: "8px 16px", fontSize: "14px", transition: "all 0.2s ease-in-out" }} />
-                                    </div>
-                                )}
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                    <label htmlFor="numeroPoliza" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Número de Póliza *</label>
-                                    <input type="text" id="numeroPoliza" name="numeroPoliza" required style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                        onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
-                                </div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                    <label htmlFor="tipoSeguro" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Tipo de Seguro</label>
-                                    <select id="tipoSeguro" name="tipoSeguro" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                        onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}>
-                                        <option value="">Selecciona un tipo</option>
-                                        <option value="Gastos Médicos Mayores">Gastos Médicos Mayores</option>
-                                        <option value="Seguro de Auto">Seguro de Auto</option>
-                                        <option value="Seguro de Moto">Seguro de Moto</option>
-                                        <option value="Seguro de Vida">Seguro de Vida</option>
-                                        <option value="Otro">Otro</option>
-                                    </select>
-                                </div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                    <label htmlFor="nombreAsegurado" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Nombre Asegurado Titular *</label>
-                                    <input type="text" id="nombreAsegurado" name="nombreAsegurado" required style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                        onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
-                                </div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                    <label htmlFor="vigenciaPoliza" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Vigencia (Opcional)</label>
-                                    <input type="date" id="vigenciaPoliza" name="vigenciaPoliza" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }} onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'} onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
-                                </div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
-                                    <label htmlFor="telefonoAseguradora" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Teléfono de Emergencias (Opcional)</label>
-                                    <input type="tel" id="telefonoAseguradora" name="telefonoAseguradora" placeholder="Ej: 800-123-4567" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                        onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
-                                </div>
-
-                                {/* Subida de Póliza */}
-                                <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "16px", paddingTop: "16px", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-                                    <div>
-                                        <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Documento Póliza (PDF, JPG, PNG)</label>
-                                        <p style={{ fontSize: "12px", color: "#9E9A95" }}>Sube el extracto de tu póliza (máx 5MB). Se mostrará a paramédicos.</p>
-                                    </div>
-                                    <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "16px" }}>
-                                        {polizaFile ? (
-                                            <div style={{ padding: "0 16px", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", color: "#E8231A", fontWeight: 700, fontSize: "14px", display: "flex", alignItems: "center", gap: "8px" }}>
-                                                📄 {polizaFile.name}
-                                            </div>
-                                        ) : null}
-                                        <div style={{ width: "100%", position: "relative" }}>
-                                            <input
-                                                type="file"
-                                                accept=".pdf,image/png,image/jpeg,image/jpg"
-                                                onChange={(e) => {
-                                                    const file = e.target.files?.[0];
-                                                    if (file) {
-                                                        if (file.size > 5 * 1024 * 1024) {
-                                                            alert("El archivo no debe pesar más de 5MB");
-                                                            e.target.value = '';
-                                                            return;
-                                                        }
-                                                        setPolizaFile(file);
-                                                    }
-                                                }}
-                                                style={{ width: "100%", display: "flex", height: "56px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", backgroundColor: "#1E1E1C", padding: "8px 16px", fontSize: "14px", transition: "all 0.2s ease-in-out", boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)", position: "relative", zIndex: 10 }}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            </>
-                        )}
-
-                        {medicalSystem === "IMSS" && (
-                            <>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                    <label htmlFor="nss" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>NSS - Número de Seguridad Social *</label>
-                                    <input type="text" id="nss" name="nss" required maxLength={11} style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                        onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
-                                </div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                    <label htmlFor="clinicaAsignada" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>UMF / Clínica asignada (Opcional)</label>
-                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" placeholder="Ej: UMF 28, Monterrey" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                        onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
-                                </div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
-                                    <label htmlFor="curpSeguro" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>CURP (Opcional)</label>
-                                    <input type="text" id="curpSeguro" name="curpSeguro" maxLength={18} style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                        onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
-                                </div>
-                            </>
-                        )}
-
-                        {medicalSystem === "ISSSTE" && (
-                            <>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
-                                    <label htmlFor="numeroAfiliacion" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Número de afiliación ISSSTE *</label>
-                                    <input type="text" id="numeroAfiliacion" name="numeroAfiliacion" required style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                        onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
-                                </div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                    <label htmlFor="clinicaAsignada" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Clínica asignada (Opcional)</label>
-                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                        onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
-                                </div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                    <label htmlFor="curpSeguro" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>CURP (Opcional)</label>
-                                    <input type="text" id="curpSeguro" name="curpSeguro" maxLength={18} style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                        onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
-                                </div>
-                            </>
-                        )}
-
-                        {medicalSystem === "IMSS-BIENESTAR" && (
-                            <>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                    <label htmlFor="curpSeguro" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>CURP *</label>
-                                    <input type="text" id="curpSeguro" name="curpSeguro" required maxLength={18} style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                        onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
-                                </div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                    <label htmlFor="clinicaAsignada" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Centro de salud asignado (Opcional)</label>
-                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                        onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
-                                </div>
-                            </>
-                        )}
-
-                        {(medicalSystem === "PEMEX" || medicalSystem === "SEDENA / SEMAR") && (
-                            <>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                    <label htmlFor="numeroAfiliacion" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Número de afiliación *</label>
-                                    <input type="text" id="numeroAfiliacion" name="numeroAfiliacion" required style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                        onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
-                                </div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                    <label htmlFor="clinicaAsignada" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Unidad médica asignada (Opcional)</label>
-                                    <input type="text" id="clinicaAsignada" name="clinicaAsignada" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                        onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                        onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
-                                </div>
-                            </>
-                        )}
-
-                        {medicalSystem === "Sin seguro médico" && (
-                            <div style={{ padding: "16px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", fontSize: "14px", color: "#9E9A95" }}>
-                                <p style={{ fontWeight: 600, color: "#F4F0EB" }}>Aviso:</p>
-                                En caso de emergencia serás atendido en el hospital público más cercano. Te recomendamos considerar un seguro de gastos médicos mayores para una mejor atención.
-                            </div>
-                        )}
-
-                        <div style={{ display: "flex", flexDirection: "column", gap: "12px", alignItems: "center", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "16px" }}>
-                            <input type="checkbox" id="organDonor" name="organDonor" style={{ width: "20px", height: "20px", borderRadius: "4px", color: "#E8231A" }} />
-                            <label htmlFor="organDonor" style={{ fontSize: "14px", fontWeight: 600 }}>Soy donante oficial de órganos</label>
-                        </div>
-
+                  <h3 style={{ fontSize: "18px", fontWeight: 700, display: "flex", alignItems: "center", gap: "10px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "12px", marginBottom: "16px", color: "#F4F0EB" }}>
+                    <span style={{ backgroundColor: "rgba(232,35,26,0.12)", color: "#E8231A", width: "28px", height: "28px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", flexShrink: 0, fontWeight: 600 }}>4</span>
+                    Mi Seguro Médico <span style={{ color: "#9E9A95", fontSize: "14px", marginLeft: "8px" }}>(Opcional)</span>
+                  </h3>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "16px", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.08)", padding: "16px" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "8px", gridColumn: '1 / -1' }}>
+                      <label htmlFor="medicalSystem" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>
+                        Sistema médico
+                      </label>
+                      <select id="medicalSystem" name="medicalSystem" value={medicalSystem}
+                        onChange={(e) => { setMedicalSystem(e.target.value); setAseguradora(''); }}
+                        style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box' }}>
+                        <option value="">Selecciona un sistema</option>
+                        <option value="Seguro Privado">{medicalConfig.privateSystemLabel}</option>
+                        {medicalConfig.publicSystems.map(sys => (
+                          <option key={sys.value} value={sys.value}>{sys.label}</option>
+                        ))}
+                        <option value="Sin seguro médico">Sin seguro médico</option>
+                      </select>
                     </div>
+
+                    {/* SEGURO PRIVADO */}
+                    {medicalSystem === "Seguro Privado" && (
+                      <>
+                        {medicalConfig.privateGeneric ? (
+                          // Input libre para países genéricos
+                          <div style={{ display: "flex", flexDirection: "column", gap: "8px", gridColumn: '1 / -1' }}>
+                            <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>
+                              Nombre de la aseguradora *
+                            </label>
+                            <input type="text" name="aseguradoraOtra"
+                              style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box' }}
+                              placeholder="Escribe el nombre de tu aseguradora" required />
+                          </div>
+                        ) : (
+                          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                            <label htmlFor="aseguradora" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>
+                              Aseguradora
+                            </label>
+                            <select id="aseguradora" name="aseguradora" value={aseguradora} onChange={(e) => setAseguradora(e.target.value)}
+                              style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box' }}>
+                              <option value="">Selecciona una aseguradora</option>
+                              {medicalConfig.privateInsurers.map(ins => (
+                                <option key={ins} value={ins}>{ins}</option>
+                              ))}
+                              <option value="Otro">Otro</option>
+                            </select>
+                          </div>
+                        )}
+                        {aseguradora === "Otro" && (
+                          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                            <label htmlFor="aseguradoraOtra" style={{ fontSize: "14px", fontWeight: 600, color: "#E8231A" }}>
+                              Especificar *
+                            </label>
+                            <input type="text" id="aseguradoraOtra" name="aseguradoraOtra" required
+                              style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box' }} />
+                          </div>
+                        )}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                          <label htmlFor="numeroPoliza" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>
+                            Número de Póliza *
+                          </label>
+                          <input type="text" id="numeroPoliza" name="numeroPoliza" required
+                            style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box' }} />
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                          <label htmlFor="nombreAsegurado" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>
+                            Nombre del titular *
+                          </label>
+                          <input type="text" id="nombreAsegurado" name="nombreAsegurado" required
+                            style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box' }} />
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                          <label htmlFor="vigenciaPoliza" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>
+                            Vigencia (Opcional)
+                          </label>
+                          <input type="date" id="vigenciaPoliza" name="vigenciaPoliza"
+                            style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box' }} />
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
+                          <label htmlFor="telefonoAseguradora" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>
+                            Teléfono de emergencias de la aseguradora (Opcional)
+                          </label>
+                          <input type="tel" id="telefonoAseguradora" name="telefonoAseguradora"
+                            style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box' }} />
+                        </div>
+                      </>
+                    )}
+
+                    {/* SISTEMAS PÚBLICOS — dinámico por país */}
+                    {medicalConfig.publicSystems.map(sys => sys.value === medicalSystem && (
+                      <React.Fragment key={sys.value}>
+                        {sys.showNSS && (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            <label htmlFor="nss" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>
+                              {sys.nssLabel || 'Número de afiliado'} *
+                            </label>
+                            <input type="text" id="nss" name="nss" required maxLength={20}
+                              style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box' }} />
+                          </div>
+                        )}
+                        {sys.showAfiliacion && (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            <label htmlFor="numeroAfiliacion" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>
+                              {sys.afiliacionLabel || 'Número de afiliación'} *
+                            </label>
+                            <input type="text" id="numeroAfiliacion" name="numeroAfiliacion" required
+                              style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box' }} />
+                          </div>
+                        )}
+                        {sys.showClinica && (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            <label htmlFor="clinicaAsignada" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>
+                              {sys.clinicaLabel || 'Unidad médica asignada'} (Opcional)
+                            </label>
+                            <input type="text" id="clinicaAsignada" name="clinicaAsignada"
+                              style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box' }} />
+                          </div>
+                        )}
+                        {sys.showCURP && (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
+                            <label htmlFor="curpSeguro" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>
+                              {sys.curpLabel || 'Documento de identidad'} (Opcional)
+                            </label>
+                            <input type="text" id="curpSeguro" name="curpSeguro" maxLength={20}
+                              style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box' }} />
+                          </div>
+                        )}
+                      </React.Fragment>
+                    ))}
+
+                    {/* SIN SEGURO */}
+                    {medicalSystem === "Sin seguro médico" && (
+                      <div style={{ gridColumn: '1 / -1', padding: "16px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", fontSize: "14px", color: "#9E9A95" }}>
+                        <p style={{ fontWeight: 600, color: "#F4F0EB", marginBottom: '4px' }}>Aviso:</p>
+                        {medicalConfig.noneWarning}
+                      </div>
+                    )}
+
+                    {/* DONANTE DE ÓRGANOS — siempre visible */}
+                    <div style={{ display: "flex", alignItems: "center", gap: "12px", gridColumn: '1 / -1', borderRadius: "12px", border: "1px solid rgba(255,255,255,0.08)", padding: "16px" }}>
+                      <input type="checkbox" id="organDonor" name="organDonor"
+                        style={{ width: "20px", height: "20px", borderRadius: "4px", color: "#E8231A" }} />
+                      <label htmlFor="organDonor" style={{ fontSize: "14px", fontWeight: 600 }}>
+                        Soy donante oficial de órganos
+                      </label>
+                    </div>
+                  </div>
                 </section>
 
                 {/* NOTAS IMPORTANTES & UBICACION */}
