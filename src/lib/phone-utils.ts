@@ -79,6 +79,7 @@ export const SUPPORTED_COUNTRIES: {
   { code: 'DO', name: 'Rep. Dominicana', flag: '🇩🇴', dialCode: '+1', placeholder: '809 555 1234', maxDigits: 10 },
   { code: 'CL', name: 'Chile', flag: '🇨🇱', dialCode: '+56', placeholder: '9 8765 4321', maxDigits: 9 },
   { code: 'CO', name: 'Colombia', flag: '🇨🇴', dialCode: '+57', placeholder: '310 123 4567', maxDigits: 10 },
+  { code: 'ES', name: 'España', flag: '🇪🇸', dialCode: '+34', placeholder: '612 345 678', maxDigits: 9 },
 ];
 
 export function formatPhoneAsYouType(input: string, countryCode: CountryCode): string {
