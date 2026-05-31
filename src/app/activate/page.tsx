@@ -838,7 +838,7 @@ function ActivationFormContent() {
                                 >
                                     {SUPPORTED_COUNTRIES.map(country => (
                                         <option key={country.code} value={country.code}>
-                                            {country.flag} {country.name}
+                                            {country.flag} {country.dialCode}
                                         </option>
                                     ))}
                                 </select>
@@ -944,7 +944,7 @@ function ActivationFormContent() {
                                         style={{ border: "1px solid rgba(255,255,255,0.1)", backgroundColor: "#1A1A18", color: "#F4F0EB", padding: "8px 10px", fontSize: "13px", borderRadius: "10px", cursor: "pointer", minWidth: "130px" }}
                                     >
                                         {SUPPORTED_COUNTRIES.map(c => (
-                                            <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
+                                            <option key={c.code} value={c.code}>{c.flag} {c.dialCode}</option>
                                         ))}
                                     </select>
                                     <input
@@ -1017,7 +1017,7 @@ function ActivationFormContent() {
                                         style={{ border: "1px solid rgba(255,255,255,0.1)", backgroundColor: "#1A1A18", color: "#F4F0EB", padding: "8px 10px", fontSize: "13px", borderRadius: "10px", cursor: "pointer", minWidth: "130px" }}
                                     >
                                         {SUPPORTED_COUNTRIES.map(c => (
-                                            <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
+                                            <option key={c.code} value={c.code}>{c.flag} {c.dialCode}</option>
                                         ))}
                                     </select>
                                     <input
@@ -1089,7 +1089,7 @@ function ActivationFormContent() {
                                         style={{ border: "1px solid rgba(255,255,255,0.1)", backgroundColor: "#1A1A18", color: "#F4F0EB", padding: "8px 10px", fontSize: "13px", borderRadius: "10px", cursor: "pointer", minWidth: "130px" }}
                                     >
                                         {SUPPORTED_COUNTRIES.map(c => (
-                                            <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
+                                            <option key={c.code} value={c.code}>{c.flag} {c.dialCode}</option>
                                         ))}
                                     </select>
                                     <input
