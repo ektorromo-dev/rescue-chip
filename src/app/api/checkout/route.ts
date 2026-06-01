@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
         const { paquete, utm_source, utm_medium, utm_campaign } = await req.json();
 
         // 1. Crear Orden
-        const prices: Record<string, number> = { individual: 499 };
+        const prices: Record<string, number> = { individual: 499, llavero: 449 };
         const monto = prices[paquete] || 0;
 
         const { data: oData, error: oError } = await supabase
@@ -58,6 +58,11 @@ export async function POST(req: NextRequest) {
                 priceData.product_data.name = "Paquete Individual";
                 priceData.product_data.description = "1 chip NFC + sticker + activación + envío gratis";
                 priceData.unit_amount = 49900; // 499.00 MXN en centavos
+                break;
+            case "llavero":
+                priceData.product_data.name = "Llavero RescueChip";
+                priceData.product_data.description = "Llavero NFC + QR de identificación médica de emergencia";
+                priceData.unit_amount = 44900; // 449.00 MXN en centavos
                 break;
             default:
                 return NextResponse.json({ error: "Paquete no válido" }, { status: 400 });

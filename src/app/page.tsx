@@ -345,6 +345,8 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pricingScrollRef = useRef<HTMLDivElement>(null);
   const [activeDot, setActiveDot] = useState(0);
+  const [llaveroImg, setLlaveroImg] = useState(0);
+  const llaveroImages = ['/images/llavero1.jpg', '/images/llavero3.jpg'];
 
   useEffect(() => {
     const el = pricingScrollRef.current;
@@ -356,7 +358,15 @@ export default function Home() {
       setActiveDot(index);
     };
     el.addEventListener("scroll", handleScroll, { passive: true });
-    return () => el.removeEventListener("scroll", handleScroll);
+
+    const llaveroInterval = setInterval(() => {
+      setLlaveroImg(prev => (prev + 1) % 2);
+    }, 3000);
+
+    return () => {
+      el.removeEventListener("scroll", handleScroll);
+      clearInterval(llaveroInterval);
+    };
   }, []);
 
   const handleBuyNow = async (paquete: string) => {
@@ -365,7 +375,7 @@ export default function Home() {
     
     // Track InitiateCheckout
     if (typeof window !== 'undefined' && (window as any).fbq) {
-      const prices: Record<string, number> = { individual: 499, pareja: 749, familiar: 1399 };
+      const prices: Record<string, number> = { individual: 499, llavero: 449 };
       (window as any).fbq('track', 'InitiateCheckout', {
         value: prices[paquete] || 499,
         currency: 'MXN',
@@ -525,6 +535,55 @@ export default function Home() {
                 {loadingPlan === "individual" ? "Procesando..." : "COMPRAR AHORA"}
               </button>
             </div>
+
+            <div className="price-card">
+              <div className="price-name">LLAVERO RESCUECHIP</div>
+              <div className="price-desc">Identificación de emergencia para tu llave</div>
+              <div style={{ position: 'relative', width: '100%', height: '160px', 
+                            borderRadius: '6px', overflow: 'hidden', marginBottom: '16px' }}>
+                {llaveroImages.map((src, i) => (
+                  <img
+                    key={src}
+                    src={src}
+                    alt={`Llavero RescueChip ${i + 1}`}
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      opacity: llaveroImg === i ? 1 : 0,
+                      transition: 'opacity 0.8s ease',
+                    }}
+                  />
+                ))}
+              </div>
+              <div className="price-amount">
+                <span className="price-currency" style={{ color: '#E11D48' }}>$</span>
+                <span className="price-value" style={{ color: '#E11D48' }}>449</span>
+              </div>
+              <div className="price-period">MXN · Pago único</div>
+              <div className="price-sub" style={{ display: 'flex', justifyContent: 'center', 
+                                                   gap: '6px', marginBottom: '8px' }}>
+                {llaveroImages.map((_, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      width: '6px', height: '6px', borderRadius: '50%',
+                      background: llaveroImg === i ? '#E11D48' : 'rgba(244,240,235,0.2)',
+                      transition: 'background 0.3s',
+                    }}
+                  />
+                ))}
+              </div>
+              <button onClick={() => handleBuyNow("llavero")} className="btn-price btn-price-solid">
+                {loadingPlan === "llavero" ? "Procesando..." : "COMPRAR LLAVERO"}
+              </button>
+            </div>
+          </div>
+          <div className="scroll-dots" style={{ marginTop: '16px' }}>
+            <div className="scroll-dot active" />
+            <div className="scroll-dot" />
           </div>
         </div>
       </section>
