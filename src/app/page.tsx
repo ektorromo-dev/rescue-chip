@@ -446,9 +446,13 @@ export default function Home() {
         fader.observe(el);
       });
 
+    const handlePageShow = () => setLoadingPlan(null);
+    window.addEventListener('pageshow', handlePageShow);
+
     return () => {
       subscription.unsubscribe();
       window.removeEventListener("scroll", onScroll);
+      window.removeEventListener('pageshow', handlePageShow);
       fader.disconnect();
     };
   }, []);
