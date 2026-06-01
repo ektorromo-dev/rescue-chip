@@ -354,10 +354,11 @@ export default function Home() {
     const el = pricingScrollRef.current;
     if (!el) return;
     const handleScroll = () => {
-      const maxScroll = el.scrollWidth - el.offsetWidth;
-      const scrollPercent = maxScroll > 0 ? el.scrollLeft / maxScroll : 0;
-      const index = Math.min(2, Math.round(scrollPercent * 2));
-      setActiveDot(index);
+      const el = pricingScrollRef.current;
+      if (!el) return;
+      const cardWidth = el.offsetWidth;
+      const index = Math.round(el.scrollLeft / cardWidth);
+      setActiveDot(Math.min(1, Math.max(0, index)));
     };
     el.addEventListener("scroll", handleScroll, { passive: true });
 
@@ -533,8 +534,8 @@ export default function Home() {
           </div>
           <div className="pricing-scroll" ref={pricingScrollRef}>
             <div className="price-card">
-              <div className="price-name">TU KIT RESCUECHIP</div>
-              <div className="price-desc">1 kit</div>
+              <div className="price-name">CASCO</div>
+              <div className="price-desc">Protección en cada rodada</div>
               <div style={{ position: 'relative', width: '100%', height: '160px',
                             borderRadius: '6px', overflow: 'hidden', marginBottom: '16px' }}>
                 {kitImages.map((src, i) => (
@@ -563,7 +564,7 @@ export default function Home() {
             </div>
 
             <div className="price-card">
-              <div className="price-name">LLAVERO RESCUECHIP</div>
+              <div className="price-name">LLAVERO</div>
               <div className="price-desc">Seguridad 24/7 con o sin casco</div>
               <div style={{ position: 'relative', width: '100%', height: '160px', 
                             borderRadius: '6px', overflow: 'hidden', marginBottom: '16px' }}>
@@ -596,8 +597,8 @@ export default function Home() {
             </div>
           </div>
           <div className="scroll-dots" style={{ marginTop: '16px' }}>
-            <div className="scroll-dot active" />
-            <div className="scroll-dot" />
+            <div className={`scroll-dot${activeDot === 0 ? ' active' : ''}`} />
+            <div className={`scroll-dot${activeDot === 1 ? ' active' : ''}`} />
           </div>
         </div>
       </section>
