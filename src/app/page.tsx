@@ -346,6 +346,8 @@ export default function Home() {
   const pricingScrollRef = useRef<HTMLDivElement>(null);
   const [activeDot, setActiveDot] = useState(0);
   const [llaveroImg, setLlaveroImg] = useState(0);
+  const [kitImg, setKitImg] = useState(0);
+  const kitImages = ['/images/casco1.jpg', '/images/casco2.jpg', '/images/casco3.jpg', '/images/casco4.jpg'];
   const llaveroImages = ['/images/llavero1.jpg', '/images/llavero3.jpg'];
 
   useEffect(() => {
@@ -363,9 +365,14 @@ export default function Home() {
       setLlaveroImg(prev => (prev + 1) % 2);
     }, 3000);
 
+    const kitInterval = setInterval(() => {
+      setKitImg(prev => (prev + 1) % 4);
+    }, 3000);
+
     return () => {
       el.removeEventListener("scroll", handleScroll);
       clearInterval(llaveroInterval);
+      clearInterval(kitInterval);
     };
   }, []);
 
@@ -528,6 +535,25 @@ export default function Home() {
             <div className="price-card">
               <div className="price-name">TU KIT RESCUECHIP</div>
               <div className="price-desc">1 kit</div>
+              <div style={{ position: 'relative', width: '100%', height: '160px',
+                            borderRadius: '6px', overflow: 'hidden', marginBottom: '16px' }}>
+                {kitImages.map((src, i) => (
+                  <img
+                    key={src}
+                    src={src}
+                    alt={`Kit RescueChip ${i + 1}`}
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      opacity: kitImg === i ? 1 : 0,
+                      transition: 'opacity 0.8s ease',
+                    }}
+                  />
+                ))}
+              </div>
               <div className="price-amount"><span className="price-currency" style={{ color: '#E11D48' }}>$</span><span className="price-value" style={{ color: '#E11D48' }}>499</span></div>
               <div className="price-period">MXN · Pago único</div>
               <div className="price-sub">&nbsp;</div>
@@ -538,7 +564,7 @@ export default function Home() {
 
             <div className="price-card">
               <div className="price-name">LLAVERO RESCUECHIP</div>
-              <div className="price-desc">Identificación de emergencia para tu llave</div>
+              <div className="price-desc">Seguridad 24/7 con o sin casco</div>
               <div style={{ position: 'relative', width: '100%', height: '160px', 
                             borderRadius: '6px', overflow: 'hidden', marginBottom: '16px' }}>
                 {llaveroImages.map((src, i) => (
@@ -563,19 +589,7 @@ export default function Home() {
                 <span className="price-value" style={{ color: '#E11D48' }}>449</span>
               </div>
               <div className="price-period">MXN · Pago único</div>
-              <div className="price-sub" style={{ display: 'flex', justifyContent: 'center', 
-                                                   gap: '6px', marginBottom: '8px' }}>
-                {llaveroImages.map((_, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      width: '6px', height: '6px', borderRadius: '50%',
-                      background: llaveroImg === i ? '#E11D48' : 'rgba(244,240,235,0.2)',
-                      transition: 'background 0.3s',
-                    }}
-                  />
-                ))}
-              </div>
+              <div className="price-sub">&nbsp;</div>
               <button onClick={() => handleBuyNow("llavero")} className="btn-price btn-price-solid">
                 {loadingPlan === "llavero" ? "Procesando..." : "COMPRAR LLAVERO"}
               </button>
