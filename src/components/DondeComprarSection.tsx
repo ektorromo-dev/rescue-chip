@@ -107,27 +107,30 @@ export default function DondeComprarSection() {
                     </div>
                   </>
                 ) : (
-                  <div style={{ padding: '32px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '24px', flex: 1, minHeight: '200px' }}>
-                    {punto.foto_url && (
-                      <a href={punto.website_url ?? '#'} target="_blank" rel="noopener noreferrer">
-                        <img
-                          src={punto.foto_url}
-                          alt={punto.nombre}
-                          style={{ height: '72px', width: 'auto', objectFit: 'contain' }}
-                        />
-                      </a>
-                    )}
-                    {punto.website_url && (
-                      <a
-                        href={punto.website_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ display: 'inline-block', padding: '12px 24px', border: '1px solid rgba(244,240,235,0.3)', borderRadius: '6px', color: '#F4F0EB', fontSize: '13px', fontWeight: 600, textDecoration: 'none', letterSpacing: '1px' }}
-                      >
-                        VISITAR SITIO WEB →
-                      </a>
-                    )}
-                  </div>
+                  <>
+                    <div style={{ width: '100%', height: '200px', backgroundImage: `url(${punto.foto_url ?? ''})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+                    <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
+                      {punto.website_url && (
+                        <a href={punto.website_url} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <img
+                            src="/tiendas/MOAP_blanco.png"
+                            alt={punto.nombre}
+                            style={{ height: '56px', width: 'auto', objectFit: 'contain' }}
+                          />
+                        </a>
+                      )}
+                      <div style={{ marginTop: 'auto', paddingTop: '16px', display: 'flex', gap: '8px' }}>
+                        <a
+                          href={punto.website_url ?? '#'}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', backgroundColor: '#E8231A', color: 'white', padding: '12px', borderRadius: '6px', fontSize: '13px', textDecoration: 'none', fontWeight: 600, textAlign: 'center', flex: 1, transition: 'background 0.2s' }}
+                        >
+                          VISITAR SITIO WEB →
+                        </a>
+                      </div>
+                    </div>
+                  </>
                 )}
               </div>
             ))}
