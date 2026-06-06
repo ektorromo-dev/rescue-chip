@@ -24,6 +24,8 @@ interface PuntoDeVenta {
   telefono: string | null;
   horario: string | null;
   foto_url: string | null;
+  website_url: string | null;
+  mostrar_direccion: boolean;
   activo: boolean;
 }
 
@@ -67,55 +69,66 @@ export default function DondeComprarSection() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px', width: '100%', marginBottom: '48px' }}>
             {puntos.map(punto => (
               <div key={punto.id} style={{ display: 'flex', flexDirection: 'column', backgroundColor: '#1A1A18', borderRadius: '12px', overflow: 'hidden', border: '1px solid rgba(244,240,235,0.08)' }}>
-                {punto.foto_url && (
-                  <div style={{ width: '100%', height: '200px', backgroundImage: `url(${punto.foto_url})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
-                )}
-                <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
-                  <h3 style={{ fontSize: '20px', fontWeight: 600, color: '#F4F0EB', margin: 0 }}>{punto.nombre}</h3>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', color: '#9E9A95', fontSize: '14px' }}>
-                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                      <MapPin size={16} style={{ flexShrink: 0, marginTop: '2px', color: '#E8231A' }} />
-                      <span>{punto.direccion}, {punto.ciudad}</span>
+                {punto.mostrar_direccion ? (
+                  <>
+                    {punto.foto_url && (
+                      <div style={{ width: '100%', height: '200px', backgroundImage: `url(${punto.foto_url})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+                    )}
+                    <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
+                      <h3 style={{ fontSize: '20px', fontWeight: 600, color: '#F4F0EB', margin: 0 }}>{punto.nombre}</h3>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', color: '#9E9A95', fontSize: '14px' }}>
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                          <MapPin size={16} style={{ flexShrink: 0, marginTop: '2px', color: '#E8231A' }} />
+                          <span>{punto.direccion}, {punto.ciudad}</span>
+                        </div>
+                        {punto.horario && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <Clock size={16} style={{ flexShrink: 0, color: '#E8231A' }} />
+                            <span>{punto.horario}</span>
+                          </div>
+                        )}
+                        {punto.telefono && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <Phone size={16} style={{ flexShrink: 0, color: '#E8231A' }} />
+                            <span>{punto.telefono}</span>
+                          </div>
+                        )}
+                      </div>
+                      <div style={{ marginTop: 'auto', paddingTop: '16px', display: 'flex', gap: '8px' }}>
+                        <a
+                          href={`https://maps.google.com/?q=${punto.lat},${punto.lng}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', backgroundColor: '#E8231A', color: 'white', padding: '12px', borderRadius: '6px', fontSize: '13px', textDecoration: 'none', fontWeight: 600, textAlign: 'center', flex: 1, transition: 'background 0.2s' }}
+                        >
+                          <MapPin size={16} /> Ver en Google Maps
+                        </a>
+                      </div>
                     </div>
-                    {punto.horario && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Clock size={16} style={{ flexShrink: 0, color: '#E8231A' }} />
-                        <span>{punto.horario}</span>
-                      </div>
+                  </>
+                ) : (
+                  <div style={{ padding: '32px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '24px', flex: 1, minHeight: '200px' }}>
+                    {punto.foto_url && (
+                      <a href={punto.website_url ?? '#'} target="_blank" rel="noopener noreferrer">
+                        <img
+                          src={punto.foto_url}
+                          alt={punto.nombre}
+                          style={{ height: '72px', width: 'auto', objectFit: 'contain' }}
+                        />
+                      </a>
                     )}
-                    {punto.telefono && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Phone size={16} style={{ flexShrink: 0, color: '#E8231A' }} />
-                        <span>{punto.telefono}</span>
-                      </div>
+                    {punto.website_url && (
+                      <a
+                        href={punto.website_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ display: 'inline-block', padding: '12px 24px', border: '1px solid rgba(244,240,235,0.3)', borderRadius: '6px', color: '#F4F0EB', fontSize: '13px', fontWeight: 600, textDecoration: 'none', letterSpacing: '1px' }}
+                      >
+                        VISITAR SITIO WEB →
+                      </a>
                     )}
                   </div>
-                  <div style={{ marginTop: 'auto', paddingTop: '16px', display: 'flex', gap: '8px' }}>
-                    <a 
-                      href={`https://maps.google.com/?q=${punto.lat},${punto.lng}`} 
-                      target="_blank" 
-                      rel="noreferrer"
-                      style={{ 
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '8px',
-                        backgroundColor: '#E8231A', 
-                        color: 'white', 
-                        padding: '12px', 
-                        borderRadius: '6px', 
-                        fontSize: '13px', 
-                        textDecoration: 'none', 
-                        fontWeight: 600,
-                        textAlign: 'center',
-                        flex: 1,
-                        transition: 'background 0.2s'
-                      }}
-                    >
-                      <MapPin size={16} /> Ver en Google Maps
-                    </a>
-                  </div>
-                </div>
+                )}
               </div>
             ))}
           </div>
