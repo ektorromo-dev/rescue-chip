@@ -138,7 +138,7 @@ export default function DondeComprarSection() {
         )}
 
         <div style={{ width: '100%', height: '420px', borderRadius: '12px', overflow: 'hidden', border: '1px solid rgba(244,240,235,0.08)' }}>
-          <MapaPuntosDeVenta puntos={puntos} />
+          <MapaPuntosDeVenta puntos={puntos.filter(p => p.mostrar_direccion)} />
         </div>
       </div>
       <style>{`
