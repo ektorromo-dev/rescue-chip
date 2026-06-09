@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import dynamic from "next/dynamic";
@@ -32,6 +32,7 @@ interface PuntoDeVenta {
 export default function DondeComprarSection() {
   const [puntos, setPuntos] = useState<PuntoDeVenta[]>([]);
   const [loading, setLoading] = useState(true);
+  const puntosMapa = useMemo(() => puntos.filter(p => p.mostrar_direccion), [puntos]);
 
   useEffect(() => {
     const fetchPuntos = async () => {
@@ -138,7 +139,7 @@ export default function DondeComprarSection() {
         )}
 
         <div style={{ width: '100%', height: '420px', borderRadius: '12px', overflow: 'hidden', border: '1px solid rgba(244,240,235,0.08)' }}>
-          <MapaPuntosDeVenta puntos={puntos.filter(p => p.mostrar_direccion)} />
+          <MapaPuntosDeVenta puntos={puntosMapa} />
         </div>
       </div>
       <style>{`
