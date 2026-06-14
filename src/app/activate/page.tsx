@@ -1418,6 +1418,24 @@ function ActivationFormContent() {
                         <li>Puedo eliminar mis datos en cualquier momento desde mi dashboard en rescue-chip.com. La eliminación es permanente e irreversible.</li>
                         <li>He leído y acepto los <a href="/terminos" target="_blank" rel="noopener noreferrer" style={{ color: '#E8231A' }}>Términos y Condiciones</a> y el <a href="/privacidad" target="_blank" rel="noopener noreferrer" style={{ color: '#E8231A' }}>Aviso de Privacidad</a>.</li>
                     </ol>
+
+                    {/* Párrafo legal adicional según país */}
+                    {profileCountry === 'CR' && (
+                      <p style={{ fontSize: '12px', color: '#9E9A95', lineHeight: '1.6', marginBottom: '12px', padding: '10px', backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: '6px', borderLeft: '2px solid rgba(232,35,26,0.4)' }}>
+                        🇨🇷 <strong style={{ color: '#F4F0EB' }}>Costa Rica — Ley N.° 8968:</strong> Sus datos serán almacenados en servidores ubicados en los Estados Unidos de América. Al activar, usted otorga consentimiento expreso a esta transferencia internacional conforme al artículo 14 de la Ley N.° 8968. Autoridad competente: PRODHAB (prodhab.go.cr).
+                      </p>
+                    )}
+                    {profileCountry === 'DO' && (
+                      <p style={{ fontSize: '12px', color: '#9E9A95', lineHeight: '1.6', marginBottom: '12px', padding: '10px', backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: '6px', borderLeft: '2px solid rgba(232,35,26,0.4)' }}>
+                        🇩🇴 <strong style={{ color: '#F4F0EB' }}>República Dominicana — Ley 172-13:</strong> El tratamiento de sus datos se rige por la Ley N.° 172-13 sobre Protección de Datos de Carácter Personal de la República Dominicana.
+                      </p>
+                    )}
+                    {profileCountry === 'ES' && (
+                      <p style={{ fontSize: '12px', color: '#9E9A95', lineHeight: '1.6', marginBottom: '12px', padding: '10px', backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: '6px', borderLeft: '2px solid rgba(232,35,26,0.4)' }}>
+                        🇪🇸 <strong style={{ color: '#F4F0EB' }}>España — RGPD:</strong> El tratamiento de sus datos se rige por el Reglamento General de Protección de Datos (RGPD UE 2016/679) y la LOPDGDD. Usted tiene derecho adicional a la portabilidad de sus datos y a la limitación del tratamiento. Autoridad competente: AEPD (aepd.es).
+                      </p>
+                    )}
+
                     <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer' }}>
                         <input
                             type="checkbox"
