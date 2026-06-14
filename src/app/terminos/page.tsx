@@ -26,7 +26,7 @@ export default function TerminosPage() {
           TÉRMINOS Y CONDICIONES DE USO
         </h1>
         <p style={{ fontSize: "14px", color: "#9E9A95", fontStyle: "italic", textAlign: "center", marginBottom: "48px" }}>
-          Última actualización: Marzo 2026
+          Última actualización: Junio 2026
         </p>
 
         <section style={{ marginBottom: "40px" }}>
@@ -94,19 +94,18 @@ export default function TerminosPage() {
             3.1 Productos disponibles
           </h3>
           <ul style={{ fontSize: "15px", lineHeight: 1.75, color: "#C8C0B4", paddingLeft: "20px", display: "flex", flexDirection: "column", gap: "8px", marginBottom: "16px" }}>
-            <li><span style={{ color: "#F4F0EB", fontWeight: 600 }}>Individual (1 chip):</span> $347 MXN, envío incluido</li>
-            <li><span style={{ color: "#F4F0EB", fontWeight: 600 }}>Pareja (2 chips):</span> $549 MXN, envío incluido</li>
-            <li><span style={{ color: "#F4F0EB", fontWeight: 600 }}>Familiar (pack):</span> $949 MXN, envío incluido</li>
+            <li><span style={{ color: "#F4F0EB", fontWeight: 600 }}>CASCO (chip NFC + sticker QR para casco):</span> $499 MXN — envío incluido en compras en línea.</li>
+            <li><span style={{ color: "#F4F0EB", fontWeight: 600 }}>LLAVERO (chip NFC en llavero):</span> $449 MXN — envío incluido en compras en línea.</li>
           </ul>
           <p style={{ fontSize: "15px", lineHeight: 1.75, color: "#C8C0B4", marginBottom: "16px" }}>
-            Los precios incluyen IVA y envío dentro de la República Mexicana. El Proveedor se reserva el derecho de modificar los precios, notificando previamente a través del Sitio.
+            Los precios incluyen IVA. El envío es gratuito dentro de la República Mexicana para compras realizadas en línea. Las compras en puntos de venta físicos autorizados no incluyen envío. El Proveedor se reserva el derecho de modificar los precios, notificando previamente a través del Sitio.
           </p>
 
           <h3 style={{ fontSize: "16px", fontWeight: 600, color: "#C8C0B4", marginTop: "24px", marginBottom: "12px" }}>
             3.2 Proceso de compra
           </h3>
           <p style={{ fontSize: "15px", lineHeight: 1.75, color: "#C8C0B4", marginBottom: "16px" }}>
-            Las compras se realizan exclusivamente a través del Sitio, procesadas mediante la plataforma de pagos Stripe, Inc. El Proveedor no almacena datos de tarjeta de crédito o débito del Usuario.
+            Las compras pueden realizarse a través de dos canales: (a) en línea a través del Sitio rescue-chip.com, procesadas mediante la plataforma de pagos Stripe, Inc. — el Proveedor no almacena datos de tarjeta de crédito o débito del Usuario; o (b) de forma presencial en puntos de venta físicos autorizados, listados en rescue-chip.com/puntos-de-venta. En compras presenciales, el proceso de pago queda sujeto a los medios disponibles en cada establecimiento.
           </p>
         </section>
 
