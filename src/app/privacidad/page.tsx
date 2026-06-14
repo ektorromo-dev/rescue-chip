@@ -26,7 +26,7 @@ export default function PrivacidadPage() {
           AVISO DE PRIVACIDAD INTEGRAL
         </h1>
         <p style={{ fontSize: "14px", color: "#9E9A95", fontStyle: "italic", textAlign: "center", marginBottom: "48px" }}>
-          Última actualización: Marzo 2026
+          Última actualización: Junio 2026
         </p>
 
         <section style={{ marginBottom: "40px" }}>
@@ -111,12 +111,13 @@ export default function PrivacidadPage() {
             VI. TRANSFERENCIAS DE DATOS
           </h2>
           <p style={{ fontSize: "15px", lineHeight: 1.75, color: "#C8C0B4", marginBottom: "16px" }}>
-            Sus datos personales pueden ser transferidos a:
+            Sus datos personales pueden ser transferidos a las siguientes categorías de destinatarios:
           </p>
           <ol style={{ fontSize: "15px", lineHeight: 1.75, color: "#C8C0B4", paddingLeft: "20px", display: "flex", flexDirection: "column", gap: "8px", marginBottom: "16px" }}>
-            <li>Proveedores de infraestructura tecnológica (Supabase, Inc.; Vercel, Inc.; Twilio, Inc.) para el almacenamiento y procesamiento necesarios para prestar el servicio. Estos proveedores actúan como encargados del tratamiento y cuentan con políticas de privacidad y acuerdos de tratamiento de datos.</li>
-            <li>Proveedores de servicios de pago (Stripe, Inc.) para el procesamiento de transacciones. Stripe no tiene acceso a datos de salud.</li>
-            <li>Autoridades competentes cuando sea requerido por ley o mandato judicial.</li>
+            <li>Proveedores de servicios de infraestructura tecnológica en la nube (alojamiento, base de datos y procesamiento), cuyos servidores se encuentran ubicados en los Estados Unidos de América. Estos proveedores actúan como encargados del tratamiento, no acceden a datos de salud más allá de lo estrictamente necesario para prestar el servicio, y están sujetos a acuerdos de tratamiento de datos conforme a la normativa aplicable.</li>
+            <li>Proveedores de servicios de comunicación (SMS y correo electrónico), cuyos servidores se encuentran ubicados en los Estados Unidos de América, utilizados exclusivamente para el envío de notificaciones de emergencia y confirmaciones de activación.</li>
+            <li>Procesadores de pago, cuyos servidores se encuentran ubicados en los Estados Unidos de América, para el procesamiento de transacciones. Estos proveedores no tienen acceso a datos de salud.</li>
+            <li>Autoridades competentes cuando sea requerido por ley, mandato judicial o requerimiento de autoridad reguladora.</li>
           </ol>
           <p style={{ fontSize: "15px", lineHeight: 1.75, color: "#C8C0B4", marginBottom: "16px" }}>
             No se realizan transferencias de datos personales a terceros con fines de marketing, publicidad o comercialización.
@@ -185,11 +186,81 @@ export default function PrivacidadPage() {
 
         <section style={{ marginBottom: "40px" }}>
           <h2 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "24px", color: "#F4F0EB", marginTop: "40px", marginBottom: "16px", letterSpacing: "1px" }}>
-            XI. AUTORIDAD
+            XI. DISPOSICIONES ESPECÍFICAS POR PAÍS
           </h2>
-          <p style={{ fontSize: "15px", lineHeight: 1.75, color: "#C8C0B4", marginBottom: "16px" }}>
-            Si considera que su derecho a la protección de datos personales ha sido vulnerado, puede acudir al Instituto Nacional de Transparencia, Acceso a la Información y Protección de Datos Personales (INAI): www.inai.org.mx
+          <p style={{ fontSize: "15px", lineHeight: 1.75, color: "#C8C0B4", marginBottom: "24px" }}>
+            Dependiendo del país de residencia o uso del titular, aplican adicionalmente las siguientes disposiciones:
           </p>
+
+          {/* MÉXICO */}
+          <div style={{ borderLeft: "3px solid #E8231A", paddingLeft: "16px", marginBottom: "32px" }}>
+            <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#F4F0EB", marginBottom: "12px" }}>
+              🇲🇽 México
+            </h3>
+            <p style={{ fontSize: "15px", lineHeight: 1.75, color: "#C8C0B4", marginBottom: "8px" }}>
+              Ley aplicable: Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP, publicada en el DOF el 20 de marzo de 2025).
+            </p>
+            <p style={{ fontSize: "15px", lineHeight: 1.75, color: "#C8C0B4", marginBottom: "8px" }}>
+              Autoridad competente: Secretaría Anticorrupción y Buen Gobierno (<a href="https://www.anticorrupcion.gob.mx" target="_blank" rel="noopener noreferrer" style={{ color: "#E8231A", textDecoration: "none" }}>www.anticorrupcion.gob.mx</a>).
+            </p>
+            <p style={{ fontSize: "15px", lineHeight: 1.75, color: "#C8C0B4" }}>
+              Plazo de respuesta a solicitudes ARCO: 20 días hábiles.
+            </p>
+          </div>
+
+          {/* COSTA RICA */}
+          <div style={{ borderLeft: "3px solid #E8231A", paddingLeft: "16px", marginBottom: "32px" }}>
+            <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#F4F0EB", marginBottom: "12px" }}>
+              🇨🇷 Costa Rica
+            </h3>
+            <p style={{ fontSize: "15px", lineHeight: 1.75, color: "#C8C0B4", marginBottom: "8px" }}>
+              Ley aplicable: Ley N.° 8968 de Protección de la Persona frente al Tratamiento de sus Datos Personales y su Reglamento (Decreto N.° 37554-JP).
+            </p>
+            <p style={{ fontSize: "15px", lineHeight: 1.75, color: "#C8C0B4", marginBottom: "8px" }}>
+              Autoridad competente: Agencia de Protección de Datos de los Habitantes — PRODHAB (<a href="https://www.prodhab.go.cr" target="_blank" rel="noopener noreferrer" style={{ color: "#E8231A", textDecoration: "none" }}>www.prodhab.go.cr</a>).
+            </p>
+            <p style={{ fontSize: "15px", lineHeight: 1.75, color: "#C8C0B4", marginBottom: "8px" }}>
+              Transferencia internacional: Los datos de usuarios costarricenses son almacenados y procesados en servidores ubicados en los Estados Unidos de América. Conforme al artículo 14 de la Ley N.° 8968, al activar su chip usted otorga consentimiento expreso e informado para dicha transferencia internacional.
+            </p>
+            <p style={{ fontSize: "15px", lineHeight: 1.75, color: "#C8C0B4" }}>
+              Plazo de respuesta a solicitudes ARCO: 5 días hábiles.
+            </p>
+          </div>
+
+          {/* REPÚBLICA DOMINICANA */}
+          <div style={{ borderLeft: "3px solid #E8231A", paddingLeft: "16px", marginBottom: "32px" }}>
+            <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#F4F0EB", marginBottom: "12px" }}>
+              🇩🇴 República Dominicana
+            </h3>
+            <p style={{ fontSize: "15px", lineHeight: 1.75, color: "#C8C0B4", marginBottom: "8px" }}>
+              Ley aplicable: Ley N.° 172-13 sobre Protección de Datos de Carácter Personal.
+            </p>
+            <p style={{ fontSize: "15px", lineHeight: 1.75, color: "#C8C0B4", marginBottom: "8px" }}>
+              Los derechos de acceso, rectificación y supresión de datos se ejercen directamente ante RESCUECHIP mediante solicitud a <a href="mailto:contacto@rescue-chip.com" style={{ color: "#E8231A", textDecoration: "none" }}>contacto@rescue-chip.com</a>. En caso de controversia, la vía competente son los tribunales ordinarios de la República Dominicana.
+            </p>
+            <p style={{ fontSize: "15px", lineHeight: 1.75, color: "#C8C0B4" }}>
+              Plazo de respuesta a solicitudes: 30 días hábiles.
+            </p>
+          </div>
+
+          {/* ESPAÑA */}
+          <div style={{ borderLeft: "3px solid #E8231A", paddingLeft: "16px", marginBottom: "16px" }}>
+            <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#F4F0EB", marginBottom: "12px" }}>
+              🇪🇸 España
+            </h3>
+            <p style={{ fontSize: "15px", lineHeight: 1.75, color: "#C8C0B4", marginBottom: "8px" }}>
+              Ley aplicable: Reglamento General de Protección de Datos (RGPD — Reglamento UE 2016/679) y Ley Orgánica 3/2018 de Protección de Datos Personales y garantía de los derechos digitales (LOPDGDD).
+            </p>
+            <p style={{ fontSize: "15px", lineHeight: 1.75, color: "#C8C0B4", marginBottom: "8px" }}>
+              Autoridad competente: Agencia Española de Protección de Datos — AEPD (<a href="https://www.aepd.es" target="_blank" rel="noopener noreferrer" style={{ color: "#E8231A", textDecoration: "none" }}>www.aepd.es</a>).
+            </p>
+            <p style={{ fontSize: "15px", lineHeight: 1.75, color: "#C8C0B4", marginBottom: "8px" }}>
+              Derechos adicionales bajo el RGPD: además de los derechos ARCO, usted tiene derecho a la <strong style={{ color: "#F4F0EB" }}>portabilidad de sus datos</strong> (recibir sus datos en formato estructurado y de uso común) y a la <strong style={{ color: "#F4F0EB" }}>limitación del tratamiento</strong>.
+            </p>
+            <p style={{ fontSize: "15px", lineHeight: 1.75, color: "#C8C0B4" }}>
+              Plazo de respuesta: 1 mes calendario, prorrogable 2 meses adicionales en casos complejos.
+            </p>
+          </div>
         </section>
 
         <section style={{ marginBottom: "40px" }}>
