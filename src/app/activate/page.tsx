@@ -469,21 +469,20 @@ function ActivationFormContent() {
         setErrorMsg("");
 
         try {
-            // Actualizamos solo el chip para vincularlo al perfil existente
-            const { error: activateError } = await supabase
-                .from('chips')
-                .update({
-                    status: 'activado',
-                    activated: true,
-                    activated_by: pendingAuthData.userId,
-                    owner_profile_id: existingProfileToLink.id,
-                    perfil_compartido: true,
-                    activated_at: new Date().toISOString()
-                })
-                .eq('id', pendingChip.id);
+            const linkRes = await fetch("/api/activate/link-to-mine", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    folio: pendingChip.folio,
+                    profileId: existingProfileToLink.id,
+                    userId: pendingAuthData.userId,
+                }),
+            });
 
-            if (activateError) {
-                throw new Error("Error al vincular el chip con tu perfil.");
+            const linkData = await linkRes.json();
+
+            if (!linkRes.ok || !linkData.success) {
+                throw new Error(linkData.error || "Error al vincular el chip. Intenta de nuevo.");
             }
 
             // --- N8N WEBHOOK CALL (Existing Profile) ---
