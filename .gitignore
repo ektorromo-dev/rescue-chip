@@ -46,3 +46,8 @@ next-env.d.ts
 # Local audit output
 AUDITORIA-SEGURIDAD-INPUT.md
 audit_script.js
+
+# Local video rendering output and temp frames
+output_local/
+tmp_frames/
+
