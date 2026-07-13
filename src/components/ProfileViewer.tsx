@@ -127,7 +127,11 @@ export default function ProfileViewer({ chip, profile, isDemo = false, isPreview
         if (navigator.geolocation) {
             try {
                 const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 3000 });
+                    navigator.geolocation.getCurrentPosition(resolve, reject, {
+                        timeout: 8000,
+                        enableHighAccuracy: true,
+                        maximumAge: 10000
+                    });
                 });
                 lat = position.coords.latitude;
                 lng = position.coords.longitude;
@@ -263,7 +267,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, isPreview
                     navigator.geolocation.getCurrentPosition(
                         (pos) => { latitud = pos.coords.latitude; longitud = pos.coords.longitude; resolve(); },
                         () => resolve(),
-                        { timeout: 3000 }
+                        { timeout: 8000, enableHighAccuracy: true, maximumAge: 10000 }
                     );
                 });
             }
