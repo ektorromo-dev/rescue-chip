@@ -138,7 +138,7 @@ function LoginForm() {
                             <label style={{ fontSize: '13px', fontWeight: 500, color: '#9E9A95' }}>
                                 Contraseña
                             </label>
-                            <Link href="/forgot-password" style={{ fontSize: '13px', color: '#E8231A', textDecoration: 'none' }}>
+                            <Link href="/reset-password" style={{ fontSize: '13px', color: '#E8231A', textDecoration: 'none' }}>
                                 ¿Olvidaste tu contraseña?
                             </Link>
                         </div>
