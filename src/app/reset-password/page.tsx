@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowLeft, Mail, AlertCircle, Loader2, CheckCircle2 } from "lucide-react";
 import { useState } from "react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
 export default function ResetPasswordPage() {
@@ -10,6 +9,7 @@ export default function ResetPasswordPage() {
     const [loading, setLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
     const [successMsg, setSuccessMsg] = useState("");
+    const [focusedInput, setFocusedInput] = useState(false);
 
     const supabase = createClient();
 
@@ -34,71 +34,180 @@ export default function ResetPasswordPage() {
     };
 
     return (
-        <div className="min-h-screen bg-muted flex flex-col items-center justify-center p-4">
-            <div className="w-full max-w-md bg-card rounded-[2.5rem] shadow-2xl border border-border/50 overflow-hidden">
-                {/* Header */}
-                <div className="bg-destructive px-8 pt-10 pb-12 text-destructive-foreground relative">
-                    <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/3" />
-                    <Link href="/login" className="inline-flex items-center gap-2 bg-white/20 px-3 py-1.5 rounded-full text-white/90 hover:bg-white/30 hover:text-white transition-colors mb-6 font-medium text-xs uppercase tracking-wider relative z-10">
-                        <ArrowLeft size={16} /> Volver a Login
-                    </Link>
-                    <h1 className="text-3xl font-black tracking-tight mb-2 relative z-10">
-                        Recuperar Cuenta
-                    </h1>
-                    <p className="text-white/90 relative z-10 text-sm font-medium">
+        <div style={{
+            minHeight: '100vh',
+            backgroundColor: '#0A0A08',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '24px 16px',
+        }}>
+            {/* Logo */}
+            <Link href="/" style={{ marginBottom: '40px', textDecoration: 'none' }}>
+                <span style={{ fontSize: '22px', fontWeight: 800, letterSpacing: '-0.5px' }}>
+                    <span style={{ color: '#F4F0EB' }}>RESCUE</span>
+                    <span style={{ color: '#E8231A' }}>CHIP</span>
+                </span>
+            </Link>
+
+            {/* Card */}
+            <div style={{
+                width: '100%',
+                maxWidth: '420px',
+                backgroundColor: '#131311',
+                border: '1px solid rgba(255,255,255,0.08)',
+                borderRadius: '16px',
+                padding: '40px 32px',
+            }}>
+                <h1 style={{
+                    fontSize: '26px',
+                    fontWeight: 700,
+                    color: '#F4F0EB',
+                    marginBottom: '8px',
+                    margin: '0 0 8px 0',
+                }}>
+                    Recuperar Cuenta
+                </h1>
+                
+                {!successMsg && (
+                    <p style={{
+                        fontSize: '14px',
+                        color: '#9E9A95',
+                        marginBottom: '32px',
+                        margin: '0 0 32px 0',
+                    }}>
                         Ingresa tu correo para recibir un enlace de recuperación.
                     </p>
-                </div>
+                )}
 
-                {/* Form */}
-                <div className="p-8 -mt-6 relative z-20 bg-card rounded-t-[2.5rem]">
+                {errorMsg && (
+                    <div style={{
+                        backgroundColor: 'rgba(232,35,26,0.12)',
+                        border: '1px solid rgba(232,35,26,0.3)',
+                        borderRadius: '8px',
+                        padding: '12px 16px',
+                        marginBottom: '20px',
+                        color: '#E8231A',
+                        fontSize: '14px',
+                    }}>
+                        {errorMsg}
+                    </div>
+                )}
 
-                    {errorMsg && (
-                        <div className="mb-6 p-4 bg-destructive/10 text-destructive border border-destructive/20 rounded-xl text-sm font-semibold flex items-center gap-2">
-                            <AlertCircle size={18} /> {errorMsg}
+                {successMsg ? (
+                    <div style={{ textAlign: 'center', padding: '16px 0' }}>
+                        <div style={{
+                            fontSize: '48px',
+                            color: '#1FA85C',
+                            marginBottom: '16px',
+                        }}>
+                            ✓
                         </div>
-                    )}
-
-                    {successMsg ? (
-                        <div className="text-center space-y-6">
-                            <div className="w-16 h-16 bg-green-500/10 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <CheckCircle2 size={32} />
-                            </div>
-                            <p className="text-lg font-medium text-foreground">{successMsg}</p>
-                            <p className="text-sm text-muted-foreground">
-                                Revisa tu bandeja de entrada o la carpeta de spam. Puedes cerrar esta ventana.
-                            </p>
+                        <p style={{
+                            fontSize: '16px',
+                            color: '#F4F0EB',
+                            fontWeight: 500,
+                            lineHeight: '1.5',
+                            margin: '0 0 16px 0',
+                        }}>
+                            {successMsg}
+                        </p>
+                        <p style={{
+                            fontSize: '13px',
+                            color: '#9E9A95',
+                            margin: 0,
+                        }}>
+                            Revisa tu bandeja de entrada o la carpeta de spam.
+                        </p>
+                    </div>
+                ) : (
+                    <form onSubmit={handleResetPassword} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        {/* Email Input */}
+                        <div>
+                            <label style={{
+                                display: 'block',
+                                fontSize: '13px',
+                                fontWeight: 500,
+                                color: '#9E9A95',
+                                marginBottom: '8px',
+                            }}>
+                                Correo electrónico
+                            </label>
+                            <input
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="tu@correo.com"
+                                required
+                                style={{
+                                    width: '100%',
+                                    backgroundColor: '#1A1A18',
+                                    border: focusedInput 
+                                        ? '1px solid rgba(232,35,26,0.5)' 
+                                        : '1px solid rgba(255,255,255,0.1)',
+                                    borderRadius: '10px',
+                                    padding: '12px 16px',
+                                    fontSize: '15px',
+                                    color: '#F4F0EB',
+                                    outline: 'none',
+                                    boxSizing: 'border-box',
+                                    transition: 'border-color 0.2s',
+                                }}
+                                onFocus={() => setFocusedInput(true)}
+                                onBlur={() => setFocusedInput(false)}
+                            />
                         </div>
-                    ) : (
-                        <form onSubmit={handleResetPassword} className="space-y-5">
-                            <div className="space-y-2">
-                                <label className="text-sm font-bold text-muted-foreground flex items-center gap-2" htmlFor="email">
-                                    <Mail size={16} /> Correo Electrónico
-                                </label>
-                                <input
-                                    id="email"
-                                    type="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full h-12 rounded-xl border border-input bg-background/50 px-4 py-2 focus-visible:ring-2 focus-visible:ring-ring transition-all"
-                                    placeholder="tu@correo.com"
-                                    required
-                                    autoFocus
-                                />
-                            </div>
 
-                            <button
-                                type="submit"
-                                disabled={loading || !email}
-                                className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground h-14 rounded-xl text-lg font-bold hover:scale-[1.02] hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 mt-4 disabled:opacity-70 disabled:pointer-events-none"
-                            >
-                                {loading ? <Loader2 size={20} className="animate-spin" /> : null}
-                                {loading ? "Enviando..." : "Enviar Enlace"}
-                            </button>
-                        </form>
-                    )}
+                        {/* Submit Button */}
+                        <button
+                            type="submit"
+                            disabled={loading || !email}
+                            style={{
+                                marginTop: '8px',
+                                width: '100%',
+                                backgroundColor: loading ? '#8B1410' : '#E8231A',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: '10px',
+                                padding: '14px',
+                                fontSize: '15px',
+                                fontWeight: 700,
+                                cursor: (loading || !email) ? 'not-allowed' : 'pointer',
+                                letterSpacing: '0.3px',
+                                transition: 'background-color 0.2s',
+                            }}
+                        >
+                            {loading ? 'Enviando...' : 'Enviar Enlace'}
+                        </button>
+                    </form>
+                )}
+
+                {/* Volver a Login */}
+                <div style={{
+                    marginTop: '28px',
+                    paddingTop: '24px',
+                    borderTop: '1px solid rgba(255,255,255,0.07)',
+                    textAlign: 'center',
+                }}>
+                    <Link href="/login" style={{ color: '#E8231A', textDecoration: 'none', fontWeight: 600, fontSize: '14px' }}>
+                        Volver a Iniciar Sesión
+                    </Link>
                 </div>
             </div>
+
+            {/* Volver a Login (debajo de la tarjeta) */}
+            <Link href="/login" style={{
+                marginTop: '24px',
+                fontSize: '13px',
+                color: '#9E9A95',
+                textDecoration: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+            }}>
+                ← Volver a Login
+            </Link>
         </div>
     );
 }

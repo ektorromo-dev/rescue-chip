@@ -1,9 +1,9 @@
 "use client";
 
-import { KeyRound, AlertCircle, Loader2, Eye, EyeOff } from "lucide-react";
 import { useState, useEffect } from "react";
-import { createClient } from "@/lib/supabase/client";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 export default function UpdatePasswordPage() {
     const [newPassword, setNewPassword] = useState("");
@@ -11,6 +11,11 @@ export default function UpdatePasswordPage() {
     const [loading, setLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [hasSession, setHasSession] = useState(true);
+
+    const [focusedInput1, setFocusedInput1] = useState(false);
+    const [focusedInput2, setFocusedInput2] = useState(false);
 
     const router = useRouter();
     const supabase = createClient();
@@ -20,8 +25,8 @@ export default function UpdatePasswordPage() {
         const checkSession = async () => {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) {
-                // If there's no session, they probably came without the token
                 setErrorMsg("Enlace inválido o expirado. Por favor solicita uno nuevo.");
+                setHasSession(false);
             }
         };
         checkSession();
@@ -59,83 +64,228 @@ export default function UpdatePasswordPage() {
     };
 
     return (
-        <div className="min-h-screen bg-muted flex flex-col items-center justify-center p-4">
-            <div className="w-full max-w-md bg-card rounded-[2.5rem] shadow-2xl border border-border/50 overflow-hidden">
-                {/* Header */}
-                <div className="bg-primary px-8 pt-12 pb-12 text-primary-foreground relative">
-                    <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/3" />
+        <div style={{
+            minHeight: '100vh',
+            backgroundColor: '#0A0A08',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '24px 16px',
+        }}>
+            {/* Logo */}
+            <Link href="/" style={{ marginBottom: '40px', textDecoration: 'none' }}>
+                <span style={{ fontSize: '22px', fontWeight: 800, letterSpacing: '-0.5px' }}>
+                    <span style={{ color: '#F4F0EB' }}>RESCUE</span>
+                    <span style={{ color: '#E8231A' }}>CHIP</span>
+                </span>
+            </Link>
 
-                    <h1 className="text-3xl font-black tracking-tight mb-2 relative z-10">
-                        Nueva Contraseña
-                    </h1>
-                    <p className="text-white/90 relative z-10 text-sm font-medium">
+            {/* Card */}
+            <div style={{
+                width: '100%',
+                maxWidth: '420px',
+                backgroundColor: '#131311',
+                border: '1px solid rgba(255,255,255,0.08)',
+                borderRadius: '16px',
+                padding: '40px 32px',
+            }}>
+                <h1 style={{
+                    fontSize: '26px',
+                    fontWeight: 700,
+                    color: '#F4F0EB',
+                    marginBottom: '8px',
+                    margin: '0 0 8px 0',
+                }}>
+                    Nueva Contraseña
+                </h1>
+                
+                {hasSession && (
+                    <p style={{
+                        fontSize: '14px',
+                        color: '#9E9A95',
+                        marginBottom: '32px',
+                        margin: '0 0 32px 0',
+                    }}>
                         Crea una nueva contraseña para acceder a tu perfil médico.
                     </p>
-                </div>
+                )}
 
-                {/* Form */}
-                <div className="p-8 -mt-6 relative z-20 bg-card rounded-t-[2.5rem]">
+                {errorMsg && (
+                    <div style={{
+                        backgroundColor: 'rgba(232,35,26,0.12)',
+                        border: '1px solid rgba(232,35,26,0.3)',
+                        borderRadius: '8px',
+                        padding: '12px 16px',
+                        marginBottom: '20px',
+                        color: '#E8231A',
+                        fontSize: '14px',
+                    }}>
+                        {errorMsg}
+                    </div>
+                )}
 
-                    {errorMsg && (
-                        <div className="mb-6 p-4 bg-destructive/10 text-destructive border border-destructive/20 rounded-xl text-sm font-semibold flex items-center gap-2">
-                            <AlertCircle size={18} /> {errorMsg}
-                        </div>
-                    )}
-
-                    <form onSubmit={handleUpdatePassword} className="space-y-5">
-                        <div className="space-y-2">
-                            <label className="text-sm font-bold text-muted-foreground flex items-center gap-2" htmlFor="newPassword">
-                                <KeyRound size={16} /> Nueva Contraseña
+                {hasSession ? (
+                    <form onSubmit={handleUpdatePassword} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        {/* New Password */}
+                        <div>
+                            <label style={{
+                                display: 'block',
+                                fontSize: '13px',
+                                fontWeight: 500,
+                                color: '#9E9A95',
+                                marginBottom: '8px',
+                            }}>
+                                Nueva Contraseña
                             </label>
-                            <div className="relative">
+                            <div style={{ position: 'relative' }}>
                                 <input
-                                    id="newPassword"
-                                    type={showPassword ? "text" : "password"}
+                                    type={showPassword ? 'text' : 'password'}
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
-                                    className="w-full h-12 rounded-xl border border-input bg-background/50 px-4 py-2 pr-12 focus-visible:ring-2 focus-visible:ring-ring transition-all"
                                     placeholder="••••••••"
                                     required
-                                    autoFocus
+                                    style={{
+                                        width: '100%',
+                                        backgroundColor: '#1A1A18',
+                                        border: focusedInput1 
+                                            ? '1px solid rgba(232,35,26,0.5)' 
+                                            : '1px solid rgba(255,255,255,0.1)',
+                                        borderRadius: '10px',
+                                        padding: '12px 48px 12px 16px',
+                                        fontSize: '15px',
+                                        color: '#F4F0EB',
+                                        outline: 'none',
+                                        boxSizing: 'border-box',
+                                        transition: 'border-color 0.2s',
+                                    }}
+                                    onFocus={() => setFocusedInput1(true)}
+                                    onBlur={() => setFocusedInput1(false)}
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-0 top-0 h-12 px-4 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+                                    style={{
+                                        position: 'absolute',
+                                        right: '14px',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        background: 'none',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        color: '#9E9A95',
+                                        fontSize: '18px',
+                                        padding: '0',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                    }}
                                 >
-                                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                    {showPassword ? '🙈' : '👁'}
                                 </button>
                             </div>
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-sm font-bold text-muted-foreground flex items-center gap-2" htmlFor="confirmPassword">
-                                <KeyRound size={16} /> Confirmar Contraseña
+                        {/* Confirm Password */}
+                        <div>
+                            <label style={{
+                                display: 'block',
+                                fontSize: '13px',
+                                fontWeight: 500,
+                                color: '#9E9A95',
+                                marginBottom: '8px',
+                            }}>
+                                Confirmar Contraseña
                             </label>
-                            <div className="relative">
+                            <div style={{ position: 'relative' }}>
                                 <input
-                                    id="confirmPassword"
-                                    type={showPassword ? "text" : "password"}
+                                    type={showConfirmPassword ? 'text' : 'password'}
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
-                                    className="w-full h-12 rounded-xl border border-input bg-background/50 px-4 py-2 pr-12 focus-visible:ring-2 focus-visible:ring-ring transition-all"
                                     placeholder="••••••••"
                                     required
+                                    style={{
+                                        width: '100%',
+                                        backgroundColor: '#1A1A18',
+                                        border: focusedInput2 
+                                            ? '1px solid rgba(232,35,26,0.5)' 
+                                            : '1px solid rgba(255,255,255,0.1)',
+                                        borderRadius: '10px',
+                                        padding: '12px 48px 12px 16px',
+                                        fontSize: '15px',
+                                        color: '#F4F0EB',
+                                        outline: 'none',
+                                        boxSizing: 'border-box',
+                                        transition: 'border-color 0.2s',
+                                    }}
+                                    onFocus={() => setFocusedInput2(true)}
+                                    onBlur={() => setFocusedInput2(false)}
                                 />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                    style={{
+                                        position: 'absolute',
+                                        right: '14px',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        background: 'none',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        color: '#9E9A95',
+                                        fontSize: '18px',
+                                        padding: '0',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                    }}
+                                >
+                                    {showConfirmPassword ? '🙈' : '👁'}
+                                </button>
                             </div>
                         </div>
 
+                        {/* Submit Button */}
                         <button
                             type="submit"
                             disabled={loading || !newPassword || !confirmPassword}
-                            className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground h-14 rounded-xl text-lg font-bold hover:scale-[1.02] hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 mt-4 disabled:opacity-70 disabled:pointer-events-none"
+                            style={{
+                                marginTop: '8px',
+                                width: '100%',
+                                backgroundColor: loading ? '#8B1410' : '#E8231A',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: '10px',
+                                padding: '14px',
+                                fontSize: '15px',
+                                fontWeight: 700,
+                                cursor: (loading || !newPassword || !confirmPassword) ? 'not-allowed' : 'pointer',
+                                letterSpacing: '0.3px',
+                                transition: 'background-color 0.2s',
+                            }}
                         >
-                            {loading ? <Loader2 size={20} className="animate-spin" /> : null}
-                            {loading ? "Actualizando..." : "Guardar Contraseña"}
+                            {loading ? 'Actualizando...' : 'Guardar Contraseña'}
                         </button>
                     </form>
-                </div>
+                ) : (
+                    <div style={{ textAlign: 'center', marginTop: '24px' }}>
+                        <Link href="/login" style={{ color: '#E8231A', textDecoration: 'none', fontWeight: 600, fontSize: '14px' }}>
+                            Volver a Iniciar Sesión
+                        </Link>
+                    </div>
+                )}
             </div>
+
+            {/* Volver al inicio */}
+            <Link href="/" style={{
+                marginTop: '24px',
+                fontSize: '13px',
+                color: '#9E9A95',
+                textDecoration: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+            }}>
+                ← Volver al inicio
+            </Link>
         </div>
     );
 }
