@@ -619,7 +619,7 @@ export default function ProfileViewer({ chip, profile, isDemo = false, isPreview
                                             {profile.numero_poliza && (
                                                 <div>
                                                     <h4 style={{ fontSize: '11px', fontWeight: 900, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>🔢 Número de Póliza</h4>
-                                                    <p style={{ fontWeight: 700, fontSize: '16px', color: C.textMain, backgroundColor: C.bgInput, padding: '4px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.08)', display: 'inline-block' }}>{maskNumber(profile.numero_poliza)}</p>
+                                                    <p style={{ fontWeight: 700, fontSize: '16px', color: C.textMain, backgroundColor: C.bgInput, padding: '4px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.08)', display: 'inline-block' }}>{isEmergency ? profile.numero_poliza : maskNumber(profile.numero_poliza)}</p>
                                                 </div>
                                             )}
                                             {profile.nombre_asegurado && (
@@ -641,13 +641,13 @@ export default function ProfileViewer({ chip, profile, isDemo = false, isPreview
                                             {profile.nss && (
                                                 <div>
                                                     <h4 style={{ fontSize: '11px', fontWeight: 900, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>NSS</h4>
-                                                    <p style={{ fontWeight: 700, fontSize: '16px', color: C.textMain, backgroundColor: C.bgInput, padding: '4px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.08)', display: 'inline-block' }}>{maskNumber(profile.nss)}</p>
+                                                    <p style={{ fontWeight: 700, fontSize: '16px', color: C.textMain, backgroundColor: C.bgInput, padding: '4px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.08)', display: 'inline-block' }}>{isEmergency ? profile.nss : maskNumber(profile.nss)}</p>
                                                 </div>
                                             )}
                                             {profile.numero_afiliacion && (
                                                 <div>
                                                     <h4 style={{ fontSize: '11px', fontWeight: 900, color: C.textMuted, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>Afiliación</h4>
-                                                    <p style={{ fontWeight: 700, fontSize: '16px', color: C.textMain, backgroundColor: C.bgInput, padding: '4px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.08)', display: 'inline-block' }}>{maskNumber(profile.numero_afiliacion)}</p>
+                                                    <p style={{ fontWeight: 700, fontSize: '16px', color: C.textMain, backgroundColor: C.bgInput, padding: '4px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.08)', display: 'inline-block' }}>{isEmergency ? profile.numero_afiliacion : maskNumber(profile.numero_afiliacion)}</p>
                                                 </div>
                                             )}
                                         </>
