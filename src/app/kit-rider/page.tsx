@@ -1,7 +1,7 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2, AlertCircle, Loader2, FileText, Download, ShieldCheck } from "lucide-react";
+import { ArrowLeft, CheckCircle2, AlertCircle, Loader2, FileText, Download, ShieldCheck, CheckSquare, Square } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
 import { createClient } from "@/lib/supabase/client";
@@ -9,12 +9,43 @@ import { validateAndFormatPhone, SUPPORTED_COUNTRIES, formatPhoneAsYouType } fro
 import type { CountryCode } from "libphonenumber-js";
 import { KIT_RIDER_PDF_URL } from "@/lib/constants";
 
+export interface RiderResource {
+    id: string;
+    titulo: string;
+    descripcion: string;
+    tipo: string;
+    url: string;
+    tamano?: string;
+    badge?: string;
+}
+
+export const RIDER_RESOURCES: RiderResource[] = [
+    {
+        id: "manual-rider-solitario",
+        titulo: "El Manual de El Rider Solitario",
+        descripcion: "Qué hacer (y qué NO) en los primeros 10 minutos después de un accidente en moto en México.",
+        tipo: "Manual PDF",
+        url: KIT_RIDER_PDF_URL,
+        tamano: "PDF · 316 KB",
+        badge: "Incluido",
+    },
+];
+
 function KitRiderContent() {
     const searchParams = useSearchParams();
     const [session, setSession] = useState<{ user?: { email?: string } } | null>(null);
     const [loadingAuth, setLoadingAuth] = useState(true);
 
-    // Form state (para usuarios sin sesión)
+    // Selección de recursos (preparado para múltiples recursos)
+    const [selectedResources, setSelectedResources] = useState<Record<string, boolean>>(() => {
+        const initial: Record<string, boolean> = {};
+        RIDER_RESOURCES.forEach((r) => {
+            initial[r.id] = true;
+        });
+        return initial;
+    });
+
+    // Form state (para visitantes sin sesión)
     const [nombre, setNombre] = useState("");
     const [whatsapp, setWhatsapp] = useState("");
     const [selectedCountry, setSelectedCountry] = useState<CountryCode>("MX");
@@ -45,6 +76,16 @@ function KitRiderContent() {
         };
     }, []);
 
+    const toggleResource = (id: string) => {
+        setSelectedResources((prev) => ({
+            ...prev,
+            [id]: !prev[id],
+        }));
+    };
+
+    const hasSelectedResources = Object.values(selectedResources).some(Boolean);
+    const activeResourcesList = RIDER_RESOURCES.filter((r) => selectedResources[r.id]);
+
     const handlePhoneChange = (val: string) => {
         const formatted = formatPhoneAsYouType(val, selectedCountry);
         setWhatsapp(formatted);
@@ -54,6 +95,11 @@ function KitRiderContent() {
     const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setErrorMsg("");
+
+        if (!hasSelectedResources) {
+            setErrorMsg("Selecciona al menos un recurso para descargar.");
+            return;
+        }
 
         if (!nombre.trim()) {
             setErrorMsg("Por favor, ingresa tu nombre completo.");
@@ -93,11 +139,9 @@ function KitRiderContent() {
                 throw new Error(data.error || "Ocurrió un error al procesar tu solicitud.");
             }
 
-            const targetUrl = data.pdfUrl || KIT_RIDER_PDF_URL;
+            // Mostrar estado de descarga lista (el usuario hace clic directo en el botón)
             setDownloadReady(true);
-
-            // Abrir el PDF de inmediato
-            window.open(targetUrl, "_blank", "noopener,noreferrer");
+            setErrorMsg("");
         } catch (err: unknown) {
             const msg = err instanceof Error ? err.message : "Error inesperado al conectar con el servidor.";
             setErrorMsg(msg);
@@ -131,39 +175,53 @@ function KitRiderContent() {
     return (
         <div style={{ backgroundColor: "#131311", border: "1px solid rgba(255,255,255,0.08)", borderTop: "none", borderRadius: "0 0 16px 16px", padding: "32px" }}>
             
-            {/* Descripción del Manual */}
+            {/* Tarjetas de Contenido del Manual */}
             <div style={{ marginBottom: "32px", display: "flex", flexDirection: "column", gap: "16px" }}>
-                <div style={{ display: "flex", alignItems: "flex-start", gap: "16px", padding: "16px", backgroundColor: "rgba(232,35,26,0.08)", border: "1px solid rgba(232,35,26,0.2)", borderRadius: "12px", color: "#F4F0EB" }}>
+                {/* Tarjeta destacada */}
+                <div style={{ display: "flex", alignItems: "flex-start", gap: "16px", padding: "18px 20px", backgroundColor: "rgba(232,35,26,0.08)", border: "1px solid rgba(232,35,26,0.25)", borderRadius: "12px", color: "#F4F0EB" }}>
                     <div style={{ color: "#E8231A", flexShrink: 0, marginTop: "2px" }}>
-                        <ShieldCheck size={24} />
+                        <ShieldCheck size={26} />
                     </div>
                     <div>
-                        <h3 style={{ fontSize: "16px", fontWeight: 700, margin: "0 0 4px 0", color: "#F4F0EB" }}>
-                            Guía Esencial de Primeros Auxilios para Motociclistas
+                        <h3 style={{ fontSize: "17px", fontWeight: 700, margin: "0 0 6px 0", color: "#F4F0EB" }}>
+                            Guía del Rider Solitario
                         </h3>
                         <p style={{ fontSize: "14px", color: "#9E9A95", margin: 0, lineHeight: 1.6 }}>
-                            En un accidente en moto, los primeros minutos son críticos. Este manual práctico te enseña qué hacer (y qué NUNCA hacer) ante un siniestro propio o de un compañero rodador.
+                            Qué hacer (y qué NO) en los primeros minutos después de una caída — para ti o para tu compañero biker.
                         </p>
                     </div>
                 </div>
 
+                {/* Grid 3 tarjetas */}
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "12px" }}>
-                    <div style={{ backgroundColor: "#1A1A18", padding: "14px 16px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.05)" }}>
-                        <div style={{ fontSize: "13px", fontWeight: 600, color: "#F4F0EB", marginBottom: "4px" }}>📋 Protocolo PAS</div>
-                        <div style={{ fontSize: "12px", color: "#9E9A95" }}>Proteger la zona, Alertar a emergencias y Socorrer con seguridad.</div>
+                    <div style={{ backgroundColor: "#1A1A18", padding: "16px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.05)" }}>
+                        <div style={{ fontSize: "14px", fontWeight: 700, color: "#F4F0EB", marginBottom: "6px" }}>
+                            Si te caíste tú
+                        </div>
+                        <div style={{ fontSize: "13px", color: "#9E9A95", lineHeight: 1.5 }}>
+                            Qué hacer y qué evitar mientras esperas ayuda.
+                        </div>
                     </div>
-                    <div style={{ backgroundColor: "#1A1A18", padding: "14px 16px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.05)" }}>
-                        <div style={{ fontSize: "13px", fontWeight: 600, color: "#F4F0EB", marginBottom: "4px" }}>🪖 Manejo del Casco</div>
-                        <div style={{ fontSize: "12px", color: "#9E9A95" }}>Cuándo y por qué nunca retirar el casco sin personal capacitado.</div>
+                    <div style={{ backgroundColor: "#1A1A18", padding: "16px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.05)" }}>
+                        <div style={{ fontSize: "14px", fontWeight: 700, color: "#F4F0EB", marginBottom: "6px" }}>
+                            Si eres testigo
+                        </div>
+                        <div style={{ fontSize: "13px", color: "#9E9A95", lineHeight: 1.5 }}>
+                            Checklist accionable para ayudar a un compañero biker en el pavimento.
+                        </div>
                     </div>
-                    <div style={{ backgroundColor: "#1A1A18", padding: "14px 16px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.05)" }}>
-                        <div style={{ fontSize: "13px", fontWeight: 600, color: "#F4F0EB", marginBottom: "4px" }}>📱 Identificación Médica</div>
-                        <div style={{ fontSize: "12px", color: "#9E9A95" }}>Cómo asegurar que tus datos médicos hablen por ti si estás inconsciente.</div>
+                    <div style={{ backgroundColor: "#1A1A18", padding: "16px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.05)" }}>
+                        <div style={{ fontSize: "14px", fontWeight: 700, color: "#F4F0EB", marginBottom: "6px" }}>
+                            Prepara a tu familia
+                        </div>
+                        <div style={{ fontSize: "13px", color: "#9E9A95", lineHeight: 1.5 }}>
+                            Cómo asegurar que tu información esté disponible si no puedes hablar.
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {/* CASO 1: USUARIO CON SESIÓN ACTIVA (BYPASS) */}
+            {/* CASO 1: USUARIO CON SESIÓN ACTIVA (BYPASS DIRECTO) */}
             {session ? (
                 <div style={{ textAlign: "center", padding: "16px 0", display: "flex", flexDirection: "column", alignItems: "center", gap: "20px" }}>
                     <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", backgroundColor: "rgba(232,35,26,0.1)", border: "1px solid rgba(232,35,26,0.3)", borderRadius: "9999px", padding: "6px 16px", fontSize: "13px", color: "#F4F0EB" }}>
@@ -172,34 +230,42 @@ function KitRiderContent() {
                     </div>
 
                     <p style={{ color: "#9E9A95", fontSize: "15px", maxWidth: "480px", margin: 0, lineHeight: 1.6 }}>
-                        Como miembro activo de la comunidad RescueChip, tienes acceso directo e ilimitado al Kit del Rider.
+                        Como miembro activo de la comunidad RescueChip, tienes acceso directo e ilimitado a todos los materiales del Kit del Rider.
                     </p>
 
-                    <a
-                        href={KIT_RIDER_PDF_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                            display: "inline-flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            gap: "10px",
-                            backgroundColor: "#E8231A",
-                            color: "#fff",
-                            width: "100%",
-                            maxWidth: "420px",
-                            height: "60px",
-                            borderRadius: "16px",
-                            fontSize: "18px",
-                            fontWeight: 900,
-                            textDecoration: "none",
-                            boxShadow: "0 4px 14px rgba(232,35,26,0.3)",
-                            transition: "background-color 0.2s",
-                        }}
-                    >
-                        <Download size={22} />
-                        Descargar Kit del Rider (PDF)
-                    </a>
+                    {/* Lista de recursos descargables */}
+                    <div style={{ width: "100%", maxWidth: "480px", display: "flex", flexDirection: "column", gap: "12px" }}>
+                        {RIDER_RESOURCES.map((recurso) => (
+                            <a
+                                key={recurso.id}
+                                href={recurso.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                    padding: "16px 20px",
+                                    backgroundColor: "#E8231A",
+                                    color: "#fff",
+                                    borderRadius: "14px",
+                                    textDecoration: "none",
+                                    fontWeight: 700,
+                                    fontSize: "16px",
+                                    boxShadow: "0 4px 14px rgba(232,35,26,0.3)",
+                                    transition: "background-color 0.2s",
+                                }}
+                            >
+                                <span style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                    <FileText size={20} />
+                                    Descargar el PDF
+                                </span>
+                                <span style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px", opacity: 0.9 }}>
+                                    <Download size={16} /> {recurso.tamano || "PDF"}
+                                </span>
+                            </a>
+                        ))}
+                    </div>
 
                     <Link
                         href="/dashboard"
@@ -208,13 +274,75 @@ function KitRiderContent() {
                             color: "#9E9A95",
                             textDecoration: "none",
                             transition: "color 0.2s",
+                            marginTop: "8px",
                         }}
                     >
-                        ← Volver a mi panel médico
+                        ← Volver a mi panel
                     </Link>
                 </div>
+            ) : downloadReady ? (
+                /* ESTADO TRAS SUBMIT EXITOSO (SIN SESIÓN) */
+                <div style={{ textAlign: "center", padding: "16px 0", display: "flex", flexDirection: "column", alignItems: "center", gap: "20px" }}>
+                    <div
+                        style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            backgroundColor: "rgba(34,197,94,0.1)",
+                            border: "1px solid rgba(34,197,94,0.3)",
+                            borderRadius: "9999px",
+                            padding: "6px 16px",
+                            fontSize: "13px",
+                            color: "#4ade80",
+                        }}
+                    >
+                        <CheckCircle2 size={16} />
+                        <span>¡Registro completado con éxito!</span>
+                    </div>
+
+                    <p style={{ color: "#F4F0EB", fontSize: "16px", fontWeight: 600, maxWidth: "480px", margin: 0, lineHeight: 1.5 }}>
+                        Haz clic a continuación para descargar tu material:
+                    </p>
+
+                    <div style={{ width: "100%", maxWidth: "480px", display: "flex", flexDirection: "column", gap: "12px" }}>
+                        {activeResourcesList.map((recurso) => (
+                            <a
+                                key={recurso.id}
+                                href={recurso.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                    padding: "18px 20px",
+                                    backgroundColor: "#E8231A",
+                                    color: "#fff",
+                                    borderRadius: "14px",
+                                    textDecoration: "none",
+                                    fontWeight: 900,
+                                    fontSize: "17px",
+                                    boxShadow: "0 4px 16px rgba(232,35,26,0.4)",
+                                    transition: "all 0.2s",
+                                }}
+                            >
+                                <span style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                    <FileText size={22} />
+                                    Descargar el PDF
+                                </span>
+                                <span style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px", fontWeight: 600 }}>
+                                    <Download size={18} /> {recurso.tamano || "PDF"}
+                                </span>
+                            </a>
+                        ))}
+                    </div>
+
+                    <p style={{ fontSize: "13px", color: "#9E9A95", margin: "8px 0 0 0" }}>
+                        El archivo se abrirá en tu lector de documentos. Puedes guardarlo en tu celular para tenerlo siempre accesible.
+                    </p>
+                </div>
             ) : (
-                /* CASO 2: VISITANTE SIN SESIÓN (FORMULARIO LEAD) */
+                /* CASO 2: VISITANTE SIN SESIÓN (FORMULARIO CON SELECCIÓN DE RECURSOS) */
                 <div>
                     {errorMsg && (
                         <div
@@ -236,33 +364,69 @@ function KitRiderContent() {
                         </div>
                     )}
 
-                    {downloadReady && (
-                        <div
-                            style={{
-                                padding: "16px",
-                                marginBottom: "24px",
-                                backgroundColor: "rgba(34,197,94,0.1)",
-                                color: "#4ade80",
-                                border: "1px solid rgba(34,197,94,0.25)",
-                                borderRadius: "10px",
-                                fontSize: "14px",
-                                fontWeight: 600,
-                                textAlign: "center",
-                            }}
-                        >
-                            <p style={{ margin: "0 0 8px 0" }}>¡Listo! Tu descarga ha comenzado en una nueva pestaña.</p>
-                            <a
-                                href={KIT_RIDER_PDF_URL}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                style={{ color: "#F4F0EB", textDecoration: "underline", fontSize: "13px" }}
-                            >
-                                Si no se abrió automáticamente, haz clic aquí para descargar el PDF.
-                            </a>
-                        </div>
-                    )}
-
                     <form onSubmit={handleFormSubmit} style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+                        
+                        {/* Selector de Recursos Disponibles (Array extensible) */}
+                        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                            <label style={{ display: "block", fontSize: "13px", fontWeight: 600, color: "#F4F0EB" }}>
+                                Materiales incluidos en esta descarga:
+                            </label>
+                            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                                {RIDER_RESOURCES.map((recurso) => {
+                                    const isChecked = !!selectedResources[recurso.id];
+                                    return (
+                                        <div
+                                            key={recurso.id}
+                                            onClick={() => toggleResource(recurso.id)}
+                                            style={{
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "space-between",
+                                                padding: "12px 16px",
+                                                backgroundColor: isChecked ? "rgba(232,35,26,0.06)" : "#1A1A18",
+                                                border: isChecked ? "1px solid rgba(232,35,26,0.3)" : "1px solid rgba(255,255,255,0.06)",
+                                                borderRadius: "10px",
+                                                cursor: "pointer",
+                                                transition: "all 0.2s",
+                                            }}
+                                        >
+                                            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                                                <div style={{ color: isChecked ? "#E8231A" : "#9E9A95", display: "flex", alignItems: "center" }}>
+                                                    {isChecked ? <CheckSquare size={20} /> : <Square size={20} />}
+                                                </div>
+                                                <div>
+                                                    <div style={{ fontSize: "14px", fontWeight: 600, color: "#F4F0EB" }}>
+                                                        {recurso.titulo}
+                                                    </div>
+                                                    <div style={{ fontSize: "12px", color: "#9E9A95" }}>
+                                                        {recurso.descripcion}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {recurso.badge && (
+                                                <span
+                                                    style={{
+                                                        fontSize: "11px",
+                                                        fontWeight: 700,
+                                                        color: "#E8231A",
+                                                        backgroundColor: "rgba(232,35,26,0.15)",
+                                                        padding: "3px 8px",
+                                                        borderRadius: "4px",
+                                                        textTransform: "uppercase",
+                                                        letterSpacing: "0.5px",
+                                                        flexShrink: 0,
+                                                    }}
+                                                >
+                                                    {recurso.badge}
+                                                </span>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        {/* Nombre Completo */}
                         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                             <label
                                 htmlFor="nombre"
@@ -295,6 +459,7 @@ function KitRiderContent() {
                             />
                         </div>
 
+                        {/* WhatsApp con selector de país */}
                         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                             <label
                                 htmlFor="whatsapp"
@@ -382,7 +547,7 @@ function KitRiderContent() {
                         {/* Botón Submit */}
                         <button
                             type="submit"
-                            disabled={!aceptaMarketing || submitting || !nombre.trim() || !whatsapp.trim()}
+                            disabled={!aceptaMarketing || submitting || !nombre.trim() || !whatsapp.trim() || !hasSelectedResources}
                             style={{
                                 width: "100%",
                                 display: "flex",
@@ -396,8 +561,8 @@ function KitRiderContent() {
                                 fontSize: "18px",
                                 fontWeight: 900,
                                 border: "none",
-                                cursor: !aceptaMarketing || submitting || !nombre.trim() || !whatsapp.trim() ? "not-allowed" : "pointer",
-                                opacity: !aceptaMarketing || submitting || !nombre.trim() || !whatsapp.trim() ? 0.4 : 1,
+                                cursor: !aceptaMarketing || submitting || !nombre.trim() || !whatsapp.trim() || !hasSelectedResources ? "not-allowed" : "pointer",
+                                opacity: !aceptaMarketing || submitting || !nombre.trim() || !whatsapp.trim() || !hasSelectedResources ? 0.4 : 1,
                                 transition: "all 0.2s",
                                 boxShadow: "0 4px 14px rgba(232,35,26,0.3)",
                             }}
@@ -490,7 +655,7 @@ export default function KitRiderPage() {
                         </h1>
                     </div>
                     <p style={{ color: "#9E9A95", fontSize: "16px", fontWeight: 500, margin: 0, lineHeight: 1.5 }}>
-                        Manual de primeros auxilios y protocolo de emergencia para motociclistas. Lo que debes saber en los primeros minutos tras un accidente.
+                        Qué hacer en los primeros minutos después de un accidente en moto. Guía práctica para ti y para quien te acompañe en la rodada.
                     </p>
                 </div>
 
