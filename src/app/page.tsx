@@ -746,8 +746,6 @@ export default function Home() {
       <footer className="rc-footer">
         <Link href="/" className="nav-logo">RESCUE<span>CHIP</span></Link>
         <ul className="footer-links">
-          <li><a href="#como-funciona">Cómo funciona</a></li>
-          <li><a href="#precios">Precios</a></li>
           <li><Link href="/kit-rider">Kit del Rider</Link></li>
           <li><Link href="/terminos">Términos y Condiciones</Link></li>
           <li><Link href="/privacidad">Aviso de Privacidad</Link></li>
