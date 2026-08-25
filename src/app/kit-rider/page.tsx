@@ -1,0 +1,524 @@
+﻿"use client";
+
+import Link from "next/link";
+import { ArrowLeft, CheckCircle2, AlertCircle, Loader2, FileText, Download, ShieldCheck } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { validateAndFormatPhone, SUPPORTED_COUNTRIES, formatPhoneAsYouType } from "@/lib/phone-utils";
+import type { CountryCode } from "libphonenumber-js";
+import { KIT_RIDER_PDF_URL } from "@/lib/constants";
+
+function KitRiderContent() {
+    const searchParams = useSearchParams();
+    const [session, setSession] = useState<{ user?: { email?: string } } | null>(null);
+    const [loadingAuth, setLoadingAuth] = useState(true);
+
+    // Form state (para usuarios sin sesión)
+    const [nombre, setNombre] = useState("");
+    const [whatsapp, setWhatsapp] = useState("");
+    const [selectedCountry, setSelectedCountry] = useState<CountryCode>("MX");
+    const [whatsappError, setWhatsappError] = useState("");
+    const [aceptaMarketing, setAceptaMarketing] = useState(false);
+
+    // UI state
+    const [submitting, setSubmitting] = useState(false);
+    const [errorMsg, setErrorMsg] = useState("");
+    const [downloadReady, setDownloadReady] = useState(false);
+
+    useEffect(() => {
+        const supabase = createClient();
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setSession(session);
+            setLoadingAuth(false);
+        });
+
+        const {
+            data: { subscription },
+        } = supabase.auth.onAuthStateChange((_event, session) => {
+            setSession(session);
+            setLoadingAuth(false);
+        });
+
+        return () => {
+            subscription.unsubscribe();
+        };
+    }, []);
+
+    const handlePhoneChange = (val: string) => {
+        const formatted = formatPhoneAsYouType(val, selectedCountry);
+        setWhatsapp(formatted);
+        if (whatsappError) setWhatsappError("");
+    };
+
+    const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setErrorMsg("");
+
+        if (!nombre.trim()) {
+            setErrorMsg("Por favor, ingresa tu nombre completo.");
+            return;
+        }
+
+        const phoneValidation = validateAndFormatPhone(whatsapp, selectedCountry);
+        if (!phoneValidation.isValid || !phoneValidation.formatted) {
+            setErrorMsg(phoneValidation.error || "Número de WhatsApp inválido para el país seleccionado.");
+            return;
+        }
+
+        if (!aceptaMarketing) {
+            setErrorMsg("Debes aceptar el consentimiento para descargar el Kit del Rider.");
+            return;
+        }
+
+        setSubmitting(true);
+
+        try {
+            const origen = searchParams.get("origen") || "direct";
+            const res = await fetch("/api/kit-rider/lead", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    nombre: nombre.trim(),
+                    whatsapp: phoneValidation.formatted,
+                    countryCode: selectedCountry,
+                    acepta_marketing: true,
+                    origen,
+                }),
+            });
+
+            const data = (await res.json()) as { success?: boolean; error?: string; pdfUrl?: string };
+
+            if (!res.ok || !data.success) {
+                throw new Error(data.error || "Ocurrió un error al procesar tu solicitud.");
+            }
+
+            const targetUrl = data.pdfUrl || KIT_RIDER_PDF_URL;
+            setDownloadReady(true);
+
+            // Abrir el PDF de inmediato
+            window.open(targetUrl, "_blank", "noopener,noreferrer");
+        } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : "Error inesperado al conectar con el servidor.";
+            setErrorMsg(msg);
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    if (loadingAuth) {
+        return (
+            <div
+                style={{
+                    backgroundColor: "#131311",
+                    padding: "96px 32px",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#9E9A95",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    borderTop: "none",
+                    borderRadius: "0 0 16px 16px",
+                }}
+            >
+                <Loader2 size={48} style={{ color: "rgba(232,35,26,0.3)", marginBottom: "16px", animation: "spin 1s linear infinite" }} />
+                <p style={{ fontWeight: 500, margin: 0 }}>Cargando información del Kit del Rider...</p>
+            </div>
+        );
+    }
+
+    return (
+        <div style={{ backgroundColor: "#131311", border: "1px solid rgba(255,255,255,0.08)", borderTop: "none", borderRadius: "0 0 16px 16px", padding: "32px" }}>
+            
+            {/* Descripción del Manual */}
+            <div style={{ marginBottom: "32px", display: "flex", flexDirection: "column", gap: "16px" }}>
+                <div style={{ display: "flex", alignItems: "flex-start", gap: "16px", padding: "16px", backgroundColor: "rgba(232,35,26,0.08)", border: "1px solid rgba(232,35,26,0.2)", borderRadius: "12px", color: "#F4F0EB" }}>
+                    <div style={{ color: "#E8231A", flexShrink: 0, marginTop: "2px" }}>
+                        <ShieldCheck size={24} />
+                    </div>
+                    <div>
+                        <h3 style={{ fontSize: "16px", fontWeight: 700, margin: "0 0 4px 0", color: "#F4F0EB" }}>
+                            Guía Esencial de Primeros Auxilios para Motociclistas
+                        </h3>
+                        <p style={{ fontSize: "14px", color: "#9E9A95", margin: 0, lineHeight: 1.6 }}>
+                            En un accidente en moto, los primeros minutos son críticos. Este manual práctico te enseña qué hacer (y qué NUNCA hacer) ante un siniestro propio o de un compañero rodador.
+                        </p>
+                    </div>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "12px" }}>
+                    <div style={{ backgroundColor: "#1A1A18", padding: "14px 16px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.05)" }}>
+                        <div style={{ fontSize: "13px", fontWeight: 600, color: "#F4F0EB", marginBottom: "4px" }}>📋 Protocolo PAS</div>
+                        <div style={{ fontSize: "12px", color: "#9E9A95" }}>Proteger la zona, Alertar a emergencias y Socorrer con seguridad.</div>
+                    </div>
+                    <div style={{ backgroundColor: "#1A1A18", padding: "14px 16px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.05)" }}>
+                        <div style={{ fontSize: "13px", fontWeight: 600, color: "#F4F0EB", marginBottom: "4px" }}>🪖 Manejo del Casco</div>
+                        <div style={{ fontSize: "12px", color: "#9E9A95" }}>Cuándo y por qué nunca retirar el casco sin personal capacitado.</div>
+                    </div>
+                    <div style={{ backgroundColor: "#1A1A18", padding: "14px 16px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.05)" }}>
+                        <div style={{ fontSize: "13px", fontWeight: 600, color: "#F4F0EB", marginBottom: "4px" }}>📱 Identificación Médica</div>
+                        <div style={{ fontSize: "12px", color: "#9E9A95" }}>Cómo asegurar que tus datos médicos hablen por ti si estás inconsciente.</div>
+                    </div>
+                </div>
+            </div>
+
+            {/* CASO 1: USUARIO CON SESIÓN ACTIVA (BYPASS) */}
+            {session ? (
+                <div style={{ textAlign: "center", padding: "16px 0", display: "flex", flexDirection: "column", alignItems: "center", gap: "20px" }}>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", backgroundColor: "rgba(232,35,26,0.1)", border: "1px solid rgba(232,35,26,0.3)", borderRadius: "9999px", padding: "6px 16px", fontSize: "13px", color: "#F4F0EB" }}>
+                        <CheckCircle2 size={16} style={{ color: "#E8231A" }} />
+                        <span>Sesión activa: <strong style={{ color: "#F4F0EB" }}>{session.user?.email || "Usuario RescueChip"}</strong></span>
+                    </div>
+
+                    <p style={{ color: "#9E9A95", fontSize: "15px", maxWidth: "480px", margin: 0, lineHeight: 1.6 }}>
+                        Como miembro activo de la comunidad RescueChip, tienes acceso directo e ilimitado al Kit del Rider.
+                    </p>
+
+                    <a
+                        href={KIT_RIDER_PDF_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: "10px",
+                            backgroundColor: "#E8231A",
+                            color: "#fff",
+                            width: "100%",
+                            maxWidth: "420px",
+                            height: "60px",
+                            borderRadius: "16px",
+                            fontSize: "18px",
+                            fontWeight: 900,
+                            textDecoration: "none",
+                            boxShadow: "0 4px 14px rgba(232,35,26,0.3)",
+                            transition: "background-color 0.2s",
+                        }}
+                    >
+                        <Download size={22} />
+                        Descargar Kit del Rider (PDF)
+                    </a>
+
+                    <Link
+                        href="/dashboard"
+                        style={{
+                            fontSize: "14px",
+                            color: "#9E9A95",
+                            textDecoration: "none",
+                            transition: "color 0.2s",
+                        }}
+                    >
+                        ← Volver a mi panel médico
+                    </Link>
+                </div>
+            ) : (
+                /* CASO 2: VISITANTE SIN SESIÓN (FORMULARIO LEAD) */
+                <div>
+                    {errorMsg && (
+                        <div
+                            style={{
+                                padding: "12px 16px",
+                                marginBottom: "24px",
+                                backgroundColor: "rgba(232,35,26,0.1)",
+                                color: "#E8231A",
+                                border: "1px solid rgba(232,35,26,0.25)",
+                                borderRadius: "10px",
+                                fontSize: "13px",
+                                fontWeight: 600,
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "8px",
+                            }}
+                        >
+                            <AlertCircle size={18} /> {errorMsg}
+                        </div>
+                    )}
+
+                    {downloadReady && (
+                        <div
+                            style={{
+                                padding: "16px",
+                                marginBottom: "24px",
+                                backgroundColor: "rgba(34,197,94,0.1)",
+                                color: "#4ade80",
+                                border: "1px solid rgba(34,197,94,0.25)",
+                                borderRadius: "10px",
+                                fontSize: "14px",
+                                fontWeight: 600,
+                                textAlign: "center",
+                            }}
+                        >
+                            <p style={{ margin: "0 0 8px 0" }}>¡Listo! Tu descarga ha comenzado en una nueva pestaña.</p>
+                            <a
+                                href={KIT_RIDER_PDF_URL}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{ color: "#F4F0EB", textDecoration: "underline", fontSize: "13px" }}
+                            >
+                                Si no se abrió automáticamente, haz clic aquí para descargar el PDF.
+                            </a>
+                        </div>
+                    )}
+
+                    <form onSubmit={handleFormSubmit} style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                            <label
+                                htmlFor="nombre"
+                                style={{ display: "block", fontSize: "13px", fontWeight: 500, color: "#9E9A95" }}
+                            >
+                                Nombre Completo <span style={{ color: "#E8231A" }}>*</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="nombre"
+                                name="nombre"
+                                value={nombre}
+                                onChange={(e) => setNombre(e.target.value)}
+                                placeholder="Ej. Carlos Mendoza"
+                                required
+                                style={{
+                                    width: "100%",
+                                    backgroundColor: "#1A1A18",
+                                    border: "1px solid rgba(255,255,255,0.1)",
+                                    borderRadius: "10px",
+                                    padding: "12px 16px",
+                                    fontSize: "15px",
+                                    color: "#F4F0EB",
+                                    outline: "none",
+                                    boxSizing: "border-box",
+                                    transition: "border-color 0.2s",
+                                }}
+                                onFocus={(e) => (e.target.style.borderColor = "rgba(232,35,26,0.5)")}
+                                onBlur={(e) => (e.target.style.borderColor = "rgba(255,255,255,0.1)")}
+                            />
+                        </div>
+
+                        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                            <label
+                                htmlFor="whatsapp"
+                                style={{ display: "block", fontSize: "13px", fontWeight: 500, color: "#9E9A95" }}
+                            >
+                                Número de WhatsApp <span style={{ color: "#E8231A" }}>*</span>
+                            </label>
+                            <div style={{ display: "flex", gap: "8px" }}>
+                                <select
+                                    value={selectedCountry}
+                                    onChange={(e) => {
+                                        const code = e.target.value as CountryCode;
+                                        setSelectedCountry(code);
+                                        if (whatsapp) handlePhoneChange(whatsapp);
+                                    }}
+                                    style={{
+                                        width: "120px",
+                                        backgroundColor: "#1A1A18",
+                                        border: "1px solid rgba(255,255,255,0.1)",
+                                        borderRadius: "10px",
+                                        padding: "12px 8px",
+                                        fontSize: "14px",
+                                        color: "#F4F0EB",
+                                        outline: "none",
+                                        cursor: "pointer",
+                                    }}
+                                >
+                                    {SUPPORTED_COUNTRIES.map((c) => (
+                                        <option key={c.code} value={c.code}>
+                                            {c.flag} {c.dialCode}
+                                        </option>
+                                    ))}
+                                </select>
+                                <input
+                                    type="tel"
+                                    id="whatsapp"
+                                    name="whatsapp"
+                                    value={whatsapp}
+                                    onChange={(e) => handlePhoneChange(e.target.value)}
+                                    placeholder={
+                                        SUPPORTED_COUNTRIES.find((c) => c.code === selectedCountry)?.placeholder ||
+                                        "55 1234 5678"
+                                    }
+                                    required
+                                    style={{
+                                        flex: 1,
+                                        backgroundColor: "#1A1A18",
+                                        border: "1px solid rgba(255,255,255,0.1)",
+                                        borderRadius: "10px",
+                                        padding: "12px 16px",
+                                        fontSize: "15px",
+                                        color: "#F4F0EB",
+                                        outline: "none",
+                                        boxSizing: "border-box",
+                                        transition: "border-color 0.2s",
+                                    }}
+                                    onFocus={(e) => (e.target.style.borderColor = "rgba(232,35,26,0.5)")}
+                                    onBlur={(e) => (e.target.style.borderColor = "rgba(255,255,255,0.1)")}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Checkbox de Consentimiento */}
+                        <div
+                            style={{
+                                background: "rgba(232,35,26,0.05)",
+                                border: "1px solid rgba(232,35,26,0.2)",
+                                borderRadius: "10px",
+                                padding: "16px",
+                            }}
+                        >
+                            <label style={{ display: "flex", alignItems: "flex-start", gap: "10px", cursor: "pointer" }}>
+                                <input
+                                    type="checkbox"
+                                    checked={aceptaMarketing}
+                                    onChange={(e) => setAceptaMarketing(e.target.checked)}
+                                    style={{ marginTop: "2px", flexShrink: 0, accentColor: "#E8231A", width: "18px", height: "18px" }}
+                                />
+                                <span style={{ fontSize: "13px", color: "#C8C0B4", lineHeight: "1.5", fontWeight: 500 }}>
+                                    Acepto recibir información de RescueChip por WhatsApp o correo.
+                                </span>
+                            </label>
+                        </div>
+
+                        {/* Botón Submit */}
+                        <button
+                            type="submit"
+                            disabled={!aceptaMarketing || submitting || !nombre.trim() || !whatsapp.trim()}
+                            style={{
+                                width: "100%",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                gap: "8px",
+                                backgroundColor: "#E8231A",
+                                color: "#fff",
+                                height: "60px",
+                                borderRadius: "16px",
+                                fontSize: "18px",
+                                fontWeight: 900,
+                                border: "none",
+                                cursor: !aceptaMarketing || submitting || !nombre.trim() || !whatsapp.trim() ? "not-allowed" : "pointer",
+                                opacity: !aceptaMarketing || submitting || !nombre.trim() || !whatsapp.trim() ? 0.4 : 1,
+                                transition: "all 0.2s",
+                                boxShadow: "0 4px 14px rgba(232,35,26,0.3)",
+                            }}
+                        >
+                            {submitting ? (
+                                <>
+                                    <Loader2 size={22} style={{ animation: "spin 1s linear infinite" }} />
+                                    <span>Generando acceso...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Download size={22} />
+                                    <span>Descargar Kit del Rider</span>
+                                </>
+                            )}
+                        </button>
+
+                        <div style={{ textAlign: "center", marginTop: "8px" }}>
+                            <span style={{ fontSize: "13px", color: "#9E9A95" }}>¿Ya tienes cuenta en RescueChip? </span>
+                            <Link href="/login" style={{ fontSize: "13px", color: "#E8231A", textDecoration: "none", fontWeight: 600 }}>
+                                Iniciar sesión
+                            </Link>
+                        </div>
+                    </form>
+                </div>
+            )}
+        </div>
+    );
+}
+
+export default function KitRiderPage() {
+    return (
+        <div
+            style={{
+                minHeight: "100vh",
+                backgroundColor: "#0A0A08",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                padding: "40px 16px",
+                fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+            }}
+        >
+            <div style={{ width: "100%", maxWidth: "640px" }}>
+                {/* Header Card */}
+                <div
+                    style={{
+                        background: "linear-gradient(135deg, #1C0A09 0%, #2C1210 60%, #1A0808 100%)",
+                        padding: "40px 32px",
+                        border: "1px solid rgba(232,35,26,0.35)",
+                        borderRadius: "16px 16px 0 0",
+                        position: "relative",
+                        overflow: "hidden",
+                    }}
+                >
+                    <Link
+                        href="/"
+                        style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            backgroundColor: "rgba(255,255,255,0.05)",
+                            padding: "6px 12px",
+                            borderRadius: "9999px",
+                            color: "#9E9A95",
+                            textDecoration: "none",
+                            marginBottom: "24px",
+                            fontSize: "12px",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.05em",
+                            fontWeight: 500,
+                        }}
+                    >
+                        <ArrowLeft size={16} /> Volver al Inicio
+                    </Link>
+                    <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "8px" }}>
+                        <div style={{ backgroundColor: "rgba(232,35,26,0.2)", padding: "8px", borderRadius: "10px", color: "#E8231A", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <FileText size={28} />
+                        </div>
+                        <h1
+                            style={{
+                                fontSize: "32px",
+                                fontWeight: 900,
+                                color: "#F4F0EB",
+                                margin: 0,
+                                letterSpacing: "-0.02em",
+                            }}
+                        >
+                            Kit del Rider
+                        </h1>
+                    </div>
+                    <p style={{ color: "#9E9A95", fontSize: "16px", fontWeight: 500, margin: 0, lineHeight: 1.5 }}>
+                        Manual de primeros auxilios y protocolo de emergencia para motociclistas. Lo que debes saber en los primeros minutos tras un accidente.
+                    </p>
+                </div>
+
+                {/* Form / Content Container with Suspense for useSearchParams */}
+                <Suspense
+                    fallback={
+                        <div
+                            style={{
+                                backgroundColor: "#131311",
+                                padding: "96px 32px",
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                color: "#9E9A95",
+                                border: "1px solid rgba(255,255,255,0.08)",
+                                borderTop: "none",
+                                borderRadius: "0 0 16px 16px",
+                            }}
+                        >
+                            <Loader2 size={48} style={{ color: "rgba(232,35,26,0.3)", marginBottom: "16px", animation: "spin 1s linear infinite" }} />
+                            <p style={{ fontWeight: 500, margin: 0 }}>Cargando Kit del Rider...</p>
+                        </div>
+                    }
+                >
+                    <KitRiderContent />
+                </Suspense>
+            </div>
+        </div>
+    );
+}

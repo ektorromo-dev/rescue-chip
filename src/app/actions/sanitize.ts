@@ -108,3 +108,12 @@ export async function sanitizeProfileInput(data: Record<string, any>) {
 
     return cleanData;
 }
+
+export async function sanitizePlainText(value: string | undefined | null, maxLength = 100): Promise<string> {
+    if (!value || typeof value !== 'string') return '';
+    const sanitized = sanitizeHtml(value, {
+        allowedTags: [],
+        allowedAttributes: {}
+    });
+    return sanitized.substring(0, maxLength).trim();
+}
