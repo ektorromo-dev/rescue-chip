@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2, AlertCircle, Loader2, FileText, Download, ShieldCheck, CheckSquare, Square } from "lucide-react";
+import { ArrowLeft, CheckCircle2, AlertCircle, Loader2, FileText, Download, CheckSquare, Square } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
 import { createClient } from "@/lib/supabase/client";
@@ -25,7 +25,7 @@ export const RIDER_RESOURCES: RiderResource[] = [
         titulo: "El Manual de El Rider Solitario",
         descripcion: "Qué hacer (y qué NO) en los primeros 10 minutos después de un accidente en moto en México.",
         tipo: "Manual PDF",
-        url: KIT_RIDER_PDF_URL,
+        url: "https://kaihkhyqjmattriozick.supabase.co/storage/v1/object/public/kit-rider/manual-rider-solitario_ilustrado.pdf?v=2",
         tamano: "PDF · 316 KB",
         badge: "Incluido",
     },
@@ -184,52 +184,6 @@ function KitRiderContent() {
     return (
         <div style={{ backgroundColor: "#131311", border: "1px solid rgba(255,255,255,0.08)", borderTop: "none", borderRadius: "0 0 16px 16px", padding: "32px" }}>
             
-            {/* Tarjetas de Contenido del Manual */}
-            <div style={{ marginBottom: "32px", display: "flex", flexDirection: "column", gap: "16px" }}>
-                {/* Tarjeta destacada */}
-                <div style={{ display: "flex", alignItems: "flex-start", gap: "16px", padding: "18px 20px", backgroundColor: "rgba(232,35,26,0.08)", border: "1px solid rgba(232,35,26,0.25)", borderRadius: "12px", color: "#F4F0EB" }}>
-                    <div style={{ color: "#E8231A", flexShrink: 0, marginTop: "2px" }}>
-                        <ShieldCheck size={26} />
-                    </div>
-                    <div>
-                        <h3 style={{ fontSize: "17px", fontWeight: 700, margin: "0 0 6px 0", color: "#F4F0EB" }}>
-                            Guía del Rider Solitario
-                        </h3>
-                        <p style={{ fontSize: "14px", color: "#9E9A95", margin: 0, lineHeight: 1.6 }}>
-                            Qué hacer (y qué NO) en los primeros minutos después de una caída — para ti o para tu compañero biker.
-                        </p>
-                    </div>
-                </div>
-
-                {/* Grid 3 tarjetas */}
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "12px" }}>
-                    <div style={{ backgroundColor: "#1A1A18", padding: "16px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.05)" }}>
-                        <div style={{ fontSize: "14px", fontWeight: 700, color: "#F4F0EB", marginBottom: "6px" }}>
-                            Si te caíste tú
-                        </div>
-                        <div style={{ fontSize: "13px", color: "#9E9A95", lineHeight: 1.5 }}>
-                            Qué hacer y qué evitar mientras esperas ayuda.
-                        </div>
-                    </div>
-                    <div style={{ backgroundColor: "#1A1A18", padding: "16px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.05)" }}>
-                        <div style={{ fontSize: "14px", fontWeight: 700, color: "#F4F0EB", marginBottom: "6px" }}>
-                            Si eres testigo
-                        </div>
-                        <div style={{ fontSize: "13px", color: "#9E9A95", lineHeight: 1.5 }}>
-                            Checklist accionable para ayudar a un compañero biker en el pavimento.
-                        </div>
-                    </div>
-                    <div style={{ backgroundColor: "#1A1A18", padding: "16px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.05)" }}>
-                        <div style={{ fontSize: "14px", fontWeight: 700, color: "#F4F0EB", marginBottom: "6px" }}>
-                            Prepara a tu familia
-                        </div>
-                        <div style={{ fontSize: "13px", color: "#9E9A95", lineHeight: 1.5 }}>
-                            Cómo asegurar que tu información esté disponible si no puedes hablar.
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             {/* CASO 1: USUARIO CON SESIÓN ACTIVA (BYPASS DIRECTO) */}
             {session ? (
                 <div style={{ textAlign: "center", padding: "16px 0", display: "flex", flexDirection: "column", alignItems: "center", gap: "20px" }}>
@@ -270,7 +224,7 @@ function KitRiderContent() {
                                     Descargar {recurso.tipo === "Manual PDF" || recurso.tipo === "PDF" ? "el PDF" : recurso.tipo}
                                 </span>
                                 <span style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px", opacity: 0.9 }}>
-                                    <Download size={16} /> {recurso.tamano || "PDF"}
+                                    <Download size={16} /> {recurso.tamano || "Descargar"}
                                 </span>
                             </a>
                         ))}
@@ -340,7 +294,7 @@ function KitRiderContent() {
                                     Descargar {recurso.tipo === "Manual PDF" || recurso.tipo === "PDF" ? "el PDF" : recurso.tipo}
                                 </span>
                                 <span style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px", fontWeight: 600 }}>
-                                    <Download size={18} /> {recurso.tamano || "PDF"}
+                                    <Download size={18} /> {recurso.tamano || "Descargar"}
                                 </span>
                             </a>
                         ))}
@@ -391,7 +345,7 @@ function KitRiderContent() {
                                                 display: "flex",
                                                 alignItems: "center",
                                                 justifyContent: "space-between",
-                                                padding: "12px 16px",
+                                                padding: "14px 16px",
                                                 backgroundColor: isChecked ? "rgba(232,35,26,0.06)" : "#1A1A18",
                                                 border: isChecked ? "1px solid rgba(232,35,26,0.3)" : "1px solid rgba(255,255,255,0.06)",
                                                 borderRadius: "10px",
@@ -407,7 +361,7 @@ function KitRiderContent() {
                                                     <div style={{ fontSize: "14px", fontWeight: 600, color: "#F4F0EB" }}>
                                                         {recurso.titulo}
                                                     </div>
-                                                    <div style={{ fontSize: "12px", color: "#9E9A95" }}>
+                                                    <div style={{ fontSize: "12px", color: "#9E9A95", marginTop: "2px", lineHeight: "1.4" }}>
                                                         {recurso.descripcion}
                                                     </div>
                                                 </div>
@@ -664,7 +618,7 @@ export default function KitRiderPage() {
                         </h1>
                     </div>
                     <p style={{ color: "#9E9A95", fontSize: "16px", fontWeight: 500, margin: 0, lineHeight: 1.5 }}>
-                        Qué hacer en los primeros minutos después de un accidente en moto. Guía práctica para ti y para quien te acompañe en la rodada.
+                        Material práctico para motociclistas: guías, infografías y recursos para que sepas qué hacer antes, durante y después de una emergencia en la rodada.
                     </p>
                 </div>
 
