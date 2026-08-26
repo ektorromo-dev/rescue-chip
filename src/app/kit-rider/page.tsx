@@ -29,6 +29,15 @@ export const RIDER_RESOURCES: RiderResource[] = [
         tamano: "PDF · 316 KB",
         badge: "Incluido",
     },
+    {
+        id: "donde-colocar-rescuechip",
+        titulo: "Dónde colocar tu RescueChip",
+        descripcion: "Guía visual de zonas recomendadas para instalar tu chip en el casco.",
+        tipo: "Infografía",
+        url: "https://kaihkhyqjmattriozick.supabase.co/storage/v1/object/public/kit-rider/Donde%20colocar%20RescueChip.png",
+        tamano: "PNG · 2.7 MB",
+        badge: undefined,
+    },
 ];
 
 function KitRiderContent() {
@@ -258,7 +267,7 @@ function KitRiderContent() {
                             >
                                 <span style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                                     <FileText size={20} />
-                                    Descargar el PDF
+                                    Descargar {recurso.tipo === "Manual PDF" || recurso.tipo === "PDF" ? "el PDF" : recurso.tipo}
                                 </span>
                                 <span style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px", opacity: 0.9 }}>
                                     <Download size={16} /> {recurso.tamano || "PDF"}
@@ -328,7 +337,7 @@ function KitRiderContent() {
                             >
                                 <span style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                                     <FileText size={22} />
-                                    Descargar el PDF
+                                    Descargar {recurso.tipo === "Manual PDF" || recurso.tipo === "PDF" ? "el PDF" : recurso.tipo}
                                 </span>
                                 <span style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px", fontWeight: 600 }}>
                                     <Download size={18} /> {recurso.tamano || "PDF"}
