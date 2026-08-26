@@ -34,7 +34,7 @@ export const RIDER_RESOURCES: RiderResource[] = [
         titulo: "Dónde colocar tu RescueChip",
         descripcion: "Guía visual de zonas recomendadas para instalar tu chip en el casco.",
         tipo: "Infografía",
-        url: "https://kaihkhyqjmattriozick.supabase.co/storage/v1/object/public/kit-rider/Donde%20colocar%20RescueChip.png",
+        url: "https://kaihkhyqjmattriozick.supabase.co/storage/v1/object/public/kit-rider/Donde%20colocar%20RescueChip.png?v=2",
         tamano: "PNG · 2.7 MB",
         badge: undefined,
     },
