@@ -77,7 +77,7 @@ export async function sanitizeProfileInput(data: Record<string, any>) {
     // Procesamos todos los campos de texto típicos de un perfil
     // Limites lógicos
     if (data.full_name !== undefined) cleanData.full_name = cleanAndTruncate(data.full_name, 100);
-    if (data.blood_type !== undefined) cleanData.blood_type = cleanAndTruncate(data.blood_type, 10);
+    if (data.blood_type !== undefined) cleanData.blood_type = cleanAndTruncate(data.blood_type, 20);
     if (data.allergies !== undefined) cleanData.allergies = cleanAndTruncate(data.allergies, 500);
     if (data.medications !== undefined) cleanData.medications = cleanAndTruncate(data.medications, 500);
     if (data.chronic_conditions !== undefined) cleanData.chronic_conditions = cleanAndTruncate(data.chronic_conditions, 500);
