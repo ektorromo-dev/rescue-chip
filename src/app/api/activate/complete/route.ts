@@ -31,20 +31,42 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ success: false, error: "Este folio ya fue activado." }, { status: 400 });
         }
 
-        // 2. Insert into profiles (El frontend ya envía la data sanitizada incluyendo el chip_id)
-        const { data: insertedProfileData, error: profileInsertError } = await supabaseAdmin
+        // 2. Verifica si el usuario ya tiene un perfil existente
+        const { data: existingProfile, error: existingProfileError } = await supabaseAdmin
             .from('profiles')
-            .insert(profileData)
-            .select()
-            .single();
+            .select('id')
+            .eq('user_id', userId)
+            .maybeSingle();
 
-        if (profileInsertError) {
-            console.error("Error insertando perfil:", profileInsertError);
+        if (existingProfileError) {
+            console.error("Error verificando perfil existente:", existingProfileError);
             return NextResponse.json({ 
                 success: false, 
-                error: profileInsertError.message || "Fallo al guardar el perfil médico.",
-                errorCode: profileInsertError.code // Para capturar el 23505 de registro doble en el frontend
-            }, { status: 400 });
+                error: "Error al verificar perfil existente." 
+            }, { status: 500 });
+        }
+
+        let insertedProfileData: { id: string };
+
+        if (existingProfile) {
+            // Reutiliza el perfil existente en lugar de crear uno nuevo
+            insertedProfileData = existingProfile;
+        } else {
+            // Crea un perfil nuevo solo si el usuario no tenía ninguno
+            const { data: newProfileData, error: profileInsertError } = await supabaseAdmin
+                .from('profiles')
+                .insert(profileData)
+                .select()
+                .single();
+            if (profileInsertError) {
+                console.error("Error insertando perfil:", profileInsertError);
+                return NextResponse.json({ 
+                    success: false, 
+                    error: profileInsertError.message || "Fallo al guardar el perfil médico.",
+                    errorCode: profileInsertError.code
+                }, { status: 400 });
+            }
+            insertedProfileData = newProfileData;
         }
 
         // 3. Update chips SET activated=true, owner_profile_id=profile.id
@@ -62,14 +84,15 @@ export async function POST(req: NextRequest) {
         if (activateError) {
             console.error("Error activando chip, iniciando rollback:", activateError);
             
-            // 4. Si el UPDATE falla: DELETE el profile recién creado (rollback)
-            const { error: rollbackError } = await supabaseAdmin
-                .from('profiles')
-                .delete()
-                .eq('id', insertedProfileData.id);
-
-            if (rollbackError) {
-                console.error("Error crítico durante rollback (perfil huérfano):", rollbackError);
+            // 4. Si el UPDATE falla: DELETE el profile SOLO si fue recién creado (rollback)
+            if (!existingProfile) {
+                const { error: rollbackError } = await supabaseAdmin
+                    .from('profiles')
+                    .delete()
+                    .eq('id', insertedProfileData.id);
+                if (rollbackError) {
+                    console.error("Error crítico durante rollback (perfil huérfano):", rollbackError);
+                }
             }
             
             return NextResponse.json({ 
