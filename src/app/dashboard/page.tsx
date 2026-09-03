@@ -122,11 +122,17 @@ export default function DashboardPage() {
         let pollingInterval: NodeJS.Timeout;
 
         const fetchUserData = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-
+            let { data: { session } } = await supabase.auth.getSession();
+            if (!session || !session.user) {
+                // Reintento único tras 800ms — cubre el caso de sesión recién 
+                // creada (ej. justo después de activar un chip) que aún no 
+                // terminó de hidratar en el cliente
+                await new Promise(resolve => setTimeout(resolve, 800));
+                const retry = await supabase.auth.getSession();
+                session = retry.data.session;
+            }
             console.log('SESSION USER ID:', session?.user?.id);
             console.log('SESSION USER EMAIL:', session?.user?.email);
-
             if (!session || !session.user) {
                 router.push('/login');
                 return;
@@ -204,6 +210,7 @@ export default function DashboardPage() {
                 const isVerified = await checkDeviceSession(session, session.access_token, currentDeviceId);
 
                 if (!isVerified) {
+                    setDeviceVerificationStatus("pending");
                     // Start polling
                     pollingInterval = setInterval(async () => {
                         const { data: dbCurrent } = await supabase
@@ -358,6 +365,15 @@ export default function DashboardPage() {
         };
 
         fetchUserData();
+
+        const stuckLoaderTimeout = setTimeout(() => {
+            setLoadingAuth(false);
+            setDeviceVerificationStatus((current) => 
+                current === 'idle' ? 'verified' : current
+            );
+        }, 10000);
+
+        return () => clearTimeout(stuckLoaderTimeout);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
