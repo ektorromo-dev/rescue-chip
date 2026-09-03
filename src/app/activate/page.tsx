@@ -587,7 +587,7 @@ function ActivationFormContent() {
                     {preValidationError}
                 </p>
                 <div style={{ paddingTop: '24px', width: '100%', maxWidth: '384px', margin: '0 auto' }}>
-                    <Link href="/shop" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', backgroundColor: '#E8231A', color: '#fff', height: '56px', borderRadius: '12px', fontWeight: 700, textDecoration: 'none' }}>
+                    <Link href="/#precios" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', backgroundColor: '#E8231A', color: '#fff', height: '56px', borderRadius: '12px', fontWeight: 700, textDecoration: 'none' }}>
                         Comprar mi RescueChip
                     </Link>
                 </div>
