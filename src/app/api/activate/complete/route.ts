@@ -32,11 +32,16 @@ export async function POST(req: NextRequest) {
         }
 
         // 2. Verifica si el usuario ya tiene un perfil existente
-        const { data: existingProfile, error: existingProfileError } = await supabaseAdmin
+        const { data: existingProfiles, error: existingProfileError } = await supabaseAdmin
             .from('profiles')
             .select('id')
             .eq('user_id', userId)
-            .maybeSingle();
+            .order('created_at', { ascending: false })
+            .limit(1);
+
+        const existingProfile = existingProfiles && existingProfiles.length > 0 
+            ? existingProfiles[0] 
+            : null;
 
         if (existingProfileError) {
             console.error("Error verificando perfil existente:", existingProfileError);
