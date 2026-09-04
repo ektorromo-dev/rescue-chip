@@ -2,10 +2,12 @@ import { AlertTriangle, Clock } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
+import { waitUntil } from "@vercel/functions";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import ProfileViewer from "@/components/ProfileViewer";
 import ReportedChipScreen from "@/components/ReportedChipScreen";
+import { processReportedChipScanAlert } from "@/lib/alert-reported-scan";
 
 export const dynamic = 'force-dynamic';
 
@@ -83,24 +85,20 @@ export default async function ProfilePage({ params, searchParams }: ProfileProps
         if (chip.status === 'reportado') {
             try {
                 const reqHeaders = await headers();
-                const host = reqHeaders.get('host') || 'rescue-chip.com';
-                const proto = reqHeaders.get('x-forwarded-proto') || (host.includes('localhost') ? 'http' : 'https');
-                const forwardedFor = reqHeaders.get('x-forwarded-for') || '';
-                const realIp = reqHeaders.get('x-real-ip') || '';
-                const userAgent = reqHeaders.get('user-agent') || '';
+                const ip_raw = reqHeaders.get('x-forwarded-for')?.split(',')[0]?.trim()
+                    || reqHeaders.get('x-real-ip')
+                    || '127.0.0.1';
+                const userAgent = reqHeaders.get('user-agent') || 'Desconocido';
 
-                fetch(`${proto}://${host}/api/alert-reported-scan`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-forwarded-for': forwardedFor,
-                        'x-real-ip': realIp,
-                        'user-agent': userAgent
-                    },
-                    body: JSON.stringify({ folio: chip.folio })
-                }).catch(e => console.error('[profile/reported-chip] Error disparando alerta:', e));
+                waitUntil(
+                    processReportedChipScanAlert({
+                        folio: chip.folio,
+                        ipAddress: ip_raw,
+                        userAgent: userAgent,
+                    }).catch(e => console.error('[profile/reported-chip] Error en background alert:', e))
+                );
             } catch (err) {
-                console.error('[profile/reported-chip] Error preparando llamada de alerta:', err);
+                console.error('[profile/reported-chip] Error preparando alerta:', err);
             }
 
             return <ReportedChipScreen folio={chip.folio} />;
@@ -190,6 +188,24 @@ export default async function ProfilePage({ params, searchParams }: ProfileProps
         if (chipErr || !chip) return <div>Error al cargar chip.</div>;
 
         if (chip.status === 'reportado') {
+            try {
+                const reqHeaders = await headers();
+                const ip_raw = reqHeaders.get('x-forwarded-for')?.split(',')[0]?.trim()
+                    || reqHeaders.get('x-real-ip')
+                    || '127.0.0.1';
+                const userAgent = reqHeaders.get('user-agent') || 'Desconocido';
+
+                waitUntil(
+                    processReportedChipScanAlert({
+                        folio: chip.folio,
+                        ipAddress: ip_raw,
+                        userAgent: userAgent,
+                    }).catch(e => console.error('[profile/reported-chip] Error en background alert:', e))
+                );
+            } catch (err) {
+                console.error('[profile/reported-chip] Error preparando alerta:', err);
+            }
+
             return <ReportedChipScreen folio={chip.folio} />;
         }
 

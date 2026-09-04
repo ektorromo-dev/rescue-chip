@@ -19,6 +19,7 @@
     "@types/mapbox-gl": "^3.4.1",
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.36.3",
+    "@vercel/functions": "^3.9.5",
     "leaflet": "^1.9.4",
     "leaflet-gesture-handling": "^1.2.2",
     "libphonenumber-js": "^1.13.1",
