@@ -1,9 +1,11 @@
 import { AlertTriangle, Clock } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import ProfileViewer from "@/components/ProfileViewer";
+import ReportedChipScreen from "@/components/ReportedChipScreen";
 
 export const dynamic = 'force-dynamic';
 
@@ -76,6 +78,32 @@ export default async function ProfilePage({ params, searchParams }: ProfileProps
                     </div>
                 </div>
             );
+        }
+
+        if (chip.status === 'reportado') {
+            try {
+                const reqHeaders = await headers();
+                const host = reqHeaders.get('host') || 'rescue-chip.com';
+                const proto = reqHeaders.get('x-forwarded-proto') || (host.includes('localhost') ? 'http' : 'https');
+                const forwardedFor = reqHeaders.get('x-forwarded-for') || '';
+                const realIp = reqHeaders.get('x-real-ip') || '';
+                const userAgent = reqHeaders.get('user-agent') || '';
+
+                fetch(`${proto}://${host}/api/alert-reported-scan`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-forwarded-for': forwardedFor,
+                        'x-real-ip': realIp,
+                        'user-agent': userAgent
+                    },
+                    body: JSON.stringify({ folio: chip.folio })
+                }).catch(e => console.error('[profile/reported-chip] Error disparando alerta:', e));
+            } catch (err) {
+                console.error('[profile/reported-chip] Error preparando llamada de alerta:', err);
+            }
+
+            return <ReportedChipScreen folio={chip.folio} />;
         }
 
         const isChipFullyActivated = chip.status === 'activado' || chip.activated === true;
@@ -160,6 +188,10 @@ export default async function ProfilePage({ params, searchParams }: ProfileProps
             .from('chips').select('*').ilike('folio', tokenRecord.chip_folio).single();
 
         if (chipErr || !chip) return <div>Error al cargar chip.</div>;
+
+        if (chip.status === 'reportado') {
+            return <ReportedChipScreen folio={chip.folio} />;
+        }
 
         let profile: any = null;
         let pQuery = supabase.from('profiles').select('*');
