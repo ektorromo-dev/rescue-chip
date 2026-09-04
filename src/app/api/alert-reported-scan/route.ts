@@ -4,6 +4,7 @@ import nodemailer from "nodemailer";
 import fs from "fs";
 import path from "path";
 import { generateScanReportPdfBuffer } from "@/components/ReportedScanPdf";
+import { parseUserAgentShort } from "@/lib/user-agent";
 
 export async function POST(req: NextRequest) {
     try {
@@ -40,6 +41,7 @@ export async function POST(req: NextRequest) {
             || "127.0.0.1";
         const ip_address = ip_raw !== "127.0.0.1" ? ip_raw : "Desconocida";
         const user_agent = req.headers.get("user-agent") || "Desconocido";
+        const userAgentShort = parseUserAgentShort(user_agent);
 
         // 3. Obtener el email del dueño a través de reported_by_user_id
         let ownerEmail: string | null = null;
@@ -84,6 +86,7 @@ export async function POST(req: NextRequest) {
                 fechaStr,
                 ipAddress: ip_address,
                 userAgent: user_agent,
+                userAgentShort,
                 ownerEmail,
                 logoBase64,
             });
@@ -124,7 +127,7 @@ export async function POST(req: NextRequest) {
                         <li><strong>Folio:</strong> ${cleanFolio}</li>
                         <li><strong>Fecha y Hora:</strong> ${fechaStr}</li>
                         <li><strong>Dirección IP:</strong> ${ip_address}</li>
-                        <li><strong>Dispositivo / User-Agent:</strong> ${user_agent}</li>
+                        <li><strong>Dispositivo / User-Agent:</strong> <strong>${userAgentShort}</strong><br><span style="font-size: 11px; color: #777; word-break: break-all;">${user_agent}</span></li>
                         <li><strong>Email del Dueño:</strong> ${ownerEmail || "No disponible"}</li>
                     </ul>
                 </div>
@@ -161,12 +164,12 @@ export async function POST(req: NextRequest) {
                             <li><strong>Folio:</strong> ${cleanFolio}</li>
                             <li><strong>Fecha y Hora:</strong> ${fechaStr}</li>
                             <li><strong>Dirección IP del Escaneo:</strong> ${ip_address}</li>
-                            <li><strong>Dispositivo detectado:</strong> ${user_agent}</li>
+                            <li><strong>Dispositivo detectado:</strong> ${userAgentShort}</li>
                         </ul>
                     </div>
                     
                     <p style="color: #555; font-size: 14px; line-height: 1.6;">
-                        <strong>Tus datos médicos se mantuvieron completamente protegidos</strong> y no fueron mostrados a quien escaneó el chip. La persona vio un aviso indicando que el chip fue reportado como robado y se le proporcionó nuestro contacto para regresarlo.
+                        <strong>Tu información de perfil de emergencia se mantuvo completamente protegida</strong> y no fue mostrada a quien escaneó el chip. La persona vio un aviso indicando que el chip fue reportado como robado y se le proporcionó nuestro contacto para regresarlo.
                     </p>
                     
                     <p style="color: #555; font-size: 14px; line-height: 1.6;">

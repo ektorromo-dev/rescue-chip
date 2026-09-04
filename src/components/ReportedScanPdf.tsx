@@ -1,5 +1,6 @@
 import React from "react";
 import { Document, Page, Text, View, StyleSheet, Image, renderToBuffer } from "@react-pdf/renderer";
+import { parseUserAgentShort } from "@/lib/user-agent";
 
 const pdfStyles = StyleSheet.create({
     page: {
@@ -88,6 +89,20 @@ const pdfStyles = StyleSheet.create({
         fontSize: 10,
         color: '#1A100A',
     },
+    valueCol: {
+        width: '62%',
+    },
+    valueShort: {
+        fontSize: 10,
+        fontWeight: 'bold',
+        color: '#1A100A',
+    },
+    valueMuted: {
+        fontSize: 7.5,
+        color: '#8C7F72',
+        marginTop: 2,
+        lineHeight: 1.3,
+    },
     noticeBox: {
         backgroundColor: '#FBF9F5',
         borderWidth: 1,
@@ -123,6 +138,7 @@ export interface ScanReportPdfProps {
     fechaStr: string;
     ipAddress: string;
     userAgent: string;
+    userAgentShort?: string;
     ownerEmail: string | null;
     logoBase64: string | null;
 }
@@ -132,9 +148,12 @@ export const ScanReportPdf: React.FC<ScanReportPdfProps> = ({
     fechaStr,
     ipAddress,
     userAgent,
+    userAgentShort,
     ownerEmail,
     logoBase64,
 }) => {
+    const shortDevice = userAgentShort || parseUserAgentShort(userAgent);
+
     return (
         <Document>
             <Page size="A4" style={pdfStyles.page}>
@@ -185,7 +204,10 @@ export const ScanReportPdf: React.FC<ScanReportPdfProps> = ({
 
                     <View style={pdfStyles.row}>
                         <Text style={pdfStyles.label}>Dispositivo / Navegador:</Text>
-                        <Text style={pdfStyles.value}>{userAgent}</Text>
+                        <View style={pdfStyles.valueCol}>
+                            <Text style={pdfStyles.valueShort}>{shortDevice}</Text>
+                            <Text style={pdfStyles.valueMuted}>{userAgent}</Text>
+                        </View>
                     </View>
 
                     {ownerEmail && (
@@ -201,7 +223,7 @@ export const ScanReportPdf: React.FC<ScanReportPdfProps> = ({
                     <Text style={pdfStyles.sectionTitle}>Acciones de Protección Ejecutadas</Text>
                     <View style={pdfStyles.noticeBox}>
                         <Text style={pdfStyles.noticeText}>
-                            1. Bloqueo Inmediato: No se expuso ninguna información médica ni datos personales confidenciales del titular.{"\n"}
+                            1. Bloqueo Inmediato: No se expuso ninguna información de su perfil de emergencia ni datos personales confidenciales del titular.{"\n"}
                             2. Notificación en Pantalla: Se presentó una advertencia indicando que el chip está reportado como robado, ofreciendo un enlace directo de devolución.{"\n"}
                             3. Registro Forense: La dirección IP y huella digital del dispositivo que realizó el escaneo quedaron registradas en los sistemas de auditoría.
                         </Text>
@@ -211,7 +233,7 @@ export const ScanReportPdf: React.FC<ScanReportPdfProps> = ({
                 {/* Pie de página */}
                 <View style={pdfStyles.footer}>
                     <Text style={pdfStyles.footerText}>
-                        RescueChip Sistema de Identificación Médica · soporte: contacto@rescue-chip.com · rescue-chip.com{"\n"}
+                        RescueChip Identificación Prehospitalaria de Emergencia · soporte: contacto@rescue-chip.com · rescue-chip.com{"\n"}
                         Documento generado automáticamente como evidencia técnica de trazabilidad.
                     </Text>
                 </View>
