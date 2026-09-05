@@ -7,7 +7,6 @@ const supabaseAdmin = createClient(
 );
 
 async function buscarUserIdPorEmail(email: string): Promise<string | null> {
-  console.log("[push-notify][DEBUG] buscando por email:", email);
   const { data, error } = await supabaseAdmin.rpc("get_user_id_by_email", {
     lookup_email: email,
   });
@@ -15,7 +14,6 @@ async function buscarUserIdPorEmail(email: string): Promise<string | null> {
     console.error("[push-notify] Error en get_user_id_by_email:", error);
     return null;
   }
-  console.log("[push-notify][DEBUG] userId encontrado:", data ?? "NINGUNO");
   return data ?? null;
 }
 
@@ -30,13 +28,11 @@ async function buscarUserIdPorTelefono(rawPhone: string): Promise<string | null>
 }
 
 async function obtenerPushToken(userId: string): Promise<string | null> {
-  console.log("[push-notify][DEBUG] buscando token para userId:", userId);
   const { data } = await supabaseAdmin
     .from("user_push_tokens")
     .select("expo_push_token")
     .eq("user_id", userId)
     .maybeSingle();
-  console.log("[push-notify][DEBUG] token encontrado:", data?.expo_push_token ?? "NINGUNO");
   return data?.expo_push_token ?? null;
 }
 
