@@ -8,26 +8,15 @@ const supabaseAdmin = createClient(
 
 async function buscarUserIdPorEmail(email: string): Promise<string | null> {
   console.log("[push-notify][DEBUG] buscando por email:", email);
-  try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1/admin/users?email=${encodeURIComponent(email)}`,
-      {
-        headers: {
-          apikey: process.env.SUPABASE_SERVICE_ROLE_KEY!,
-          Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
-        },
-      }
-    );
-    console.log("[push-notify][DEBUG] status respuesta admin/users:", res.status);
-    const data = await res.json();
-    console.log("[push-notify][DEBUG] data completa:", JSON.stringify(data));
-    if (!res.ok) return null;
-    console.log("[push-notify][DEBUG] userId encontrado:", data?.users?.[0]?.id ?? "NINGUNO");
-    return data?.users?.[0]?.id ?? null;
-  } catch (err) {
-    console.error("[push-notify] Error buscando por email:", err);
+  const { data, error } = await supabaseAdmin.rpc("get_user_id_by_email", {
+    lookup_email: email,
+  });
+  if (error) {
+    console.error("[push-notify] Error en get_user_id_by_email:", error);
     return null;
   }
+  console.log("[push-notify][DEBUG] userId encontrado:", data ?? "NINGUNO");
+  return data ?? null;
 }
 
 async function buscarUserIdPorTelefono(rawPhone: string): Promise<string | null> {
