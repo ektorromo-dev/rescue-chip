@@ -7,6 +7,7 @@ const supabaseAdmin = createClient(
 );
 
 async function buscarUserIdPorEmail(email: string): Promise<string | null> {
+  console.log("[push-notify][DEBUG] buscando por email:", email);
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1/admin/users?email=${encodeURIComponent(email)}`,
@@ -17,8 +18,11 @@ async function buscarUserIdPorEmail(email: string): Promise<string | null> {
         },
       }
     );
-    if (!res.ok) return null;
+    console.log("[push-notify][DEBUG] status respuesta admin/users:", res.status);
     const data = await res.json();
+    console.log("[push-notify][DEBUG] data completa:", JSON.stringify(data));
+    if (!res.ok) return null;
+    console.log("[push-notify][DEBUG] userId encontrado:", data?.users?.[0]?.id ?? "NINGUNO");
     return data?.users?.[0]?.id ?? null;
   } catch (err) {
     console.error("[push-notify] Error buscando por email:", err);
@@ -37,11 +41,13 @@ async function buscarUserIdPorTelefono(rawPhone: string): Promise<string | null>
 }
 
 async function obtenerPushToken(userId: string): Promise<string | null> {
+  console.log("[push-notify][DEBUG] buscando token para userId:", userId);
   const { data } = await supabaseAdmin
     .from("user_push_tokens")
     .select("expo_push_token")
     .eq("user_id", userId)
     .maybeSingle();
+  console.log("[push-notify][DEBUG] token encontrado:", data?.expo_push_token ?? "NINGUNO");
   return data?.expo_push_token ?? null;
 }
 
