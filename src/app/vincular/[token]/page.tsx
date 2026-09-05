@@ -167,7 +167,7 @@ export default async function VincularPage({ params }: PageProps) {
 
   const { data: invitation, error: inviteError } = await supabase
     .from('contact_invitations')
-    .select('id, inviter_profile_id, contact_name, contact_email, status, expires_at')
+    .select('id, inviter_profile_id, contact_name, contact_phone, contact_email, status, expires_at')
     .eq('token', token)
     .maybeSingle();
 
@@ -251,6 +251,16 @@ export default async function VincularPage({ params }: PageProps) {
   }
 
   // 4. Caso: Pending (activo)
+  let existingAccountHint = false;
+  if (invitation.contact_phone) {
+    const { data: matchingProfile } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('phone', invitation.contact_phone)
+      .maybeSingle();
+    existingAccountHint = Boolean(matchingProfile);
+  }
+
   return (
     <PageLayout>
       <VincularClient
@@ -258,6 +268,7 @@ export default async function VincularPage({ params }: PageProps) {
         riderName={riderName}
         contactEmail={invitation.contact_email}
         contactName={invitation.contact_name}
+        existingAccountHint={existingAccountHint}
       />
     </PageLayout>
   );

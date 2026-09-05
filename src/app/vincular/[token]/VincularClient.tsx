@@ -11,12 +11,14 @@ interface VincularClientProps {
   riderName: string;
   contactEmail: string | null;
   contactName: string | null;
+  existingAccountHint: boolean;
 }
 
 export default function VincularClient({
   token,
   riderName,
   contactEmail,
+  existingAccountHint,
 }: VincularClientProps) {
   const supabase = createClient();
   const [email, setEmail] = useState(contactEmail || '');
@@ -262,6 +264,25 @@ export default function VincularClient({
           </div>
         )}
 
+        {existingAccountHint && !error && (
+          <div
+            style={{
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              border: '1px solid rgba(59, 130, 246, 0.3)',
+              borderRadius: '10px',
+              padding: '12px 16px',
+              marginBottom: '20px',
+              color: '#93C5FD',
+              fontSize: '13px',
+              lineHeight: 1.5,
+            }}
+          >
+            Detectamos que ya existe una cuenta de RescueChip asociada a este
+            número de teléfono. Si esa cuenta es tuya, usa el correo con el que
+            la registraste en vez del correo pre-llenado.
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div>
             <label
@@ -349,7 +370,9 @@ export default function VincularClient({
               </button>
             </div>
             <span style={{ display: 'block', fontSize: '11px', color: '#6E6A65', marginTop: '6px' }}>
-              Si ya tienes cuenta en RescueChip, usa tu contraseña existente. Si no, esta será tu clave de acceso.
+              ¿Ya tienes cuenta en RescueChip? Cambia el correo de arriba por el de
+              tu cuenta e ingresa tu contraseña. Si no tienes cuenta, esta será tu
+              clave de acceso con el correo indicado.
             </span>
           </div>
 
