@@ -4,6 +4,11 @@ import sanitizeHtml from 'sanitize-html';
 import { createClient } from "@/lib/supabase/server";
 import { headers } from "next/headers";
 import { logAuditEvent } from "@/lib/audit";
+import { randomBytes } from 'crypto';
+
+function generarTokenInvitacion(): string {
+    return randomBytes(16).toString('hex');
+}
 
 export async function updateProfileSafe(profileId: string, data: Record<string, any>) {
     const supabase = await createClient();
@@ -39,6 +44,56 @@ export async function updateProfileSafe(profileId: string, data: Record<string, 
 
     if (updateError) {
         throw new Error("Error en BD al guardar: " + updateError.message);
+    }
+
+    // Generar invitaciones de contacto automáticamente si hay contactos nuevos
+    if (sanitizedData.emergency_contacts && Array.isArray(sanitizedData.emergency_contacts)) {
+        for (const contacto of sanitizedData.emergency_contacts) {
+            try {
+                const phone = contacto.phone ? String(contacto.phone).trim() : null;
+                const email = contacto.email ? String(contacto.email).trim() : null;
+
+                if (!phone && !email) continue;
+
+                let checkQuery = supabase
+                    .from('contact_invitations')
+                    .select('id')
+                    .eq('inviter_profile_id', profileId);
+
+                if (phone && email) {
+                    checkQuery = checkQuery.or(`contact_phone.eq.${phone},contact_email.eq.${email}`);
+                } else if (phone) {
+                    checkQuery = checkQuery.eq('contact_phone', phone);
+                } else if (email) {
+                    checkQuery = checkQuery.eq('contact_email', email);
+                }
+
+                const { data: existingInvites, error: checkError } = await checkQuery.limit(1);
+
+                if (checkError) {
+                    console.error('[contact-invitations] Error verificando invitación existente:', checkError);
+                    continue;
+                }
+
+                if (!existingInvites || existingInvites.length === 0) {
+                    const { error: inviteError } = await supabase
+                        .from('contact_invitations')
+                        .insert({
+                            inviter_profile_id: profileId,
+                            contact_name: contacto.name,
+                            contact_phone: contacto.phone || null,
+                            contact_email: contacto.email || null,
+                            token: generarTokenInvitacion(),
+                        });
+
+                    if (inviteError) {
+                        console.error('[contact-invitations] Error creando invitación:', inviteError);
+                    }
+                }
+            } catch (inviteLoopErr) {
+                console.error('[contact-invitations] Error procesando invitación de contacto:', inviteLoopErr);
+            }
+        }
     }
 
     const headersList = await headers();
