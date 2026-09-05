@@ -55,10 +55,12 @@ export async function updateProfileSafe(profileId: string, data: Record<string, 
 
                 if (!phone && !email) continue;
 
+                const contactName = contacto.name ? String(contacto.name).trim() : null;
                 let checkQuery = supabase
                     .from('contact_invitations')
                     .select('id')
-                    .eq('inviter_profile_id', profileId);
+                    .eq('inviter_profile_id', profileId)
+                    .eq('contact_name', contactName);
 
                 if (phone && email) {
                     checkQuery = checkQuery.or(`contact_phone.eq.${phone},contact_email.eq.${email}`);
