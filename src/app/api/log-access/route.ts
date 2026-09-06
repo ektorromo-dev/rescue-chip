@@ -6,7 +6,7 @@ import twilio from "twilio";
 import { rateLimitSendEmergency } from "@/lib/ratelimit";
 import { formatStoredPhone } from '@/lib/phone-utils';
 import { logAuditEvent } from '@/lib/audit';
-import { intentarPush } from "@/lib/push-notify";
+import { intentarPush, intentarPushSilenciosa } from "@/lib/push-notify";
 
 // Twilio Setup
 const twilioClient = twilio(
@@ -273,6 +273,28 @@ export async function POST(req: NextRequest) {
                             });
                         }
                     });
+
+                    // ── PUSH SILENCIOSA AL DUEÑO: activa Modo Viaje automático ──
+                    if (ownerEmail || ownerPhones.length > 0) {
+                      try {
+                        const silentPushSuccess = await intentarPushSilenciosa(
+                          { email: ownerEmail || undefined, phone: ownerPhones[0] || undefined },
+                          {
+                            tipo: 'auto_start_trip',
+                            incidentToken: incidentToken,
+                            chipFolio: chip_folio,
+                          }
+                        );
+                        console.log(
+                          silentPushSuccess
+                            ? `[Push Silenciosa] Enviada al dueño para auto-activar Modo Viaje.`
+                            : `[Push Silenciosa] No se pudo enviar al dueño (sin token o token inválido).`
+                        );
+                      } catch (silentPushError) {
+                        console.error('[Push Silenciosa] Error:', silentPushError);
+                      }
+                    }
+                    // ── FIN PUSH SILENCIOSA ──
 
                     const notificationPromises = notifyTargets.map(async (target) => {
                         const pushSuccess = await intentarPush(
