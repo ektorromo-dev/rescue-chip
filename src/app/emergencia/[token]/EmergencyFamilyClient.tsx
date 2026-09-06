@@ -7,20 +7,39 @@ const MAPBOX_JS = 'https://api.mapbox.com/mapbox-gl-js/v3.23.1/mapbox-gl.js';
 const MAPBOX_CSS = 'https://api.mapbox.com/mapbox-gl-js/v3.23.1/mapbox-gl.css';
 
 function loadMapbox(): Promise<void> {
-  return new Promise((resolve) => {
-    if ((window as any).mapboxgl) { resolve(); return; }
-    if (!document.getElementById('mapbox-gl-css')) {
-      const link = document.createElement('link');
-      link.id = 'mapbox-gl-css'; link.rel = 'stylesheet'; link.href = MAPBOX_CSS;
-      document.head.appendChild(link);
+  const cssPromise = new Promise<void>((resolveCss) => {
+    const existingLink = document.getElementById('mapbox-gl-css') as HTMLLinkElement | null;
+    if (existingLink) {
+      resolveCss();
+      return;
+    }
+    const link = document.createElement('link');
+    link.id = 'mapbox-gl-css';
+    link.rel = 'stylesheet';
+    link.href = MAPBOX_CSS;
+    link.onload = () => resolveCss();
+    link.onerror = () => resolveCss();
+    document.head.appendChild(link);
+  });
+
+  const jsPromise = new Promise<void>((resolveJs) => {
+    if ((window as any).mapboxgl) {
+      resolveJs();
+      return;
     }
     const existing = document.getElementById('mapbox-gl-js');
-    if (existing) { existing.addEventListener('load', () => resolve()); return; }
+    if (existing) {
+      existing.addEventListener('load', () => resolveJs());
+      return;
+    }
     const script = document.createElement('script');
-    script.id = 'mapbox-gl-js'; script.src = MAPBOX_JS;
-    script.onload = () => resolve();
+    script.id = 'mapbox-gl-js';
+    script.src = MAPBOX_JS;
+    script.onload = () => resolveJs();
     document.head.appendChild(script);
   });
+
+  return Promise.all([cssPromise, jsPromise]).then(() => undefined);
 }
 
 function formatTimeSince(isoString: string): string {
@@ -344,16 +363,47 @@ export default function EmergencyFamilyClient({ incidente, profile, isDemo = fal
             </div>
             {(liveLocation || (effectiveLat && effectiveLng)) && (
               <div style={{ marginBottom: '12px' }}>
-                <div
-                  ref={mapContainerRef}
-                  style={{
-                    width: '100%',
-                    height: '220px',
-                    borderRadius: '12px',
-                    overflow: 'hidden',
-                    marginBottom: '8px',
-                  }}
-                />
+                <div style={{ position: 'relative' }}>
+                  <div
+                    ref={mapContainerRef}
+                    style={{
+                      width: '100%',
+                      height: '220px',
+                      borderRadius: '12px',
+                      overflow: 'hidden',
+                      marginBottom: '8px',
+                    }}
+                  />
+                  <button
+                    onClick={() => {
+                      const displayLat = liveLocation?.latitude ?? effectiveLat;
+                      const displayLng = liveLocation?.longitude ?? effectiveLng;
+                      if (displayLat && displayLng && mapRef.current) {
+                        mapRef.current.flyTo({ center: [displayLng, displayLat], zoom: 15 });
+                      }
+                    }}
+                    style={{
+                      position: 'absolute',
+                      bottom: '18px',
+                      right: '10px',
+                      backgroundColor: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      width: '36px',
+                      height: '36px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+                      cursor: 'pointer',
+                      fontSize: '18px',
+                      padding: 0,
+                    }}
+                    aria-label="Centrar mapa"
+                  >
+                    📍
+                  </button>
+                </div>
                 <p key={tick} style={{ fontSize: '12px', color: '#9E9A95', textAlign: 'center' as const, margin: 0 }}>
                   {liveLocation
                     ? `🟢 Compartiendo ubicación en vivo — actualizado ${formatTimeSince(liveLocation.updatedAt)}`
