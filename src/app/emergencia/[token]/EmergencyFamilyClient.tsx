@@ -144,18 +144,14 @@ export default function EmergencyFamilyClient({ incidente, profile, isDemo = fal
     const displayLng = liveLocation?.longitude ?? effectiveLng;
     if (!displayLat || !displayLng || !mapContainerRef.current) return;
 
-    console.log('[MAP DEBUG] Efecto ejecutado. displayLat:', displayLat, 'displayLng:', displayLng, 'mapRef.current existe:', !!mapRef.current);
-
     const initOrUpdateMap = async () => {
       await loadMapbox();
       if (!mapContainerRef.current) return;
 
-      console.log('[MAP DEBUG] loadMapbox completado.');
       const mapboxgl = (window as any).mapboxgl;
       mapboxgl.accessToken = MAPBOX_TOKEN;
 
       if (!mapRef.current) {
-        console.log('[MAP DEBUG] Creando mapa nuevo.');
         const map = new mapboxgl.Map({
           container: mapContainerRef.current,
           style: 'mapbox://styles/mapbox/streets-v12',
@@ -173,23 +169,18 @@ export default function EmergencyFamilyClient({ incidente, profile, isDemo = fal
         map.addControl(new mapboxgl.FullscreenControl(), 'top-right');
 
         map.on('load', () => {
-          console.log('[MAP DEBUG] Evento load disparado.');
           if (!mapRef.current) return;
           const marker = new mapboxgl.Marker({ color: '#E11D48' })
             .setLngLat([displayLng, displayLat])
             .addTo(map);
           markerRef.current = marker;
-          console.log('[MAP DEBUG] Marcador creado exitosamente.');
         });
       } else if (markerRef.current) {
-        console.log('[MAP DEBUG] Actualizando mapa existente con marcador.');
         mapRef.current.easeTo({
           center: [displayLng, displayLat],
           duration: 1000,
         });
         markerRef.current.setLngLat([displayLng, displayLat]);
-      } else {
-        console.log('[MAP DEBUG] Mapa existe pero sin marcador todavía, esperando a que cargue.');
       }
     };
 
