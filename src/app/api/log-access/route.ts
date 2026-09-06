@@ -6,6 +6,7 @@ import twilio from "twilio";
 import { rateLimitSendEmergency } from "@/lib/ratelimit";
 import { formatStoredPhone } from '@/lib/phone-utils';
 import { logAuditEvent } from '@/lib/audit';
+import { intentarPush } from "@/lib/push-notify";
 
 // Twilio Setup
 const twilioClient = twilio(
@@ -236,55 +237,59 @@ export async function POST(req: NextRequest) {
                         console.log("No hay emails para notificar (ni de dueño ni de contactos).");
                     }
 
-                    // --- TWILIO SMS & WHATSAPP INTEGRATION ---
-
-
+                    // --- PUSH PRIMERO, SMS SOLO SI FALLA PUSH ---
                     const plainLocation = latitud && longitud
                         ? `https://maps.google.com/?q=${latitud},${longitud}`
                         : "No disponible";
-
-                    // Shortened to < 160 characters for WhatsApp/SMS compatibility
                     const textMessageBody = incidentUrl
                         ? `⚠️ RESCUECHIP EMERGENCIA: ${userName} necesita ayuda. GPS: ${plainLocation}. Instrucciones: ${incidentUrl}`
                         : `⚠️ RESCUECHIP EMERGENCIA: ${userName} necesita ayuda. GPS: ${plainLocation}. Llama al 911.`;
 
-                    const ownerPhones = [];
-                    // Extract owner phone if available
-                    if (profileData.user_id) {
-                        // Normally user phone is in profiles table, let's see if we have phone in auth.users
-                        // Instead, profile data might contain a phone or general user profile.
-                        // We will just process contacts array in the profile and user. phone if present.
-                    }
+                    const pushTitle = "⚠️ Alerta de Emergencia RescueChip";
+                    const pushData = { incidentUrl: incidentUrl || null, tipo: "emergencia" };
 
-                    // Extract contact phones
-                    const contactPhones = contacts
-                        .filter((c: any) => c.phone && c.phone.trim() !== '')
-                        .map((c: any) => c.phone.trim());
-
-                    // Find if profile has an owner phone directly natively? 
-                    // No direct phone_number field retrieved earlier, 
-                    // Let's rely on retrieving the Auth User's phone if configured:
+                    const ownerPhones: string[] = [];
                     if (profileData.user_id) {
                         const { data: userData } = await supabase.auth.admin.getUserById(profileData.user_id);
                         if (userData && userData.user && userData.user.phone) {
                             ownerPhones.push(userData.user.phone);
                         }
                     }
-
-                    // Fallback: usar phone de profiles si auth.users no tiene
                     if (ownerPhones.length === 0 && profileData.phone) {
                         ownerPhones.push(profileData.phone);
                     }
 
-                    const allPhonesToNotify = Array.from(new Set([...ownerPhones, ...contactPhones]));
+                    interface NotifyTarget { email?: string; phone?: string; }
+                    const notifyTargets: NotifyTarget[] = [];
 
-                    // Trigger notifications concurrently
-                    const notificationPromises = allPhonesToNotify.map(async (rawPhone) => {
-                        const formattedPhone = formatStoredPhone(rawPhone);
+                    if (ownerEmail || ownerPhones.length > 0) {
+                        notifyTargets.push({ email: ownerEmail || undefined, phone: ownerPhones[0] || undefined });
+                    }
+                    contacts.forEach((c: any) => {
+                        if ((c.phone && c.phone.trim() !== '') || (c.email && c.email.trim() !== '')) {
+                            notifyTargets.push({
+                                email: c.email && c.email.trim() !== '' ? c.email.trim() : undefined,
+                                phone: c.phone && c.phone.trim() !== '' ? c.phone.trim() : undefined,
+                            });
+                        }
+                    });
 
-                        console.log(`[Twilio Pre-Send Check] Procesando SMS para destino: ${formattedPhone}`);
+                    const notificationPromises = notifyTargets.map(async (target) => {
+                        const pushSuccess = await intentarPush(
+                            { email: target.email, phone: target.phone },
+                            pushTitle,
+                            textMessageBody,
+                            pushData
+                        );
 
-                        // 1) SEND SMS
+                        if (pushSuccess) {
+                            console.log(`[Push] Enviado exitosamente a ${target.email || target.phone}`);
+                            return;
+                        }
+
+                        if (!target.phone) return;
+                        const formattedPhone = formatStoredPhone(target.phone);
+                        console.log(`[Twilio] Push falló, enviando SMS a: ${formattedPhone}`);
                         try {
                             await twilioClient.messages.create({
                                 body: textMessageBody,
@@ -295,24 +300,8 @@ export async function POST(req: NextRequest) {
                         } catch (smsError: any) {
                             console.error(`[Twilio SMS Error] Falló el envío a ${formattedPhone}:`, smsError.message);
                         }
-
-                        // 2) SEND WHATSAPP
-                        const waTo = `whatsapp:${formattedPhone}`;
-                        console.log(`[Twilio Pre-Send Check] Procesando WhatsApp para destino: ${waTo}`);
-                        try {
-                            const waFrom = process.env.TWILIO_WHATSAPP_NUMBER || "whatsapp:+14155238886";
-                            await twilioClient.messages.create({
-                                body: textMessageBody,
-                                from: waFrom,
-                                to: waTo
-                            });
-                            console.log(`[Twilio WA] Enviado exitosamente a ${waTo}`);
-                        } catch (waError: any) {
-                            console.error(`[Twilio WA Error] Falló el envío a ${waTo}:`, waError.message);
-                        }
                     });
 
-                    // Wait for all messages across all phones to finish attempting
                     await Promise.all(notificationPromises);
                 }
             }
