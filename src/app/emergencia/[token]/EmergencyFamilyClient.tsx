@@ -144,15 +144,20 @@ export default function EmergencyFamilyClient({ incidente, profile, isDemo = fal
     const displayLng = liveLocation?.longitude ?? effectiveLng;
     if (!displayLat || !displayLng || !mapContainerRef.current) return;
 
+    console.log('[MAP DEBUG] Efecto ejecutado. displayLat:', displayLat, 'displayLng:', displayLng, 'mapRef.current existe:', !!mapRef.current);
+
     let cancelled = false;
 
     const initOrUpdateMap = async () => {
       await loadMapbox();
       if (cancelled || !mapContainerRef.current) return;
+
+      console.log('[MAP DEBUG] loadMapbox completado. cancelled:', cancelled);
       const mapboxgl = (window as any).mapboxgl;
       mapboxgl.accessToken = MAPBOX_TOKEN;
 
       if (!mapRef.current) {
+        console.log('[MAP DEBUG] Creando mapa nuevo.');
         const map = new mapboxgl.Map({
           container: mapContainerRef.current,
           style: 'mapbox://styles/mapbox/streets-v12',
@@ -170,13 +175,16 @@ export default function EmergencyFamilyClient({ incidente, profile, isDemo = fal
         map.addControl(new mapboxgl.FullscreenControl(), 'top-right');
 
         map.on('load', () => {
+          console.log('[MAP DEBUG] Evento load disparado. cancelled:', cancelled);
           if (cancelled) return;
           const marker = new mapboxgl.Marker({ color: '#E11D48' })
             .setLngLat([displayLng, displayLat])
             .addTo(map);
           markerRef.current = marker;
+          console.log('[MAP DEBUG] Marcador creado exitosamente.');
         });
       } else {
+        console.log('[MAP DEBUG] Actualizando mapa existente. markerRef.current existe:', !!markerRef.current);
         mapRef.current.easeTo({
           center: [displayLng, displayLat],
           duration: 1000,
@@ -384,7 +392,7 @@ export default function EmergencyFamilyClient({ incidente, profile, isDemo = fal
                     }}
                     style={{
                       position: 'absolute',
-                      bottom: '18px',
+                      top: '46px',
                       right: '10px',
                       backgroundColor: 'white',
                       border: 'none',
