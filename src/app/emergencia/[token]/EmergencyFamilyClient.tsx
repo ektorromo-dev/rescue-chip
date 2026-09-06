@@ -376,37 +376,40 @@ export default function EmergencyFamilyClient({ incidente, profile, isDemo = fal
                       borderRadius: '12px',
                       overflow: 'hidden',
                       marginBottom: '8px',
+                      position: 'relative',
                     }}
-                  />
-                  <button
-                    onClick={() => {
-                      const displayLat = liveLocation?.latitude ?? effectiveLat;
-                      const displayLng = liveLocation?.longitude ?? effectiveLng;
-                      if (displayLat && displayLng && mapRef.current) {
-                        mapRef.current.flyTo({ center: [displayLng, displayLat], zoom: 15 });
-                      }
-                    }}
-                    style={{
-                      position: 'absolute',
-                      top: '46px',
-                      right: '10px',
-                      backgroundColor: 'white',
-                      border: 'none',
-                      borderRadius: '8px',
-                      width: '36px',
-                      height: '36px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
-                      cursor: 'pointer',
-                      fontSize: '18px',
-                      padding: 0,
-                    }}
-                    aria-label="Centrar mapa"
                   >
-                    📍
-                  </button>
+                    <button
+                      onClick={() => {
+                        const displayLat = liveLocation?.latitude ?? effectiveLat;
+                        const displayLng = liveLocation?.longitude ?? effectiveLng;
+                        if (displayLat && displayLng && mapRef.current) {
+                          mapRef.current.flyTo({ center: [displayLng, displayLat], zoom: 15 });
+                        }
+                      }}
+                      style={{
+                        position: 'absolute',
+                        top: '46px',
+                        right: '10px',
+                        backgroundColor: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        width: '36px',
+                        height: '36px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+                        cursor: 'pointer',
+                        fontSize: '18px',
+                        padding: 0,
+                        zIndex: 10,
+                      }}
+                      aria-label="Centrar mapa"
+                    >
+                      📍
+                    </button>
+                  </div>
                 </div>
                 <p key={tick} style={{ fontSize: '12px', color: '#9E9A95', textAlign: 'center' as const, margin: 0 }}>
                   {liveLocation
