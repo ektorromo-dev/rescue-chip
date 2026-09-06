@@ -146,13 +146,11 @@ export default function EmergencyFamilyClient({ incidente, profile, isDemo = fal
 
     console.log('[MAP DEBUG] Efecto ejecutado. displayLat:', displayLat, 'displayLng:', displayLng, 'mapRef.current existe:', !!mapRef.current);
 
-    let cancelled = false;
-
     const initOrUpdateMap = async () => {
       await loadMapbox();
-      if (cancelled || !mapContainerRef.current) return;
+      if (!mapContainerRef.current) return;
 
-      console.log('[MAP DEBUG] loadMapbox completado. cancelled:', cancelled);
+      console.log('[MAP DEBUG] loadMapbox completado.');
       const mapboxgl = (window as any).mapboxgl;
       mapboxgl.accessToken = MAPBOX_TOKEN;
 
@@ -175,29 +173,27 @@ export default function EmergencyFamilyClient({ incidente, profile, isDemo = fal
         map.addControl(new mapboxgl.FullscreenControl(), 'top-right');
 
         map.on('load', () => {
-          console.log('[MAP DEBUG] Evento load disparado. cancelled:', cancelled);
-          if (cancelled) return;
+          console.log('[MAP DEBUG] Evento load disparado.');
+          if (!mapRef.current) return;
           const marker = new mapboxgl.Marker({ color: '#E11D48' })
             .setLngLat([displayLng, displayLat])
             .addTo(map);
           markerRef.current = marker;
           console.log('[MAP DEBUG] Marcador creado exitosamente.');
         });
-      } else {
-        console.log('[MAP DEBUG] Actualizando mapa existente. markerRef.current existe:', !!markerRef.current);
+      } else if (markerRef.current) {
+        console.log('[MAP DEBUG] Actualizando mapa existente con marcador.');
         mapRef.current.easeTo({
           center: [displayLng, displayLat],
           duration: 1000,
         });
-        markerRef.current?.setLngLat([displayLng, displayLat]);
+        markerRef.current.setLngLat([displayLng, displayLat]);
+      } else {
+        console.log('[MAP DEBUG] Mapa existe pero sin marcador todavía, esperando a que cargue.');
       }
     };
 
     initOrUpdateMap();
-
-    return () => {
-      cancelled = true;
-    };
   }, [liveLocation, effectiveLat, effectiveLng]);
 
   useEffect(() => {
