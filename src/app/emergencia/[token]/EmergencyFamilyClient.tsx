@@ -70,6 +70,7 @@ export default function EmergencyFamilyClient({ incidente, profile, isDemo = fal
     tripActive: boolean;
     updatedAt: string;
   } | null>(null);
+  const [tick, setTick] = useState(0);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
   const markerRef = useRef<any>(null);
@@ -139,20 +140,19 @@ export default function EmergencyFamilyClient({ incidente, profile, isDemo = fal
           center: [displayLng, displayLat],
           zoom: 15,
           interactive: true,
+          cooperativeGestures: true,
+          locale: {
+            'TouchPanBlocker.Message': 'Usa dos dedos para mover el mapa',
+            'ScrollZoomBlocker.CtrlMessage': 'Mantén Ctrl y haz scroll para hacer zoom',
+            'ScrollZoomBlocker.CmdMessage': 'Mantén ⌘ y haz scroll para hacer zoom',
+          },
         });
         mapRef.current = map;
+        map.addControl(new mapboxgl.FullscreenControl(), 'top-right');
 
         map.on('load', () => {
           if (cancelled) return;
-          const el = document.createElement('div');
-          el.style.cssText = [
-            'width:24px', 'height:24px',
-            'border-radius:50%',
-            'border:3px solid white',
-            'box-shadow:0 0 0 4px rgba(225,29,72,0.4)',
-            'background:#E11D48',
-          ].join(';');
-          const marker = new mapboxgl.Marker({ element: el })
+          const marker = new mapboxgl.Marker({ color: '#E11D48' })
             .setLngLat([displayLng, displayLat])
             .addTo(map);
           markerRef.current = marker;
@@ -178,6 +178,11 @@ export default function EmergencyFamilyClient({ incidente, profile, isDemo = fal
       mapRef.current?.remove();
       mapRef.current = null;
     };
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => setTick((t) => t + 1), 1000);
+    return () => clearInterval(interval);
   }, []);
 
   const userName = profile?.fullName || 'Usuario RescueChip';
@@ -349,11 +354,9 @@ export default function EmergencyFamilyClient({ incidente, profile, isDemo = fal
                     marginBottom: '8px',
                   }}
                 />
-                <p style={{ fontSize: '12px', color: '#9E9A95', textAlign: 'center' as const, margin: 0 }}>
+                <p key={tick} style={{ fontSize: '12px', color: '#9E9A95', textAlign: 'center' as const, margin: 0 }}>
                   {liveLocation
-                    ? (liveLocation.tripActive
-                        ? `🟢 En movimiento — actualizado ${formatTimeSince(liveLocation.updatedAt)}`
-                        : `⚪ Última posición conocida — ${formatTimeSince(liveLocation.updatedAt)}`)
+                    ? `🟢 Compartiendo ubicación en vivo — actualizado ${formatTimeSince(liveLocation.updatedAt)}`
                     : '📍 Ubicación del momento de la alerta'}
                 </p>
               </div>
