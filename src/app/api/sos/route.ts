@@ -48,8 +48,6 @@ export async function POST(req: NextRequest) {
     try {
         // ── 1. AUTENTICACIÓN VÍA BEARER TOKEN ──
         const authHeader = req.headers.get("authorization");
-        console.log("[SOS DEBUG] authHeader presente:", !!authHeader);
-        console.log("[SOS DEBUG] authHeader primeros 20 caracteres:", authHeader?.substring(0, 20));
         if (!authHeader?.startsWith("Bearer ")) {
             return NextResponse.json({ error: "No autorizado" }, { status: 401 });
         }
@@ -60,8 +58,6 @@ export async function POST(req: NextRequest) {
         }
 
         const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
-        console.log("[SOS DEBUG] authError:", authError?.message || "ninguno");
-        console.log("[SOS DEBUG] user encontrado:", !!user);
         if (authError || !user) {
             return NextResponse.json({ error: "No autorizado" }, { status: 401 });
         }
