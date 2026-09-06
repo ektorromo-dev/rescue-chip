@@ -1,6 +1,36 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+
+const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
+const MAPBOX_JS = 'https://api.mapbox.com/mapbox-gl-js/v3.23.1/mapbox-gl.js';
+const MAPBOX_CSS = 'https://api.mapbox.com/mapbox-gl-js/v3.23.1/mapbox-gl.css';
+
+function loadMapbox(): Promise<void> {
+  return new Promise((resolve) => {
+    if ((window as any).mapboxgl) { resolve(); return; }
+    if (!document.getElementById('mapbox-gl-css')) {
+      const link = document.createElement('link');
+      link.id = 'mapbox-gl-css'; link.rel = 'stylesheet'; link.href = MAPBOX_CSS;
+      document.head.appendChild(link);
+    }
+    const existing = document.getElementById('mapbox-gl-js');
+    if (existing) { existing.addEventListener('load', () => resolve()); return; }
+    const script = document.createElement('script');
+    script.id = 'mapbox-gl-js'; script.src = MAPBOX_JS;
+    script.onload = () => resolve();
+    document.head.appendChild(script);
+  });
+}
+
+function formatTimeSince(isoString: string): string {
+  const seconds = Math.floor((Date.now() - new Date(isoString).getTime()) / 1000);
+  if (seconds < 60) return `hace ${seconds} segundos`;
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `hace ${minutes} minuto${minutes === 1 ? '' : 's'}`;
+  const hours = Math.floor(minutes / 60);
+  return `hace ${hours} hora${hours === 1 ? '' : 's'}`;
+}
 
 interface IncidenteData {
   token: string;
@@ -34,6 +64,121 @@ export default function EmergencyFamilyClient({ incidente, profile, isDemo = fal
   const [enCamino, setEnCamino] = useState(incidente.familiarEnCamino);
   const [sending, setSending] = useState(false);
   const [checkedItems, setCheckedItems] = useState<Record<number, boolean>>({});
+  const [liveLocation, setLiveLocation] = useState<{
+    latitude: number;
+    longitude: number;
+    tripActive: boolean;
+    updatedAt: string;
+  } | null>(null);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<any>(null);
+  const markerRef = useRef<any>(null);
+
+  const effectiveLat = liveLocation?.latitude ?? incidente.latitud;
+  const effectiveLng = liveLocation?.longitude ?? incidente.longitud;
+  const mapsUrl = effectiveLat && effectiveLng
+    ? `https://www.google.com/maps?q=${effectiveLat},${effectiveLng}`
+    : null;
+  const wazeUrl = effectiveLat && effectiveLng
+    ? `https://waze.com/ul?ll=${effectiveLat},${effectiveLng}&navigate=yes`
+    : null;
+  const coordsText = effectiveLat && effectiveLng
+    ? `${effectiveLat.toFixed(6)}, ${effectiveLng.toFixed(6)}`
+    : null;
+
+  useEffect(() => {
+    if (isDemo) return;
+
+    let cancelled = false;
+
+    const fetchLocation = async () => {
+      try {
+        const res = await fetch(`/api/emergencia/${incidente.token}/ubicacion`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (cancelled) return;
+        if (data.available) {
+          setLiveLocation({
+            latitude: data.latitude,
+            longitude: data.longitude,
+            tripActive: data.tripActive,
+            updatedAt: data.updatedAt,
+          });
+        }
+      } catch (err) {
+        console.error('Error consultando ubicación en vivo:', err);
+      }
+    };
+
+    fetchLocation();
+    const interval = setInterval(fetchLocation, 15000);
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [incidente.token, isDemo]);
+
+  useEffect(() => {
+    const displayLat = liveLocation?.latitude ?? effectiveLat;
+    const displayLng = liveLocation?.longitude ?? effectiveLng;
+    if (!displayLat || !displayLng || !mapContainerRef.current) return;
+
+    let cancelled = false;
+
+    const initOrUpdateMap = async () => {
+      await loadMapbox();
+      if (cancelled || !mapContainerRef.current) return;
+      const mapboxgl = (window as any).mapboxgl;
+      mapboxgl.accessToken = MAPBOX_TOKEN;
+
+      if (!mapRef.current) {
+        const map = new mapboxgl.Map({
+          container: mapContainerRef.current,
+          style: 'mapbox://styles/mapbox/streets-v12',
+          center: [displayLng, displayLat],
+          zoom: 15,
+          interactive: true,
+        });
+        mapRef.current = map;
+
+        map.on('load', () => {
+          if (cancelled) return;
+          const el = document.createElement('div');
+          el.style.cssText = [
+            'width:24px', 'height:24px',
+            'border-radius:50%',
+            'border:3px solid white',
+            'box-shadow:0 0 0 4px rgba(225,29,72,0.4)',
+            'background:#E11D48',
+          ].join(';');
+          const marker = new mapboxgl.Marker({ element: el })
+            .setLngLat([displayLng, displayLat])
+            .addTo(map);
+          markerRef.current = marker;
+        });
+      } else {
+        mapRef.current.easeTo({
+          center: [displayLng, displayLat],
+          duration: 1000,
+        });
+        markerRef.current?.setLngLat([displayLng, displayLat]);
+      }
+    };
+
+    initOrUpdateMap();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [liveLocation, effectiveLat, effectiveLng]);
+
+  useEffect(() => {
+    return () => {
+      mapRef.current?.remove();
+      mapRef.current = null;
+    };
+  }, []);
 
   const userName = profile?.fullName || 'Usuario RescueChip';
   const firstName = profile?.fullName?.split(' ')[0] || 'tu ser querido';
@@ -42,18 +187,6 @@ export default function EmergencyFamilyClient({ incidente, profile, isDemo = fal
     dateStyle: 'short',
     timeStyle: 'short',
   });
-
-  const mapsUrl = incidente.latitud && incidente.longitud
-    ? `https://www.google.com/maps?q=${incidente.latitud},${incidente.longitud}`
-    : null;
-
-  const wazeUrl = incidente.latitud && incidente.longitud
-    ? `https://waze.com/ul?ll=${incidente.latitud},${incidente.longitud}&navigate=yes`
-    : null;
-
-  const coordsText = incidente.latitud && incidente.longitud
-    ? `${incidente.latitud.toFixed(6)}, ${incidente.longitud.toFixed(6)}`
-    : null;
 
   const handleEnCamino = async () => {
     if (isDemo) {
@@ -204,6 +337,27 @@ export default function EmergencyFamilyClient({ incidente, profile, isDemo = fal
                 {coordsText}
               </div>
             </div>
+            {(liveLocation || (effectiveLat && effectiveLng)) && (
+              <div style={{ marginBottom: '12px' }}>
+                <div
+                  ref={mapContainerRef}
+                  style={{
+                    width: '100%',
+                    height: '220px',
+                    borderRadius: '12px',
+                    overflow: 'hidden',
+                    marginBottom: '8px',
+                  }}
+                />
+                <p style={{ fontSize: '12px', color: '#9E9A95', textAlign: 'center' as const, margin: 0 }}>
+                  {liveLocation
+                    ? (liveLocation.tripActive
+                        ? `🟢 En movimiento — actualizado ${formatTimeSince(liveLocation.updatedAt)}`
+                        : `⚪ Última posición conocida — ${formatTimeSince(liveLocation.updatedAt)}`)
+                    : '📍 Ubicación del momento de la alerta'}
+                </p>
+              </div>
+            )}
             <a href={mapsUrl} target="_blank" rel="noopener noreferrer"
               style={{ ...buttonPrimary, backgroundColor: '#1a73e8', color: 'white' }}>
               Abrir en Google Maps
