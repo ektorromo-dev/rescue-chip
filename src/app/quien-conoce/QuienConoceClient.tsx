@@ -702,7 +702,7 @@ export default function QuienConoceClient({ personal, initialFolio = '' }: Quien
 
         {/* Footer oficial de referencia */}
         <footer className="qc-footer">
-          NOM&#8209;034&#8209;SSA3&#8209;2013 &nbsp;·&nbsp; <b style={{ color: '#0A0A08' }}>rescue-chip.com</b>
+          rescue-chip.com
         </footer>
       </div>
     </div>
