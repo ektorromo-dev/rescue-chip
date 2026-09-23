@@ -109,6 +109,35 @@ export default async function ProfilePage({ params, searchParams }: ProfileProps
             redirect(`/activate?folio=${encodeURIComponent(chip.folio)}`);
         }
 
+        if (isPreview) {
+            try {
+                const reqHeaders = await headers();
+                const ip_address = reqHeaders.get('x-forwarded-for')?.split(',')[0]?.trim()
+                    || reqHeaders.get('x-real-ip')
+                    || '127.0.0.1';
+                const user_agent = reqHeaders.get('user-agent') || 'Desconocido';
+
+                waitUntil(
+                    (async () => {
+                        const { error } = await supabase.from('chip_accesos').insert({
+                            chip_folio: chip.folio,
+                            tipo: 'previsualizacion',
+                            latitud: null,
+                            longitud: null,
+                            ip_address,
+                            user_agent,
+                            session_token: null,
+                        });
+                        if (error) {
+                            console.error('[profile/preview] Error registrando acceso de previsualización:', error);
+                        }
+                    })().catch(e => console.error('[profile/preview] Error en background preview log:', e))
+                );
+            } catch (err) {
+                console.error('[profile/preview] Error preparando registro de previsualización:', err);
+            }
+        }
+
         // Load profile directly without token generation to prevent 307 caching loops on Safari
         let profile: any = null;
         let pQuery = supabase.from('profiles').select('*');
