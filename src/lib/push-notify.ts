@@ -120,3 +120,21 @@ export async function intentarPushSilenciosa(
 
   return enviarPushSilenciosa(token, data);
 }
+
+export async function intentarPushPorPerfil(
+  profileId: string,
+  data: Record<string, unknown>
+): Promise<boolean> {
+  const { data: profile, error } = await supabaseAdmin
+    .from("profiles")
+    .select("user_id")
+    .eq("id", profileId)
+    .maybeSingle();
+
+  if (error || !profile?.user_id) return false;
+
+  const token = await obtenerPushToken(profile.user_id);
+  if (!token) return false;
+
+  return enviarPushSilenciosa(token, data);
+}
