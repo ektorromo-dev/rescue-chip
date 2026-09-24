@@ -161,6 +161,56 @@ export default function VincularClient({
             emergencia.
           </p>
 
+          {process.env.NEXT_PUBLIC_INVITATIONS_ENABLED === 'true' && (
+            <div
+              style={{
+                backgroundColor: 'rgba(255,255,255,0.03)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                borderRadius: '12px',
+                padding: '18px 16px',
+                textAlign: 'center',
+                margin: '0 0 24px 0',
+              }}
+            >
+              <p style={{ color: '#9E9A95', fontSize: '14px', lineHeight: 1.5, margin: '0 0 14px 0' }}>
+                Para recibir las alertas al instante, descarga la app de RescueChip e inicia sesión con este mismo correo.
+              </p>
+              {process.env.NEXT_PUBLIC_APP_DOWNLOAD_URL ? (
+                <a
+                  href={process.env.NEXT_PUBLIC_APP_DOWNLOAD_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-block',
+                    backgroundColor: '#1E1E1C',
+                    color: '#F4F0EB',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    padding: '10px 20px',
+                    borderRadius: '8px',
+                    textDecoration: 'none',
+                  }}
+                >
+                  Descargar la app
+                </a>
+              ) : (
+                <span
+                  style={{
+                    display: 'inline-block',
+                    color: '#6E6A65',
+                    fontSize: '12px',
+                    fontWeight: 500,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                  }}
+                >
+                  Muy pronto en Google Play y App Store
+                </span>
+              )}
+            </div>
+          )}
+
           <Link
             href="/dashboard"
             style={{

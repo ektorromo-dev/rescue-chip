@@ -254,7 +254,7 @@ export async function POST(req: NextRequest) {
             : `⚠️ RESCUECHIP EMERGENCIA: ${userName} necesita ayuda. GPS: ${plainLocation}. Llama al 911.`;
 
         const pushTitle = "⚠️ Alerta de Emergencia RescueChip";
-        const pushData: Record<string, unknown> = { incidentUrl: incidentUrl || null, tipo: "emergencia" };
+        const pushData: Record<string, unknown> = { incidentUrl: incidentUrl || null, incidentToken: incidentToken || null, tipo: "emergencia" };
 
         const ownerPhones: string[] = [];
         if (user.phone) {
@@ -288,7 +288,8 @@ export async function POST(req: NextRequest) {
                 { email: target.email, phone: target.phone },
                 pushTitle,
                 textMessageBody,
-                pushData
+                pushData,
+                profileData.id
             );
 
             if (pushSuccess) {

@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { randomBytes } from "crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sanitizeProfileInput } from "@/app/actions/sanitize";
 import { logAuditEvent } from "@/lib/audit";
-
+import { syncContactInvitations, EmergencyContactItem } from "@/lib/contact-invitations";
 const ALLOWED_FIELDS = [
     "full_name",
     "location",
@@ -31,17 +30,6 @@ const ALLOWED_FIELDS = [
     "curp_seguro",
 ] as const;
 
-interface EmergencyContactItem {
-    name?: string | null;
-    phone?: string | null;
-    email?: string | null;
-    [key: string]: unknown;
-}
-
-function generarTokenInvitacion(): string {
-    return randomBytes(16).toString("hex");
-}
-
 export async function POST(req: NextRequest) {
     try {
         const supabaseAdmin = createAdminClient();
@@ -65,7 +53,7 @@ export async function POST(req: NextRequest) {
         // 2. Buscar el perfil del usuario
         const { data: profile, error: profileError } = await supabaseAdmin
             .from("profiles")
-            .select("id")
+            .select("id, full_name")
             .eq("user_id", user.id)
             .maybeSingle();
 
@@ -100,56 +88,10 @@ export async function POST(req: NextRequest) {
             throw new Error("Error en BD al guardar: " + updateError.message);
         }
 
-        // 7. Generar invitaciones de contacto automáticamente si hay contactos
+        // 7. Sincronizar invitaciones de contacto
         if (sanitizedData.emergency_contacts && Array.isArray(sanitizedData.emergency_contacts)) {
-            for (const contacto of sanitizedData.emergency_contacts as EmergencyContactItem[]) {
-                try {
-                    const phone = contacto.phone ? String(contacto.phone).trim() : null;
-                    const email = contacto.email ? String(contacto.email).trim() : null;
-
-                    if (!phone && !email) continue;
-
-                    const contactName = contacto.name ? String(contacto.name).trim() : null;
-                    let checkQuery = supabaseAdmin
-                        .from("contact_invitations")
-                        .select("id")
-                        .eq("inviter_profile_id", profile.id)
-                        .eq("contact_name", contactName);
-
-                    if (phone && email) {
-                        checkQuery = checkQuery.or(`contact_phone.eq.${phone},contact_email.eq.${email}`);
-                    } else if (phone) {
-                        checkQuery = checkQuery.eq("contact_phone", phone);
-                    } else if (email) {
-                        checkQuery = checkQuery.eq("contact_email", email);
-                    }
-
-                    const { data: existingInvites, error: checkError } = await checkQuery.limit(1);
-
-                    if (checkError) {
-                        console.error("[contact-invitations] Error verificando invitación existente:", checkError);
-                        continue;
-                    }
-
-                    if (!existingInvites || existingInvites.length === 0) {
-                        const { error: inviteError } = await supabaseAdmin
-                            .from("contact_invitations")
-                            .insert({
-                                inviter_profile_id: profile.id,
-                                contact_name: contacto.name,
-                                contact_phone: contacto.phone || null,
-                                contact_email: contacto.email || null,
-                                token: generarTokenInvitacion(),
-                            });
-
-                        if (inviteError) {
-                            console.error("[contact-invitations] Error creando invitación:", inviteError);
-                        }
-                    }
-                } catch (inviteLoopErr) {
-                    console.error("[contact-invitations] Error procesando invitación de contacto:", inviteLoopErr);
-                }
-            }
+            const riderName = (sanitizedData.full_name as string) || profile.full_name || '';
+            await syncContactInvitations(profile.id, riderName, sanitizedData.emergency_contacts as EmergencyContactItem[]);
         }
 
         // 8. Registrar evento de auditoría

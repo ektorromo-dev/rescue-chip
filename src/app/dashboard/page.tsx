@@ -82,6 +82,136 @@ export default function DashboardPage() {
     const [contact3Phone, setContact3Phone] = useState("");
     const [contact3Email, setContact3Email] = useState("");
 
+    interface ContactInviteInfo {
+        id: string;
+        contact_name: string | null;
+        contact_phone: string | null;
+        contact_email: string | null;
+        status: 'pending' | 'accepted' | 'cancelled' | 'expired';
+        expires_at: string | null;
+        token: string;
+    }
+    const [contactInvitations, setContactInvitations] = useState<ContactInviteInfo[]>([]);
+    const [actionLoadingKey, setActionLoadingKey] = useState<string | null>(null);
+    const [actionFeedback, setActionFeedback] = useState<{ [key: string]: string }>({});
+    const isInvitationsEnabled = process.env.NEXT_PUBLIC_INVITATIONS_ENABLED === 'true';
+
+    const getContactInvitation = (phone: string, email: string): ContactInviteInfo | null => {
+        const cleanPhone = phone ? phone.replace(/\s+/g, '') : '';
+        const cleanEmail = email ? email.trim().toLowerCase() : '';
+        return contactInvitations.find((inv) => {
+            const invPhone = inv.contact_phone ? inv.contact_phone.replace(/\s+/g, '') : '';
+            const invEmail = inv.contact_email ? inv.contact_email.trim().toLowerCase() : '';
+            const matchPhone = cleanPhone && (invPhone === cleanPhone || invPhone.endsWith(cleanPhone) || cleanPhone.endsWith(invPhone));
+            const matchEmail = cleanEmail && invEmail === cleanEmail;
+            return matchPhone || matchEmail;
+        }) || null;
+    };
+
+    const getInvitationStatus = (inv: ContactInviteInfo | null): 'accepted' | 'pending_active' | 'unlinked' => {
+        if (!inv) return 'unlinked';
+        if (inv.status === 'accepted') return 'accepted';
+        if (inv.status === 'pending') {
+            const isExpired = inv.expires_at ? new Date(inv.expires_at) < new Date() : false;
+            return isExpired ? 'unlinked' : 'pending_active';
+        }
+        return 'unlinked';
+    };
+
+    const handleResendAction = async (
+        actionType: 'whatsapp' | 'copy' | 'email',
+        contactIdx: number,
+        name: string,
+        phone: string,
+        email: string
+    ) => {
+        const inv = getContactInvitation(phone, email);
+        if (!inv) {
+            alert('Guarda los cambios de tu perfil primero para generar el enlace de invitación de este contacto.');
+            return;
+        }
+
+        const actionKey = `${actionType}-${contactIdx}`;
+        setActionLoadingKey(actionKey);
+
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            const accessToken = session?.access_token;
+            if (!accessToken) {
+                throw new Error('No hay sesión activa. Intenta iniciar sesión de nuevo.');
+            }
+
+            const res = await fetch('/api/contact-invitations/resend', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`,
+                },
+                body: JSON.stringify({ invitationId: inv.id }),
+            });
+
+            const result = await res.json();
+            if (!res.ok || !result.ok) {
+                throw new Error(result.error || 'Error al procesar la invitación.');
+            }
+
+            const link = result.link;
+
+            setContactInvitations((prev) =>
+                prev.map((item) =>
+                    item.id === inv.id
+                        ? {
+                              ...item,
+                              status: 'pending',
+                              expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+                          }
+                        : item
+                )
+            );
+
+            if (actionType === 'copy') {
+                await navigator.clipboard.writeText(link);
+                setActionFeedback((prev) => ({ ...prev, [actionKey]: '¡Copiado!' }));
+                setTimeout(() => {
+                    setActionFeedback((prev) => {
+                        const next = { ...prev };
+                        delete next[actionKey];
+                        return next;
+                    });
+                }, 3000);
+            } else if (actionType === 'whatsapp') {
+                const cleanName = name.trim() || 'contacto';
+                const msg = `Hola ${cleanName}, te agregué como mi contacto de emergencia en RescueChip. Si algo me pasa, te llegará la alerta con mi ubicación. Confirma aquí: ${link}`;
+                const encodedMsg = encodeURIComponent(msg);
+
+                let waUrl = `https://wa.me/?text=${encodedMsg}`;
+                if (phone) {
+                    const digits = phone.replace(/\D/g, '');
+                    if (digits.length === 10) {
+                        waUrl = `https://wa.me/52${digits}?text=${encodedMsg}`;
+                    } else if (digits.length > 10) {
+                        waUrl = `https://wa.me/${digits}?text=${encodedMsg}`;
+                    }
+                }
+                window.open(waUrl, '_blank');
+            } else if (actionType === 'email') {
+                setActionFeedback((prev) => ({ ...prev, [actionKey]: '¡Correo enviado!' }));
+                setTimeout(() => {
+                    setActionFeedback((prev) => {
+                        const next = { ...prev };
+                        delete next[actionKey];
+                        return next;
+                    });
+                }, 3000);
+            }
+        } catch (err: unknown) {
+            const errorMsg = err instanceof Error ? err.message : String(err);
+            alert('Error: ' + errorMsg);
+        } finally {
+            setActionLoadingKey(null);
+        }
+    };
+
     // Access Logs
     const [accessLogs, setAccessLogs] = useState<any[]>([]);
     const [loadingLogs, setLoadingLogs] = useState(false);
@@ -339,6 +469,17 @@ export default function DashboardPage() {
                     if (c3) { setContact3Name(c3.name || ""); setContact3Phone(c3.phone || ""); setContact3Email(c3.email || ""); }
                 }
 
+                // Cargar invitaciones de contacto si están habilitadas
+                if (isInvitationsEnabled) {
+                    const { data: invData, error: invError } = await supabase
+                        .from('contact_invitations')
+                        .select('id, contact_name, contact_phone, contact_email, status, expires_at, token')
+                        .eq('inviter_profile_id', profile.id);
+                    if (!invError && invData) {
+                        setContactInvitations(invData as ContactInviteInfo[]);
+                    }
+                }
+
                 // Fetch access logs
                 if (associatedFolios.length > 0) {
                     setLoadingLogs(true);
@@ -511,6 +652,16 @@ export default function DashboardPage() {
             };
 
             await updateProfileSafe(profileId, profileToUpdate);
+
+            if (isInvitationsEnabled) {
+                const { data: invData } = await supabase
+                    .from('contact_invitations')
+                    .select('id, contact_name, contact_phone, contact_email, status, expires_at, token')
+                    .eq('inviter_profile_id', profileId);
+                if (invData) {
+                    setContactInvitations(invData as ContactInviteInfo[]);
+                }
+            }
 
             setSuccessMsg("¡Perfil actualizado con éxito!");
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -839,76 +990,354 @@ export default function DashboardPage() {
                                         Contactos de Emergencia
                                     </h3>
 
-                                    <div style={{ padding: "8px 16px", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", display: "flex", flexDirection: "column", gap: "16px" }}>
-                                        <h4 style={{ fontSize: "14px", fontWeight: 700, color: "#E8231A" }}>Contacto 1 (Requerido)</h4>
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                                <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Nombre</label>
-                                                <input type="text" value={contact1Name} onChange={(e) => setContact1Name(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                                    onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} required />
-                                            </div>
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                                <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Teléfono</label>
-                                                <input type="tel" value={contact1Phone} onChange={(e) => setContact1Phone(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                                    onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} required />
-                                            </div>
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
-                                                <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Email (Opcional, para recibir alertas)</label>
-                                                <input type="email" value={contact1Email} onChange={(e) => setContact1Email(e.target.value)} placeholder="Email del contacto" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                                    onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
-                                            </div>
-                                        </div>
+                                    <div style={{ padding: "12px 16px", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", display: "flex", flexDirection: "column", gap: "16px" }}>
+                                        {(() => {
+                                            const inv1 = getContactInvitation(contact1Phone, contact1Email);
+                                            const status1 = getInvitationStatus(inv1);
+                                            return (
+                                                <>
+                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+                                                        <h4 style={{ fontSize: "14px", fontWeight: 700, color: "#E8231A", margin: 0 }}>Contacto 1 (Requerido)</h4>
+                                                        {isInvitationsEnabled && (
+                                                            <span style={{
+                                                                fontSize: '11px',
+                                                                fontWeight: 700,
+                                                                padding: '3px 10px',
+                                                                borderRadius: '999px',
+                                                                textTransform: 'uppercase',
+                                                                letterSpacing: '0.6px',
+                                                                backgroundColor: status1 === 'accepted' ? 'rgba(34, 197, 94, 0.12)' : status1 === 'pending_active' ? 'rgba(245, 158, 11, 0.12)' : 'rgba(255, 255, 255, 0.05)',
+                                                                border: status1 === 'accepted' ? '1px solid rgba(34, 197, 94, 0.3)' : status1 === 'pending_active' ? '1px solid rgba(245, 158, 11, 0.3)' : '1px solid rgba(255, 255, 255, 0.12)',
+                                                                color: status1 === 'accepted' ? '#22c55e' : status1 === 'pending_active' ? '#f59e0b' : '#9E9A95',
+                                                            }}>
+                                                                {status1 === 'accepted' ? 'Vinculado' : status1 === 'pending_active' ? 'Invitación enviada' : 'Sin vincular'}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
+                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                            <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Nombre</label>
+                                                            <input type="text" value={contact1Name} onChange={(e) => setContact1Name(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                                onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                                                onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} required />
+                                                        </div>
+                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                            <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Teléfono</label>
+                                                            <input type="tel" value={contact1Phone} onChange={(e) => setContact1Phone(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                                onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                                                onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} required />
+                                                        </div>
+                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
+                                                            <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Email (Opcional, para recibir alertas)</label>
+                                                            <input type="email" value={contact1Email} onChange={(e) => setContact1Email(e.target.value)} placeholder="Email del contacto" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                                onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                                                onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
+                                                        </div>
+                                                    </div>
+                                                    {isInvitationsEnabled && status1 !== 'accepted' && (
+                                                        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', paddingTop: '12px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                                                            <span style={{ fontSize: '12px', color: '#9E9A95', marginRight: '4px' }}>Acciones:</span>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleResendAction('whatsapp', 1, contact1Name, contact1Phone, contact1Email)}
+                                                                disabled={actionLoadingKey === 'whatsapp-1'}
+                                                                style={{
+                                                                    display: 'inline-flex',
+                                                                    alignItems: 'center',
+                                                                    gap: '6px',
+                                                                    backgroundColor: '#1E1E1C',
+                                                                    border: '1px solid rgba(34, 197, 94, 0.3)',
+                                                                    borderRadius: '8px',
+                                                                    padding: '6px 12px',
+                                                                    color: '#22c55e',
+                                                                    fontSize: '12px',
+                                                                    fontWeight: 600,
+                                                                    cursor: actionLoadingKey === 'whatsapp-1' ? 'wait' : 'pointer',
+                                                                }}
+                                                            >
+                                                                {actionLoadingKey === 'whatsapp-1' ? 'Cargando...' : 'WhatsApp'}
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleResendAction('copy', 1, contact1Name, contact1Phone, contact1Email)}
+                                                                disabled={actionLoadingKey === 'copy-1'}
+                                                                style={{
+                                                                    display: 'inline-flex',
+                                                                    alignItems: 'center',
+                                                                    gap: '6px',
+                                                                    backgroundColor: '#1E1E1C',
+                                                                    border: '1px solid rgba(255,255,255,0.12)',
+                                                                    borderRadius: '8px',
+                                                                    padding: '6px 12px',
+                                                                    color: '#F4F0EB',
+                                                                    fontSize: '12px',
+                                                                    fontWeight: 600,
+                                                                    cursor: actionLoadingKey === 'copy-1' ? 'wait' : 'pointer',
+                                                                }}
+                                                            >
+                                                                {actionFeedback['copy-1'] || (actionLoadingKey === 'copy-1' ? 'Copiando...' : 'Copiar link')}
+                                                            </button>
+                                                            {contact1Email.trim() !== '' && (
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => handleResendAction('email', 1, contact1Name, contact1Phone, contact1Email)}
+                                                                    disabled={actionLoadingKey === 'email-1'}
+                                                                    style={{
+                                                                        display: 'inline-flex',
+                                                                        alignItems: 'center',
+                                                                        gap: '6px',
+                                                                        backgroundColor: '#1E1E1C',
+                                                                        border: '1px solid rgba(56, 189, 248, 0.3)',
+                                                                        borderRadius: '8px',
+                                                                        padding: '6px 12px',
+                                                                        color: '#38bdf8',
+                                                                        fontSize: '12px',
+                                                                        fontWeight: 600,
+                                                                        cursor: actionLoadingKey === 'email-1' ? 'wait' : 'pointer',
+                                                                    }}
+                                                                >
+                                                                    {actionFeedback['email-1'] || (actionLoadingKey === 'email-1' ? 'Enviando...' : 'Reenviar correo')}
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </>
+                                            );
+                                        })()}
                                     </div>
 
-                                    <div style={{ padding: "8px 16px", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", display: "flex", flexDirection: "column", gap: "16px" }}>
-                                        <h4 style={{ fontSize: "14px", fontWeight: 700 }}>Contacto 2 (Opcional)</h4>
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                                <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Nombre</label>
-                                                <input type="text" value={contact2Name} onChange={(e) => setContact2Name(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                                    onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
-                                            </div>
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                                <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Teléfono</label>
-                                                <input type="tel" value={contact2Phone} onChange={(e) => setContact2Phone(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                                    onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
-                                            </div>
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
-                                                <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Email (Opcional, para recibir alertas)</label>
-                                                <input type="email" value={contact2Email} onChange={(e) => setContact2Email(e.target.value)} placeholder="Email del contacto" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                                    onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
-                                            </div>
-                                        </div>
+                                    <div style={{ padding: "12px 16px", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", display: "flex", flexDirection: "column", gap: "16px" }}>
+                                        {(() => {
+                                            const inv2 = getContactInvitation(contact2Phone, contact2Email);
+                                            const status2 = getInvitationStatus(inv2);
+                                            const hasContact2 = Boolean(contact2Name.trim() || contact2Phone.trim() || contact2Email.trim());
+                                            return (
+                                                <>
+                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+                                                        <h4 style={{ fontSize: "14px", fontWeight: 700, margin: 0 }}>Contacto 2 (Opcional)</h4>
+                                                        {isInvitationsEnabled && hasContact2 && (
+                                                            <span style={{
+                                                                fontSize: '11px',
+                                                                fontWeight: 700,
+                                                                padding: '3px 10px',
+                                                                borderRadius: '999px',
+                                                                textTransform: 'uppercase',
+                                                                letterSpacing: '0.6px',
+                                                                backgroundColor: status2 === 'accepted' ? 'rgba(34, 197, 94, 0.12)' : status2 === 'pending_active' ? 'rgba(245, 158, 11, 0.12)' : 'rgba(255, 255, 255, 0.05)',
+                                                                border: status2 === 'accepted' ? '1px solid rgba(34, 197, 94, 0.3)' : status2 === 'pending_active' ? '1px solid rgba(245, 158, 11, 0.3)' : '1px solid rgba(255, 255, 255, 0.12)',
+                                                                color: status2 === 'accepted' ? '#22c55e' : status2 === 'pending_active' ? '#f59e0b' : '#9E9A95',
+                                                            }}>
+                                                                {status2 === 'accepted' ? 'Vinculado' : status2 === 'pending_active' ? 'Invitación enviada' : 'Sin vincular'}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
+                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                            <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Nombre</label>
+                                                            <input type="text" value={contact2Name} onChange={(e) => setContact2Name(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                                onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                                                onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
+                                                        </div>
+                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                            <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Teléfono</label>
+                                                            <input type="tel" value={contact2Phone} onChange={(e) => setContact2Phone(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                                onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                                                onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
+                                                        </div>
+                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
+                                                            <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Email (Opcional, para recibir alertas)</label>
+                                                            <input type="email" value={contact2Email} onChange={(e) => setContact2Email(e.target.value)} placeholder="Email del contacto" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                                onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                                                onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
+                                                        </div>
+                                                    </div>
+                                                    {isInvitationsEnabled && hasContact2 && status2 !== 'accepted' && (
+                                                        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', paddingTop: '12px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                                                            <span style={{ fontSize: '12px', color: '#9E9A95', marginRight: '4px' }}>Acciones:</span>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleResendAction('whatsapp', 2, contact2Name, contact2Phone, contact2Email)}
+                                                                disabled={actionLoadingKey === 'whatsapp-2'}
+                                                                style={{
+                                                                    display: 'inline-flex',
+                                                                    alignItems: 'center',
+                                                                    gap: '6px',
+                                                                    backgroundColor: '#1E1E1C',
+                                                                    border: '1px solid rgba(34, 197, 94, 0.3)',
+                                                                    borderRadius: '8px',
+                                                                    padding: '6px 12px',
+                                                                    color: '#22c55e',
+                                                                    fontSize: '12px',
+                                                                    fontWeight: 600,
+                                                                    cursor: actionLoadingKey === 'whatsapp-2' ? 'wait' : 'pointer',
+                                                                }}
+                                                            >
+                                                                {actionLoadingKey === 'whatsapp-2' ? 'Cargando...' : 'WhatsApp'}
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleResendAction('copy', 2, contact2Name, contact2Phone, contact2Email)}
+                                                                disabled={actionLoadingKey === 'copy-2'}
+                                                                style={{
+                                                                    display: 'inline-flex',
+                                                                    alignItems: 'center',
+                                                                    gap: '6px',
+                                                                    backgroundColor: '#1E1E1C',
+                                                                    border: '1px solid rgba(255,255,255,0.12)',
+                                                                    borderRadius: '8px',
+                                                                    padding: '6px 12px',
+                                                                    color: '#F4F0EB',
+                                                                    fontSize: '12px',
+                                                                    fontWeight: 600,
+                                                                    cursor: actionLoadingKey === 'copy-2' ? 'wait' : 'pointer',
+                                                                }}
+                                                            >
+                                                                {actionFeedback['copy-2'] || (actionLoadingKey === 'copy-2' ? 'Copiando...' : 'Copiar link')}
+                                                            </button>
+                                                            {contact2Email.trim() !== '' && (
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => handleResendAction('email', 2, contact2Name, contact2Phone, contact2Email)}
+                                                                    disabled={actionLoadingKey === 'email-2'}
+                                                                    style={{
+                                                                        display: 'inline-flex',
+                                                                        alignItems: 'center',
+                                                                        gap: '6px',
+                                                                        backgroundColor: '#1E1E1C',
+                                                                        border: '1px solid rgba(56, 189, 248, 0.3)',
+                                                                        borderRadius: '8px',
+                                                                        padding: '6px 12px',
+                                                                        color: '#38bdf8',
+                                                                        fontSize: '12px',
+                                                                        fontWeight: 600,
+                                                                        cursor: actionLoadingKey === 'email-2' ? 'wait' : 'pointer',
+                                                                    }}
+                                                                >
+                                                                    {actionFeedback['email-2'] || (actionLoadingKey === 'email-2' ? 'Enviando...' : 'Reenviar correo')}
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </>
+                                            );
+                                        })()}
                                     </div>
 
-                                    <div style={{ padding: "8px 16px", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", display: "flex", flexDirection: "column", gap: "16px" }}>
-                                        <h4 style={{ fontSize: "14px", fontWeight: 700 }}>Contacto 3 (Opcional)</h4>
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                                <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Nombre</label>
-                                                <input type="text" value={contact3Name} onChange={(e) => setContact3Name(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                                    onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
-                                            </div>
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                                <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Teléfono</label>
-                                                <input type="tel" value={contact3Phone} onChange={(e) => setContact3Phone(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                                    onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
-                                            </div>
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
-                                                <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Email (Opcional, para recibir alertas)</label>
-                                                <input type="email" value={contact3Email} onChange={(e) => setContact3Email(e.target.value)} placeholder="Email del contacto" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                                    onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
-                                            </div>
-                                        </div>
+                                    <div style={{ padding: "12px 16px", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", display: "flex", flexDirection: "column", gap: "16px" }}>
+                                        {(() => {
+                                            const inv3 = getContactInvitation(contact3Phone, contact3Email);
+                                            const status3 = getInvitationStatus(inv3);
+                                            const hasContact3 = Boolean(contact3Name.trim() || contact3Phone.trim() || contact3Email.trim());
+                                            return (
+                                                <>
+                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+                                                        <h4 style={{ fontSize: "14px", fontWeight: 700, margin: 0 }}>Contacto 3 (Opcional)</h4>
+                                                        {isInvitationsEnabled && hasContact3 && (
+                                                            <span style={{
+                                                                fontSize: '11px',
+                                                                fontWeight: 700,
+                                                                padding: '3px 10px',
+                                                                borderRadius: '999px',
+                                                                textTransform: 'uppercase',
+                                                                letterSpacing: '0.6px',
+                                                                backgroundColor: status3 === 'accepted' ? 'rgba(34, 197, 94, 0.12)' : status3 === 'pending_active' ? 'rgba(245, 158, 11, 0.12)' : 'rgba(255, 255, 255, 0.05)',
+                                                                border: status3 === 'accepted' ? '1px solid rgba(34, 197, 94, 0.3)' : status3 === 'pending_active' ? '1px solid rgba(245, 158, 11, 0.3)' : '1px solid rgba(255, 255, 255, 0.12)',
+                                                                color: status3 === 'accepted' ? '#22c55e' : status3 === 'pending_active' ? '#f59e0b' : '#9E9A95',
+                                                            }}>
+                                                                {status3 === 'accepted' ? 'Vinculado' : status3 === 'pending_active' ? 'Invitación enviada' : 'Sin vincular'}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
+                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                            <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Nombre</label>
+                                                            <input type="text" value={contact3Name} onChange={(e) => setContact3Name(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                                onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                                                onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
+                                                        </div>
+                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                            <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Teléfono</label>
+                                                            <input type="tel" value={contact3Phone} onChange={(e) => setContact3Phone(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                                onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                                                onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
+                                                        </div>
+                                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
+                                                            <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Email (Opcional, para recibir alertas)</label>
+                                                            <input type="email" value={contact3Email} onChange={(e) => setContact3Email(e.target.value)} placeholder="Email del contacto" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                                onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
+                                                                onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
+                                                        </div>
+                                                    </div>
+                                                    {isInvitationsEnabled && hasContact3 && status3 !== 'accepted' && (
+                                                        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', paddingTop: '12px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                                                            <span style={{ fontSize: '12px', color: '#9E9A95', marginRight: '4px' }}>Acciones:</span>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleResendAction('whatsapp', 3, contact3Name, contact3Phone, contact3Email)}
+                                                                disabled={actionLoadingKey === 'whatsapp-3'}
+                                                                style={{
+                                                                    display: 'inline-flex',
+                                                                    alignItems: 'center',
+                                                                    gap: '6px',
+                                                                    backgroundColor: '#1E1E1C',
+                                                                    border: '1px solid rgba(34, 197, 94, 0.3)',
+                                                                    borderRadius: '8px',
+                                                                    padding: '6px 12px',
+                                                                    color: '#22c55e',
+                                                                    fontSize: '12px',
+                                                                    fontWeight: 600,
+                                                                    cursor: actionLoadingKey === 'whatsapp-3' ? 'wait' : 'pointer',
+                                                                }}
+                                                            >
+                                                                {actionLoadingKey === 'whatsapp-3' ? 'Cargando...' : 'WhatsApp'}
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleResendAction('copy', 3, contact3Name, contact3Phone, contact3Email)}
+                                                                disabled={actionLoadingKey === 'copy-3'}
+                                                                style={{
+                                                                    display: 'inline-flex',
+                                                                    alignItems: 'center',
+                                                                    gap: '6px',
+                                                                    backgroundColor: '#1E1E1C',
+                                                                    border: '1px solid rgba(255,255,255,0.12)',
+                                                                    borderRadius: '8px',
+                                                                    padding: '6px 12px',
+                                                                    color: '#F4F0EB',
+                                                                    fontSize: '12px',
+                                                                    fontWeight: 600,
+                                                                    cursor: actionLoadingKey === 'copy-3' ? 'wait' : 'pointer',
+                                                                }}
+                                                            >
+                                                                {actionFeedback['copy-3'] || (actionLoadingKey === 'copy-3' ? 'Copiando...' : 'Copiar link')}
+                                                            </button>
+                                                            {contact3Email.trim() !== '' && (
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => handleResendAction('email', 3, contact3Name, contact3Phone, contact3Email)}
+                                                                    disabled={actionLoadingKey === 'email-3'}
+                                                                    style={{
+                                                                        display: 'inline-flex',
+                                                                        alignItems: 'center',
+                                                                        gap: '6px',
+                                                                        backgroundColor: '#1E1E1C',
+                                                                        border: '1px solid rgba(56, 189, 248, 0.3)',
+                                                                        borderRadius: '8px',
+                                                                        padding: '6px 12px',
+                                                                        color: '#38bdf8',
+                                                                        fontSize: '12px',
+                                                                        fontWeight: 600,
+                                                                        cursor: actionLoadingKey === 'email-3' ? 'wait' : 'pointer',
+                                                                    }}
+                                                                >
+                                                                    {actionFeedback['email-3'] || (actionLoadingKey === 'email-3' ? 'Enviando...' : 'Reenviar correo')}
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </>
+                                            );
+                                        })()}
                                     </div>
                                 </section>
 
