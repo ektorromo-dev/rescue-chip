@@ -240,11 +240,13 @@ export async function syncContactInvitations(
             } else if (newInvite?.id) {
               matchedInviteIds.add(newInvite.id);
 
-              // Si tiene email y las invitaciones están habilitadas → enviar correo fire & forget
+              // Si tiene email y las invitaciones están habilitadas → enviar correo esperado
               if (rawEmail && INVITATIONS_ENABLED) {
-                sendInvitationEmail(newInvite.id).catch((emailErr) => {
-                  console.error('[contact-invitations] Error fire & forget en sendInvitationEmail:', emailErr);
-                });
+                try {
+                  await sendInvitationEmail(newInvite.id);
+                } catch (emailErr) {
+                  console.error('[contact-invitations] Error enviando correo de invitación:', emailErr);
+                }
               }
             }
           }
