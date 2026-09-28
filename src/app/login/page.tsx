@@ -2,11 +2,10 @@
 
 import { useState, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 function LoginForm() {
     const router = useRouter();
-    const searchParams = useSearchParams();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -27,7 +26,7 @@ function LoginForm() {
             if (!res.ok) {
                 setError(data.error || 'Error al iniciar sesión');
             } else {
-                const redirectTo = searchParams.get('redirect');
+                const redirectTo = new URLSearchParams(window.location.search).get('redirect');
                 const safeRedirect = redirectTo && redirectTo.startsWith('/') ? redirectTo : '/dashboard';
                 router.push(safeRedirect);
             }
