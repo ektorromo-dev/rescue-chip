@@ -489,7 +489,7 @@ export default function QuienConoceClient({ personal, initialFolio = '' }: Quien
               {organizaciones.length}
             </div>
             <div className="qc-stat-label">
-              Organización
+              {organizaciones.length === 1 ? 'Organización' : 'Organizaciones'}
             </div>
           </div>
 
