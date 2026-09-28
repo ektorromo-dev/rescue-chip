@@ -11,11 +11,13 @@ import { parsePhoneNumber } from 'libphonenumber-js';
 import type { CountryCode } from 'libphonenumber-js';
 import React from 'react';
 import { getMedicalConfig, PROFILE_COUNTRIES, getPhoneCountryFromProfileCountry } from '@/lib/medical-systems';
+import type { Session } from '@supabase/supabase-js';
 
 export default function DashboardPage() {
     const router = useRouter();
     const supabase = createClient();
 
+    const [cachedSession, setCachedSession] = useState<Session | null>(null);
     const [loadingAuth, setLoadingAuth] = useState(true);
     const [saving, setSaving] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
@@ -135,8 +137,7 @@ export default function DashboardPage() {
         setActionLoadingKey(actionKey);
 
         try {
-            const { data: { session } } = await supabase.auth.getSession();
-            const accessToken = session?.access_token;
+            const accessToken = cachedSession?.access_token;
             if (!accessToken) {
                 throw new Error('No hay sesión activa. Intenta iniciar sesión de nuevo.');
             }
@@ -224,27 +225,30 @@ export default function DashboardPage() {
 
     const [profileCountry, setProfileCountry] = useState<string>('MX');
 
-    // Este useEffect corre SIEMPRE que el usuario esté autenticado en el dashboard
     useEffect(() => {
+        // Solo correr el polling de sesión si el dispositivo ya está verificado
+        // Aumentamos el intervalo a 30s para reducir competencia por el LockManager
         const sessionCheck = setInterval(async () => {
-            console.log('Checking session...');
-            // Leer device_id desde las cookies
-            const localDeviceId = document.cookie.split('; ').find(row => row.startsWith('rescuechip_device_id='))?.split('=')[1];
+            const localDeviceId = document.cookie
+                .split('; ')
+                .find(row => row.startsWith('rescuechip_device_id='))
+                ?.split('=')[1];
             if (!localDeviceId) return;
-
-            const { data, error } = await supabase
-                .from('user_sessions')
-                .select('status')
-                .eq('device_id', localDeviceId)
-                .maybeSingle();
-
-            if (!error && (!data || data.status === 'revoked')) {
-                clearInterval(sessionCheck);
-                await supabase.auth.signOut();
-                window.location.href = '/login';
+            try {
+                const { data, error } = await supabase
+                    .from('user_sessions')
+                    .select('status')
+                    .eq('device_id', localDeviceId)
+                    .maybeSingle();
+                if (!error && (!data || data.status === 'revoked')) {
+                    clearInterval(sessionCheck);
+                    await supabase.auth.signOut();
+                    window.location.href = '/login';
+                }
+            } catch {
+                // Ignorar errores de red — el siguiente tick reintentará
             }
-        }, 5000);
-
+        }, 30000); // 30s en lugar de 5s
         return () => clearInterval(sessionCheck);
     }, []);
 
@@ -261,6 +265,7 @@ export default function DashboardPage() {
                 const retry = await supabase.auth.getSession();
                 session = retry.data.session;
             }
+            if (session) setCachedSession(session);
             console.log('SESSION USER ID:', session?.user?.id);
             console.log('SESSION USER EMAIL:', session?.user?.email);
             if (!session || !session.user) {
@@ -527,8 +532,7 @@ export default function DashboardPage() {
         if (deleteConfirmText !== 'ELIMINAR') return;
         setDeletingData(true);
         try {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session) throw new Error("No session");
+            if (!cachedSession) throw new Error("No session");
             const { error } = await supabase
                 .from('profiles')
                 .update({
@@ -546,7 +550,7 @@ export default function DashboardPage() {
                     google_maps_link: null,
                     photo_url: null,
                 })
-                .eq('user_id', session.user.id);
+                .eq('user_id', cachedSession.user.id);
             if (error) throw error;
             setShowDeleteConfirm(false);
             setDeleteConfirmText('');
@@ -598,8 +602,7 @@ export default function DashboardPage() {
 
             let newPolizaUrl = currentPolizaUrl;
             if (polizaFile) {
-                const sessionResponse = await supabase.auth.getSession();
-                const userId = sessionResponse.data.session?.user.id;
+                const userId = cachedSession?.user?.id;
                 const fileExt = polizaFile.name.split('.').pop();
                 const fileName = `poliza.${fileExt}`;
                 const fullPath = `${userId}/${fileName}`;
