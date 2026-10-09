@@ -79,6 +79,11 @@ const LANDING_CSS = `
     color: var(--white);
   }
 
+  .hero-social { display:flex; flex-wrap:wrap; gap:24px; margin-top:20px; align-items:center; }
+  .hero-social-link { display:inline-flex; align-items:center; gap:8px; min-height:44px; color:var(--off-white); text-decoration:none; font-size:13px; letter-spacing:1px; transition:color .2s; }
+  .hero-social-link:hover { color:var(--white); }
+  .hero-social-link svg { flex-shrink:0; }
+
   /* SECTION LABELS */
   .section-label { font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--red); font-weight:600; margin-bottom:16px; }
   .section-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(36px,5vw,60px); line-height:1; letter-spacing:1px; margin-bottom:16px; }
@@ -257,7 +262,7 @@ const LANDING_CSS = `
   @media(max-width:900px){
     .rc-nav{padding:16px 20px;} .nav-links{display:none;}
     .hamburger { display:flex !important; }
-    .hero{padding:0 24px 80px;min-height:100svh;} .hero-accent{display:none;}
+    .hero{padding:0 24px 40px;min-height:100svh;} .hero-accent{display:none;}
     .pricing,.trust,.how-it-works,.benefits{padding:80px 24px;}
     .agency-pricing{padding:80px 24px;} .agency-cards{grid-template-columns:1fr;}
     .cta-content{padding:60px 24px;}
@@ -284,7 +289,7 @@ const LANDING_CSS = `
     .nav-login{ font-size:12px !important; padding:8px 10px !important; display:none; }
 
     /* HERO */
-    .hero{ padding: 80px 16px 60px; min-height:100svh; justify-content:flex-end; }
+    .hero{ padding: 80px 16px 28px; min-height:100svh; justify-content:flex-end; }
     .hero-badge{ font-size:10px; padding:6px 10px; letter-spacing:1px; margin-bottom:16px; }
     .hero h1{ font-size:52px; line-height:.9; letter-spacing:1px; margin-bottom:20px; word-break:keep-all; }
     .hero-sub{ font-size:13px; line-height:1.6; max-width:100%; margin-bottom:28px; }
@@ -292,6 +297,7 @@ const LANDING_CSS = `
     .btn-primary{ width:100%; text-align:center; justify-content:center; font-size:13px; padding:15px 16px; }
     
     .hero-secondary-btns { grid-template-columns: 1fr; width: 100%; }
+    .hero-social { justify-content:center; }
 
     /* PRICING */
     .pricing{ padding:52px 0; }
@@ -524,6 +530,51 @@ export default function Home() {
                 👨‍👩‍👧 Lo que tu familia ve
               </a>
             </div>
+          </div>
+          <div className="hero-social">
+            <a
+              href="https://www.instagram.com/ek.rider93"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram: ek.rider93"
+              className="hero-social-link"
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+                stroke="url(#igGrad)" strokeWidth="2" strokeLinecap="round"
+                strokeLinejoin="round" aria-hidden="true">
+                <defs>
+                  <linearGradient id="igGrad" gradientUnits="userSpaceOnUse"
+                    x1="2" y1="22" x2="22" y2="2">
+                    <stop offset="0" stopColor="#FEDA75" />
+                    <stop offset="0.25" stopColor="#FA7E1E" />
+                    <stop offset="0.5" stopColor="#D62976" />
+                    <stop offset="0.75" stopColor="#962FBF" />
+                    <stop offset="1" stopColor="#4F5BD5" />
+                  </linearGradient>
+                </defs>
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                <circle cx="12" cy="12" r="4" />
+                <circle cx="17.5" cy="6.5" r="1.1" fill="url(#igGrad)" stroke="none" />
+              </svg>
+              <span>ek.rider93</span>
+            </a>
+            <a
+              href="https://www.tiktok.com/@ek.rider93"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="TikTok: ek.rider93"
+              className="hero-social-link"
+            >
+              <svg width="22" height="22" viewBox="-1.5 -1.5 27 27" aria-hidden="true">
+                <defs>
+                  <path id="ttNote" d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z" />
+                </defs>
+                <use href="#ttNote" fill="#25F4EE" transform="translate(-1.2 -1.2)" />
+                <use href="#ttNote" fill="#FE2C55" transform="translate(1.2 1.2)" />
+                <use href="#ttNote" fill="#FFFFFF" />
+              </svg>
+              <span>ek.rider93</span>
+            </a>
           </div>
         </div>
       </section>
