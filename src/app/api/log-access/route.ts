@@ -115,7 +115,7 @@ export async function POST(req: NextRequest) {
 
             if (!rateLimitSuccess) {
                 console.warn(`Rate limit excedido para emergencias del chip: ${chip_folio}`);
-                return NextResponse.json({ error: "Límite de notificaciones de emergencia alcanzado para hoy." }, { status: 429 });
+                return NextResponse.json({ error: "Alcanzaste el límite de alertas por hora. Intenta de nuevo en unos minutos. Si es una emergencia, llama al 911." }, { status: 429 });
             }
 
             // Obtener el ID de usuario del dueño de este chip

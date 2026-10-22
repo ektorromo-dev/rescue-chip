@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
         if (!rateLimitSuccess) {
             console.warn(`Rate limit excedido para SOS del usuario: ${user.id}`);
             return NextResponse.json(
-                { error: "Límite de notificaciones de emergencia alcanzado para hoy." },
+                { error: "Alcanzaste el límite de alertas por hora. Intenta de nuevo en unos minutos. Si es una emergencia, llama al 911." },
                 { status: 429 }
             );
         }
