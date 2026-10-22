@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.rescuechip.mobile",
+      "sha256_cert_fingerprints": [
+        "D8:E4:EF:F6:98:11:55:FD:FC:6F:2E:C3:48:E7:68:40:19:1B:AF:41:BE:1D:F1:E0:F0:82:6E:60:C2:64:CE:ED"
+      ]
+    }
+  }
+]
