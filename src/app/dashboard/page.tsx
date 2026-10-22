@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { updateProfileSafe } from "@/app/actions/sanitize";
+import { validateEmergencyContacts, isEmailRequired } from '@/lib/contact-validation';
 import { validateAndFormatPhone, SUPPORTED_COUNTRIES, formatPhoneAsYouType } from '@/lib/phone-utils';
 import { parsePhoneNumber } from 'libphonenumber-js';
 import type { CountryCode } from 'libphonenumber-js';
@@ -28,6 +29,8 @@ export default function DashboardPage() {
     const [deviceId, setDeviceId] = useState("");
 
     const [profileId, setProfileId] = useState("");
+    const [profileCreatedAt, setProfileCreatedAt] = useState<string | null>(null);
+    const [savedContacts, setSavedContacts] = useState<Array<{ name?: string; phone?: string; email?: string }>>([]);
     const [folio, setFolio] = useState("");
 
     // Photo
@@ -393,6 +396,7 @@ export default function DashboardPage() {
 
                 // Populate state
                 setProfileId(profile.id);
+                setProfileCreatedAt(profile.created_at || null);
                 setProfileCountry(profile.country || 'MX');
 
                 // Fetch associated chips robustly
@@ -464,6 +468,7 @@ export default function DashboardPage() {
                 setGoogleMapsLink(profile.google_maps_link || "");
 
                 if (profile.emergency_contacts && Array.isArray(profile.emergency_contacts)) {
+                    setSavedContacts(profile.emergency_contacts);
                     const c1 = profile.emergency_contacts[0];
                     if (c1) { setContact1Name(c1.name || ""); setContact1Phone(c1.phone || ""); setContact1Email(c1.email || ""); }
 
@@ -472,6 +477,8 @@ export default function DashboardPage() {
 
                     const c3 = profile.emergency_contacts[2];
                     if (c3) { setContact3Name(c3.name || ""); setContact3Phone(c3.phone || ""); setContact3Email(c3.email || ""); }
+                } else {
+                    setSavedContacts([]);
                 }
 
                 // Cargar invitaciones de contacto si están habilitadas
@@ -572,14 +579,27 @@ export default function DashboardPage() {
         setSuccessMsg("");
 
         try {
-            const emergencyContacts = [];
-            if (contact1Name && contact1Phone) emergencyContacts.push({ name: contact1Name, phone: contact1Phone, email: contact1Email });
-            if (contact2Name && contact2Phone) emergencyContacts.push({ name: contact2Name, phone: contact2Phone, email: contact2Email });
-            if (contact3Name && contact3Phone) emergencyContacts.push({ name: contact3Name, phone: contact3Phone, email: contact3Email });
+            const rawSlots = [
+                { name: contact1Name, phone: contact1Phone, email: contact1Email },
+                { name: contact2Name, phone: contact2Phone, email: contact2Email },
+                { name: contact3Name, phone: contact3Phone, email: contact3Email },
+            ];
 
-            if (emergencyContacts.length === 0) {
-                throw new Error("Debes proporcionar al menos un contacto de emergencia.");
+            const validation = validateEmergencyContacts(rawSlots, {
+                requireEmail: isEmailRequired(profileCreatedAt),
+                country: profileCountry,
+            });
+
+            if (!validation.ok) {
+                setErrorMsg(validation.error);
+                setSaving(false);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return;
             }
+
+            const emergencyContacts = rawSlots.filter(
+                (c) => Boolean(c.name.trim() || c.phone.trim() || c.email.trim())
+            );
 
             let newPhotoUrl = currentPhotoUrl;
             if (photoFile) {
@@ -654,7 +674,15 @@ export default function DashboardPage() {
                 updated_at: new Date().toISOString()
             };
 
-            await updateProfileSafe(profileId, profileToUpdate);
+            const result = await updateProfileSafe(profileId, profileToUpdate);
+            if (result.success === false) {
+                setErrorMsg(result.error);
+                setSaving(false);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return;
+            }
+
+            setSavedContacts(emergencyContacts);
 
             if (isInvitationsEnabled) {
                 const { data: invData } = await supabase
@@ -1031,8 +1059,8 @@ export default function DashboardPage() {
                                                                 onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} required />
                                                         </div>
                                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
-                                                            <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Email (Opcional, para recibir alertas)</label>
-                                                            <input type="email" value={contact1Email} onChange={(e) => setContact1Email(e.target.value)} placeholder="Email del contacto" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
+                                                            <label style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>{isEmailRequired(profileCreatedAt) ? "Email *" : "Email (Opcional, para recibir alertas)"}</label>
+                                                            <input type="email" value={contact1Email} onChange={(e) => setContact1Email(e.target.value)} placeholder="Email del contacto" required={isEmailRequired(profileCreatedAt)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                                                 onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
                                                                 onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                                         </div>
@@ -1114,11 +1142,19 @@ export default function DashboardPage() {
                                             const inv2 = getContactInvitation(contact2Phone, contact2Email);
                                             const status2 = getInvitationStatus(inv2);
                                             const hasContact2 = Boolean(contact2Name.trim() || contact2Phone.trim() || contact2Email.trim());
+                                            const isContact2Saved = Boolean(hasContact2 && ((savedContacts[1] && (savedContacts[1].name || savedContacts[1].phone)) || inv2));
                                             return (
                                                 <>
                                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
-                                                        <h4 style={{ fontSize: "14px", fontWeight: 700, margin: 0 }}>Contacto 2 (Opcional)</h4>
-                                                        {isInvitationsEnabled && hasContact2 && (
+                                                        <div>
+                                                            <h4 style={{ fontSize: "14px", fontWeight: 700, margin: 0 }}>Contacto 2 (Opcional)</h4>
+                                                            <p style={{ fontSize: "12px", color: "#9E9A95", margin: "2px 0 0 0" }}>
+                                                                {isEmailRequired(profileCreatedAt)
+                                                                    ? "Llena nombre, teléfono y correo, o déjalo vacío."
+                                                                    : "Llena nombre y teléfono, o déjalo vacío."}
+                                                            </p>
+                                                        </div>
+                                                        {isInvitationsEnabled && isContact2Saved && (
                                                             <span style={{
                                                                 fontSize: '11px',
                                                                 fontWeight: 700,
@@ -1154,7 +1190,7 @@ export default function DashboardPage() {
                                                                 onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                                         </div>
                                                     </div>
-                                                    {isInvitationsEnabled && hasContact2 && status2 !== 'accepted' && (
+                                                    {isInvitationsEnabled && isContact2Saved && status2 !== 'accepted' && (
                                                         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', paddingTop: '12px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                                                             <span style={{ fontSize: '12px', color: '#9E9A95', marginRight: '4px' }}>Acciones:</span>
                                                             <button
@@ -1231,11 +1267,19 @@ export default function DashboardPage() {
                                             const inv3 = getContactInvitation(contact3Phone, contact3Email);
                                             const status3 = getInvitationStatus(inv3);
                                             const hasContact3 = Boolean(contact3Name.trim() || contact3Phone.trim() || contact3Email.trim());
+                                            const isContact3Saved = Boolean(hasContact3 && ((savedContacts[2] && (savedContacts[2].name || savedContacts[2].phone)) || inv3));
                                             return (
                                                 <>
                                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
-                                                        <h4 style={{ fontSize: "14px", fontWeight: 700, margin: 0 }}>Contacto 3 (Opcional)</h4>
-                                                        {isInvitationsEnabled && hasContact3 && (
+                                                        <div>
+                                                            <h4 style={{ fontSize: "14px", fontWeight: 700, margin: 0 }}>Contacto 3 (Opcional)</h4>
+                                                            <p style={{ fontSize: "12px", color: "#9E9A95", margin: "2px 0 0 0" }}>
+                                                                {isEmailRequired(profileCreatedAt)
+                                                                    ? "Llena nombre, teléfono y correo, o déjalo vacío."
+                                                                    : "Llena nombre y teléfono, o déjalo vacío."}
+                                                            </p>
+                                                        </div>
+                                                        {isInvitationsEnabled && isContact3Saved && (
                                                             <span style={{
                                                                 fontSize: '11px',
                                                                 fontWeight: 700,
@@ -1271,7 +1315,7 @@ export default function DashboardPage() {
                                                                 onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
                                                         </div>
                                                     </div>
-                                                    {isInvitationsEnabled && hasContact3 && status3 !== 'accepted' && (
+                                                    {isInvitationsEnabled && isContact3Saved && status3 !== 'accepted' && (
                                                         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', paddingTop: '12px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                                                             <span style={{ fontSize: '12px', color: '#9E9A95', marginRight: '4px' }}>Acciones:</span>
                                                             <button

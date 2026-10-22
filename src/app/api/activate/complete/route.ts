@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { validateEmergencyContacts } from "@/lib/contact-validation";
 
 // Inicializamos supabaseAdmin que saltará las políticas RLS
 const supabaseAdmin = createClient(
@@ -57,6 +58,19 @@ export async function POST(req: NextRequest) {
             // Reutiliza el perfil existente en lugar de crear uno nuevo
             insertedProfileData = existingProfile;
         } else {
+            // Validar contactos de emergencia para perfil nuevo
+            const contacts = profileData?.emergency_contacts;
+            if (!Array.isArray(contacts)) {
+                return NextResponse.json({ success: false, error: "Formato de contactos de emergencia inválido." }, { status: 400 });
+            }
+            const contactValidation = validateEmergencyContacts(contacts, {
+                requireEmail: true,
+                country: profileData?.country,
+            });
+            if (!contactValidation.ok) {
+                return NextResponse.json({ success: false, error: contactValidation.error }, { status: 400 });
+            }
+
             // Crea un perfil nuevo solo si el usuario no tenía ninguno
             const { data: newProfileData, error: profileInsertError } = await supabaseAdmin
                 .from('profiles')

@@ -5,8 +5,12 @@ import { createClient } from "@/lib/supabase/server";
 import { headers } from "next/headers";
 import { logAuditEvent } from "@/lib/audit";
 import { syncContactInvitations, EmergencyContactItem } from '@/lib/contact-invitations';
+import { validateEmergencyContacts, isEmailRequired } from '@/lib/contact-validation';
 
-export async function updateProfileSafe(profileId: string, data: Record<string, any>) {
+export async function updateProfileSafe(
+    profileId: string,
+    data: Record<string, any>
+): Promise<{ success: true } | { success: false; error: string }> {
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
@@ -17,7 +21,7 @@ export async function updateProfileSafe(profileId: string, data: Record<string, 
     // VALIDACIÓN EXPLÍCITA DE OWNERSHIP EN EL SERVIDOR
     const { data: existingProfile, error: profileCheckError } = await supabase
         .from('profiles')
-        .select('user_id, full_name')
+        .select('user_id, full_name, created_at, country')
         .eq('id', profileId)
         .single();
 
@@ -27,6 +31,23 @@ export async function updateProfileSafe(profileId: string, data: Record<string, 
 
     if (existingProfile.user_id !== user.id) {
         throw new Error("Violación de seguridad: No tienes permisos para modificar este perfil.");
+    }
+
+    // Validación de contactos de emergencia antes del update
+    if ('emergency_contacts' in data && data.emergency_contacts !== undefined) {
+        if (!Array.isArray(data.emergency_contacts)) {
+            return { success: false, error: "Formato de contactos de emergencia inválido." };
+        }
+        const validation = validateEmergencyContacts(
+            data.emergency_contacts,
+            {
+                requireEmail: isEmailRequired(existingProfile.created_at),
+                country: existingProfile.country,
+            }
+        );
+        if (!validation.ok) {
+            return { success: false, error: validation.error };
+        }
     }
 
     // Generar objeto sanitizado

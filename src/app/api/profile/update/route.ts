@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { sanitizeProfileInput } from "@/app/actions/sanitize";
 import { logAuditEvent } from "@/lib/audit";
 import { syncContactInvitations, EmergencyContactItem } from "@/lib/contact-invitations";
+import { validateEmergencyContacts, isEmailRequired } from "@/lib/contact-validation";
 const ALLOWED_FIELDS = [
     "full_name",
     "location",
@@ -53,7 +54,7 @@ export async function POST(req: NextRequest) {
         // 2. Buscar el perfil del usuario
         const { data: profile, error: profileError } = await supabaseAdmin
             .from("profiles")
-            .select("id, full_name")
+            .select("id, full_name, created_at, country")
             .eq("user_id", user.id)
             .maybeSingle();
 
@@ -66,6 +67,23 @@ export async function POST(req: NextRequest) {
         const body = typeof rawBody === "object" && rawBody !== null
             ? (rawBody as Record<string, unknown>)
             : {};
+
+        // Validar emergency_contacts si vienen en el body ANTES de guardar
+        if ("emergency_contacts" in body && body.emergency_contacts !== undefined) {
+            if (!Array.isArray(body.emergency_contacts)) {
+                return NextResponse.json({ error: "Formato de contactos de emergencia inválido." }, { status: 400 });
+            }
+            const validation = validateEmergencyContacts(
+                body.emergency_contacts as { name?: string; phone?: string; email?: string }[],
+                {
+                    requireEmail: isEmailRequired(profile.created_at),
+                    country: profile.country,
+                }
+            );
+            if (!validation.ok) {
+                return NextResponse.json({ error: validation.error }, { status: 400 });
+            }
+        }
 
         // 4. Filtrar el body a SOLO los campos permitidos
         const filteredData: Record<string, unknown> = {};

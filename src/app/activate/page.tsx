@@ -8,6 +8,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useState, Suspense, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { sanitizeProfileInput } from "@/app/actions/sanitize";
+import { validateEmergencyContacts } from "@/lib/contact-validation";
 import { validateAndFormatPhone, SUPPORTED_COUNTRIES, formatPhoneAsYouType } from '@/lib/phone-utils';
 import type { CountryCode } from 'libphonenumber-js';
 import React from 'react';
@@ -250,28 +251,35 @@ function ActivationFormContent() {
         try {
             // ================= CONTINUAR FLUJO NORMAL DE REGISTRO =================
             // Build emergency contacts array dynamically
-            const emergencyContacts = [];
+            const rawContacts = [
+                {
+                    name: (formData.get("contact1Name") as string) || "",
+                    phone: (formData.get("contact1Phone") as string) || "",
+                    email: (formData.get("contact1Email") as string) || "",
+                },
+                {
+                    name: (formData.get("contact2Name") as string) || "",
+                    phone: (formData.get("contact2Phone") as string) || "",
+                    email: (formData.get("contact2Email") as string) || "",
+                },
+                {
+                    name: (formData.get("contact3Name") as string) || "",
+                    phone: (formData.get("contact3Phone") as string) || "",
+                    email: (formData.get("contact3Email") as string) || "",
+                },
+            ];
 
-            // Contact 1 (Required)
-            emergencyContacts.push({
-                name: formData.get("contact1Name") as string,
-                phone: formData.get("contact1Phone") as string,
-                email: formData.get("contact1Email") as string || ""
+            const contactValidation = validateEmergencyContacts(rawContacts, {
+                requireEmail: true,
+                country: profileCountry,
             });
-
-            // Contact 2 (Optional)
-            const contact2Name = formData.get("contact2Name") as string;
-            const contact2Phone = formData.get("contact2Phone") as string;
-            if (contact2Name && contact2Phone) {
-                emergencyContacts.push({ name: contact2Name, phone: contact2Phone, email: formData.get("contact2Email") as string || "" });
+            if (!contactValidation.ok) {
+                setErrorMsg(contactValidation.error);
+                setLoading(false);
+                return;
             }
 
-            // Contact 3 (Optional)
-            const contact3Name = formData.get("contact3Name") as string;
-            const contact3Phone = formData.get("contact3Phone") as string;
-            if (contact3Name && contact3Phone) {
-                emergencyContacts.push({ name: contact3Name, phone: contact3Phone, email: formData.get("contact3Email") as string || "" });
-            }
+            const emergencyContacts = rawContacts.filter(c => c.name.trim() || c.phone.trim() || c.email.trim());
 
             // Optional integer parsing
             const ageStr = formData.get("age") as string;
@@ -983,16 +991,19 @@ function ActivationFormContent() {
                                 )}
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
-                                <label htmlFor="contact1Email" style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Email (Opcional, para recibir alertas)</label>
+                                <label htmlFor="contact1Email" style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Email *</label>
                                 <input type="email" id="contact1Email" name="contact1Email" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
                                     onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Email del contacto" />
+                                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Email del contacto" required />
                             </div>
                         </div>
                     </div>
 
                     <div style={{ padding: "16px", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", display: "flex", flexDirection: "column", gap: "16px" }}>
-                        <h4 style={{ fontSize: "14px", fontWeight: 700 }}>Contacto 2 (Opcional)</h4>
+                        <div>
+                            <h4 style={{ fontSize: "14px", fontWeight: 700, margin: 0 }}>Contacto 2 (Opcional)</h4>
+                            <p style={{ fontSize: "12px", color: "#9E9A95", margin: "2px 0 0 0" }}>Llena nombre, teléfono y correo, o déjalo vacío.</p>
+                        </div>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                 <label htmlFor="contact2Name" style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Nombre</label>
@@ -1064,7 +1075,10 @@ function ActivationFormContent() {
                     </div>
 
                     <div style={{ padding: "16px", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", display: "flex", flexDirection: "column", gap: "16px" }}>
-                        <h4 style={{ fontSize: "14px", fontWeight: 700 }}>Contacto 3 (Opcional)</h4>
+                        <div>
+                            <h4 style={{ fontSize: "14px", fontWeight: 700, margin: 0 }}>Contacto 3 (Opcional)</h4>
+                            <p style={{ fontSize: "12px", color: "#9E9A95", margin: "2px 0 0 0" }}>Llena nombre, teléfono y correo, o déjalo vacío.</p>
+                        </div>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                 <label htmlFor="contact3Name" style={{ fontSize: "14px", fontWeight: 600, color: "#9E9A95" }}>Nombre</label>
