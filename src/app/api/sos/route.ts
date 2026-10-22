@@ -146,7 +146,7 @@ export async function POST(req: NextRequest) {
         if (incidentError) {
             console.error("[sos] Error creando incidente:", incidentError);
         } else {
-            incidentUrl = `https://rescue-chip.com/emergencia/${incidentToken}`;
+            incidentUrl = `https://www.rescue-chip.com/emergencia/${incidentToken}`;
             console.log(`[sos] Incidente creado: ${incidentUrl}`);
         }
 
