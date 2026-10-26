@@ -470,7 +470,7 @@ export default function AdminDashboard() {
               <h3 className="text-blue-400 text-sm font-semibold mb-2 flex items-center gap-2"><Zap size={16} /> Insights Generados</h3>
               <ul className="text-sm text-[#8b949e] space-y-2 list-disc list-inside">
                 {totalUnits < 50 && <li>Fase Seed: Enfócate en los 100 usuarios (hacer de mano en mano)</li>}
-                {profiles.total > 0 && <li>Tasa Veracidad Celular: {Math.round((profiles.withPhone / (profiles.total || 1)) * 100)}% (Potencial N8N)</li>}
+                {profiles.total > 0 && <li>Tasa Veracidad Celular: {Math.round((profiles.withPhone / (profiles.total || 1)) * 100)}% (Potencial WhatsApp/SMS)</li>}
               </ul>
             </div>
           </div>

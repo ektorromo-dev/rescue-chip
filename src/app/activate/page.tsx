@@ -417,24 +417,6 @@ function ActivationFormContent() {
                 throw new Error(result.error || "Fallo crítico al completar la activación del chip.");
             }
 
-            // --- N8N WEBHOOK CALL (New Profile) ---
-            try {
-                await fetch('https://rescuechip.app.n8n.cloud/webhook/4882f6c2-6163-41a3-b60e-556f76717486', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-rescuechip-secret': 'rescuechip2026'
-                    },
-                    body: JSON.stringify({
-                        phone: formattedPhone,
-                        name: formData.get("fullName") as string,
-                        folio: chip.folio
-                    })
-                });
-                console.log("N8N Webhook disparado exitosamente (Nuevo Perfil).");
-            } catch (n8nError) {
-                console.error("Fallo al disparar webhook de N8N (ignorado):", n8nError);
-            }
 
             // 4. Redirect to the dashboard to let them edit their new profile instead of returning directly to public profile
             // Pre-registrar dispositivo como verificado para evitar pantalla de verificación
@@ -493,24 +475,6 @@ function ActivationFormContent() {
                 throw new Error(linkData.error || "Error al vincular el chip. Intenta de nuevo.");
             }
 
-            // --- N8N WEBHOOK CALL (Existing Profile) ---
-            try {
-                await fetch('https://rescuechip.app.n8n.cloud/webhook/4882f6c2-6163-41a3-b60e-556f76717486', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-rescuechip-secret': 'rescuechip2026'
-                    },
-                    body: JSON.stringify({
-                        phone: existingProfileToLink.phone || "Desconocido",
-                        name: existingProfileToLink.full_name || "Desconocido",
-                        folio: pendingChip.folio
-                    })
-                });
-                console.log("N8N Webhook disparado exitosamente (Perfil Existente).");
-            } catch (n8nError) {
-                console.error("Fallo al disparar webhook de N8N (ignorado):", n8nError);
-            }
 
             // Track CompleteRegistration
             if (typeof window !== 'undefined' && (window as any).fbq) {

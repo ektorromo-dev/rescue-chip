@@ -25,9 +25,7 @@ flowchart TD
     C -->|Inserta registros| D[(Supabase: Tabla chips)]
     
     D --> E{¿Exitoso?}
-    E -- Sí ✅ --> F[⚡ Llama webhook N8N]
-    F --> G[⚡ N8N usa Twilio]
-    G --> H[SMS enviado al usuario]
+    E -- Sí ✅ --> F[Envío de email de confirmación / SMS]
     
     E -- No 🔴 --> I[Error / Retry]
 
@@ -35,7 +33,7 @@ flowchart TD
     classDef error fill:#f87171,stroke:#991b1b,stroke-width:2px,color:#fff;
     classDef external fill:#eab308,stroke:#a16207,stroke-width:2px,color:#000;
     
-    class F,G,H external;
+    class F external;
 ```
 
 ---
@@ -44,7 +42,7 @@ flowchart TD
 **Archivos:** `middleware.ts`, `src/app/activate/page.tsx`, `src/app/api/activate/validate/route.ts`
 
 - **Condicionantes:** `folio`, `chip.status`, `chip.activated`
-- **APIs llamadas:** `/api/activate/validate` (GET), `Supabase Auth`, `N8N` (POST)
+- **APIs llamadas:** `/api/activate/validate` (GET), `Supabase Auth`
 - **Redireccionamientos:** `ProfileViewer` (si ya está activado o en validación inicial fallida donde sea requerido), `Dashboard` (éxito).
 
 ```mermaid
@@ -75,15 +73,12 @@ flowchart TD
     M -- No ✅ --> Q[Inserta Profile Nuevo]
     Q --> R[Actualiza Chip: activado = true]
     
-    R --> S[⚡ Dispara Webhook N8N de Registro]
-    O --> S
-    S --> T[Redirige a /dashboard]
+    R --> T[Redirige a /dashboard]
+    O --> T
 
     classDef success fill:#4ade80,stroke:#166534,stroke-width:2px,color:#000;
     classDef error fill:#f87171,stroke:#991b1b,stroke-width:2px,color:#fff;
-    classDef external fill:#eab308,stroke:#a16207,stroke-width:2px,color:#000;
     
-    class S external;
     class T,F,H success;
 ```
 
