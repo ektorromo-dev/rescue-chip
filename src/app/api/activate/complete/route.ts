@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { validateEmergencyContacts } from "@/lib/contact-validation";
+import { getUserFromRequest } from "@/lib/auth-request";
 
 // Inicializamos supabaseAdmin que saltará las políticas RLS
 const supabaseAdmin = createClient(
@@ -10,14 +11,21 @@ const supabaseAdmin = createClient(
 
 export async function POST(req: NextRequest) {
     try {
-        const body = await req.json();
-        const { folio, profileData, userId, consentIp } = body;
+        // 0. Exigir Bearer token válido y tomar userId exclusivamente del token
+        const userAuth = await getUserFromRequest(req);
+        if (!userAuth) {
+            return NextResponse.json({ success: false, error: "No autorizado" }, { status: 401 });
+        }
+        const userId = userAuth.userId;
 
-        if (!folio || !profileData || !userId) {
+        const body = await req.json();
+        const { folio, profileData } = body;
+
+        if (!folio || !profileData) {
             return NextResponse.json({ success: false, error: "Datos incompletos para activación." }, { status: 400 });
         }
 
-        // 1. Verificar que el chip con ese folio existe
+        // 1. Verificar que el chip con ese folio existe y está libre ('disponible' y activated = false)
         const { data: chip, error: chipError } = await supabaseAdmin
             .from('chips')
             .select('*')
@@ -29,7 +37,7 @@ export async function POST(req: NextRequest) {
         }
 
         if (chip.activated === true || String(chip.activated).toLowerCase() === 'true' || chip.status === 'activado') {
-            return NextResponse.json({ success: false, error: "Este folio ya fue activado." }, { status: 400 });
+            return NextResponse.json({ success: false, error: "El chip no está disponible para activación." }, { status: 409 });
         }
 
         // 2. Verifica si el usuario ya tiene un perfil existente
@@ -70,6 +78,9 @@ export async function POST(req: NextRequest) {
             if (!contactValidation.ok) {
                 return NextResponse.json({ success: false, error: contactValidation.error }, { status: 400 });
             }
+
+            // Asegurar que el user_id asignado sea el autenticado en el token
+            profileData.user_id = userId;
 
             // Crea un perfil nuevo solo si el usuario no tenía ninguno
             const { data: newProfileData, error: profileInsertError } = await supabaseAdmin
@@ -123,7 +134,7 @@ export async function POST(req: NextRequest) {
         // 5. Retornar success
         return NextResponse.json({ success: true, profileId: insertedProfileData.id });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Error inesperado en activate complete:", error);
         return NextResponse.json({ success: false, error: "Error interno del servidor." }, { status: 500 });
     }

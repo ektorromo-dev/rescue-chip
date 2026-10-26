@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import Stripe from "stripe";
 import { rateLimitCheckout } from "@/lib/ratelimit";
+import { PRODUCTOS } from "@/lib/prices";
 
 if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
     throw new Error('SUPABASE_SERVICE_ROLE_KEY requerido en /api/checkout');
@@ -24,14 +25,18 @@ export async function POST(req: NextRequest) {
 
         // Utiliza la variable de entorno, asegúrate de que esté configurada en Vercel/.env.local
         const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-            apiVersion: "2023-10-16" as any,
+            apiVersion: "2023-10-16" as Stripe.LatestApiVersion,
         });
 
         const { paquete, utm_source, utm_medium, utm_campaign } = await req.json();
 
+        if (paquete !== "individual" && paquete !== "llavero") {
+            return NextResponse.json({ error: "Paquete no válido" }, { status: 400 });
+        }
+
         // 1. Crear Orden
-        const prices: Record<string, number> = { individual: 499, llavero: 449 };
-        const monto = prices[paquete] || 0;
+        const producto = PRODUCTOS[paquete as keyof typeof PRODUCTOS];
+        const monto = producto.precio;
 
         const { data: oData, error: oError } = await supabase
             .from("orders")
@@ -48,25 +53,15 @@ export async function POST(req: NextRequest) {
         if (oError) throw new Error("Error creando orden en DB: " + oError.message);
         const order_id = oData.id;
 
-        let priceData = {
-            product_data: { name: "", description: "" },
-            unit_amount: 0,
+        const priceData = {
+            product_data: {
+                name: producto.nombre,
+                description: paquete === "individual"
+                    ? "1 chip NFC + sticker + activación + envío gratis"
+                    : "Llavero NFC + QR de identificación médica de emergencia",
+            },
+            unit_amount: producto.precio * 100,
         };
-
-        switch (paquete) {
-            case "individual":
-                priceData.product_data.name = "Paquete Individual";
-                priceData.product_data.description = "1 chip NFC + sticker + activación + envío gratis";
-                priceData.unit_amount = 49900; // 499.00 MXN en centavos
-                break;
-            case "llavero":
-                priceData.product_data.name = "Llavero RescueChip";
-                priceData.product_data.description = "Llavero NFC + QR de identificación médica de emergencia";
-                priceData.unit_amount = 44900; // 449.00 MXN en centavos
-                break;
-            default:
-                return NextResponse.json({ error: "Paquete no válido" }, { status: 400 });
-        }
 
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ["card"],

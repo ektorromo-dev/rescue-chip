@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import React from "react";
+import { PRODUCTOS } from "@/lib/prices";
 
 export const metadata: Metadata = {
   title: "Términos y Condiciones | RescueChip",
@@ -94,8 +95,8 @@ export default function TerminosPage() {
             3.1 Productos disponibles
           </h3>
           <ul style={{ fontSize: "15px", lineHeight: 1.75, color: "#C8C0B4", paddingLeft: "20px", display: "flex", flexDirection: "column", gap: "8px", marginBottom: "16px" }}>
-            <li><span style={{ color: "#F4F0EB", fontWeight: 600 }}>CASCO (chip NFC + sticker QR para casco):</span> $499 MXN — envío incluido en compras en línea.</li>
-            <li><span style={{ color: "#F4F0EB", fontWeight: 600 }}>LLAVERO (chip NFC + código QR integrados en llavero):</span> $449 MXN — envío incluido en compras en línea.</li>
+            <li><span style={{ color: "#F4F0EB", fontWeight: 600 }}>CASCO (chip NFC + sticker QR para casco):</span> ${PRODUCTOS.individual.precio} MXN — envío incluido en compras en línea.</li>
+            <li><span style={{ color: "#F4F0EB", fontWeight: 600 }}>LLAVERO (chip NFC + código QR integrados en llavero):</span> ${PRODUCTOS.llavero.precio} MXN — envío incluido en compras en línea.</li>
           </ul>
           <p style={{ fontSize: "15px", lineHeight: 1.75, color: "#C8C0B4", marginBottom: "16px" }}>
             Los precios incluyen IVA. El envío es gratuito dentro de la República Mexicana para compras realizadas en línea. Las compras en puntos de venta físicos autorizados no incluyen envío. El Proveedor se reserva el derecho de modificar los precios, notificando previamente a través del Sitio.

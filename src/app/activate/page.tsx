@@ -384,12 +384,20 @@ function ActivationFormContent() {
 
             console.log("Activación - Intentando insertar en perfiles sanitize:", sanitizedProfile);
 
+            const { data: { session: activeSession } } = await supabase.auth.getSession();
+            const authToken = activeSession?.access_token;
+            if (!authToken) {
+                throw new Error("No hay una sesión activa para completar la activación.");
+            }
+
             const response = await fetch('/api/activate/complete', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                },
                 body: JSON.stringify({
                     folio: chip.folio,
-                    userId: userId,
                     consentIp: userIp,
                     profileData: sanitizedProfile
                 })
@@ -459,13 +467,21 @@ function ActivationFormContent() {
         setErrorMsg("");
 
         try {
+            const { data: { session: activeSession } } = await supabase.auth.getSession();
+            const authToken = activeSession?.access_token;
+            if (!authToken) {
+                throw new Error("No hay una sesión activa para vincular el chip.");
+            }
+
             const linkRes = await fetch("/api/activate/link-to-mine", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${authToken}`
+                },
                 body: JSON.stringify({
                     folio: pendingChip.folio,
                     profileId: existingProfileToLink.id,
-                    userId: pendingAuthData.userId,
                 }),
             });
 

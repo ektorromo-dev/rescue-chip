@@ -5,6 +5,7 @@ import { useEffect, useState, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Menu, X } from "lucide-react";
 import DondeComprarSection from "@/components/DondeComprarSection";
+import { PRODUCTOS } from "@/lib/prices";
 
 const LANDING_CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Barlow+Condensed:wght@400;600;700&display=swap');
@@ -389,9 +390,12 @@ export default function Home() {
     
     // Track InitiateCheckout
     if (typeof window !== 'undefined' && (window as any).fbq) {
-      const prices: Record<string, number> = { individual: 499, llavero: 449 };
+      const prices: Record<string, number> = {
+        individual: PRODUCTOS.individual.precio,
+        llavero: PRODUCTOS.llavero.precio,
+      };
       (window as any).fbq('track', 'InitiateCheckout', {
-        value: prices[paquete] || 499,
+        value: prices[paquete] || PRODUCTOS.individual.precio,
         currency: 'MXN',
       });
     }
@@ -521,7 +525,7 @@ export default function Home() {
           <h1>Mantén informada a tu familia si algo te pasa.</h1>
           <p className="hero-sub">Un chip NFC y un Código QR en tu casco que permite a los paramédicos o testigos acceder a tu perfil médico y alertar a tu familia con tu ubicación exacta. Sin app. Sin registro previo. En segundos. Además de una tarjeta médica para tu cartera.</p>
           <div className="hero-actions">
-            <a href="#precios" className="btn-primary">Protege tu rodada — $499</a>
+            <a href="#precios" className="btn-primary">Protege tu rodada — ${PRODUCTOS.individual.precio}</a>
             <div className="hero-secondary-btns">
               <a href="/profile/RSC-DEMO" target="_blank" className="btn-secondary">
                 🩺 Lo que el paramédico ve
@@ -610,7 +614,7 @@ export default function Home() {
                   />
                 ))}
               </div>
-              <div className="price-amount"><span className="price-currency" style={{ color: '#E11D48' }}>$</span><span className="price-value" style={{ color: '#E11D48' }}>499</span></div>
+              <div className="price-amount"><span className="price-currency" style={{ color: '#E11D48' }}>$</span><span className="price-value" style={{ color: '#E11D48' }}>{PRODUCTOS.individual.precio}</span></div>
               <div className="price-period">MXN · Pago único</div>
               <div className="price-sub">&nbsp;</div>
               <button onClick={() => handleBuyNow("individual")} className="btn-price btn-price-solid">
@@ -642,7 +646,7 @@ export default function Home() {
               </div>
               <div className="price-amount">
                 <span className="price-currency" style={{ color: '#E11D48' }}>$</span>
-                <span className="price-value" style={{ color: '#E11D48' }}>449</span>
+                <span className="price-value" style={{ color: '#E11D48' }}>{PRODUCTOS.llavero.precio}</span>
               </div>
               <div className="price-period">MXN · Pago único</div>
               <div className="price-sub">&nbsp;</div>
@@ -716,7 +720,7 @@ export default function Home() {
             </div>
             <div className="benefit-item">
               <h3>Un pago. Para siempre.</h3>
-              <p>$499 MXN con envío incluido. Sin mensualidades. Sin suscripciones. Sin letra chica. Tu perfil activo de por vida.</p>
+              <p>${PRODUCTOS.individual.precio} MXN con envío incluido. Sin mensualidades. Sin suscripciones. Sin letra chica. Tu perfil activo de por vida.</p>
             </div>
           </div>
         </div>
@@ -788,7 +792,7 @@ export default function Home() {
           <h2 className="section-title">Tu chip llega en<br />5-7 días hábiles</h2>
           <p>Pago único. Sin suscripción. Envío incluido a todo México. Tu perfil activo desde el primer escaneo.</p>
           <div className="cta-actions">
-            <a href="#precios" className="btn-primary">Proteger mis rodadas — $499</a>
+            <a href="#precios" className="btn-primary">Proteger mis rodadas — ${PRODUCTOS.individual.precio}</a>
           </div>
         </div>
       </section>
@@ -807,7 +811,7 @@ export default function Home() {
       {/* STICKY CTA MOBILE */}
       <div className="sticky-cta-mobile">
         <a href="#donde-comprar" className="sticky-cta-btn">
-          ¿Lo quieres hoy? $449 MXN en puntos de venta →
+          ¿Lo quieres hoy? ${PRODUCTOS.llavero.precio} MXN en puntos de venta →
         </a>
       </div>
     </div>

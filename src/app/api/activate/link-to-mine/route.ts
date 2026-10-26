@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { getUserFromRequest } from "@/lib/auth-request";
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -8,17 +9,41 @@ const supabaseAdmin = createClient(
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { folio, profileId, userId } = body;
+    // 0. Exigir Bearer token y tomar userId exclusivamente del token
+    const userAuth = await getUserFromRequest(req);
+    if (!userAuth) {
+      return NextResponse.json(
+        { success: false, error: "No autorizado" },
+        { status: 401 }
+      );
+    }
+    const userId = userAuth.userId;
 
-    if (!folio || !profileId || !userId) {
+    const body = await req.json();
+    const { folio, profileId } = body;
+
+    if (!folio || !profileId) {
       return NextResponse.json(
         { success: false, error: "Datos incompletos." },
         { status: 400 }
       );
     }
 
-    // Verificar que el chip existe y no está activado
+    // 1. Verificar que profiles.id = profileId tenga user_id = userId del token (403 si no)
+    const { data: profile, error: profileErr } = await supabaseAdmin
+      .from("profiles")
+      .select("id, user_id")
+      .eq("id", profileId)
+      .maybeSingle();
+
+    if (profileErr || !profile || profile.user_id !== userId) {
+      return NextResponse.json(
+        { success: false, error: "No tienes permiso sobre este perfil." },
+        { status: 403 }
+      );
+    }
+
+    // 2. Verificar que el chip existe y no está activado
     const { data: chip, error: chipError } = await supabaseAdmin
       .from("chips")
       .select("*")
@@ -39,7 +64,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Vincular chip al perfil existente
+    // 3. Vincular chip al perfil existente
     const { error: updateError } = await supabaseAdmin
       .from("chips")
       .update({
@@ -61,7 +86,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error inesperado en link-to-mine:", error);
     return NextResponse.json(
       { success: false, error: "Error interno del servidor." },

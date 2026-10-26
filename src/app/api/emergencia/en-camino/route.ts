@@ -1,65 +1,67 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import nodemailer from 'nodemailer';
-import twilio from 'twilio';
-import { formatStoredPhone } from '@/lib/phone-utils';
+import { getUserFromRequest } from '@/lib/auth-request';
+import { notificarActualizacionIncidente, resolverNombreActor } from '@/lib/incident-notify';
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-const twilioClient = twilio(
-  process.env.TWILIO_ACCOUNT_SID,
-  process.env.TWILIO_AUTH_TOKEN
-);
-
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT) || 587,
-  secure: Number(process.env.SMTP_PORT) === 465,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
-
-
+const TOKEN_REGEX = /^[A-Za-z0-9_-]{8,64}$/;
 
 export async function POST(req: NextRequest) {
   try {
-    const { token } = await req.json();
+    // 0. Bearer token opcional para identificar al actor
+    const userAuth = await getUserFromRequest(req);
+    const actorUserId = userAuth?.userId ?? null;
+    const actorEmail = userAuth?.email ?? null;
 
-    if (!token || typeof token !== 'string') {
-      return NextResponse.json({ error: 'Token requerido' }, { status: 400 });
+    const body = await req.json();
+    const { token } = body;
+
+    if (!token || typeof token !== 'string' || !TOKEN_REGEX.test(token)) {
+      return NextResponse.json({ error: 'Token inválido' }, { status: 400 });
     }
 
     // 1. Buscar incidente
     const { data: incidente, error: fetchError } = await supabaseAdmin
       .from('incidentes')
-      .select('id, expires_at, profile_id, chip_folio, familiar_en_camino')
+      .select('id, token, expires_at, status, profile_id, chip_folio, familiar_en_camino, en_camino_por')
       .eq('token', token)
-      .single();
+      .maybeSingle();
 
     if (fetchError || !incidente) {
       return NextResponse.json({ error: 'Incidente no encontrado' }, { status: 404 });
     }
 
-    if (new Date(incidente.expires_at) < new Date()) {
-      return NextResponse.json({ error: 'Incidente expirado' }, { status: 410 });
+    // 2. 410 si el incidente venció (expires_at <= now) o status = 'closed'
+    const isExpired = new Date(incidente.expires_at) <= new Date();
+    const isClosed = incidente.status === 'closed';
+    if (isExpired || isClosed) {
+      return NextResponse.json({ error: 'Incidente expirado o cerrado' }, { status: 410 });
     }
 
-    // Si ya se marcó antes, no notificar de nuevo (evitar spam)
+    // Resolver nombre del actor
+    const nombre = await resolverNombreActor(actorUserId, incidente.profile_id ?? '');
+
+    // Si ya se marcó antes, retornar sin volver a notificar (evitar spam)
     if (incidente.familiar_en_camino) {
-      return NextResponse.json({ ok: true, already: true });
+      return NextResponse.json({
+        ok: true,
+        already: true,
+        en_camino_por: incidente.en_camino_por || nombre,
+      });
     }
 
-    // 2. Marcar en camino
+    // 3. Guardar en_camino_por (solo si está vacío), familiar_en_camino y familiar_en_camino_at
+    const enCaminoPor = incidente.en_camino_por || nombre;
     const { error: updateError } = await supabaseAdmin
       .from('incidentes')
       .update({
         familiar_en_camino: true,
         familiar_en_camino_at: new Date().toISOString(),
+        en_camino_por: enCaminoPor,
       })
       .eq('id', incidente.id);
 
@@ -68,118 +70,37 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Error interno' }, { status: 500 });
     }
 
-    // 3. Si hay perfil, notificar a contactos + accidentado
+    // 4. Notificar a contactos y accidentado con notificarActualizacionIncidente, excluyendo al actor
     if (incidente.profile_id) {
+      let primerNombreRider = 'el rider';
       const { data: profileData } = await supabaseAdmin
         .from('profiles')
-        .select('user_id, full_name, emergency_contacts, phone')
+        .select('full_name')
         .eq('id', incidente.profile_id)
-        .single();
+        .maybeSingle();
 
-      if (profileData) {
-        const userName = profileData.full_name || 'Usuario';
-        const contacts: { name?: string; email?: string; phone?: string }[] =
-          profileData.emergency_contacts || [];
-
-        // Obtener datos del dueño (accidentado) desde Auth
-        let ownerEmail: string | null = null;
-        let ownerPhone: string | null = null;
-
-        if (profileData.user_id) {
-          const { data: userData } = await supabaseAdmin.auth.admin.getUserById(
-            profileData.user_id
-          );
-          if (userData?.user) {
-            ownerEmail = userData.user.email ?? null;
-            ownerPhone = userData.user.phone ?? null;
-          }
-        }
-
-        // Si tiene phone en profiles, usarlo también
-        if (profileData.phone && !ownerPhone) {
-          ownerPhone = profileData.phone;
-        }
-
-        // ── NOTIFICACIONES EN PARALELO (email + SMS) ────────────
-        const contactEmails = contacts
-          .filter((c) => c.email && c.email.trim() !== '')
-          .map((c) => c.email!.trim());
-        const allEmails = Array.from(
-          new Set([...(ownerEmail ? [ownerEmail] : []), ...contactEmails])
-        );
-
-        const contactPhones = contacts
-          .filter((c) => c.phone && c.phone.trim() !== '')
-          .map((c) => c.phone!.trim());
-        const allPhones = Array.from(
-          new Set([...(ownerPhone ? [ownerPhone] : []), ...contactPhones])
-        );
-
-        console.log(`[En camino] Emails: ${JSON.stringify(allEmails)}, Phones: ${JSON.stringify(allPhones)}, ownerPhone: ${ownerPhone}, profilePhone: ${profileData.phone}`);
-
-        const emailHtml = `
-            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 2px solid #166534; border-radius: 10px;">
-              <h2 style="color: #166534; margin-top: 0; text-align: center;">✅ Un familiar va en camino</h2>
-              <p style="font-size: 16px; text-align: center;">
-                Un contacto de emergencia de <strong>${userName}</strong> confirmó que ya va en camino al lugar del incidente.
-              </p>
-              <div style="background-color: #f0fdf4; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: center;">
-                <p style="color: #166534; font-size: 15px; margin: 0;">
-                  Folio del chip: <strong>${incidente.chip_folio}</strong>
-                </p>
-              </div>
-              <p style="color: #555; font-size: 14px; text-align: center;">
-                Si necesitas ayuda, llama al 911 o contacta a:<br/>
-                <a href="mailto:contacto@rescue-chip.com" style="color: #166534; font-weight: bold;">contacto@rescue-chip.com</a>
-              </p>
-            </div>
-          `;
-
-        const smsBody = `✅ RescueChip: Un familiar de ${userName} confirmó que ya va en camino al lugar del incidente.`;
-
-        // Construir TODAS las promesas
-        const allNotificationPromises: Promise<void>[] = [];
-
-        // Email promise
-        if (allEmails.length > 0) {
-          allNotificationPromises.push(
-            transporter.sendMail({
-              from: 'RescueChip <contacto@rescue-chip.com>',
-              replyTo: 'contacto@rescue-chip.com',
-              to: allEmails.join(', '),
-              subject: '✅ Un familiar va en camino — RescueChip',
-              html: emailHtml,
-            }).then(() => {
-              console.log(`[En camino] Email enviado a: ${allEmails.join(', ')}`);
-            }).catch((mailError: any) => {
-              console.error('[En camino] Error enviando email:', mailError.message);
-            })
-          );
-        }
-
-        // SMS promises
-        for (const rawPhone of allPhones) {
-          const formatted = formatStoredPhone(rawPhone);
-          allNotificationPromises.push(
-            twilioClient.messages.create({
-              body: smsBody,
-              from: process.env.TWILIO_PHONE_NUMBER,
-              to: formatted,
-            }).then(() => {
-              console.log(`[En camino SMS] Enviado a ${formatted}`);
-            }).catch((smsError: any) => {
-              console.error(`[En camino SMS Error] ${formatted}: ${smsError.message}`);
-            })
-          );
-        }
-
-        // Ejecutar TODO en paralelo
-        await Promise.all(allNotificationPromises);
+      if (profileData?.full_name?.trim()) {
+        primerNombreRider = profileData.full_name.trim().split(/\s+/)[0];
       }
+
+      const mensaje = `${nombre} va en camino con ${primerNombreRider}.`;
+      await notificarActualizacionIncidente({
+        profileId: incidente.profile_id,
+        excluirEmail: actorEmail,
+        titulo: `🚗 ${nombre} va en camino`,
+        cuerpo: mensaje,
+        smsTexto: mensaje,
+        emailAsunto: `🚗 ${nombre} va en camino — RescueChip`,
+        emailTexto: mensaje,
+        data: {
+          tipo: 'incidente_actualizado',
+          incidentToken: incidente.token,
+        },
+      });
     }
 
-    return NextResponse.json({ ok: true });
-  } catch (err) {
+    return NextResponse.json({ ok: true, en_camino_por: enCaminoPor });
+  } catch (err: unknown) {
     console.error('en-camino error:', err);
     return NextResponse.json({ error: 'Error interno' }, { status: 500 });
   }

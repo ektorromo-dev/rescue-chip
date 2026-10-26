@@ -11,6 +11,10 @@ interface IncidenteRecord {
   id: string;
   profile_id: string | null;
   expires_at: string;
+  status: string | null;
+  en_camino_por: string | null;
+  atendido: boolean | null;
+  atendido_por: string | null;
 }
 
 interface RiderLocationRecord {
@@ -43,7 +47,7 @@ export async function GET(
     // 1. Buscar incidente por token
     const { data: incidente, error: incidenteError } = await supabase
       .from('incidentes')
-      .select('id, profile_id, expires_at')
+      .select('id, profile_id, expires_at, status, en_camino_por, atendido, atendido_por')
       .eq('token', token)
       .single<IncidenteRecord>();
 
@@ -54,10 +58,16 @@ export async function GET(
       );
     }
 
-    // 2. Validar expiración del enlace
-    if (new Date(incidente.expires_at) < new Date()) {
+    // 2. Validar expiración o cierre del incidente (410 con estado discriminado)
+    const isClosed = incidente.status === 'closed';
+    const isExpired = new Date(incidente.expires_at) <= new Date();
+
+    if (isClosed || isExpired) {
       return NextResponse.json(
-        { error: 'Enlace expirado' },
+        {
+          error: 'Enlace expirado',
+          estado: isClosed ? 'cerrada' : 'vencida',
+        },
         { status: 410, headers: NO_CACHE_HEADERS }
       );
     }
@@ -65,7 +75,12 @@ export async function GET(
     // 3. Validar si tiene profile_id asociado
     if (!incidente.profile_id) {
       return NextResponse.json(
-        { available: false },
+        {
+          available: false,
+          en_camino_por: incidente.en_camino_por ?? null,
+          atendido: incidente.atendido ?? false,
+          atendido_por: incidente.atendido_por ?? null,
+        },
         { status: 200, headers: NO_CACHE_HEADERS }
       );
     }
@@ -79,12 +94,17 @@ export async function GET(
 
     if (locationError || !location) {
       return NextResponse.json(
-        { available: false },
+        {
+          available: false,
+          en_camino_por: incidente.en_camino_por ?? null,
+          atendido: incidente.atendido ?? false,
+          atendido_por: incidente.atendido_por ?? null,
+        },
         { status: 200, headers: NO_CACHE_HEADERS }
       );
     }
 
-    // 5. Responder con la ubicación encontrada
+    // 5. Responder con la ubicación encontrada y el estado de atención
     return NextResponse.json(
       {
         available: true,
@@ -92,13 +112,16 @@ export async function GET(
         longitude: location.longitude,
         tripActive: location.trip_active,
         updatedAt: location.updated_at,
+        en_camino_por: incidente.en_camino_por ?? null,
+        atendido: incidente.atendido ?? false,
+        atendido_por: incidente.atendido_por ?? null,
       },
       {
         status: 200,
         headers: NO_CACHE_HEADERS,
       }
     );
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error al consultar ubicación de emergencia:', error);
     return NextResponse.json(
       { error: 'Error interno del servidor' },
