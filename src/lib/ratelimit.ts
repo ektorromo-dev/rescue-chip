@@ -55,3 +55,20 @@ export const rateLimitCheckout = new RateLimiter(5, "15 m", "@upstash/ratelimit/
 
 // /api/factura-notify: máximo 5 requests por IP por hora
 export const rateLimitFactura = new RateLimiter(5, "1 h", "@upstash/ratelimit/factura");
+
+// Endpoints APP MVP
+// /api/app/chip/estado: 20 por hora por IP
+export const rateLimitAppChipEstado = new RateLimiter(20, "1 h", "@upstash/ratelimit/app-chip-estado");
+
+// /api/app/registro/solicitar-codigo: 5 por hora por email y 10 por hora por IP
+export const rateLimitAppRegistroEmail = new RateLimiter(5, "1 h", "@upstash/ratelimit/app-reg-email");
+export const rateLimitAppRegistroIp = new RateLimiter(10, "1 h", "@upstash/ratelimit/app-reg-ip");
+
+// /api/app/dispositivo/solicitar-codigo: 5 por hora por usuario
+export const rateLimitAppDispositivoUser = new RateLimiter(5, "1 h", "@upstash/ratelimit/app-disp-user");
+
+// /api/app/vinculo-qr/{token}: 30 por hora por IP
+export const rateLimitAppVinculoQrIp = new RateLimiter(30, "1 h", "@upstash/ratelimit/app-vinculo-qr-ip");
+
+// /api/app/invitacion/{token}: 30 por hora por IP
+export const rateLimitAppInvitacionIp = new RateLimiter(30, "1 h", "@upstash/ratelimit/app-invitacion-ip");
