@@ -19,17 +19,6 @@ function getClientIp(req: NextRequest): string {
 
 export async function GET(req: NextRequest, context: RouteContext) {
   try {
-    const ip = getClientIp(req);
-
-    // 1. Rate limit: 30 por hora por IP
-    const { success } = await rateLimitAppVinculoQrIp.limit(`qr_get:${ip}`);
-    if (!success) {
-      return NextResponse.json(
-        { error: "demasiados_intentos", mensaje: "Demasiados intentos. Intenta más tarde." },
-        { status: 429 }
-      );
-    }
-
     const { token } = await context.params;
     if (!token) {
       return NextResponse.json(
@@ -40,12 +29,38 @@ export async function GET(req: NextRequest, context: RouteContext) {
 
     const supabaseAdmin = createAdminClient();
 
-    // 2. Buscar token QR
+    // 1. Buscar token QR
     const { data: qrRecord, error: qrErr } = await supabaseAdmin
       .from("vinculo_qr_tokens")
       .select("*")
       .eq("token", token.trim())
       .maybeSingle();
+
+    // 2. Buscar perfil del rider si existe el token
+    const { data: riderProfile } = qrRecord
+      ? await supabaseAdmin
+          .from("profiles")
+          .select("id, full_name, photo_url, user_id")
+          .eq("id", qrRecord.rider_profile_id)
+          .maybeSingle()
+      : { data: null };
+
+    // 3. Validar Bearer del dueño antes de aplicar rate limit
+    const userAuth = await getUserFromRequest(req);
+    const userId = userAuth?.userId ?? null;
+    const isOwner = Boolean(userId && riderProfile && riderProfile.user_id === userId);
+
+    // Si NO es el dueño, aplicar rate limit (30 por hora por IP)
+    if (!isOwner) {
+      const ip = getClientIp(req);
+      const { success } = await rateLimitAppVinculoQrIp.limit(`qr_get:${ip}`);
+      if (!success) {
+        return NextResponse.json(
+          { error: "demasiados_intentos", mensaje: "Demasiados intentos. Intenta más tarde." },
+          { status: 429 }
+        );
+      }
+    }
 
     if (qrErr || !qrRecord) {
       return NextResponse.json(
@@ -53,13 +68,6 @@ export async function GET(req: NextRequest, context: RouteContext) {
         { status: 404 }
       );
     }
-
-    // 3. Buscar perfil del rider
-    const { data: riderProfile } = await supabaseAdmin
-      .from("profiles")
-      .select("id, full_name, photo_url, user_id")
-      .eq("id", qrRecord.rider_profile_id)
-      .maybeSingle();
 
     const primerNombre =
       riderProfile?.full_name?.trim().split(/\s+/)[0] || riderProfile?.full_name || "Rider";
@@ -86,11 +94,8 @@ export async function GET(req: NextRequest, context: RouteContext) {
       },
     };
 
-    // 5. Verificar si viene Bearer del dueño
-    const userAuth = await getUserFromRequest(req);
-    const userId = userAuth?.userId ?? null;
-
-    if (userId && riderProfile && riderProfile.user_id === userId) {
+    // 5. Si es el dueño, incluir invitation_id y detalles de uso
+    if (isOwner) {
       responsePayload.invitation_id = qrRecord.invitation_id ?? null;
 
       if (qrRecord.usado_at) {

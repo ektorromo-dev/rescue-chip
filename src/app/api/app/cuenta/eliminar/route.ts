@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
 
     const profileIds = (userProfiles || []).map((p) => p.id);
 
-    // a) Desvincular chips asociados a esos perfiles (y los activados por este user)
+    // a) Desvincular chips asociados a esos perfiles
     if (profileIds.length > 0) {
       const { error: chipsUpdateErr } = await supabaseAdmin
         .from("chips")
@@ -65,26 +65,6 @@ export async function POST(req: NextRequest) {
           { status: 500 }
         );
       }
-    }
-
-    const { error: chipsUserErr } = await supabaseAdmin
-      .from("chips")
-      .update({
-        owner_profile_id: null,
-        activated: false,
-        status: "disponible",
-        activated_by: null,
-        activated_at: null,
-        perfil_compartido: null,
-      })
-      .eq("activated_by", userId);
-
-    if (chipsUserErr) {
-      console.error("[cuenta/eliminar] Error desvinculando chips por activated_by:", chipsUserErr);
-      return NextResponse.json(
-        { error: "error_servidor", mensaje: "Error al liberar chips del usuario." },
-        { status: 500 }
-      );
     }
 
     // b) Anonimizar incidentes de esos perfiles (profile_id = null)

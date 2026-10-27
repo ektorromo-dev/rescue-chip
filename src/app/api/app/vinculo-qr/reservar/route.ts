@@ -40,6 +40,21 @@ export async function POST(req: NextRequest) {
     }
 
     const now = new Date();
+
+    const isReservedByOtherDevice = Boolean(
+      qrRecord.reservado_device_id &&
+        qrRecord.reservado_device_id !== cleanDeviceId &&
+        qrRecord.reservado_hasta &&
+        new Date(qrRecord.reservado_hasta) > now
+    );
+
+    if (isReservedByOtherDevice) {
+      return NextResponse.json(
+        { error: "qr_en_uso", mensaje: "Alguien más está usando este código. Pídele al rider que genere uno nuevo." },
+        { status: 409 }
+      );
+    }
+
     const isVigente = new Date(qrRecord.expires_at) > now;
     const isReservedBySameDevice = Boolean(
       qrRecord.reservado_device_id &&
