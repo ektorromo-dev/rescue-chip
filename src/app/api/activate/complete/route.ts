@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
         const userId = userAuth.userId;
 
         const body = await req.json();
-        const { folio, profileData } = body;
+        const { folio, profileData, consentIp, consentDatosSalud, origen } = body;
 
         if (!folio || !profileData) {
             return NextResponse.json({ success: false, error: "Datos incompletos para activación." }, { status: 400 });
@@ -67,6 +67,27 @@ export async function POST(req: NextRequest) {
             // Reutiliza el perfil existente en lugar de crear uno nuevo
             insertedProfileData = existingProfile;
         } else {
+            // 1. IP de consentimiento: si no viene en body, tomar x-forwarded-for o x-real-ip
+            const reqIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req.headers.get("x-real-ip") || null;
+            const finalConsentIp = consentIp !== undefined ? consentIp : (profileData.consent_ip ?? reqIp);
+            profileData.consent_ip = finalConsentIp;
+
+            // 2. Consentimiento de datos de salud
+            const hasConsentSalud = consentDatosSalud === true || profileData.consentDatosSalud === true || profileData.consent_datos_salud === true;
+            if (hasConsentSalud) {
+                profileData.consent_datos_salud_at = new Date().toISOString();
+            }
+
+            // 3. Origen app -> consent_version
+            if (origen === "app" || profileData.origen === "app") {
+                profileData.consent_version = "v2.0-app";
+            }
+
+            // Limpiar propiedades auxiliares que no son columnas de la base de datos
+            delete profileData.consentDatosSalud;
+            delete profileData.consent_datos_salud;
+            delete profileData.origen;
+
             // Validar contactos de emergencia para perfil nuevo
             const contacts = profileData?.emergency_contacts;
             if (!Array.isArray(contacts)) {
@@ -84,11 +105,25 @@ export async function POST(req: NextRequest) {
             profileData.user_id = userId;
 
             // Crea un perfil nuevo solo si el usuario no tenía ninguno
-            const { data: newProfileData, error: profileInsertError } = await supabaseAdmin
+            let { data: newProfileData, error: profileInsertError } = await supabaseAdmin
                 .from('profiles')
                 .insert(profileData)
                 .select()
                 .single();
+
+            // Si falla porque la columna consent_datos_salud_at aún no existe en DB, reintentar sin ella
+            if (profileInsertError && profileInsertError.message?.includes('consent_datos_salud_at')) {
+                console.warn("[activate/complete] Columna consent_datos_salud_at no presente en DB, reintentando insert sin esa columna...");
+                delete profileData.consent_datos_salud_at;
+                const retry = await supabaseAdmin
+                    .from('profiles')
+                    .insert(profileData)
+                    .select()
+                    .single();
+                newProfileData = retry.data;
+                profileInsertError = retry.error;
+            }
+
             if (profileInsertError) {
                 console.error("Error insertando perfil:", profileInsertError);
                 return NextResponse.json({ 
