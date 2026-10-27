@@ -60,6 +60,10 @@ interface IncidenteData {
   createdAt: string;
   expiresAt: string;
   familiarEnCamino: boolean;
+  status?: string | null;
+  enCaminoPor?: string | null;
+  atendido?: boolean | null;
+  atendidoPor?: string | null;
 }
 
 interface ProfileData {
@@ -80,8 +84,13 @@ interface Props {
 }
 
 export default function EmergencyFamilyClient({ incidente, profile, isDemo = false }: Props) {
-  const [enCamino, setEnCamino] = useState(incidente.familiarEnCamino);
-  const [sending, setSending] = useState(false);
+  const [enCamino, setEnCamino] = useState(Boolean(incidente.familiarEnCamino || incidente.enCaminoPor));
+  const [enCaminoPor, setEnCaminoPor] = useState<string | null>(incidente.enCaminoPor ?? null);
+  const [atendido, setAtendido] = useState<boolean>(Boolean(incidente.atendido));
+  const [atendidoPor, setAtendidoPor] = useState<string | null>(incidente.atendidoPor ?? null);
+  const [sendingEnCamino, setSendingEnCamino] = useState(false);
+  const [sendingAtendido, setSendingAtendido] = useState(false);
+  const [expiredView, setExpiredView] = useState<'cerrada' | 'vencida' | null>(null);
   const [checkedItems, setCheckedItems] = useState<Record<number, boolean>>({});
   const [liveLocation, setLiveLocation] = useState<{
     latitude: number;
@@ -114,9 +123,34 @@ export default function EmergencyFamilyClient({ incidente, profile, isDemo = fal
     const fetchLocation = async () => {
       try {
         const res = await fetch(`/api/emergencia/${incidente.token}/ubicacion`);
-        if (!res.ok) return;
+        if (!res.ok) {
+          if (res.status === 410) {
+            const errData = await res.json().catch(() => null);
+            if (cancelled) return;
+            if (errData?.estado === 'cerrada') {
+              setExpiredView('cerrada');
+            } else {
+              setExpiredView('vencida');
+            }
+          }
+          return;
+        }
         const data = await res.json();
         if (cancelled) return;
+
+        // Actualizar datos de atención SIEMPRE
+        if (data.en_camino_por) {
+          setEnCaminoPor(data.en_camino_por);
+          setEnCamino(true);
+        }
+        if (typeof data.atendido === 'boolean') {
+          setAtendido(data.atendido);
+        }
+        if (data.atendido_por) {
+          setAtendidoPor(data.atendido_por);
+        }
+
+        // Actualizar ubicación en vivo si está disponible
         if (data.available) {
           setLiveLocation({
             latitude: data.latitude,
@@ -210,21 +244,124 @@ export default function EmergencyFamilyClient({ incidente, profile, isDemo = fal
   const handleEnCamino = async () => {
     if (isDemo) {
       setEnCamino(true);
+      setEnCaminoPor('Tú');
       return;
     }
-    setSending(true);
+    setSendingEnCamino(true);
     try {
-      await fetch('/api/emergencia/en-camino', {
+      const res = await fetch('/api/emergencia/en-camino', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: incidente.token }),
       });
+      const data = await res.json();
       setEnCamino(true);
+      if (data?.en_camino_por) {
+        setEnCaminoPor(data.en_camino_por);
+      }
     } catch (err) {
       console.error('Error:', err);
     }
-    setSending(false);
+    setSendingEnCamino(false);
   };
+
+  const handleAtendido = async () => {
+    if (isDemo) {
+      setAtendido(true);
+      setAtendidoPor('Tú');
+      return;
+    }
+    setSendingAtendido(true);
+    try {
+      const res = await fetch('/api/emergencia/atendido', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: incidente.token }),
+      });
+      const data = await res.json();
+      if (res.ok && data?.ok) {
+        setAtendido(true);
+        if (data.atendido_por) {
+          setAtendidoPor(data.atendido_por);
+        }
+      }
+    } catch (err) {
+      console.error('Error marcando atendido:', err);
+    }
+    setSendingAtendido(false);
+  };
+
+  if (expiredView === 'cerrada') {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        backgroundColor: '#0D0D0C',
+        color: '#F4F0EB',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px',
+        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+      }}>
+        <div style={{
+          textAlign: 'center',
+          maxWidth: '440px',
+          width: '100%',
+          backgroundColor: '#131311',
+          border: '1px solid rgba(34, 197, 94, 0.3)',
+          borderRadius: '16px',
+          padding: '40px 24px',
+        }}>
+          <div style={{ fontSize: '48px', marginBottom: '16px' }}>✅</div>
+          <h1 style={{ fontSize: '22px', fontWeight: 700, color: '#4ade80', marginBottom: '12px' }}>
+            ✅ {firstName} está bien
+          </h1>
+          <p style={{ fontSize: '15px', color: '#D4D0CA', lineHeight: '1.6', margin: 0 }}>
+            Cerró la alerta. Ya no se comparte su ubicación.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (expiredView === 'vencida') {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        backgroundColor: '#0D0D0C',
+        color: '#F4F0EB',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px',
+        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+      }}>
+        <div style={{ textAlign: 'center', maxWidth: '400px' }}>
+          <div style={{ fontSize: '48px', marginBottom: '16px' }}>⏰</div>
+          <h1 style={{ fontSize: '22px', fontWeight: 600, marginBottom: '8px' }}>
+            Enlace expirado
+          </h1>
+          <p style={{ fontSize: '15px', color: '#9E9A95' }}>
+            Este enlace de emergencia ha expirado después de 24 horas.
+            Si necesitas asistencia, llama al 911.
+          </p>
+          <a href="tel:911" style={{
+            display: 'inline-block',
+            marginTop: '20px',
+            padding: '14px 28px',
+            backgroundColor: '#E11D48',
+            color: 'white',
+            borderRadius: '10px',
+            textDecoration: 'none',
+            fontWeight: 600,
+            fontSize: '16px',
+          }}>
+            Llamar al 911
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   const pageStyle: React.CSSProperties = {
     minHeight: '100vh',
@@ -579,6 +716,25 @@ export default function EmergencyFamilyClient({ incidente, profile, isDemo = fal
 
       {/* ── BOTONES DE ACCIÓN ── */}
       <div style={{ padding: '20px 16px 40px' }}>
+        {/* Línea de estado arriba de los botones de acción */}
+        <div style={{
+          textAlign: 'center',
+          marginBottom: '16px',
+          padding: '12px 16px',
+          backgroundColor: '#1A1A18',
+          border: '1px solid rgba(255,255,255,0.08)',
+          borderRadius: '10px',
+          fontSize: '14px',
+          fontWeight: 600,
+          color: atendidoPor ? '#4ade80' : enCaminoPor ? '#93C5FD' : '#9E9A95',
+        }}>
+          {atendidoPor
+            ? `✅ ${atendidoPor} ya está con ${firstName}`
+            : enCaminoPor
+              ? `🚗 ${enCaminoPor} va en camino`
+              : 'Nadie ha confirmado todavía'}
+        </div>
+
         <a href="tel:911"
           style={{ ...buttonPrimary, backgroundColor: '#E11D48', color: 'white', fontSize: '18px' }}>
           📞 Llamar al 911
@@ -587,14 +743,14 @@ export default function EmergencyFamilyClient({ incidente, profile, isDemo = fal
         {!enCamino ? (
           <button
             onClick={handleEnCamino}
-            disabled={sending}
+            disabled={sendingEnCamino}
             style={{
               ...buttonPrimary,
               backgroundColor: '#166534',
               color: 'white',
-              opacity: sending ? 0.6 : 1,
+              opacity: sendingEnCamino ? 0.6 : 1,
             }}>
-            {sending ? 'Enviando...' : '✅ Ya estoy en camino'}
+            {sendingEnCamino ? 'Enviando...' : '✅ Ya estoy en camino'}
           </button>
         ) : (
           <div style={{
@@ -607,6 +763,32 @@ export default function EmergencyFamilyClient({ incidente, profile, isDemo = fal
               ✅ Registrado — los demás contactos pueden ver que alguien va en camino
             </div>
           </div>
+        )}
+
+        {!atendido ? (
+          <button
+            onClick={handleAtendido}
+            disabled={sendingAtendido}
+            style={{
+              ...buttonPrimary,
+              backgroundColor: '#003DA5',
+              color: 'white',
+              opacity: sendingAtendido ? 0.6 : 1,
+            }}>
+            {sendingAtendido ? 'Enviando...' : `✅ Ya estoy con ${firstName}`}
+          </button>
+        ) : (
+          <button
+            disabled
+            style={{
+              ...buttonPrimary,
+              backgroundColor: '#003DA5',
+              color: 'white',
+              opacity: 0.7,
+              cursor: 'not-allowed',
+            }}>
+            ✅ Registrado — los demás saben que ya estás con él/ella
+          </button>
         )}
 
         {mapsUrl && (

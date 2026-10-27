@@ -59,7 +59,7 @@ export default function VincularClient({
           });
           if (signInError) {
             throw new Error(
-              'El usuario ya existe, pero la contraseña es incorrecta. Si ya tienes cuenta, ingresa tu contraseña correctamente.'
+              'Este correo ya tiene una cuenta en RescueChip. Ingresa tu contraseña o usa ¿Olvidaste tu contraseña?'
             );
           }
           userId = signInData.user?.id || '';
@@ -100,8 +100,15 @@ export default function VincularClient({
 
       setIsSuccess(true);
     } catch (err: unknown) {
-      const message =
+      let message =
         err instanceof Error ? err.message : 'Ocurrió un error inesperado al procesar la vinculación.';
+      if (
+        message.toLowerCase().includes('invalid login credentials') ||
+        message.toLowerCase().includes('invalid_grant')
+      ) {
+        message =
+          'Este correo ya tiene una cuenta en RescueChip. Ingresa tu contraseña o usa ¿Olvidaste tu contraseña?';
+      }
       setError(message);
     } finally {
       setLoading(false);
@@ -156,60 +163,9 @@ export default function VincularClient({
               marginBottom: '24px',
             }}
           >
-            Listo. Ahora eres contacto de emergencia de{' '}
-            <strong style={{ color: '#F4F0EB' }}>{riderName}</strong>. Recibirás alertas si activa una
-            emergencia.
+            Listo. Ya eres contacto de emergencia de{' '}
+            <strong style={{ color: '#F4F0EB' }}>{riderName}</strong>. Te avisaremos si su chip es escaneado o activa una alerta.
           </p>
-
-          {process.env.NEXT_PUBLIC_INVITATIONS_ENABLED === 'true' && (
-            <div
-              style={{
-                backgroundColor: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                borderRadius: '12px',
-                padding: '18px 16px',
-                textAlign: 'center',
-                margin: '0 0 24px 0',
-              }}
-            >
-              <p style={{ color: '#9E9A95', fontSize: '14px', lineHeight: 1.5, margin: '0 0 14px 0' }}>
-                Para recibir las alertas al instante, descarga la app de RescueChip e inicia sesión con este mismo correo.
-              </p>
-              {process.env.NEXT_PUBLIC_APP_DOWNLOAD_URL ? (
-                <a
-                  href={process.env.NEXT_PUBLIC_APP_DOWNLOAD_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    display: 'inline-block',
-                    backgroundColor: '#1E1E1C',
-                    color: '#F4F0EB',
-                    border: '1px solid rgba(255,255,255,0.12)',
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    padding: '10px 20px',
-                    borderRadius: '8px',
-                    textDecoration: 'none',
-                  }}
-                >
-                  Descargar la app
-                </a>
-              ) : (
-                <span
-                  style={{
-                    display: 'inline-block',
-                    color: '#6E6A65',
-                    fontSize: '12px',
-                    fontWeight: 500,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
-                  }}
-                >
-                  Muy pronto en Google Play y App Store
-                </span>
-              )}
-            </div>
-          )}
 
           <Link
             href="/dashboard"
@@ -259,6 +215,8 @@ export default function VincularClient({
     );
   }
 
+  const primerNombreRider = riderName?.trim().split(/\s+/)[0] || riderName || 'tu familiar';
+
   return (
     <div style={{ width: '100%', maxWidth: '440px' }}>
       <div
@@ -289,8 +247,7 @@ export default function VincularClient({
             marginBottom: '28px',
           }}
         >
-          Si {riderName} activa una alerta de emergencia, recibirás una notificación con su ubicación
-          en tiempo real para que puedas ayudarlo más rápido.
+          Recibirás las alertas de emergencia de {primerNombreRider} por correo y SMS, con su ubicación y los pasos a seguir.
         </p>
 
         {error && (
@@ -419,6 +376,18 @@ export default function VincularClient({
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
+            <div style={{ marginTop: '8px', textAlign: 'right' }}>
+              <Link
+                href="/reset-password"
+                style={{
+                  fontSize: '12px',
+                  color: '#9E9A95',
+                  textDecoration: 'underline',
+                }}
+              >
+                ¿Olvidaste tu contraseña?
+              </Link>
+            </div>
             <span style={{ display: 'block', fontSize: '11px', color: '#6E6A65', marginTop: '6px' }}>
               ¿Ya tienes cuenta en RescueChip? Cambia el correo de arriba por el de
               tu cuenta e ingresa tu contraseña. Si no tienes cuenta, esta será tu
@@ -444,7 +413,7 @@ export default function VincularClient({
               transition: 'background-color 0.2s',
             }}
           >
-            {loading ? 'Vinculando...' : 'Aceptar y vincularme'}
+            {loading ? 'Vinculando...' : 'Aceptar desde la web'}
           </button>
         </form>
       </div>

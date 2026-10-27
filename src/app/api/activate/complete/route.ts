@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { validateEmergencyContacts } from "@/lib/contact-validation";
 import { getUserFromRequest } from "@/lib/auth-request";
+import { syncContactInvitations, EmergencyContactItem } from "@/lib/contact-invitations";
 
 // Inicializamos supabaseAdmin que saltará las políticas RLS
 const supabaseAdmin = createClient(
@@ -131,7 +132,20 @@ export async function POST(req: NextRequest) {
             }, { status: 500 });
         }
 
-        // 5. Retornar success
+        // 5. Si es perfil nuevo y se activó con éxito, sincronizar invitaciones a contactos
+        if (!existingProfile) {
+            try {
+                const riderName = profileData?.full_name || "Rider";
+                const contacts = Array.isArray(profileData?.emergency_contacts)
+                    ? (profileData.emergency_contacts as EmergencyContactItem[])
+                    : [];
+                await syncContactInvitations(insertedProfileData.id, riderName, contacts);
+            } catch (invErr: unknown) {
+                console.error("[activate/complete] Error sincronizando invitaciones de contacto:", invErr);
+            }
+        }
+
+        // 6. Retornar success
         return NextResponse.json({ success: true, profileId: insertedProfileData.id });
 
     } catch (error: unknown) {

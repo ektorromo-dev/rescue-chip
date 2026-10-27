@@ -1,6 +1,7 @@
 import { randomBytes } from 'crypto';
 import nodemailer from 'nodemailer';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { escapeHtml } from '@/lib/escape-html';
 
 export const INVITATIONS_ENABLED = process.env.INVITATIONS_ENABLED === 'true';
 export const NEXT_PUBLIC_INVITATIONS_ENABLED = process.env.NEXT_PUBLIC_INVITATIONS_ENABLED === 'true';
@@ -75,7 +76,9 @@ export async function sendInvitationEmail(invitationId: string): Promise<boolean
     }
 
     const primerNombreRider = riderFullName.split(' ')[0] || riderFullName;
-    const vincularUrl = `https://rescue-chip.com/vincular/${invitation.token}`;
+    const safeRiderName = escapeHtml(riderFullName);
+    const safeContactName = escapeHtml(invitation.contact_name || '');
+    const vincularUrl = `https://www.rescue-chip.com/vincular/${invitation.token}`;
     const appDownloadUrl = process.env.NEXT_PUBLIC_APP_DOWNLOAD_URL?.trim();
 
     const emailHtml = `
@@ -92,7 +95,7 @@ export async function sendInvitationEmail(invitationId: string): Promise<boolean
           <!-- Contenido Principal -->
           <div style="padding: 32px 32px 24px;">
             <h1 style="color: #F4F0EB; font-size: 20px; font-weight: 700; line-height: 1.4; margin: 0 0 16px; text-align: center;">
-              ${riderFullName} te agregó como contacto de emergencia en RescueChip.
+              ${safeRiderName} te agregó como contacto de emergencia en RescueChip.
             </h1>
             
             <p style="color: #D4D0CA; font-size: 15px; line-height: 1.6; margin: 0 0 28px; text-align: center;">
@@ -110,7 +113,7 @@ export async function sendInvitationEmail(invitationId: string): Promise<boolean
             <!-- Bloque Secundario App -->
             <div style="background-color: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 12px;">
               <p style="color: #9E9A95; font-size: 14px; line-height: 1.5; margin: 0 0 14px;">
-                Para recibir las alertas al instante, descarga la app de RescueChip e inicia sesión con este mismo correo.
+                Al confirmar, crearás tu acceso como contacto de emergencia con este mismo correo. Si ya tienes cuenta en RescueChip, usa tu contraseña de siempre.
               </p>
               ${
                 appDownloadUrl

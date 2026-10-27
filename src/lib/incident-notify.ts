@@ -3,6 +3,7 @@ import twilio from "twilio";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatStoredPhone } from "@/lib/phone-utils";
 import { intentarPush } from "@/lib/push-notify";
+import { escapeHtml } from "@/lib/escape-html";
 
 interface ContactoEmergencia {
   name?: string;
@@ -185,8 +186,8 @@ export async function notificarActualizacionIncidente(
               text: emailTexto,
               html: `
                 <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px;">
-                  <h2 style="color: #166534; margin-top: 0;">${titulo}</h2>
-                  <p style="font-size: 16px; line-height: 1.5; color: #1f2937;">${emailTexto}</p>
+                  <h2 style="color: #166534; margin-top: 0;">${escapeHtml(titulo)}</h2>
+                  <p style="font-size: 16px; line-height: 1.5; color: #1f2937;">${escapeHtml(emailTexto)}</p>
                   <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;" />
                   <p style="font-size: 13px; color: #6b7280; margin: 0;">
                     RescueChip — Sistema de identificación médica y alertas prehospitalarias.
