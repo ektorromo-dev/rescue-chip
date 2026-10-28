@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
         const userId = userAuth.userId;
 
         const body = await req.json();
-        const { folio, profileData } = body;
+        const { folio, profileData, consentIp, consentDatosSalud, origen } = body;
 
         if (!folio || !profileData) {
             return NextResponse.json({ success: false, error: "Datos incompletos para activación." }, { status: 400 });
@@ -67,28 +67,101 @@ export async function POST(req: NextRequest) {
             // Reutiliza el perfil existente en lugar de crear uno nuevo
             insertedProfileData = existingProfile;
         } else {
+            // a) Asignar SIEMPRE chip_id del chip actual
+            profileData.chip_id = chip.id;
+
+            // 1. IP de consentimiento: si no viene en body, tomar x-forwarded-for o x-real-ip
+            const reqIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req.headers.get("x-real-ip") || null;
+            const finalConsentIp = consentIp !== undefined ? consentIp : (profileData.consent_ip ?? reqIp);
+
+            // 2. Consentimiento de datos de salud
+            const hasConsentSalud = consentDatosSalud === true || profileData.consentDatosSalud === true || profileData.consent_datos_salud === true;
+            const consentDatosSaludAt = hasConsentSalud
+                ? (profileData.consent_datos_salud_at || new Date().toISOString())
+                : (profileData.consent_datos_salud_at ?? null);
+
+            // 3. Origen app -> consent_version
+            const consentVersion = (origen === "app" || profileData.origen === "app")
+                ? "v2.0-app"
+                : (profileData.consent_version || "v1.0");
+
+            const consentTimestamp = profileData.consent_timestamp || new Date().toISOString();
+
+            // b) Construir el objeto a insertar SOLO con los campos permitidos
+            const ALLOWED_PROFILE_FIELDS = [
+                "full_name",
+                "phone",
+                "whatsapp_opted_in",
+                "country",
+                "sexo",
+                "blood_type",
+                "age",
+                "location",
+                "is_motorcyclist",
+                "photo_url",
+                "allergies",
+                "medical_conditions",
+                "important_medications",
+                "organ_donor",
+                "medical_system",
+                "sistema_medico",
+                "nss",
+                "numero_afiliacion",
+                "clinica_asignada",
+                "curp_seguro",
+                "aseguradora",
+                "numero_poliza",
+                "tipo_seguro",
+                "nombre_asegurado",
+                "vigencia_poliza",
+                "telefono_aseguradora",
+                "poliza_url",
+                "hospital_name",
+                "google_maps_link",
+                "additional_notes",
+                "insurance_provider",
+                "policy_number",
+                "emergency_contacts",
+                "plan",
+            ] as const;
+
+            const profileToInsert: Record<string, unknown> = {};
+            for (const field of ALLOWED_PROFILE_FIELDS) {
+                if (field in profileData && profileData[field] !== undefined) {
+                    profileToInsert[field] = profileData[field];
+                }
+            }
+
+            // Campos asignados por el servidor
+            profileToInsert.user_id = userId;
+            profileToInsert.chip_id = chip.id;
+            profileToInsert.consent_ip = finalConsentIp;
+            profileToInsert.consent_timestamp = consentTimestamp;
+            profileToInsert.consent_version = consentVersion;
+            if (consentDatosSaludAt) {
+                profileToInsert.consent_datos_salud_at = consentDatosSaludAt;
+            }
+
             // Validar contactos de emergencia para perfil nuevo
-            const contacts = profileData?.emergency_contacts;
+            const contacts = profileToInsert.emergency_contacts;
             if (!Array.isArray(contacts)) {
                 return NextResponse.json({ success: false, error: "Formato de contactos de emergencia inválido." }, { status: 400 });
             }
             const contactValidation = validateEmergencyContacts(contacts, {
                 requireEmail: true,
-                country: profileData?.country,
+                country: typeof profileToInsert.country === "string" ? profileToInsert.country : undefined,
             });
             if (!contactValidation.ok) {
                 return NextResponse.json({ success: false, error: contactValidation.error }, { status: 400 });
             }
 
-            // Asegurar que el user_id asignado sea el autenticado en el token
-            profileData.user_id = userId;
-
             // Crea un perfil nuevo solo si el usuario no tenía ninguno
             const { data: newProfileData, error: profileInsertError } = await supabaseAdmin
                 .from('profiles')
-                .insert(profileData)
+                .insert(profileToInsert)
                 .select()
                 .single();
+
             if (profileInsertError) {
                 console.error("Error insertando perfil:", profileInsertError);
                 return NextResponse.json({ 
