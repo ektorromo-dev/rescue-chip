@@ -6,6 +6,7 @@ import { headers } from "next/headers";
 import { logAuditEvent } from "@/lib/audit";
 import { syncContactInvitations, EmergencyContactItem } from '@/lib/contact-invitations';
 import { validateEmergencyContacts, isEmailRequired } from '@/lib/contact-validation';
+import { calcularEdad, normalizarMunicipio, construirLocation } from '@/lib/perfil-utils';
 
 export async function updateProfileSafe(
     profileId: string,
@@ -52,6 +53,21 @@ export async function updateProfileSafe(
 
     // Generar objeto sanitizado
     const sanitizedData = await sanitizeProfileInput(data);
+
+    if (typeof sanitizedData.municipio === 'string' && typeof sanitizedData.estado === 'string') {
+        const normMuni = normalizarMunicipio(sanitizedData.municipio as string);
+        sanitizedData.municipio = normMuni;
+        if (normMuni && (sanitizedData.estado as string).trim()) {
+            sanitizedData.location = construirLocation(normMuni, sanitizedData.estado as string);
+        }
+    }
+
+    if (typeof sanitizedData.fecha_nacimiento === 'string' && (sanitizedData.fecha_nacimiento as string).trim()) {
+        const computedAge = calcularEdad(sanitizedData.fecha_nacimiento as string);
+        if (computedAge !== null) {
+            sanitizedData.age = computedAge;
+        }
+    }
 
     // Actualizar directamente desde el servidor
     const { error: updateError } = await supabase

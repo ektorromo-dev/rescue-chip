@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { validateEmergencyContacts } from "@/lib/contact-validation";
 import { getUserFromRequest } from "@/lib/auth-request";
 import { syncContactInvitations, EmergencyContactItem } from "@/lib/contact-invitations";
+import { calcularEdad, normalizarMunicipio, construirLocation } from "@/lib/perfil-utils";
 
 // Inicializamos supabaseAdmin que saltará las políticas RLS
 const supabaseAdmin = createClient(
@@ -97,6 +98,9 @@ export async function POST(req: NextRequest) {
                 "blood_type",
                 "age",
                 "location",
+                "fecha_nacimiento",
+                "estado",
+                "municipio",
                 "is_motorcyclist",
                 "photo_url",
                 "allergies",
@@ -129,6 +133,21 @@ export async function POST(req: NextRequest) {
             for (const field of ALLOWED_PROFILE_FIELDS) {
                 if (field in profileData && profileData[field] !== undefined) {
                     profileToInsert[field] = profileData[field];
+                }
+            }
+
+            if (typeof profileToInsert.municipio === 'string' && typeof profileToInsert.estado === 'string') {
+                const normMuni = normalizarMunicipio(profileToInsert.municipio);
+                profileToInsert.municipio = normMuni;
+                if (normMuni && profileToInsert.estado.trim()) {
+                    profileToInsert.location = construirLocation(normMuni, profileToInsert.estado);
+                }
+            }
+
+            if (typeof profileToInsert.fecha_nacimiento === 'string' && profileToInsert.fecha_nacimiento.trim()) {
+                const computedAge = calcularEdad(profileToInsert.fecha_nacimiento);
+                if (computedAge !== null) {
+                    profileToInsert.age = computedAge;
                 }
             }
 

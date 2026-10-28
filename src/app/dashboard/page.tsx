@@ -12,6 +12,8 @@ import { parsePhoneNumber } from 'libphonenumber-js';
 import type { CountryCode } from 'libphonenumber-js';
 import React from 'react';
 import { getMedicalConfig, PROFILE_COUNTRIES, getPhoneCountryFromProfileCountry } from '@/lib/medical-systems';
+import { ESTADOS_MX } from '@/lib/estados-mx';
+import { calcularEdad, normalizarMunicipio, construirLocation, MESES_MX, DIAS_OPCIONES, generarAnios } from '@/lib/perfil-utils';
 import type { Session } from '@supabase/supabase-js';
 
 export default function DashboardPage() {
@@ -41,6 +43,13 @@ export default function DashboardPage() {
     const [fullName, setFullName] = useState("");
     const [age, setAge] = useState("");
     const [location, setLocation] = useState("");
+    const [birthDay, setBirthDay] = useState("");
+    const [birthMonth, setBirthMonth] = useState("");
+    const [birthYear, setBirthYear] = useState("");
+    const [estado, setEstado] = useState("");
+    const [municipio, setMunicipio] = useState("");
+    const [prevLocation, setPrevLocation] = useState("");
+    const aniosList = React.useMemo(() => generarAnios(), []);
     const [bloodType, setBloodType] = useState("");
     const [allergies, setAllergies] = useState("");
     const [medicalConditions, setMedicalConditions] = useState("");
@@ -433,6 +442,32 @@ export default function DashboardPage() {
                 }
                 setAge(profile.age ? profile.age.toString() : "");
                 setLocation(profile.location || "");
+                if (profile.fecha_nacimiento) {
+                    const match = String(profile.fecha_nacimiento).match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+                    if (match) {
+                        setBirthYear(match[1]);
+                        setBirthMonth(match[2].padStart(2, '0'));
+                        setBirthDay(match[3].padStart(2, '0'));
+                    } else {
+                        setBirthDay("");
+                        setBirthMonth("");
+                        setBirthYear("");
+                    }
+                } else {
+                    setBirthDay("");
+                    setBirthMonth("");
+                    setBirthYear("");
+                }
+
+                if (profile.estado || profile.municipio) {
+                    setEstado(profile.estado || "");
+                    setMunicipio(profile.municipio || "");
+                    setPrevLocation("");
+                } else {
+                    setEstado("");
+                    setMunicipio("");
+                    setPrevLocation(profile.location || "");
+                }
                 setBloodType(profile.blood_type || "");
                 setAllergies(profile.allergies || "");
                 setMedicalConditions(profile.medical_conditions || "");
@@ -640,12 +675,34 @@ export default function DashboardPage() {
 
             const finalAseguradora = aseguradora === "Otro" ? aseguradoraOtra : (aseguradora || null);
 
+            const finalEstado = estado.trim();
+            const normMunicipio = normalizarMunicipio(municipio.trim());
+
+            if (!finalEstado || !normMunicipio) {
+                setErrorMsg("El estado y el municipio son obligatorios.");
+                setSaving(false);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return;
+            }
+
+            const constructedLocation = construirLocation(normMunicipio, finalEstado);
+
+            let fechaNacimiento: string | null = null;
+            let computedAge: number | null = null;
+            if (birthYear && birthMonth && birthDay) {
+                fechaNacimiento = `${birthYear}-${birthMonth.padStart(2, '0')}-${birthDay.padStart(2, '0')}`;
+                computedAge = calcularEdad(fechaNacimiento);
+            }
+
             const profileToUpdate = {
                 full_name: fullName,
                 photo_url: newPhotoUrl,
                 country: profileCountry,
-                age: age ? parseInt(age, 10) : null,
-                location: location,
+                fecha_nacimiento: fechaNacimiento,
+                age: computedAge ?? (age ? parseInt(age, 10) : null),
+                estado: finalEstado,
+                municipio: normMunicipio,
+                location: constructedLocation,
                 emergency_contacts: emergencyContacts,
                 blood_type: bloodType,
                 allergies: allergies,
@@ -954,17 +1011,89 @@ export default function DashboardPage() {
                                                 onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} required />
                                         </div>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                            <label htmlFor="age" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Edad</label>
-                                            <input type="number" id="age" value={age} onChange={(e) => setAge(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                                onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                                onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} min="0" max="130" />
-                                        </div>
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                            <label htmlFor="location" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Ciudad / País *</label>
-                                            <input type="text" id="location" value={location} onChange={(e) => setLocation(e.target.value)} style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                                onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                                onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} required />
-                                        </div>
+                                             <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Fecha de nacimiento (Opcional)</label>
+                                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+                                                 <select
+                                                     value={birthDay}
+                                                     onChange={(e) => setBirthDay(e.target.value)}
+                                                     style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 10px', fontSize: '14px', color: birthDay ? '#F4F0EB' : '#9E9A95', outline: 'none', boxSizing: 'border-box' }}
+                                                 >
+                                                     <option value="" style={{ backgroundColor: '#1A1A18', color: '#9E9A95' }}>Día</option>
+                                                     {DIAS_OPCIONES.map((d) => (
+                                                         <option key={d} value={d} style={{ backgroundColor: '#1A1A18', color: '#F4F0EB' }}>{parseInt(d, 10)}</option>
+                                                     ))}
+                                                 </select>
+                                                 <select
+                                                     value={birthMonth}
+                                                     onChange={(e) => setBirthMonth(e.target.value)}
+                                                     style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 10px', fontSize: '14px', color: birthMonth ? '#F4F0EB' : '#9E9A95', outline: 'none', boxSizing: 'border-box' }}
+                                                 >
+                                                     <option value="" style={{ backgroundColor: '#1A1A18', color: '#9E9A95' }}>Mes</option>
+                                                     {MESES_MX.map((m) => (
+                                                         <option key={m.value} value={m.value} style={{ backgroundColor: '#1A1A18', color: '#F4F0EB' }}>{m.label}</option>
+                                                     ))}
+                                                 </select>
+                                                 <select
+                                                     value={birthYear}
+                                                     onChange={(e) => setBirthYear(e.target.value)}
+                                                     style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 10px', fontSize: '14px', color: birthYear ? '#F4F0EB' : '#9E9A95', outline: 'none', boxSizing: 'border-box' }}
+                                                 >
+                                                     <option value="" style={{ backgroundColor: '#1A1A18', color: '#9E9A95' }}>Año</option>
+                                                     {aniosList.map((y) => (
+                                                         <option key={y} value={String(y)} style={{ backgroundColor: '#1A1A18', color: '#F4F0EB' }}>{y}</option>
+                                                     ))}
+                                                 </select>
+                                             </div>
+                                         </div>
+                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                             <label htmlFor="estado" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Estado *</label>
+                                             {profileCountry === 'MX' ? (
+                                                 <select
+                                                     id="estado"
+                                                     value={estado}
+                                                     onChange={(e) => setEstado(e.target.value)}
+                                                     required
+                                                     style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: estado ? '#F4F0EB' : '#9E9A95', outline: 'none', boxSizing: 'border-box' }}
+                                                 >
+                                                     <option value="" style={{ backgroundColor: '#1A1A18', color: '#9E9A95' }}>Selecciona tu estado</option>
+                                                     {ESTADOS_MX.map((est) => (
+                                                         <option key={est} value={est} style={{ backgroundColor: '#1A1A18', color: '#F4F0EB' }}>{est}</option>
+                                                     ))}
+                                                 </select>
+                                             ) : (
+                                                 <input
+                                                     type="text"
+                                                     id="estado"
+                                                     value={estado}
+                                                     onChange={(e) => setEstado(e.target.value)}
+                                                     required
+                                                     placeholder="Provincia, departamento o estado"
+                                                     style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box' }}
+                                                 />
+                                             )}
+                                             {prevLocation && (
+                                                 <span style={{ fontSize: '12px', color: '#9E9A95' }}>
+                                                     Antes: {prevLocation}
+                                                 </span>
+                                             )}
+                                         </div>
+                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                             <label htmlFor="municipio" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Municipio o alcaldía *</label>
+                                             <input
+                                                 type="text"
+                                                 id="municipio"
+                                                 value={municipio}
+                                                 onChange={(e) => setMunicipio(e.target.value)}
+                                                 required
+                                                 placeholder="Ej. Zapopan, Cuauhtémoc..."
+                                                 style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box' }}
+                                             />
+                                             {prevLocation && (
+                                                 <span style={{ fontSize: '12px', color: '#9E9A95' }}>
+                                                     Antes: {prevLocation}
+                                                 </span>
+                                             )}
+                                         </div>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', gridColumn: '1 / -1' }}>
                                             <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Número de Celular</label>
                                             <div style={{ display: "flex", gap: "8px", width: "100%", overflow: "hidden" }}>

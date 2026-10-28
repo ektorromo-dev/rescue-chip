@@ -13,6 +13,8 @@ import { validateAndFormatPhone, SUPPORTED_COUNTRIES, formatPhoneAsYouType } fro
 import type { CountryCode } from 'libphonenumber-js';
 import React from 'react';
 import { getMedicalConfig, PROFILE_COUNTRIES, getPhoneCountryFromProfileCountry } from '@/lib/medical-systems';
+import { ESTADOS_MX } from '@/lib/estados-mx';
+import { calcularEdad, normalizarMunicipio, construirLocation, MESES_MX, DIAS_OPCIONES, generarAnios } from '@/lib/perfil-utils';
 
 function ActivationFormContent() {
     const searchParams = useSearchParams();
@@ -36,6 +38,12 @@ function ActivationFormContent() {
     const [whatsappOptedIn, setWhatsappOptedIn] = useState(true);
     const [consentimientoPublico, setConsentimientoPublico] = useState(false);
     const [sexo, setSexo] = useState<string>('');
+    const [birthDay, setBirthDay] = useState("");
+    const [birthMonth, setBirthMonth] = useState("");
+    const [birthYear, setBirthYear] = useState("");
+    const [estado, setEstado] = useState("");
+    const [municipio, setMunicipio] = useState("");
+    const aniosList = React.useMemo(() => generarAnios(), []);
 
     // Estado del flujo "Chip extra"
     const [existingProfileToLink, setExistingProfileToLink] = useState<any>(null);
@@ -282,8 +290,25 @@ function ActivationFormContent() {
             const emergencyContacts = rawContacts.filter(c => c.name.trim() || c.phone.trim() || c.email.trim());
 
             // Optional integer parsing
-            const ageStr = formData.get("age") as string;
-            const age = ageStr ? parseInt(ageStr, 10) : null;
+            const formEstado = estado.trim();
+            const formMunicipio = normalizarMunicipio(municipio.trim());
+
+            if (!formEstado || !formMunicipio) {
+                setErrorMsg("El estado y el municipio son obligatorios.");
+                setLoading(false);
+                return;
+            }
+
+            const constructedLocation = construirLocation(formMunicipio, formEstado);
+
+            let fechaNacimiento: string | null = null;
+            let computedAge: number | null = null;
+            if (birthYear && birthMonth && birthDay) {
+                fechaNacimiento = `${birthYear}-${birthMonth.padStart(2, '0')}-${birthDay.padStart(2, '0')}`;
+                computedAge = calcularEdad(fechaNacimiento);
+            }
+            const age = computedAge;
+
 
             // Optional boolean parsing
             const organDonor = formData.get("organDonor") === "on";
@@ -354,7 +379,10 @@ function ActivationFormContent() {
                 whatsapp_opted_in: whatsappOptedIn,
                 age: age,
                 sexo: sexo,
-                location: formData.get("location") as string,
+                fecha_nacimiento: fechaNacimiento,
+                estado: formEstado,
+                municipio: formMunicipio,
+                location: constructedLocation,
                 emergency_contacts: emergencyContacts,
                 blood_type: formData.get("bloodType") as string,
                 allergies: formData.get("allergies") as string,
@@ -885,16 +913,78 @@ function ActivationFormContent() {
                             </label>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                            <label htmlFor="age" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Edad (Opcional)</label>
-                            <input type="number" id="age" name="age" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Ej. 30" min="0" max="130" />
+                            <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Fecha de nacimiento (Opcional)</label>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+                                <select
+                                    value={birthDay}
+                                    onChange={(e) => setBirthDay(e.target.value)}
+                                    style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 10px', fontSize: '14px', color: birthDay ? '#F4F0EB' : '#9E9A95', outline: 'none', boxSizing: 'border-box' }}
+                                >
+                                    <option value="" style={{ backgroundColor: '#1A1A18', color: '#9E9A95' }}>Día</option>
+                                    {DIAS_OPCIONES.map((d) => (
+                                        <option key={d} value={d} style={{ backgroundColor: '#1A1A18', color: '#F4F0EB' }}>{parseInt(d, 10)}</option>
+                                    ))}
+                                </select>
+                                <select
+                                    value={birthMonth}
+                                    onChange={(e) => setBirthMonth(e.target.value)}
+                                    style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 10px', fontSize: '14px', color: birthMonth ? '#F4F0EB' : '#9E9A95', outline: 'none', boxSizing: 'border-box' }}
+                                >
+                                    <option value="" style={{ backgroundColor: '#1A1A18', color: '#9E9A95' }}>Mes</option>
+                                    {MESES_MX.map((m) => (
+                                        <option key={m.value} value={m.value} style={{ backgroundColor: '#1A1A18', color: '#F4F0EB' }}>{m.label}</option>
+                                    ))}
+                                </select>
+                                <select
+                                    value={birthYear}
+                                    onChange={(e) => setBirthYear(e.target.value)}
+                                    style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 10px', fontSize: '14px', color: birthYear ? '#F4F0EB' : '#9E9A95', outline: 'none', boxSizing: 'border-box' }}
+                                >
+                                    <option value="" style={{ backgroundColor: '#1A1A18', color: '#9E9A95' }}>Año</option>
+                                    {aniosList.map((y) => (
+                                        <option key={y} value={String(y)} style={{ backgroundColor: '#1A1A18', color: '#F4F0EB' }}>{y}</option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                            <label htmlFor="location" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Ciudad / País *</label>
-                            <input type="text" id="location" name="location" style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s' }}
-                                onFocus={(e) => e.target.style.borderColor = 'rgba(232,35,26,0.5)'}
-                                onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} placeholder="Ciudad de México, México" required />
+                            <label htmlFor="estado" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Estado *</label>
+                            {profileCountry === 'MX' ? (
+                                <select
+                                    id="estado"
+                                    value={estado}
+                                    onChange={(e) => setEstado(e.target.value)}
+                                    required
+                                    style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: estado ? '#F4F0EB' : '#9E9A95', outline: 'none', boxSizing: 'border-box' }}
+                                >
+                                    <option value="" style={{ backgroundColor: '#1A1A18', color: '#9E9A95' }}>Selecciona tu estado</option>
+                                    {ESTADOS_MX.map((est) => (
+                                        <option key={est} value={est} style={{ backgroundColor: '#1A1A18', color: '#F4F0EB' }}>{est}</option>
+                                    ))}
+                                </select>
+                            ) : (
+                                <input
+                                    type="text"
+                                    id="estado"
+                                    value={estado}
+                                    onChange={(e) => setEstado(e.target.value)}
+                                    required
+                                    placeholder="Provincia, departamento o estado"
+                                    style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box' }}
+                                />
+                            )}
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            <label htmlFor="municipio" style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#9E9A95', marginBottom: '8px' }}>Municipio o alcaldía *</label>
+                            <input
+                                type="text"
+                                id="municipio"
+                                value={municipio}
+                                onChange={(e) => setMunicipio(e.target.value)}
+                                required
+                                placeholder="Ej. Zapopan, Cuauhtémoc..."
+                                style={{ width: '100%', backgroundColor: '#1A1A18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px 16px', fontSize: '15px', color: '#F4F0EB', outline: 'none', boxSizing: 'border-box' }}
+                            />
                         </div>
                     </div>
                 </section>
