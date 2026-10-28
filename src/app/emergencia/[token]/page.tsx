@@ -2,6 +2,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import EmergencyFamilyClient from './EmergencyFamilyClient';
+import { calcularEdad } from '@/lib/perfil-utils';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -77,7 +78,7 @@ export default async function EmergenciaPage({ params }: PageProps) {
   if (incidente.profile_id) {
     const { data } = await supabase
       .from('profiles')
-      .select('full_name, blood_type, medical_conditions, important_medications, allergies, emergency_contacts, sexo, age, location')
+      .select('full_name, blood_type, medical_conditions, important_medications, allergies, emergency_contacts, sexo, age, location, fecha_nacimiento')
       .eq('id', incidente.profile_id)
       .single();
     profileData = data;
@@ -189,7 +190,7 @@ export default async function EmergenciaPage({ params }: PageProps) {
         importantMedications: profileData.important_medications || null,
         allergies: profileData.allergies || null,
         sexo: profileData.sexo || null,
-        age: profileData.age || null,
+        age: (profileData.fecha_nacimiento ? calcularEdad(profileData.fecha_nacimiento) : profileData.age) || null,
         city: profileData.location || null,
       } : null}
       isDemo={false}

@@ -4,9 +4,13 @@ import { sanitizeProfileInput } from "@/app/actions/sanitize";
 import { logAuditEvent } from "@/lib/audit";
 import { syncContactInvitations, EmergencyContactItem } from "@/lib/contact-invitations";
 import { validateEmergencyContacts, isEmailRequired } from "@/lib/contact-validation";
+import { calcularEdad, normalizarMunicipio, construirLocation } from "@/lib/perfil-utils";
 const ALLOWED_FIELDS = [
     "full_name",
     "location",
+    "fecha_nacimiento",
+    "estado",
+    "municipio",
     "age",
     "blood_type",
     "allergies",
@@ -95,6 +99,21 @@ export async function POST(req: NextRequest) {
 
         // 5. Sanitizar datos filtrados
         const sanitizedData = await sanitizeProfileInput(filteredData);
+
+        if (typeof sanitizedData.municipio === 'string' && typeof sanitizedData.estado === 'string') {
+            const normMuni = normalizarMunicipio(sanitizedData.municipio as string);
+            sanitizedData.municipio = normMuni;
+            if (normMuni && (sanitizedData.estado as string).trim()) {
+                sanitizedData.location = construirLocation(normMuni, sanitizedData.estado as string);
+            }
+        }
+
+        if (typeof sanitizedData.fecha_nacimiento === 'string' && (sanitizedData.fecha_nacimiento as string).trim()) {
+            const computedAge = calcularEdad(sanitizedData.fecha_nacimiento as string);
+            if (computedAge !== null) {
+                sanitizedData.age = computedAge;
+            }
+        }
 
         // 6. Actualizar perfil en Supabase
         const { error: updateError } = await supabaseAdmin

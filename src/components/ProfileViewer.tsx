@@ -6,6 +6,7 @@ import Link from "next/link";
 import FirstAidBanner from "@/components/FirstAidBanner";
 import { getMedicalConfig } from '@/lib/medical-systems';
 import { parsePhoneNumber } from 'libphonenumber-js';
+import { calcularEdad } from "@/lib/perfil-utils";
 
 interface ProfileViewerProps {
     chip: any;
@@ -508,7 +509,14 @@ export default function ProfileViewer({ chip, profile, isDemo = false, isPreview
                             <p style={{
                                 fontSize: '14px', color: C.textMuted, marginTop: '6px', marginBottom: 0
                             }}>
-                                {[isDemo ? '32 años' : (profile.age && `${profile.age} años`), isDemo ? 'Monterrey, NL' : profile.city].filter(Boolean).join(' • ')}
+                                {[
+                                    isDemo
+                                        ? '32 años'
+                                        : (profile.fecha_nacimiento ? calcularEdad(profile.fecha_nacimiento) : profile.age)
+                                            ? `${profile.fecha_nacimiento ? calcularEdad(profile.fecha_nacimiento) : profile.age} años`
+                                            : null,
+                                    isDemo ? 'Monterrey, NL' : (profile.city || profile.location)
+                                ].filter(Boolean).join(' • ')}
                             </p>
 
                         </div>
