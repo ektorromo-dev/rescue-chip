@@ -15,6 +15,7 @@ import React from 'react';
 import { getMedicalConfig, PROFILE_COUNTRIES, getPhoneCountryFromProfileCountry } from '@/lib/medical-systems';
 import { ESTADOS_MX } from '@/lib/estados-mx';
 import { calcularEdad, normalizarMunicipio, construirLocation, MESES_MX, DIAS_OPCIONES, generarAnios } from '@/lib/perfil-utils';
+import { isValidFolio } from '@/lib/folio';
 
 function ActivationFormContent() {
     const searchParams = useSearchParams();
@@ -22,6 +23,13 @@ function ActivationFormContent() {
     const supabase = createClient();
 
     const folioFromUrl = searchParams.get("folio") || "";
+    const [isAndroid, setIsAndroid] = useState(false);
+
+    useEffect(() => {
+        if (typeof navigator !== 'undefined' && /android/i.test(navigator.userAgent)) {
+            setIsAndroid(true);
+        }
+    }, []);
 
     const [folio, setFolio] = useState(folioFromUrl);
     const [loading, setLoading] = useState(false);
@@ -639,6 +647,43 @@ function ActivationFormContent() {
 
     return (
         <div style={{ padding: "32px" }}>
+            {isAndroid && isValidFolio(folioFromUrl) && (
+                <div style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: "16px",
+                    padding: "14px 18px",
+                    marginBottom: "24px",
+                    backgroundColor: "rgba(255, 255, 255, 0.04)",
+                    border: "1px solid rgba(255, 255, 255, 0.12)",
+                    borderRadius: "12px",
+                    flexWrap: "wrap",
+                }}>
+                    <span style={{ fontSize: "14px", color: "#D1CDC7", fontWeight: 500 }}>
+                        ¿Tienes la app de RescueChip? Actívalo desde la app
+                    </span>
+                    <a
+                        href={`https://www.rescue-chip.com/app/activar/${encodeURIComponent(folioFromUrl.trim())}`}
+                        style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            backgroundColor: "#E8231A",
+                            color: "#FFFFFF",
+                            padding: "8px 16px",
+                            borderRadius: "8px",
+                            fontSize: "13px",
+                            fontWeight: 700,
+                            textDecoration: "none",
+                            whiteSpace: "nowrap",
+                            transition: "background-color 0.2s",
+                        }}
+                    >
+                        Abrir en la app
+                    </a>
+                </div>
+            )}
 
 
             <div style={{ display: "flex", alignItems: "flex-start", gap: "16px", padding: "16px", marginBottom: "32px", backgroundColor: "rgba(232,35,26,0.08)", border: "1px solid rgba(232,35,26,0.2)", borderRadius: "12px", color: "#F4F0EB" }}>
