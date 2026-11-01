@@ -4,7 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import nodemailer from "nodemailer";
 import twilio from "twilio";
 import { rateLimitSendEmergency } from "@/lib/ratelimit";
-import { formatStoredPhone } from '@/lib/phone-utils';
+import { enviarCorreosIndividuales, enviarSmsATodos } from "@/lib/emergency-channels";
 import { logAuditEvent } from '@/lib/audit';
 import { intentarPush, intentarPushSilenciosa } from "@/lib/push-notify";
 
@@ -161,10 +161,13 @@ export async function POST(req: NextRequest) {
                     }
                     // ── FIN CREAR INCIDENTE ──────────────────────────
                     const userName = profileData.full_name || 'Usuario';
-                    const contacts = profileData.emergency_contacts || [];
+                    interface EmergencyContact { name?: string; phone?: string; email?: string; relationship?: string; }
+                    const contacts: EmergencyContact[] = Array.isArray(profileData.emergency_contacts)
+                        ? (profileData.emergency_contacts as EmergencyContact[])
+                        : [];
                     const contactEmails = contacts
-                        .filter((c: any) => c.email && c.email.trim() !== '')
-                        .map((c: any) => c.email.trim());
+                        .filter((c) => typeof c.email === 'string' && c.email.trim() !== '')
+                        .map((c) => (c.email as string).trim());
 
                     // Buscar el email del DUEÑO en auth.users (requiere Service Role)
                     let ownerEmail = null;
@@ -217,27 +220,20 @@ export async function POST(req: NextRequest) {
                     if (ownerEmail) allEmailsToNotify.push(ownerEmail);
                     if (contactEmails.length > 0) allEmailsToNotify.push(...contactEmails);
 
-                    // De-duplicate emails
-                    const uniqueEmails = Array.from(new Set(allEmailsToNotify));
+                    // Deduplicar emails sin distinguir mayúsculas
+                    const uniqueEmails = Array.from(
+                        new Map(allEmailsToNotify.map((e) => [e.trim().toLowerCase(), e.trim()])).values()
+                    );
 
-                    if (uniqueEmails.length > 0) {
-                        try {
-                            await transporter.sendMail({
-                                from: 'RescueChip <contacto@rescue-chip.com>',
-                                replyTo: 'contacto@rescue-chip.com',
-                                to: uniqueEmails.join(', '),
-                                subject: "⚠️ ALERTA: Un chip RescueChip fue escaneado en una emergencia",
-                                html: emailHtml,
-                            });
-                            console.log(`Notificación de emergencia enviada a: ${uniqueEmails.join(', ')}`);
-                        } catch (mailError) {
-                            console.error("Error enviando email de emergencia:", mailError);
-                        }
-                    } else {
-                        console.log("No hay emails para notificar (ni de dueño ni de contactos).");
-                    }
+                    await enviarCorreosIndividuales({
+                        transporter,
+                        destinatarios: uniqueEmails,
+                        asunto: "⚠️ ALERTA: Un chip RescueChip fue escaneado en una emergencia",
+                        html: emailHtml,
+                        etiqueta: "log-access",
+                    });
 
-                    // --- PUSH PRIMERO, SMS SOLO SI FALLA PUSH ---
+                    // --- PUSH Y SMS EN PARALELO; EMAIL INDIVIDUAL ---
                     const plainLocation = latitud && longitud
                         ? `https://maps.google.com/?q=${latitud},${longitud}`
                         : "No disponible";
@@ -265,7 +261,7 @@ export async function POST(req: NextRequest) {
                     if (ownerEmail || ownerPhones.length > 0) {
                         notifyTargets.push({ email: ownerEmail || undefined, phone: ownerPhones[0] || undefined });
                     }
-                    contacts.forEach((c: any) => {
+                    contacts.forEach((c) => {
                         if ((c.phone && c.phone.trim() !== '') || (c.email && c.email.trim() !== '')) {
                             notifyTargets.push({
                                 email: c.email && c.email.trim() !== '' ? c.email.trim() : undefined,
@@ -297,44 +293,48 @@ export async function POST(req: NextRequest) {
                     }
                     // ── FIN PUSH SILENCIOSA ──
 
-                    const notificationPromises = notifyTargets.map(async (target) => {
-                        const pushSuccess = await intentarPush(
-                            { email: target.email, phone: target.phone },
-                            pushTitle,
-                            textMessageBody,
-                            pushData,
-                            profileData.id
-                        );
-
-                        if (pushSuccess) {
-                            console.log(`[Push] Enviado exitosamente a ${target.email || target.phone}`);
-                            return;
-                        }
-
-                        if (!target.phone) return;
-                        const formattedPhone = formatStoredPhone(target.phone);
-                        console.log(`[Twilio] Push falló, enviando SMS a: ${formattedPhone}`);
+                    const pushPromises = notifyTargets.map(async (target) => {
                         try {
-                            await twilioClient.messages.create({
-                                body: textMessageBody,
-                                from: process.env.TWILIO_PHONE_NUMBER,
-                                to: formattedPhone
-                            });
-                            console.log(`[Twilio SMS] Enviado exitosamente a ${formattedPhone}`);
-                        } catch (smsError: any) {
-                            console.error(`[Twilio SMS Error] Falló el envío a ${formattedPhone}:`, smsError.message);
+                            const pushSuccess = await intentarPush(
+                                { email: target.email, phone: target.phone },
+                                pushTitle,
+                                textMessageBody,
+                                pushData,
+                                profileData.id
+                            );
+
+                            if (pushSuccess) {
+                                console.log(`[log-access Push] Enviado exitosamente a ${target.email || target.phone}`);
+                            }
+                        } catch (pushErr: unknown) {
+                            const msg = pushErr instanceof Error ? pushErr.message : String(pushErr);
+                            console.error(`[log-access Push Error] Falló el envío a ${target.email || target.phone}:`, msg);
                         }
                     });
 
-                    await Promise.all(notificationPromises);
+                    // SMS a todos los targets que tengan teléfono (incluye dueño y contactos)
+                    const smsTargets = notifyTargets
+                        .filter((target): target is NotifyTarget & { phone: string } => typeof target.phone === 'string' && target.phone.trim() !== '')
+                        .map((target) => ({ phone: target.phone }));
+
+                    await Promise.allSettled([
+                        ...pushPromises,
+                        enviarSmsATodos({
+                            twilioClient,
+                            destinatarios: smsTargets,
+                            cuerpo: textMessageBody,
+                            etiqueta: "log-access",
+                        }),
+                    ]);
                 }
             }
         }
 
         return NextResponse.json({ success: true });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : "Error interno del servidor";
         console.error("Error en log-access:", error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }

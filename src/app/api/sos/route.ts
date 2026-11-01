@@ -4,7 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import nodemailer from "nodemailer";
 import twilio from "twilio";
 import { rateLimitSendEmergency } from "@/lib/ratelimit";
-import { formatStoredPhone } from "@/lib/phone-utils";
+import { enviarCorreosIndividuales, enviarSmsATodos } from "@/lib/emergency-channels";
 import { logAuditEvent } from "@/lib/audit";
 import { intentarPush } from "@/lib/push-notify";
 
@@ -225,27 +225,20 @@ export async function POST(req: NextRequest) {
         if (ownerEmail) allEmailsToNotify.push(ownerEmail);
         if (contactEmails.length > 0) allEmailsToNotify.push(...contactEmails);
 
-        // De-duplicate emails
-        const uniqueEmails = Array.from(new Set(allEmailsToNotify));
+        // Deduplicar emails sin distinguir mayúsculas
+        const uniqueEmails = Array.from(
+            new Map(allEmailsToNotify.map((e) => [e.trim().toLowerCase(), e.trim()])).values()
+        );
 
-        if (uniqueEmails.length > 0) {
-            try {
-                await transporter.sendMail({
-                    from: "RescueChip <contacto@rescue-chip.com>",
-                    replyTo: "contacto@rescue-chip.com",
-                    to: uniqueEmails.join(", "),
-                    subject: "⚠️ ALERTA: Un chip RescueChip activó una emergencia SOS",
-                    html: emailHtml,
-                });
-                console.log(`[sos] Notificación de emergencia enviada a: ${uniqueEmails.join(", ")}`);
-            } catch (mailError) {
-                console.error("[sos] Error enviando email de emergencia:", mailError);
-            }
-        } else {
-            console.log("[sos] No hay emails para notificar (ni de dueño ni de contactos).");
-        }
+        await enviarCorreosIndividuales({
+            transporter,
+            destinatarios: uniqueEmails,
+            asunto: "⚠️ ALERTA: Un chip RescueChip activó una emergencia SOS",
+            html: emailHtml,
+            etiqueta: "sos",
+        });
 
-        // --- PUSH PRIMERO, SMS SOLO SI FALLA PUSH ---
+        // --- PUSH Y SMS EN PARALELO; EMAIL INDIVIDUAL ---
         const plainLocation = latitud && longitud
             ? `https://maps.google.com/?q=${latitud},${longitud}`
             : "No disponible";
@@ -283,37 +276,40 @@ export async function POST(req: NextRequest) {
             }
         });
 
-        const notificationPromises = notifyTargets.map(async (target) => {
-            const pushSuccess = await intentarPush(
-                { email: target.email, phone: target.phone },
-                pushTitle,
-                textMessageBody,
-                pushData,
-                profileData.id
-            );
-
-            if (pushSuccess) {
-                console.log(`[sos Push] Enviado exitosamente a ${target.email || target.phone}`);
-                return;
-            }
-
-            if (!target.phone) return;
-            const formattedPhone = formatStoredPhone(target.phone);
-            console.log(`[sos Twilio] Push falló, enviando SMS a: ${formattedPhone}`);
+        const pushPromises = notifyTargets.map(async (target) => {
             try {
-                await twilioClient.messages.create({
-                    body: textMessageBody,
-                    from: process.env.TWILIO_PHONE_NUMBER,
-                    to: formattedPhone,
-                });
-                console.log(`[sos Twilio SMS] Enviado exitosamente a ${formattedPhone}`);
-            } catch (smsError: unknown) {
-                const errMsg = smsError instanceof Error ? smsError.message : String(smsError);
-                console.error(`[sos Twilio SMS Error] Falló el envío a ${formattedPhone}:`, errMsg);
+                const pushSuccess = await intentarPush(
+                    { email: target.email, phone: target.phone },
+                    pushTitle,
+                    textMessageBody,
+                    pushData,
+                    profileData.id
+                );
+
+                if (pushSuccess) {
+                    console.log(`[sos Push] Enviado exitosamente a ${target.email || target.phone}`);
+                }
+            } catch (pushErr: unknown) {
+                const msg = pushErr instanceof Error ? pushErr.message : String(pushErr);
+                console.error(`[sos Push Error] Falló el envío a ${target.email || target.phone}:`, msg);
             }
         });
 
-        await Promise.all(notificationPromises);
+        // En SOS se excluye al dueño (target 0), solo contactos para SMS
+        const contactTargets = (ownerEmail || ownerPhones.length > 0) ? notifyTargets.slice(1) : notifyTargets;
+        const smsTargets = contactTargets
+            .filter((target): target is NotifyTarget & { phone: string } => typeof target.phone === "string" && target.phone.trim() !== "")
+            .map((target) => ({ phone: target.phone }));
+
+        await Promise.allSettled([
+            ...pushPromises,
+            enviarSmsATodos({
+                twilioClient,
+                destinatarios: smsTargets,
+                cuerpo: textMessageBody,
+                etiqueta: "sos",
+            }),
+        ]);
 
         // Notificación push silenciosa omitida intencionalmente:
         // Quien presiona el botón SOS es el propio dueño desde su app, y el Modo Viaje
