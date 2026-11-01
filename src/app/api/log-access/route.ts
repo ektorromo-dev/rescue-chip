@@ -225,14 +225,6 @@ export async function POST(req: NextRequest) {
                         new Map(allEmailsToNotify.map((e) => [e.trim().toLowerCase(), e.trim()])).values()
                     );
 
-                    await enviarCorreosIndividuales({
-                        transporter,
-                        destinatarios: uniqueEmails,
-                        asunto: "⚠️ ALERTA: Un chip RescueChip fue escaneado en una emergencia",
-                        html: emailHtml,
-                        etiqueta: "log-access",
-                    });
-
                     // --- PUSH Y SMS EN PARALELO; EMAIL INDIVIDUAL ---
                     const plainLocation = latitud && longitud
                         ? `https://maps.google.com/?q=${latitud},${longitud}`
@@ -319,6 +311,13 @@ export async function POST(req: NextRequest) {
 
                     await Promise.allSettled([
                         ...pushPromises,
+                        enviarCorreosIndividuales({
+                            transporter,
+                            destinatarios: uniqueEmails,
+                            asunto: "⚠️ ALERTA: Un chip RescueChip fue escaneado en una emergencia",
+                            html: emailHtml,
+                            etiqueta: "log-access",
+                        }),
                         enviarSmsATodos({
                             twilioClient,
                             destinatarios: smsTargets,
