@@ -15,6 +15,10 @@ interface IncidenteRecord {
   en_camino_por: string | null;
   atendido: boolean | null;
   atendido_por: string | null;
+  latitud: number | null;
+  longitud: number | null;
+  location_shared: boolean | null;
+  created_at: string;
 }
 
 interface RiderLocationRecord {
@@ -47,7 +51,7 @@ export async function GET(
     // 1. Buscar incidente por token
     const { data: incidente, error: incidenteError } = await supabase
       .from('incidentes')
-      .select('id, profile_id, expires_at, status, en_camino_por, atendido, atendido_por')
+      .select('id, profile_id, expires_at, status, en_camino_por, atendido, atendido_por, latitud, longitud, location_shared, created_at')
       .eq('token', token)
       .single<IncidenteRecord>();
 
@@ -72,54 +76,83 @@ export async function GET(
       );
     }
 
-    // 3. Validar si tiene profile_id asociado
-    if (!incidente.profile_id) {
+    // 3. Buscar rider_locations si tiene profile_id asociado
+    let location: RiderLocationRecord | null = null;
+    if (incidente.profile_id) {
+      const { data, error: locationError } = await supabase
+        .from('rider_locations')
+        .select('latitude, longitude, trip_active, updated_at')
+        .eq('profile_id', incidente.profile_id)
+        .maybeSingle<RiderLocationRecord>();
+
+      if (!locationError && data) {
+        location = data;
+      }
+    }
+
+    // 4. Evaluar frescura de rider_locations
+    // Una rider_locations es "fresca" solo si updated_at >= created_at del incidente menos 60 segundos
+    const isFresh =
+      Boolean(location) &&
+      new Date(location!.updated_at).getTime() >=
+        new Date(incidente.created_at).getTime() - 60000;
+
+    if (isFresh && location) {
       return NextResponse.json(
         {
-          available: false,
+          available: true,
+          latitude: location.latitude,
+          longitude: location.longitude,
+          tripActive: location.trip_active,
+          updatedAt: location.updated_at,
+          source: 'rider',
           en_camino_por: incidente.en_camino_por ?? null,
           atendido: incidente.atendido ?? false,
           atendido_por: incidente.atendido_por ?? null,
         },
-        { status: 200, headers: NO_CACHE_HEADERS }
+        {
+          status: 200,
+          headers: NO_CACHE_HEADERS,
+        }
       );
     }
 
-    // 4. Buscar última ubicación del rider
-    const { data: location, error: locationError } = await supabase
-      .from('rider_locations')
-      .select('latitude, longitude, trip_active, updated_at')
-      .eq('profile_id', incidente.profile_id)
-      .maybeSingle<RiderLocationRecord>();
+    // 5. Fallback a coordenadas del incidente si existen y son numéricas
+    const hasIncidentCoords =
+      typeof incidente.latitud === 'number' &&
+      typeof incidente.longitud === 'number' &&
+      !Number.isNaN(incidente.latitud) &&
+      !Number.isNaN(incidente.longitud);
 
-    if (locationError || !location) {
+    if (hasIncidentCoords) {
       return NextResponse.json(
         {
-          available: false,
+          available: true,
+          latitude: incidente.latitud,
+          longitude: incidente.longitud,
+          tripActive: false,
+          updatedAt: incidente.created_at,
+          source: 'incidente',
           en_camino_por: incidente.en_camino_por ?? null,
           atendido: incidente.atendido ?? false,
           atendido_por: incidente.atendido_por ?? null,
         },
-        { status: 200, headers: NO_CACHE_HEADERS }
+        {
+          status: 200,
+          headers: NO_CACHE_HEADERS,
+        }
       );
     }
 
-    // 5. Responder con la ubicación encontrada y el estado de atención
+    // 6. Si no es fresca y el incidente no tiene coordenadas: available: false
     return NextResponse.json(
       {
-        available: true,
-        latitude: location.latitude,
-        longitude: location.longitude,
-        tripActive: location.trip_active,
-        updatedAt: location.updated_at,
+        available: false,
         en_camino_por: incidente.en_camino_por ?? null,
         atendido: incidente.atendido ?? false,
         atendido_por: incidente.atendido_por ?? null,
       },
-      {
-        status: 200,
-        headers: NO_CACHE_HEADERS,
-      }
+      { status: 200, headers: NO_CACHE_HEADERS }
     );
   } catch (error: unknown) {
     console.error('Error al consultar ubicación de emergencia:', error);

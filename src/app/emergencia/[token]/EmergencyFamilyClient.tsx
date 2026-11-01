@@ -97,6 +97,7 @@ export default function EmergencyFamilyClient({ incidente, profile, isDemo = fal
     longitude: number;
     tripActive: boolean;
     updatedAt: string;
+    source?: 'rider' | 'incidente';
   } | null>(null);
   const [tick, setTick] = useState(0);
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -157,6 +158,7 @@ export default function EmergencyFamilyClient({ incidente, profile, isDemo = fal
             longitude: data.longitude,
             tripActive: data.tripActive,
             updatedAt: data.updatedAt,
+            source: data.source,
           });
         }
       } catch (err) {
@@ -540,7 +542,7 @@ export default function EmergencyFamilyClient({ incidente, profile, isDemo = fal
                   </div>
                 </div>
                 <p key={tick} style={{ fontSize: '12px', color: '#9E9A95', textAlign: 'center' as const, margin: 0 }}>
-                  {liveLocation
+                  {liveLocation?.source === 'rider'
                     ? `🟢 Compartiendo ubicación en vivo — actualizado ${formatTimeSince(liveLocation.updatedAt)}`
                     : '📍 Ubicación del momento de la alerta'}
                 </p>
